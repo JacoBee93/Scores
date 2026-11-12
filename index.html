@@ -2,7 +2,7 @@
 <html lang="cs">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="theme-color" content="#000000">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
@@ -11,7 +11,7 @@
 <link rel="apple-touch-icon" href="icon.png">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@125,600;125,800&family=Barlow+Condensed:wght@600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@100..125,600..800&family=Barlow+Condensed:wght@600;700&display=swap" rel="stylesheet">
 <title>Skóre</title>
 <style>
 :root{--bg:#000;--card:#1c1c1e;--mut:#8e8e93;--line:#2c2c2e;--acc:#6b2cf5;--live:#ff453a;
@@ -20,14 +20,14 @@
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{margin:0;background:var(--bg);color:#fff;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;font-size:16px}
 button{font:inherit;color:inherit;background:none;border:0;cursor:pointer;padding:0}
-header{padding:calc(env(safe-area-inset-top) + 10px) 16px 6px}
+header{padding:18px 16px 6px}
 .tabs{display:flex;gap:8px;align-items:center}
 .pill{background:var(--card);border-radius:12px;padding:7px 15px;font-family:var(--num);font-weight:700;font-size:19px;letter-spacing:.5px;line-height:1.2}
 .pill.on{background:#fff;color:#000}
 .grow{flex:1}
 .icon{width:36px;height:36px;border-radius:11px;background:var(--card);font-size:18px;display:flex;align-items:center;justify-content:center}
 .back{font-size:30px;line-height:1;padding:2px 12px 2px 0}
-main{padding:6px 16px calc(40px + env(safe-area-inset-bottom))}
+main{padding:6px 16px 0}
 .strip{display:flex;gap:6px;overflow-x:auto;margin:10px -16px 0;padding:0 16px;scrollbar-width:none;-webkit-overflow-scrolling:touch}
 .strip::-webkit-scrollbar{display:none}
 .dy{flex:none;width:54px;background:var(--card);border-radius:12px;padding:6px 0;font-family:var(--num);font-weight:700;font-size:16px;display:flex;flex-direction:column;align-items:center;line-height:1.15;color:var(--mut)}
@@ -55,21 +55,25 @@ main{padding:6px 16px calc(40px + env(safe-area-inset-bottom))}
 .hero .m{text-align:center;font-size:15px;font-weight:600;line-height:1.25}
 .hero .m.live{color:var(--live)}
 .hero .m span{color:#fff;font-weight:500}
-.dtabs{display:flex;gap:20px;border-bottom:1px solid var(--line);margin:0 -16px 16px;padding:0 16px;overflow-x:auto;scrollbar-width:none}
+.dtabs{display:flex;gap:26px;border-bottom:1px solid var(--line);margin:0 -16px;padding:0 16px;overflow-x:auto;scrollbar-width:none}
 .dtabs::-webkit-scrollbar{display:none}
-.dtabs button{flex:none;padding:12px 0 10px;font-family:var(--wide);font-stretch:125%;font-weight:600;font-size:14px;letter-spacing:.6px;color:var(--mut);border-bottom:3px solid transparent;white-space:nowrap}
+.dtabs button{flex:none;padding:14px 0 11px;font-weight:600;font-size:18px;letter-spacing:1.2px;color:var(--mut);border-bottom:3px solid transparent;white-space:nowrap}
+.dtabs.sm{gap:20px}
+.dtabs.sm button{font-size:15px;letter-spacing:.6px}
 .dtabs button.on{color:#fff;border-color:#fff}
-.seg{display:flex;background:var(--card);border-radius:999px;padding:3px;margin:4px auto 6px;max-width:380px;border:1px solid var(--line)}
-.seg button{flex:1;padding:8px;border-radius:999px;font-weight:600;font-size:16px;color:#fff}
+.seg{display:flex;background:transparent;border-radius:999px;padding:3px;margin:0 auto 8px;max-width:252px;border:1.5px solid #3a3a3c}
+.seg button{flex:1;padding:6px 4px;border-radius:999px;font-weight:600;font-size:16px;color:#fff}
 .seg button.on{background:#fff;color:#000}
-.blk{margin-top:26px}
-.tw{overflow-x:auto;margin:0 -16px;padding:0 16px;-webkit-overflow-scrolling:touch}
-table{border-collapse:collapse;width:100%;font-size:16px;white-space:nowrap}
-th{color:#fff;font-weight:700;font-size:14px;text-align:center;padding:10px 6px;border-bottom:1px solid var(--line)}
-th.n{text-align:left;font-family:var(--wide);font-stretch:125%;font-weight:800;font-size:15px;letter-spacing:.4px;text-transform:uppercase;padding-left:0;position:sticky;left:0;background:var(--bg)}
-td{text-align:center;padding:7px 6px}
-td.n{text-align:left;padding-left:0;position:sticky;left:0;background:var(--bg);font-family:var(--num);font-weight:700;font-size:19px;min-width:128px}
-.pn{display:inline-block;max-width:116px;overflow:hidden;text-overflow:ellipsis;vertical-align:bottom}
+.pane{background:var(--card);margin:0 -16px;padding:18px 16px 48px;min-height:70vh}
+.blk{margin-top:28px}
+.tw{overflow-x:auto;-webkit-overflow-scrolling:touch}
+table{border-collapse:collapse;width:100%;font-size:17px;white-space:nowrap}
+th{color:#fff;font-weight:700;font-size:14px;text-align:center;padding:10px 4px;border-bottom:1px solid #3a3a3c}
+th.n{text-align:left;font-family:var(--wide);font-stretch:112%;font-weight:800;font-size:12.5px;letter-spacing:.5px;text-transform:uppercase;padding-left:0;position:sticky;left:0;background:var(--card)}
+td{text-align:center;padding:4px;font-variant-numeric:tabular-nums}
+.neg{position:absolute;margin-left:-.42em}
+td.n{text-align:left;padding-left:0;position:sticky;left:0;background:var(--card);font-family:var(--num);font-weight:700;font-size:18px;line-height:1.15}
+.pn{display:inline-block;max-width:118px;overflow:hidden;text-overflow:ellipsis;vertical-align:bottom}
 td.n small{color:var(--mut);font-family:-apple-system,sans-serif;font-size:11px;font-weight:600;margin-left:4px}
 tr[data-player]{cursor:pointer}
 tr[data-player]:active td{opacity:.6}
@@ -122,6 +126,7 @@ const fmtShort = iso => { const d = new Date(iso); return d.getDate() + '.' + (d
 const dayWord = iso => ymd(new Date(iso)) === ymd(new Date()) ? 'Today' : fmtShort(iso);
 const todayET = () => { const p = new Date().toLocaleDateString('en-CA', { timeZone: 'America/New_York' }).split('-').map(Number); return new Date(p[0], p[1]-1, p[2], 12); };
 const store = { get(k){ try { return localStorage.getItem(k); } catch(e){ return null; } }, set(k,v){ try { localStorage.setItem(k,v); } catch(e){} } };
+const nv = v => /^-\d/.test(String(v)) ? `<span class="neg">-</span>${esc(String(v).slice(1))}` : esc(v);
 const msg = t => `<div class="msg">${esc(t)}</div>`;
 async function getJson(url) { const r = await fetch(url); if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); }
 
@@ -261,13 +266,13 @@ function renderGame() {
     <header><div class="tabs"><button class="back" data-back aria-label="Zpět">‹</button><span class="grow"></span><button class="icon" data-refresh aria-label="Obnovit">↻</button></div></header>
     <main>${hero}
       <div class="dtabs"><button data-tab="stats" class="${g.tab === 'stats' ? 'on' : ''}">Stats</button><button data-tab="plays" class="${g.tab === 'plays' ? 'on' : ''}">Plays</button></div>
-      ${body}</main>`;
+      <div class="pane">${body}</div></main>`;
 }
 
 /* ----- tabulka statistik ----- */
 function tbl(title, labels, rows) {
   const trs = rows.map(r => `<tr data-player="${esc(r.id)}" data-pn="${esc(r.name)}" data-pp="${esc(r.pos)}" data-pj="${esc(r.jersey)}" data-ti="${r.ti}">
-    <td class="n"><span class="pn">${esc(r.short)}</span><small>${esc(r.pos)}</small></td>${r.vals.map(v => `<td>${esc(v)}</td>`).join('')}</tr>`).join('');
+    <td class="n"><span class="pn">${esc(r.short)}</span><small>${esc(r.pos)}</small></td>${r.vals.map(v => `<td>${nv(v)}</td>`).join('')}</tr>`).join('');
   return `<section class="blk"><div class="tw"><table><thead><tr><th class="n">${esc(title)}</th>${labels.map(l => `<th>${esc(l)}</th>`).join('')}</tr></thead><tbody>${trs}</tbody></table></div></section>`;
 }
 function mergedAthletes(t) {
@@ -310,7 +315,7 @@ function statsHTML(g) {
     const all = mergedAthletes(t);
     const posOf = m => (m.a.position && m.a.position.abbreviation) || '';
     const sets = [['Forwards', all.filter(m => !['D', 'G'].includes(posOf(m))), NHL_SKATER],
-                  ['Defense', all.filter(m => posOf(m) === 'D'), NHL_SKATER],
+                  ['D-Men', all.filter(m => posOf(m) === 'D'), NHL_SKATER],
                   ['Goalies', all.filter(m => posOf(m) === 'G'), NHL_GOALIE]];
     sets.forEach(s => { if (s[1].length) { const cols = pickCols(s[1], s[2]); out += tbl(s[0], cols.map(c => c.label), toRows(s[1], cols, idx)); } });
   } else if (g.league === 'nba') {
@@ -378,11 +383,11 @@ function renderPlayer() {
     <header><div class="tabs"><button class="back" data-back aria-label="Zpět">‹</button><span class="grow"></span><button class="icon" data-refresh aria-label="Obnovit">↻</button></div></header>
     <main><div class="phero"><img class="hs" src="https://a.espncdn.com/i/headshots/${p.league}/players/full/${esc(p.id)}.png" alt="" onerror="this.style.visibility='hidden'">
       <div><div class="pname">${esc(p.name)}</div><div class="psub">${esc(sub)}</div></div></div>
-      <div class="dtabs">${tab('gl', 'Gamelog')}${tab('season', 'Season stats')}${tab('career', 'Career stats')}</div>
-      ${body}</main>`;
+      <div class="dtabs sm">${tab('gl', 'Gamelog')}${tab('season', 'Season stats')}${tab('career', 'Career stats')}</div>
+      <div class="pane">${body}</div></main>`;
 }
 function simpleTable(title, labels, rows, totals) {
-  const trs = rows.map(r => `<tr><td class="n"><span class="pn">${esc(r.n)}</span><small>${esc(r.sub || '')}</small></td>${r.vals.map(v => `<td>${esc(v)}</td>`).join('')}</tr>`).join('');
+  const trs = rows.map(r => `<tr><td class="n"><span class="pn">${esc(r.n)}</span><small>${esc(r.sub || '')}</small></td>${r.vals.map(v => `<td>${nv(v)}</td>`).join('')}</tr>`).join('');
   const tot = totals ? `<tr><td class="n">Career</td>${totals.map(v => `<td><b>${esc(v)}</b></td>`).join('')}</tr>` : '';
   return `<section class="blk"><div class="tw"><table><thead><tr><th class="n">${esc(title)}</th>${labels.map(l => `<th>${esc(l)}</th>`).join('')}</tr></thead><tbody>${trs}${tot}</tbody></table></div></section>`;
 }
@@ -402,7 +407,7 @@ function gamelogHTML(p) {
   const trs = rows.slice(0, 10).map(r => {
     const m = r.m, opp = (m.opponent && (m.opponent.abbreviation || m.opponent.displayName)) || '';
     return `<tr><td class="n"><span class="pn">${m.gameDate ? esc(fmtShort(m.gameDate)) : ''}</span><small>${esc((m.atVs || '') + ' ' + opp)}</small></td>
-      <td><span class="${m.gameResult === 'W' ? 'W' : m.gameResult === 'L' ? 'L' : ''}">${esc(m.gameResult || '')}</span> ${esc(m.score || '')}</td>${cols.map(c => `<td>${esc(r.s[c[1]])}</td>`).join('')}</tr>`;
+      <td><span class="${m.gameResult === 'W' ? 'W' : m.gameResult === 'L' ? 'L' : ''}">${esc(m.gameResult || '')}</span> ${esc(m.score || '')}</td>${cols.map(c => `<td>${nv(r.s[c[1]])}</td>`).join('')}</tr>`;
   }).join('');
   return `<section class="blk" style="margin-top:6px"><div class="tw"><table><thead><tr><th class="n">Last 10</th><th></th>${cols.map(c => `<th>${esc(c[0])}</th>`).join('')}</tr></thead><tbody>${trs}</tbody></table></div></section>`;
 }
