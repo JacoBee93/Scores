@@ -138,7 +138,13 @@ details[open] summary::after{content:'⌃'}
 .fx th,.fx td{padding-left:1px;padding-right:1px;overflow:visible}
 .fx th{font-size:10.5px}
 .fx td{font-size:14.5px}
-.fx td.sm{font-size:12px}
+.fx td.sm{font-size:12.5px}
+.fx tbody td{border-bottom:1px solid #2c2c2e;padding-top:9px;padding-bottom:9px}
+.fx tbody tr:last-child td{border-bottom:0}
+.fx tbody tr:first-child td{padding-top:9px}
+.fx th[data-sort]{cursor:pointer;position:relative}
+.fx th.on::after{content:'';position:absolute;left:50%;bottom:5px;margin-left:-3px;border:3px solid transparent;border-top:4px solid #fff}
+.fx th.on.asc::after{border-top-color:transparent;border-bottom:4px solid #fff;bottom:7px}
 .fx th.n,.fx td.n{width:auto;padding-left:0;position:static}
 .fx .pn{max-width:100%}
 .fx td.n{overflow:hidden;text-overflow:ellipsis}
@@ -313,7 +319,18 @@ async function loadPlayer() {
   const p = state.player; if (!p) return;
   p.loaded = true;
   const base = WEB + LEAGUES[p.league].path + '/athletes/' + p.id;
-  const res = await Promise.allSettled([getJson(base + '/gamelog'), getJson(base + '/stats'), ensureTeams(p.league)]);
+  const res = await Promise.allSettled([getJson(base + '/gamelog'), getJson(base + '/stats'), ensureTeams(p.league), getJson(base)]);
+  try {
+    const aj = res[3].status === 'fulfilled' ? res[3].value : null, at = aj && (aj.athlete || aj);
+    if (at) {
+      p.name = p.name || at.displayName || at.fullName || '';
+      p.pos = p.pos || (at.position && at.position.abbreviation) || '';
+      p.jersey = p.jersey || at.jersey || '';
+      p.team = p.team || (at.team && (at.team.displayName || at.team.name)) || '';
+    }
+    const sa = (res[1].status === 'fulfilled' && res[1].value && res[1].value.athlete) || (res[0].status === 'fulfilled' && res[0].value && res[0].value.athlete);
+    if (sa) p.name = p.name || sa.displayName || sa.fullName || '';
+  } catch (e) {}
   const err = r => r.status === 'rejected' ? String((r.reason && r.reason.message) || r.reason) : null;
   p.gl = res[0].status === 'fulfilled' ? res[0].value : null; p.glErr = err(res[0]);
   p.st = res[1].status === 'fulfilled' ? res[1].value : null; p.stErr = err(res[1]);
@@ -563,12 +580,13 @@ function pickStatCols(labels, league, n) {
   if (cols.length < 3) cols = labels.map((_, k) => k);
   return cols.slice(0, n || 7);
 }
-const cell = v => { const t = String(v == null ? '' : v); return `<td class="${t.length > 5 ? 'sm' : ''}">${nv(v)}</td>`; };
+const dl = (l, league) => league === 'nhl' && l === 'S' ? 'SOG' : l;
+const cell = v => { const t = String(v == null ? '' : v).replace(/,/g, ''); return `<td class="${t.length > 4 ? 'sm' : ''}">${nv(t)}</td>`; };
 function simpleTable(title, labels, rows, totals, league) {
   const cols = pickStatCols(labels, league, 7);
   const trs = rows.map(r => `<tr><td class="n"><span class="pn">${esc(r.n)}</span><small>${esc(r.sub || '')}</small></td>${cols.map(k => cell(r.vals[k])).join('')}</tr>`).join('');
-  const tot = totals ? `<tr><td class="n">Career</td>${cols.map(k => `<td${String(totals[k]).length > 5 ? ' class="sm"' : ''}><b>${esc(totals[k])}</b></td>`).join('')}</tr>` : '';
-  return `<section class="blk"><div class="tw"><table class="fx"><colgroup><col style="width:96px"></colgroup><thead><tr><th class="n">${esc(title)}</th>${cols.map(k => `<th>${esc(labels[k])}</th>`).join('')}</tr></thead><tbody>${trs}${tot}</tbody></table></div></section>`;
+  const tot = totals ? `<tr><td class="n">Career</td>${cols.map(k => `<td${String(totals[k]).replace(/,/g, '').length > 4 ? ' class="sm"' : ''}><b>${esc(String(totals[k]).replace(/,/g, ''))}</b></td>`).join('')}</tr>` : '';
+  return `<section class="blk"><div class="tw"><table class="fx"><colgroup><col style="width:96px"></colgroup><thead><tr><th class="n">${esc(title)}</th>${cols.map(k => `<th>${esc(dl(labels[k], league))}</th>`).join('')}</tr></thead><tbody>${trs}${tot}</tbody></table></div></section>`;
 }
 function gamelogHTML(p) {
   if (p.glErr) return msg('Gamelog se nepodařilo načíst (' + p.glErr + ').');
@@ -582,7 +600,8 @@ function gamelogHTML(p) {
   if (!rows.length) return msg('Žádné odehrané zápasy.');
   rows.sort((a, b) => new Date(b.m.gameDate || 0) - new Date(a.m.gameDate || 0));
   let cols = (GL_COLS[p.league] || []).filter(l => !(l === 'S' && labels.includes('SOG'))).map(l => [l, labels.indexOf(l)]).filter(c => c[1] >= 0);
-  if (cols.length < 3) cols = labels.map((l, i) => [l, i]);
+  let fit = false;
+  if (cols.length < 3) { cols = labels.map((l, i) => [l, i]).slice(0, 5); fit = true; }
   const trs = rows.slice(0, 10).map(r => {
     const m = r.m, opp = (m.opponent && (m.opponent.abbreviation || m.opponent.displayName)) || '';
     const sm = String(m.score || '').match(/^(\S+)\s*(.*)$/) || [];
@@ -590,7 +609,7 @@ function gamelogHTML(p) {
     return `<tr><td class="n"><span class="pn">${m.gameDate ? esc(fmtShort(m.gameDate)) : ''}</span><small>${esc((m.atVs || '') + ' ' + opp)}</small></td>
       <td class="res"><span class="wl ${wl === 'W' || wl === 'L' ? wl : ''}">${esc(wl)}</span><span class="scr">${esc(sm[1] || '')}</span><span class="sfx">${esc(sm[2] || '')}</span></td>${cols.map(c => `<td>${nv(r.s[c[1]])}</td>`).join('')}</tr>`;
   }).join('');
-  return `<section class="blk" style="margin-top:6px"><div class="tw"><table><thead><tr><th class="n">Last 10</th><th></th>${cols.map(c => `<th>${esc(c[0])}</th>`).join('')}</tr></thead><tbody>${trs}</tbody></table></div></section>`;
+  return `<section class="blk" style="margin-top:6px"><div class="tw"><table class="${fit ? 'fx' : ''}">${fit ? '<colgroup><col style="width:96px"><col style="width:84px"></colgroup>' : ''}<thead><tr><th class="n">Last 10</th><th></th>${cols.map(c => `<th>${esc(c[0])}</th>`).join('')}</tr></thead><tbody>${trs}</tbody></table></div></section>`;
 }
 function statCats(j, league) {
   return ((j && j.categories) || []).filter(c => c.statistics && c.statistics.length).map(c => ({
@@ -681,7 +700,7 @@ function scheduleHTML(t) {
   return `<div class="mstrip" id="mstrip">${strip}</div>${html}`;
 }
 const CAT_NAME = { skating: 'Skaters', goaltending: 'Goalies', general: 'General' };
-const PREF = { nhl: ['GP','G','A','PTS','+/-','PIM','SOG','S','GS','W','L','OTL','GAA','SV%'], nba: ['GP','MIN','PTS','REB','AST','STL','BLK','FG%','3P%','FT%'] };
+const PREF = { nhl: ['GP','G','A','PTS','+/-','PIM','S','GS','W','L','OTL','GAA','SV%'], nba: ['GP','MIN','PTS','REB','AST','STL','BLK','FG%','3P%','FT%'] };
 const shortNm = n => { const p = String(n || '').trim().split(/\s+/); return p.length > 1 ? p[0][0] + '. ' + p.slice(1).join(' ') : n; };
 async function loadTeamPlayers(t) {
   if (t.ps) return;
@@ -722,14 +741,17 @@ function teamStatsHTML(t) {
   return [...t.ps.cats.values()].map(c => {
     const title = c.name;
     const cols = pickStatCols(c.labels, t.league, 7);
-    const sk = cols.find(k => ['PTS', 'YDS', 'W'].includes(c.labels[k])) ?? cols[Math.min(1, cols.length - 1)];
-    const num = v => { const n = parseFloat(String(v).replace(/,/g, '')); return isNaN(n) ? -1e9 : n; };
-    const rows = [...c.rows].sort((x, y) => num(y.vals[sk]) - num(x.vals[sk]));
+    const gk = title + '|' + c.labels.join(',');
+    const sel = (t.sort && t.sort[gk]) || {};
+    const defK = cols.find(k => ['PTS', 'YDS', 'W'].includes(c.labels[k])) ?? cols[Math.min(1, cols.length - 1)];
+    const sk = sel.k != null && cols.includes(sel.k) ? sel.k : defK, asc = !!sel.asc;
+    const num = v => { const x = String(v).replace(/,/g, ''); if (/^\d+:\d+$/.test(x)) { const m = x.split(':'); return +m[0] * 60 + +m[1]; } const n = parseFloat(x); return isNaN(n) ? -1e9 : n; };
+    const rows = [...c.rows].sort((x, y) => (asc ? 1 : -1) * (num(x.vals[sk]) - num(y.vals[sk])));
     const trs = rows.map(r => {
       const a = r.a, pos = (a.position && a.position.abbreviation) || '';
       return `<tr data-player="${esc(a.id)}" data-pl="${t.league}" data-pn="${esc(a.displayName || '')}" data-pp="${esc(pos)}" data-pj="${esc(a.jersey || '')}" data-pt="${esc(tn)}"><td class="n"><span class="pn">${esc(shortNm(a.displayName || a.fullName))}</span></td>${cols.map(k => `${cell(r.vals[k])}`).join('')}</tr>`;
     }).join('');
-    return `<section class="blk"><div class="tw"><table class="fx"><colgroup><col style="width:112px"></colgroup><thead><tr><th class="n">${esc(CAT_NAME[String(title).toLowerCase()] || title)}</th>${cols.map(k => `<th>${esc(c.labels[k])}</th>`).join('')}</tr></thead><tbody>${trs}</tbody></table></div></section>`;
+    return `<section class="blk"><div class="tw"><table class="fx"><colgroup><col style="width:112px"></colgroup><thead><tr><th class="n">${esc(CAT_NAME[String(title).toLowerCase()] || title)}</th>${cols.map(k => `<th data-sort="${k}" data-sg="${esc(gk)}" class="${k === sk ? 'on' + (asc ? ' asc' : '') : ''}">${esc(dl(c.labels[k], t.league))}</th>`).join('')}</tr></thead><tbody>${trs}</tbody></table></div></section>`;
   }).join('');
 }
 
@@ -884,7 +906,7 @@ window.addEventListener('hashchange', route);
 
 const $app = document.getElementById('app');
 $app.addEventListener('click', ev => {
-  const b = ev.target.closest('[data-league],[data-game],[data-date],[data-tab],[data-ptab],[data-ttab],[data-team],[data-player],[data-topen],[data-search],[data-month],[data-refresh],[data-back]');
+  const b = ev.target.closest('[data-league],[data-game],[data-date],[data-tab],[data-ptab],[data-ttab],[data-sort],[data-team],[data-player],[data-topen],[data-search],[data-month],[data-refresh],[data-back]');
   if (!b) return;
   const d = b.dataset;
   if (d.league) {
@@ -908,6 +930,9 @@ $app.addEventListener('click', ev => {
     state.game.tab = d.tab; window.scrollTo(0, 0); render();
   } else if (d.ptab) {
     state.player.tab = d.ptab; render();
+  } else if (d.sort !== undefined) {
+    const t = state.team; t.sort = t.sort || {}; const cur = t.sort[d.sg];
+    t.sort[d.sg] = { k: +d.sort, asc: cur && cur.k === +d.sort ? !cur.asc : false }; render();
   } else if (d.ttab) {
     state.team.tab = d.ttab; if (d.ttab === 'stats' && state.team.done) loadTeamPlayers(state.team); render();
   } else if (d.team !== undefined) {
