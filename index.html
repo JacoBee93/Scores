@@ -86,7 +86,9 @@ header.d + main{padding-top:0}
 .lc{padding:10px 0;border-top:1px solid #2c2c2e}
 .lh{font-family:var(--wide);font-stretch:112%;font-weight:800;font-size:11px;letter-spacing:.5px;text-transform:uppercase;color:var(--mut);text-align:center;margin-bottom:8px}
 .lg{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.ld{display:flex;gap:10px;align-items:center;min-width:0}
+.ld{display:flex;gap:10px;align-items:flex-start;min-width:0}
+.ld .lt{padding-top:2px}
+.ln small.pl{margin:0 4px 0 0}
 .ld.r{flex-direction:row-reverse;text-align:right}
 .ld .hs{width:52px;height:52px;border-radius:50%;background:#2c2c2e;object-fit:cover;flex:none}
 .ld .lt{min-width:0}
@@ -102,9 +104,16 @@ header.d + main{padding-top:0}
 .bar{flex:1;height:10px;border-radius:6px;background:#2f3a47;overflow:hidden}
 .bar i{display:block;height:100%;border-radius:6px}
 .cx{width:42px;text-align:right;font-size:13px;color:var(--mut);font-weight:600;flex:none}
-.ir{display:flex;align-items:center;gap:12px;padding:10px 0;border-top:1px solid #2c2c2e}
+.ir{cursor:pointer;display:flex;align-items:center;gap:12px;padding:10px 0;border-top:1px solid #2c2c2e}
 .ir .hs{width:44px;height:44px;border-radius:50%;background:#2c2c2e;object-fit:cover;flex:none}
 .is{text-align:right;flex:none}
+.tt{width:100%;border-collapse:collapse;white-space:normal}
+.tt th{padding:10px 6px;text-align:right;border-bottom:1px solid #3a3a3c}
+.tt th img{width:26px;height:26px;object-fit:contain}
+.tt td{padding:12px 6px;font-size:15px;text-align:right;font-variant-numeric:tabular-nums}
+.tt td:first-child{text-align:left;color:#d1d1d6;padding-left:0}
+.tt tbody tr:nth-child(odd) td{background:#242426}
+.tt th:first-child{width:56%}
 .chip{display:inline-block;font-size:10.5px;font-weight:800;letter-spacing:.3px;text-transform:uppercase;padding:2px 7px;border-radius:6px;border:1px solid #a85a3a;color:#ff9f5a}
 .chip.red{border-color:#c0443c;color:#ff6b61}
 .l5{display:grid;grid-template-columns:1fr 1fr;border-top:1px solid #2c2c2e}
@@ -351,7 +360,7 @@ async function loadGame() {
     g.err = null;
     if (!g.tabInit) { g.tabInit = true; g.tab = g.ev && g.ev.state === 'pre' ? 'preview' : 'stats'; }
     else if (g.ev && g.ev.state !== 'pre' && g.tab === 'preview' && !g.tabSet) g.tab = 'stats';
-    if (g.ev && g.ev.state === 'pre' && !g.ts && !g.tsLoading) loadPreviewStats(g);
+    if (g.ev && !g.ts && !g.tsLoading) loadPreviewStats(g);
   } catch (e) { g.err = 'Nepodařilo se načíst zápas (' + (e.message || e) + ').'; }
   if (state.game === g && topView() === 'game') render();
 }
@@ -523,7 +532,7 @@ function renderGame() {
   $app.innerHTML = `
     <header class="d"><div class="tabs"><button class="back" data-back aria-label="Zpět">‹</button></div></header>
     <main>${hero}
-      ${g.tabInit ? `<div class="dtabs">${e && e.state === 'pre' ? `<button data-tab="preview" class="${g.tab === 'preview' ? 'on' : ''}">Preview</button>` : ''}<button data-tab="stats" class="${g.tab === 'stats' ? 'on' : ''}">Stats</button><button data-tab="plays" class="${g.tab === 'plays' ? 'on' : ''}">Plays</button></div>` : '<div class="dtabs"></div>'}
+      ${g.tabInit ? `<div class="dtabs"><button data-tab="preview" class="${g.tab === 'preview' ? 'on' : ''}">Preview</button><button data-tab="stats" class="${g.tab === 'stats' ? 'on' : ''}">Stats</button><button data-tab="plays" class="${g.tab === 'plays' ? 'on' : ''}">Plays</button></div>` : '<div class="dtabs"></div>'}
       <div class="pane ${g.tab === 'plays' ? 't' : ''}">${body}</div></main>`;
 }
 
@@ -629,7 +638,7 @@ function pvLeaders(g) {
     const a = top.athlete, ms = top.mainStat, val = ms ? `${ms.value} ${ms.label || ''}` : (top.displayValue || ''), sub = ms ? (top.summary || '') : '';
     const pos = (a.position && a.position.abbreviation) || '';
     return `<div class="ld ${right ? 'r' : ''}"><img class="hs" src="${esc(hsOf(a, g.league))}" alt="" onerror="this.style.visibility='hidden'">
-      <div class="lt"><div class="ln">${esc(a.shortName || a.displayName || '')}<small>${esc(pos)}</small></div><div class="lv">${esc(String(val).trim())}</div>${sub ? `<div class="ls">${esc(sub)}</div>` : ''}</div></div>`;
+      <div class="lt"><div class="ln">${right ? `<small class="pl">${esc(pos)}</small>` : ''}${esc(a.shortName || a.displayName || '')}${right ? '' : `<small>${esc(pos)}</small>`}</div><div class="lv">${esc(String(val).trim())}</div>${sub ? `<div class="ls">${esc(sub)}</div>` : ''}</div></div>`;
   };
   const rows = names.slice(0, 4).map(n => {
     const ca = la.find(c => c.name === n), ch = lh.find(c => c.name === n), t = ca || ch;
@@ -639,32 +648,75 @@ function pvLeaders(g) {
   return `<section class="pv"><div class="sec">Season leaders</div><div class="lhd">${logoImg(e.away.logo)}<b>${esc(e.away.abbr)}</b><span class="grow"></span><b>${esc(e.home.abbr)}</b>${logoImg(e.home.logo)}</div>${rows}</section>`;
 }
 const PV_STATS = {
-  nfl: [['Pts per Game', /^(avg)?(total)?points ?per ?game|^points ?per ?game|avgpoints$/i], ['Yds per Game', /total ?yards ?per ?game|^yards ?per ?game|avg.*total ?yards/i], ['Pass Yds per Game', /passing ?yards ?per ?game|net passing yards per game/i], ['Rush Yds per Game', /rushing ?yards ?per ?game/i], ['3rd Down %', /third ?down.*(pct|percent|conv)|3rd down/i], ['Sacks', /^sacks$/i], ['Interceptions', /^(passing)?interceptions$/i]],
-  nhl: [['Goals per Game', /goals ?per ?game|avggoals$|^goalsforpergame/i], ['Goals Against per Game', /goals ?against ?(per ?game|average)|avggoalsagainst|goalsAgainstAverage/i], ['Shots per Game', /shots ?per ?game|avgshots$/i], ['Power Play %', /power ?play ?(pct|percent|%)|ppPct/i], ['Penalty Kill %', /penalty ?kill ?(pct|percent|%)|pkPct/i], ['Faceoff %', /face ?off ?(win )?(pct|percent|%)/i], ['Save %', /^save ?(pct|percent)|savePct/i]],
-  nba: [['Points per Game', /avgpoints$|points ?per ?game|^points$/i], ['Rebounds per Game', /avgrebounds$|rebounds ?per ?game/i], ['Assists per Game', /avgassists$|assists ?per ?game/i], ['FG %', /fieldgoalpct|field goal (pct|percent)|fg ?%/i], ['3P %', /threepointfieldgoalpct|three point (pct|percent)|3p ?%/i], ['FT %', /freethrowpct|free throw (pct|percent)/i], ['Turnovers per Game', /avgturnovers$|turnovers ?per ?game/i]]
+  nfl: [['Pts Scored per Game', /^(avg)?(total)?points ?per ?game|^points ?per ?game|avgpoints$/i], ['Pts Allowed per Game', /(opp|against|allowed).*points ?per ?game|pointsAgainstPerGame|pointsAllowed/i, true], ['Yds per Game', /total ?yards ?per ?game|^yards ?per ?game|avg.*total ?yards/i], ['Pass Yds per Game', /passing ?yards ?per ?game|net passing yards per game/i], ['Rush Yds per Game', /rushing ?yards ?per ?game/i], ['3rd Down Efficiency Percentage', /third ?down.*(pct|percent|conv)|3rd down/i], ['Sacks', /^sacks$/i], ['Interceptions', /^(passing)?interceptions$/i]],
+  nba: [['Points per Game', /avgpoints$|points ?per ?game|^points$/i], ['Rebounds per Game', /avgrebounds$|rebounds ?per ?game/i], ['Assists per Game', /avgassists$|assists ?per ?game/i], ['FG %', /fieldgoalpct|field goal (pct|percent)|fg ?%/i], ['3P %', /threepointfieldgoalpct|three point (pct|percent)|3p ?%/i], ['FT %', /freethrowpct|free throw (pct|percent)/i], ['Turnovers per Game', /avgturnovers$|turnovers ?per ?game/i, true]]
 };
+const NHL_TABLE = [/goals for/i, /goals against (avg|average|per game)/i, /^shots per game/i, /shots against per game/i, /^penalty minutes/i, /^power play goals$/i, /power play percentage/i, /power play goals against/i, /penalty kill percentage/i, /^short handed goals$/i, /short handed goals against/i, /face ?off/i];
 function flatStats(j) {
   if (!j) return [];
   const cats = (j.results && j.results.stats && j.results.stats.categories) || (j.stats && j.stats.categories) || (j.splits && j.splits.categories) || j.categories || [];
   return cats.flatMap(c => c.stats || []);
 }
+const findStat = (list, re) => list.find(x => re.test(String(x.name || ''))) || list.find(x => re.test(String(x.displayName || '')));
+const numOf = st => { if (!st) return NaN; const v = st.value != null && st.value !== '' ? +st.value : parseFloat(String(st.displayValue).replace(/,/g, '')); return v; };
+function compactLeague(list, league) {
+  const o = {};
+  (PV_STATS[league] || []).forEach(([t, re]) => { const st = findStat(list, re); if (st) o[t] = numOf(st); });
+  return o;
+}
+state.lgs = {};
+function ensureLeagueStats(league, cb) {
+  if (state.lgs[league]) { if (state.lgs[league].data && cb) cb(); return; }
+  const ent = state.lgs[league] = { data: null };
+  try { const st = JSON.parse(localStorage.getItem('lgs_' + league) || 'null'); if (st && Date.now() - st.t < 12 * 3600e3 && Object.keys(st.d || {}).length > 10) { ent.data = st.d; if (cb) cb(); return; } } catch (e) {}
+  (async () => {
+    try {
+      await ensureTeams(league);
+      const ids = (state.teamList[league] || []).map(t => t.id), d = {};
+      let i = 0;
+      const base = API + LEAGUES[league].path + '/teams/';
+      const worker = async () => { while (i < ids.length) { const id = ids[i++]; try { d[id] = compactLeague(flatStats(await getJson(base + id + '/statistics')), league); } catch (e) {} } };
+      await Promise.all(Array.from({ length: 8 }, worker));
+      ent.data = d;
+      try { localStorage.setItem('lgs_' + league, JSON.stringify({ t: Date.now(), d })); } catch (e) {}
+      if (cb) cb();
+    } catch (e) { delete state.lgs[league]; }
+  })();
+}
+function pvTeamTable(g) {
+  const e = g.ev, A = flatStats(g.ts[0]), H = flatStats(g.ts[1]);
+  let rows = NHL_TABLE.map(re => { const a = A.find(x => re.test(String(x.displayName || x.name || ''))); const h = a && H.find(x => x.name === a.name); return a && h ? [a, h] : null; }).filter(Boolean);
+  if (rows.length < 4) rows = A.slice(0, 12).map(a => [a, H.find(x => x.name === a.name)]).filter(r => r[1]);
+  if (!rows.length) return '';
+  const seen = new Set(); rows = rows.filter(r => !seen.has(r[0].name) && seen.add(r[0].name));
+  return `<section class="pv"><div class="sec">Team stats</div><table class="tt"><thead><tr><th></th><th>${logoImg(e.away.logo)}</th><th>${logoImg(e.home.logo)}</th></tr></thead><tbody>${rows.map(r => `<tr><td>${esc(r[0].displayName || r[0].name)}</td><td>${esc(r[0].displayValue)}</td><td>${esc(r[1].displayValue)}</td></tr>`).join('')}</tbody></table></section>`;
+}
 function pvStats(g) {
   const e = g.ev;
-  if (g.tsLoading || !g.ts) return `<section class="pv"><div class="sec">League rankings</div>${msg('Načítám…')}</section>`;
+  if (g.tsLoading || !g.ts) return `<section class="pv"><div class="sec">Team stats</div>${msg('Načítám…')}</section>`;
   const A = flatStats(g.ts[0]), H = flatStats(g.ts[1]);
   if (!A.length && !H.length) return '';
+  if (g.league === 'nhl') return pvTeamTable(g);
   const comps = (g.sum.header && g.sum.header.competitions && g.sum.header.competitions[0] && g.sum.header.competitions[0].competitors) || [];
   const cA = teamColor(comps.find(c => String(c.team.id) === String(e.away.id)), '#4aa3ff'), cH = teamColor(comps.find(c => String(c.team.id) === String(e.home.id)), '#d9c27a');
-  const N = (state.teamList[g.league] || []).length || (g.league === 'nba' ? 30 : 32);
-  const find = (list, re) => list.find(x => re.test(String(x.name || '')) ) || list.find(x => re.test(String(x.displayName || '')));
-  let picks = (PV_STATS[g.league] || []).map(([t, re]) => [t, find(A, re), find(H, re)]).filter(p => p[1] && p[2]);
+  const lg = state.lgs[g.league];
+  if (!lg) ensureLeagueStats(g.league, () => { if (state.game === g && topView() === 'game' && g.tab === 'preview') render(); });
+  const data = lg && lg.data;
+  let picks = (PV_STATS[g.league] || []).map(([t, re, low]) => [t, findStat(A, re), findStat(H, re), low]).filter(p => p[1] && p[2]);
   if (picks.length < 3) picks = A.slice(0, 8).map(x => [x.displayName || x.name, x, H.find(y => y.name === x.name)]).filter(p => p[2]);
   if (!picks.length) return '';
-  const row = (logo, st, col) => {
-    const rk = st.rank != null ? +st.rank : parseInt(st.rankDisplayValue), w = isNaN(rk) ? 0 : Math.max(5, Math.round((N - rk + 1) / N * 100));
-    return `<div class="cr">${logoImg(logo)}<span class="cv">${esc(st.displayValue != null ? st.displayValue : st.value)}</span><span class="bar"><i style="width:${w}%;background:${col}"></i></span><span class="cx">${esc(st.rankDisplayValue || (isNaN(rk) ? '' : ordinal(rk)))}</span></div>`;
+  const rankOf = (title, st, low) => {
+    if (st.rank != null && !isNaN(+st.rank)) return { r: +st.rank, n: (state.teamList[g.league] || []).length || 32 };
+    if (!data) return null;
+    const mine = numOf(st), vals = Object.values(data).map(o => o[title]).filter(v => v != null && !isNaN(v));
+    if (!vals.length || isNaN(mine)) return null;
+    return { r: 1 + vals.filter(v => low ? v < mine : v > mine).length, n: vals.length };
   };
-  return `<section class="pv"><div class="sec">League rankings</div>${picks.map(p => `<div class="cc"><div class="ct">${esc(p[0])}</div>${row(e.away.logo, p[1], cA)}${row(e.home.logo, p[2], cH)}</div>`).join('')}</section>`;
+  const row = (logo, title, st, col, low) => {
+    const rk = rankOf(title, st, low), w = rk ? Math.max(5, Math.round((rk.n - rk.r + 1) / rk.n * 100)) : 0;
+    return `<div class="cr">${logoImg(logo)}<span class="cv">${esc(st.displayValue != null ? st.displayValue : st.value)}</span><span class="bar"><i style="width:${w}%;background:${col}"></i></span><span class="cx">${rk ? ordinal(rk.r) : ''}</span></div>`;
+  };
+  return `<section class="pv"><div class="sec">League rankings</div>${picks.map(p => `<div class="cc"><div class="ct">${esc(p[0])}</div>${row(e.away.logo, p[0], p[1], cA, p[3])}${row(e.home.logo, p[0], p[2], cH, p[3])}</div>`).join('')}</section>`;
 }
 const ordinal = n => { const v = n % 100, s = ['th', 'st', 'nd', 'rd']; return n + (s[(v - 20) % 10] || s[v] || s[0]); };
 function pvInjuries(g) {
@@ -676,7 +728,7 @@ function pvInjuries(g) {
   const rows = mine.length ? mine.slice(0, 12).map(i => {
     const a = i.athlete || {}, st = String(i.status || (i.type && i.type.description) || ''), det = (i.details && (i.details.type || i.details.detail)) || i.shortComment || '';
     const red = /out|^ir|injured reserve|suspen/i.test(st), pos = (a.position && a.position.abbreviation) || '';
-    return `<div class="ir"><img class="hs" src="${esc(hsOf(a, g.league))}" alt="" onerror="this.style.visibility='hidden'"><div class="grow"><div class="ln">${esc(a.displayName || a.shortName || '')}</div><div class="ls">${esc([pos, a.jersey ? '#' + a.jersey : ''].filter(Boolean).join(' · '))}</div></div><div class="is"><span class="chip ${red ? 'red' : ''}">${esc(st)}</span><div class="ls">${esc(det)}</div></div></div>`;
+ return `<div class="ir" data-player="${esc(a.id)}" data-pl="${g.league}" data-pn="${esc(a.displayName || '')}" data-pp="${esc(pos)}" data-pj="${esc(a.jersey || '')}" data-pt="${esc(t.name || '')}"><img class="hs" src="${esc(hsOf(a, g.league))}" alt="" onerror="this.style.visibility='hidden'"><div class="grow"><div class="ln">${esc(a.displayName || a.shortName || '')}</div><div class="ls">${esc([pos, a.jersey ? '#' + a.jersey : ''].filter(Boolean).join(' · '))}</div></div><div class="is"><span class="chip ${red ? 'red' : ''}">${esc(st)}</span><div class="ls">${esc(det)}</div></div></div>`;
   }).join('') : msg('Žádná hlášená zranění.');
   return `<section class="pv"><div class="sec">Injury report</div>${seg}${rows}</section>`;
 }
