@@ -80,6 +80,16 @@ header.d + main{padding-top:0}
 .foot{color:var(--mut);font-size:12px;text-align:center;margin-top:20px;padding-bottom:30px}
 /* detail zápasu */
 .hero{background:var(--card);border-radius:22px;padding:16px 0;display:grid;grid-template-columns:repeat(5,1fr);align-items:center;justify-items:center;margin:0 4px}
+.hero.hw{padding-top:10px}
+.hero .s{position:relative;white-space:nowrap}
+.hero .s.ab{font-size:42px;cursor:pointer}
+.hero .s.ab4{font-size:33px}
+.hero.hpre .t .rc{margin-top:2px}
+.hero.hpre .m span{font-weight:600}
+.hero .wa{position:absolute;top:50%;margin-top:-7px;width:0;height:0;border-top:7px solid transparent;border-bottom:7px solid transparent}
+.hero .wa.l{right:-14px;border-right:9px solid #fff}
+.hero .wa.r{left:-14px;border-left:9px solid #fff}
+.hero .wk{grid-column:1 / -1;font-size:13px;font-weight:600;color:var(--mut);letter-spacing:.3px;margin-bottom:6px;text-align:center}
 .hero .t{display:flex;flex-direction:column;align-items:center;gap:5px;font-weight:600;font-size:14.5px}
 .hero .t img,.hero .t .ph{width:42px;height:42px;object-fit:contain}
 .hero .s{font-family:var(--num);font-weight:700;font-size:50px;line-height:1}
@@ -212,6 +222,9 @@ details[open] summary::after{content:'⌃'}
 .ssr{font-size:12.5px;color:var(--mut)}
 .ssg > div[data-sstat]{cursor:pointer}
 .ssg > div[data-sstat]:active{opacity:.6}
+.glbt{font-family:var(--wide);font-stretch:112%;font-weight:800;font-size:15px;letter-spacing:.5px;text-transform:uppercase;color:#fff;white-space:nowrap}
+.glt th.gh{text-align:left;vertical-align:bottom}
+.glt th.ovt{overflow:visible;z-index:3}
 .glt tr.mb td{border-top:2px solid #48484a}
 .ysel{position:relative;margin:2px 0 6px}
 .ybtn{display:inline-flex;align-items:center;gap:8px;background:#2c2c2e;border-radius:12px;padding:7px 14px;font-weight:600;font-size:15px}
@@ -488,7 +501,8 @@ function normEvent(ev) {
   const awayC = comps.find(x => x.homeAway === 'away') || comps[1];
   const t = ((ev.status || c.status || {}).type) || {};
   const e = { id: ev.id, date: ev.date || c.date, state: t.state, short: t.shortDetail || t.detail || '',
-              home: normTeam(homeC), away: normTeam(awayC) };
+              home: normTeam(homeC), away: normTeam(awayC),
+              week: ev.week && ev.week.number, stype: ev.season && ev.season.type, note: (c.notes && c.notes[0] && c.notes[0].headline) || '' };
   if (e.state === 'post' && !e.home.winner && !e.away.winner) {
     const h = parseInt(e.home.score), a = parseInt(e.away.score);
     if (!isNaN(h) && !isNaN(a) && h !== a) (h > a ? e.home : e.away).winner = true;
@@ -786,17 +800,21 @@ function renderGame() {
   else if (!g.sum) body = msg('Načítám…');
   else if (!g.tabInit) body = msg('Načítám…');
   else body = g.tab === 'preview' ? previewHTML(g) : g.tab === 'stats' ? statsHTML(g) : playsHTML(g);
-  const side = t => `<div class="t" data-topen="${esc(t.id)}" data-tl="${g.league}" data-tn="${esc(t.name)}" data-tlogo="${esc(t.logo)}">${logoImg(t.logo)}<span>${esc(t.abbr)}</span>${t.record ? `<span class="rc">${esc(String(t.record).replace(/,\s*\d+\s*pts?\b/i, ''))}</span>` : ''}</div>`;
+  const side = (t, na) => `<div class="t" data-topen="${esc(t.id)}" data-tl="${g.league}" data-tn="${esc(t.name)}" data-tlogo="${esc(t.logo)}">${logoImg(t.logo)}${na ? '' : `<span>${esc(t.abbr)}</span>`}${t.record ? `<span class="rc">${esc(String(t.record).replace(/,\s*\d+\s*pts?\b/i, ''))}</span>` : ''}</div>`;
   let hero = '';
   if (e) {
     const mid = e.state === 'post' ? `Final${e.short.replace('Final', '')}<br><span>${dayWord(e.date)}</span>`
-              : e.state === 'pre' ? `<span>${dayWord(e.date)} – ${fmtTime(e.date)}</span>`
+              : e.state === 'pre' ? `<span>${dayWord(e.date)}<br>${fmtTime(e.date)}</span>`
               : esc(e.short).replace(' - ', '<br>');
-    hero = `<div class="hero">${side(e.away)}
-      ${e.state === 'pre' ? '' : `<span class="s ${e.state === 'post' && !e.away.winner ? 'lose' : ''}">${esc(e.away.score)}</span>`}
-      <div class="m ${e.state === 'in' ? 'live' : ''} ${e.state === 'pre' ? 'pre' : ''}">${mid}</div>
-      ${e.state === 'pre' ? '' : `<span class="s ${e.state === 'post' && !e.home.winner ? 'lose' : ''}">${esc(e.home.score)}</span>`}
-      ${side(e.home)}</div>`;
+    const hd = (g.sum && g.sum.header) || {}, hc = (hd.competitions && hd.competitions[0]) || {};
+    const wk = e.week || hd.week, st = e.stype || (hd.season && hd.season.type), note = e.note || (hc.notes && hc.notes[0] && hc.notes[0].headline) || '';
+    const wlab = (st === 3 || (!wk && note)) ? note : g.league === 'nfl' && wk ? (st === 1 ? 'Preseason · Week ' + wk : 'Week ' + wk) : '';
+    const pre = e.state === 'pre', ab = t => `<span class="s ab ${String(t.abbr || '').length > 3 ? 'ab4' : ''}" data-topen="${esc(t.id)}" data-tl="${g.league}" data-tn="${esc(t.name)}" data-tlogo="${esc(t.logo)}">${esc(t.abbr || '')}</span>`;
+    hero = `<div class="hero${wlab ? ' hw' : ''}${pre ? ' hpre' : ''}">${wlab ? `<div class="wk">${esc(wlab)}</div>` : ''}${side(e.away, pre)}
+      ${pre ? ab(e.away) : `<span class="s ${e.state === 'post' && !e.away.winner ? 'lose' : ''}">${esc(e.away.score)}${e.state === 'post' && e.away.winner ? '<i class="wa l"></i>' : ''}</span>`}
+      <div class="m ${e.state === 'in' ? 'live' : ''}">${mid}</div>
+      ${pre ? ab(e.home) : `<span class="s ${e.state === 'post' && !e.home.winner ? 'lose' : ''}">${e.state === 'post' && e.home.winner ? '<i class="wa r"></i>' : ''}${esc(e.home.score)}</span>`}
+      ${side(e.home, pre)}</div>`;
   }
   $app.innerHTML = `
     <header class="d"><div class="tabs"><button class="back" data-back aria-label="Zpět">‹</button><button class="home" data-home aria-label="Domů"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"><path d="M3 10.5 12 3l9 7.5"/><path d="M5.5 9v11h13V9"/><path d="M10 20v-6h4v6"/></svg></button><button class="home" data-refresh aria-label="Obnovit"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12a8 8 0 1 1-2.34-5.66"/><path d="M20 4v5h-5"/></svg></button></div></header>
@@ -1312,15 +1330,16 @@ function simpleTable(title, labels, rows, totals, league, names) {
 function gamelogHTML(p, o) {
   o = o || {};
   const J = o.j !== undefined ? o.j : p.gl;
-  if (o.j === undefined && p.glErr) return msg('Gamelog se nepodařilo načíst (' + p.glErr + ').');
-  if (!J) return msg('Gamelog není k dispozici.');
+  const H = o.head || '';
+  if (o.j === undefined && p.glErr) return H + msg('Gamelog se nepodařilo načíst (' + p.glErr + ').');
+  if (!J) return H + msg('Gamelog není k dispozici.');
   const j = J, labels = j.labels || j.names || [], meta = j.events || {};
   const seen = new Set(), rows = [];
   (j.seasonTypes || []).forEach(st => (st.categories || []).forEach(cat => (cat.events || []).forEach(e => {
     if (seen.has(e.eventId) || !e.stats) return;
     seen.add(e.eventId); rows.push({ id: e.eventId, m: meta[e.eventId] || {}, s: e.stats });
   })));
-  if (!rows.length) return msg('Žádné odehrané zápasy.');
+  if (!rows.length) return H + msg('Žádné odehrané zápasy.');
   rows.sort((a, b) => new Date(b.m.gameDate || 0) - new Date(a.m.gameDate || 0));
   const mk = r => { const d = new Date(r.m.gameDate || 0); return d.getFullYear() + '-' + pad(d.getMonth() + 1); };
   const strip = '';
@@ -1364,14 +1383,16 @@ function gamelogHTML(p, o) {
     });
     totRow = `<tr class="tot"><td class="n">Total</td><td class="rs2"></td>${tv.map(x => `<td>${nv(x)}</td>`).join('')}</tr>`;
   }
-  const ghead = groups && groups.length > 1 ? `<tr><th class="n gh" colspan="2"></th>${groups.map(g => `<th class="grp" colspan="${g[1]}">${esc(g[0])}</th>`).join('')}</tr>` : '';
-  return (o.head || '') + `<section class="blk" style="margin-top:6px"><div class="tw"><table class="nfx sep glt" style="width:${tw}px"><colgroup><col style="width:84px"><col style="width:${rw}px">${cols.map(c => `<col style="width:${w(c[0])}px">`).join('')}</colgroup><thead>${ghead}<tr><th class="n">${esc(o.title || 'Gamelog')}</th><th></th>${cols.map(c => `<th>${esc(c[0])}</th>`).join('')}</tr></thead><tbody>${trs}${totRow}</tbody></table></div></section>`;
+  const bigT = o.big ? `<span class="glbt">${esc(o.title)}</span>` : '';
+  const ghead = groups && groups.length > 1 ? `<tr><th class="n gh" colspan="2">${bigT}</th>${groups.map(g => `<th class="grp" colspan="${g[1]}">${esc(g[0])}</th>`).join('')}</tr>` : '';
+  return (o.head || '') + `<section class="blk" style="margin-top:6px"><div class="tw"><table class="nfx sep glt" style="width:${tw}px"><colgroup><col style="width:84px"><col style="width:${rw}px">${cols.map(c => `<col style="width:${w(c[0])}px">`).join('')}</colgroup><thead>${ghead}<tr>${o.big && !(groups && groups.length > 1) ? `<th class="n gh" colspan="2">${bigT}</th>` : `<th class="n">${o.big ? '' : esc(o.title || 'Gamelog')}</th><th></th>`}${cols.map(c => `<th>${esc(c[0])}</th>`).join('')}</tr></thead><tbody>${trs}${totRow}</tbody></table></div></section>`;
 }
 function seasonLbl(p, y) { y = +y; return p.league === 'nfl' ? String(y) : (y - 1) + '-' + String(y).slice(2); }
-function glSeasons(p) {
-  const f = ((p.gl && p.gl.filters) || []).find(x => x && /season$/i.test(x.name || '') && Array.isArray(x.options));
+function glSeasons(p, J) {
+  const G = J !== undefined ? J : p.gl;
+  const f = ((G && G.filters) || []).find(x => x && /season$/i.test(x.name || '') && Array.isArray(x.options));
   let L = f ? f.options.map(x => ({ y: String(x.value), t: x.displayValue || seasonLbl(p, x.value) })).filter(x => /^\d{4}$/.test(x.y)) : [];
-  if (!L.length) L = [...new Set(statCats(p.st, p.league).flatMap(c => c.rows.map(r => r.year)).filter(Boolean))].map(y => ({ y: String(y), t: seasonLbl(p, y) }));
+  if (!L.length && J === undefined) L = [...new Set(statCats(p.st, p.league).flatMap(c => c.rows.map(r => r.year)).filter(Boolean))].map(y => ({ y: String(y), t: seasonLbl(p, y) }));
   const cur = f && f.value ? String(f.value) : (L[0] && L[0].y);
   L.sort((a, b) => b.y - a.y);
   return { L, cur };
@@ -1384,10 +1405,48 @@ async function loadGlSeason(p, y) {
   catch (e) { p.glBy[y] = { err: String((e && e.message) || e) }; }
   if (state.player === p && topView() === 'player') render();
 }
+async function ncaaCid(p) {
+  let cid = p.bio && p.bio.collegeAthlete && (p.bio.collegeAthlete.id || ((p.bio.collegeAthlete.$ref || '').match(/athletes\/(\d+)/) || [])[1]);
+  if (!cid) { const c = await getJson('https://sports.core.api.espn.com/v2/sports/football/leagues/nfl/athletes/' + p.id + '?lang=en&region=us'); const ca = c && c.collegeAthlete; cid = ca && (ca.id || ((ca.$ref || '').match(/athletes\/(\d+)/) || [])[1]); }
+  if (!cid) throw new Error('none');
+  return cid;
+}
+async function loadNcGl(p, y) {
+  p.ncBy = p.ncBy || {};
+  const k = y || 'def';
+  if (p.ncBy[k]) return;
+  p.ncBy[k] = { loading: true };
+  try {
+    p.ncCid = p.ncCid || await ncaaCid(p);
+    const base = WEB + 'football/college-football/athletes/' + p.ncCid + '/gamelog';
+    let j = await getJson(base + (y ? '?season=' + y : ''));
+    const has = x => x && Object.keys(x.events || {}).length;
+    if (!y && !has(j)) { const { L } = glSeasons(p, j); for (const o of L.slice(0, 6)) { const jj = await getJson(base + '?season=' + o.y).catch(() => null); if (has(jj)) { j = jj; break; } } }
+    p.ncBy[k] = { j };
+  } catch (e) { p.ncBy[k] = { err: 1 }; }
+  if (state.player === p && topView() === 'player') render();
+}
+function ncaaGamelog(p, seg) {
+  const d = (p.ncBy || {}).def;
+  if (!d) { loadNcGl(p); return seg + msg('Načítám…'); }
+  if (d.loading) return seg + msg('Načítám…');
+  if (d.err || !d.j) return seg + msg('Gamelog z NCAA není k dispozici.');
+  const { L, cur } = glSeasons(p, d.j), sel = p.ncY || cur;
+  const lbl = (L.find(x => x.y === sel) || {}).t || sel || '';
+  const head = seg + (L.length ? `<div class="ysel"><button class="ybtn" data-glyo="1">${esc(lbl)}<i class="chev ${p.glYOpen ? 'up' : ''}"></i></button>${p.glYOpen ? `<div class="ylist">${L.map(x => `<button data-ncy="${x.y}" class="${x.y === sel ? 'on' : ''}">${esc(x.t)}</button>`).join('')}</div>` : ''}</div>` : '');
+  if (!sel || sel === cur) return gamelogHTML(p, { head, j: d.j });
+  const g = p.ncBy[sel];
+  if (!g) { loadNcGl(p, sel); return head + msg('Načítám…'); }
+  if (g.loading) return head + msg('Načítám…');
+  if (g.err) return head + msg('Gamelog se nepodařilo načíst.');
+  return gamelogHTML(p, { head, j: g.j });
+}
 function gamelogFull(p) {
+  const seg = p.league === 'nfl' ? `<div class="seg pseg"><button data-glsrc="nfl" class="${p.glSrc !== 'ncaa' ? 'on' : ''}">NFL</button><button data-glsrc="ncaa" class="${p.glSrc === 'ncaa' ? 'on' : ''}">NCAA</button></div>` : '';
+  if (p.glSrc === 'ncaa') return ncaaGamelog(p, seg);
   const { L, cur } = glSeasons(p), sel = p.glY || cur;
   const lbl = (L.find(x => x.y === sel) || {}).t || (sel ? seasonLbl(p, sel) : '');
-  const head = L.length ? `<div class="ysel"><button class="ybtn" data-glyo="1">${esc(lbl)}<i class="chev ${p.glYOpen ? 'up' : ''}"></i></button>${p.glYOpen ? `<div class="ylist">${L.map(x => `<button data-gly="${x.y}" class="${x.y === sel ? 'on' : ''}">${esc(x.t)}</button>`).join('')}</div>` : ''}</div>` : '';
+  const head = seg + (L.length ? `<div class="ysel"><button class="ybtn" data-glyo="1">${esc(lbl)}<i class="chev ${p.glYOpen ? 'up' : ''}"></i></button>${p.glYOpen ? `<div class="ylist">${L.map(x => `<button data-gly="${x.y}" class="${x.y === sel ? 'on' : ''}">${esc(x.t)}</button>`).join('')}</div>` : ''}</div>` : '');
   if (!sel || sel === cur) return gamelogHTML(p, { head });
   const g = (p.glBy || {})[sel];
   if (!g) { loadGlSeason(p, sel); return head + msg('Načítám…'); }
@@ -1404,11 +1463,11 @@ function summaryHTML(p) {
   const a = p.bio || {}, ss = a.statsSummary, st = ((ss && ss.statistics) || []).filter(x => x && x.displayValue != null).slice(0, 4);
   if (!st.length) return '';
   const col = a.team && a.team.color ? '#' + String(a.team.color).replace('#', '') : 'var(--acc)';
-  return `<section class="ssum"><div class="ssh" style="background:${esc(col)}">${esc(ss.displayName || 'Season stats')}</div><div class="ssg">${st.map(x => `<div data-sstat="${esc(ssCat(p, x))}" data-sstl="${esc(x.displayName || x.abbreviation || '')}"><div class="ssl">${esc(x.abbreviation || x.shortDisplayName || x.displayName || '')}</div><div class="ssv">${esc(x.displayValue)}</div><div class="ssr">${esc(x.rankDisplayValue || '')}</div></div>`).join('')}</div></section>`;
+  return `<section class="ssum"><div class="ssh" style="background:${esc(col)}">${esc(ss.displayName || 'Season stats')}</div><div class="ssg">${st.map(x => `<div data-sstat="${esc(ssCat(p, x))}" data-sstl="${esc(x.displayName || x.abbreviation || '')}" data-sslab="${esc(x.abbreviation || x.shortDisplayName || '')}"><div class="ssl">${esc(x.abbreviation || x.shortDisplayName || x.displayName || '')}</div><div class="ssv">${esc(x.displayValue)}</div><div class="ssr">${esc(x.rankDisplayValue || '')}</div></div>`).join('')}</div></section>`;
 }
 function overviewHTML(p) {
   const sum = summaryHTML(p);
-  const gl = p.gl ? gamelogHTML(p, { limit: 5, title: ' ', head: '<div class="sec" style="margin:4px 0 0">Recent games</div>' }) : '';
+  const gl = p.gl ? gamelogHTML(p, { limit: 5, title: 'Recent games', big: 1 }) : '';
   return (sum + gl) || msg('Přehled není k dispozici.');
 }
 function statCats(j, league) {
@@ -2078,7 +2137,8 @@ async function loadLeaders() {
     v.data = { cols, rows };
     const keys = catKeys(v.cat);
     const di = cols.findIndex(c => keys.includes(String(c.name).toLowerCase()));
-    if (v.sk == null) v.sk = di >= 0 ? di : 0;
+    const li = di >= 0 ? di : v.lab ? cols.findIndex(c => String(c.label).toLowerCase() === String(v.lab).toLowerCase()) : -1;
+    if (v.sk == null) v.sk = li >= 0 ? li : 0;
   } catch (e) {
     try {
       const j = await getJson('https://sports.core.api.espn.com/v2/sports/' + parts[0] + '/leagues/' + parts[1] + '/seasons/' + seasonYear(v.league) + '/types/2/leaders?limit=50&lang=en&region=us');
@@ -2222,7 +2282,7 @@ window.addEventListener('hashchange', route);
 const $app = document.getElementById('app');
 $app.addEventListener('click', ev => {
   if (window._lpAt && Date.now() - window._lpAt < 900) { const lb = ev.target.closest('[data-league]'); if (lb) { ev.preventDefault(); return; } }
-  const b = ev.target.closest('[data-rclear],[data-go2],[data-home],[data-csort],[data-glm],[data-glyo],[data-sstat],[data-gly],[data-league],[data-game],[data-date],[data-wk],[data-pst],[data-smode],[data-cl],[data-lsort],[data-drv],[data-pm],[data-tab],[data-ptab],[data-xp],[data-ttab],[data-pvt],[data-sort],[data-fav],[data-team],[data-player],[data-topen],[data-search],[data-month],[data-refresh],[data-back]');
+  const b = ev.target.closest('[data-rclear],[data-go2],[data-home],[data-csort],[data-glm],[data-glyo],[data-glsrc],[data-ncy],[data-sstat],[data-gly],[data-league],[data-game],[data-date],[data-wk],[data-pst],[data-smode],[data-cl],[data-lsort],[data-drv],[data-pm],[data-tab],[data-ptab],[data-xp],[data-ttab],[data-pvt],[data-sort],[data-fav],[data-team],[data-player],[data-topen],[data-search],[data-month],[data-refresh],[data-back]');
   if (!b) return;
   const d = b.dataset;
   if (topView() === 'search' && !ev.target.closest('.fstar')) { if (d.topen) addRecent({ k: 't', l: d.tl, id: d.topen, name: d.tn || '', logo: d.tlogo || '' }); else if (d.player) addRecent({ k: 'p', l: d.pl, id: d.player, name: d.pn || '', sub: d.pt || '' }); }
@@ -2246,7 +2306,7 @@ $app.addEventListener('click', ev => {
   } else if (d.game !== undefined) {
     window._fromList = true; location.hash = '#/game/' + (d.gl || state.league) + '/' + d.game;
   } else if (d.sstat) {
-    state.lv = { kind: 'leaders', league: state.player.league, cat: d.sstat, sk: null, asc: false, title: d.sstl || '' };
+    state.lv = { kind: 'leaders', league: state.player.league, cat: d.sstat, sk: null, asc: false, title: d.sstl || '', lab: d.sslab || '' };
     window._fromList = true; location.hash = '#/leaders/' + state.player.league + '/' + d.sstat;
   } else if (d.cl !== undefined) {
     window._fromList = true; location.hash = '#/leaders/' + state.lv.league + '/' + (d.cl || 'x');
@@ -2293,6 +2353,10 @@ $app.addEventListener('click', ev => {
     pl.csort[d.cs] = cur && cur.i === i ? (cur.asc ? null : { i, asc: true }) : { i, asc: false }; render();
   } else if (d.glyo) {
     state.player.glYOpen = !state.player.glYOpen; render();
+  } else if (d.glsrc) {
+    state.player.glSrc = d.glsrc; state.player.glYOpen = false; render();
+  } else if (d.ncy) {
+    state.player.ncY = d.ncy; state.player.glYOpen = false; render();
   } else if (d.gly) {
     state.player.glY = d.gly; state.player.glYOpen = false; render();
   } else if (d.glm) {
