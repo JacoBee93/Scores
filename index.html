@@ -26,6 +26,15 @@ header.d{padding:calc(env(safe-area-inset-top) + 30px) 12px 7px}
 .tabs{display:flex;gap:8px;align-items:center}
 .pill{background:var(--card);border-radius:12px;padding:7px 15px;font-family:var(--num);font-weight:700;font-size:19px;letter-spacing:.5px;line-height:1.2}
 .pill.on{background:#fff;color:#000}
+.pill.star{padding:7px 12px;display:flex;align-items:center}
+.pill.star svg{width:21px;height:21px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linejoin:round}
+.pill.star.on svg{fill:currentColor}
+.fstar{flex:none;width:44px;height:44px;display:flex;align-items:center;justify-content:center;border-radius:12px}
+.fstar svg{width:26px;height:26px;fill:none;stroke:var(--mut);stroke-width:2;stroke-linejoin:round}
+.fstar.on svg{fill:#ffd60a;stroke:#ffd60a}
+.fstar:active{opacity:.6}
+.card .top{display:flex;justify-content:space-between}
+.card .top .lgt{font-family:var(--num);font-weight:700;letter-spacing:.5px;font-size:13px}
 .back{font-size:46px;line-height:1;height:50px;padding:0 18px 8px 8px}
 main{padding:6px 16px 0}
 header.d + main{padding-top:0}
@@ -209,6 +218,11 @@ const fmtTime = iso => new Date(iso).toLocaleTimeString('cs-CZ', { hour:'2-digit
 const fmtShort = iso => { const d = new Date(iso); return d.getDate() + '.' + (d.getMonth()+1) + '.'; };
 const dayWord = iso => ymd(new Date(iso)) === ymd(new Date()) ? 'Today' : fmtShort(iso);
 const todayET = () => { const p = new Date().toLocaleDateString('en-CA', { timeZone: 'America/New_York' }).split('-').map(Number); return new Date(p[0], p[1]-1, p[2], 12); };
+const FAVKEY = 'favs';
+const getFavs = () => { try { return JSON.parse(localStorage.getItem(FAVKEY) || '[]'); } catch (e) { return []; } };
+const isFav = (l, id) => getFavs().some(f => f.l === l && f.id === String(id));
+function toggleFav(f) { let a = getFavs(); const i = a.findIndex(x => x.l === f.l && x.id === f.id); if (i >= 0) a.splice(i, 1); else a.push(f); try { localStorage.setItem(FAVKEY, JSON.stringify(a)); } catch (e) {} state.favVer = (state.favVer || 0) + 1; state.favLoaded = false; }
+const STAR_SVG = '<svg viewBox="0 0 24 24"><path d="M12 3.2l2.7 5.6 6.1.8-4.5 4.2 1.1 6.1L12 17l-5.4 2.9 1.1-6.1L3.2 9.6l6.1-.8z"/></svg>';
 const store = { get(k){ try { return localStorage.getItem(k); } catch(e){ return null; } }, set(k,v){ try { localStorage.setItem(k,v); } catch(e){} } };
 const nv = v => /^-\d/.test(String(v)) ? `<span class="neg">-</span>${esc(String(v).slice(1))}` : esc(v);
 const msg = t => `<div class="msg">${esc(t)}</div>`;
@@ -252,7 +266,27 @@ function normEvent(ev) {
 function statusText(e) { return e.state === 'pre' ? fmtTime(e.date) : e.short; }
 
 /* ---------- načítání ---------- */
+async function loadFavs(silent) {
+  const my = ++reqId;
+  const favs = getFavs();
+  if (!silent) { state.loading = true; state.error = null; state.events = []; render(); }
+  const res = await Promise.allSettled(favs.flatMap(f => { const b = API + LEAGUES[f.l].path + '/teams/' + f.id + '/schedule'; return [getJson(b), getJson(b + '?seasontype=3')].map(p => p.then(j => ({ f, j }))); }));
+  if (my !== reqId) return;
+  const byTeam = new Map();
+  res.forEach(r => { if (r.status !== 'fulfilled') return; const { f, j } = r.value; const k = f.l + f.id; if (!byTeam.has(k)) byTeam.set(k, { f, evs: new Map() }); ((j && j.events) || []).forEach(ev => { if (ev && !byTeam.get(k).evs.has(ev.id)) { const e = normEvent(ev); e.league = f.l; byTeam.get(k).evs.set(ev.id, e); } }); });
+  const out = new Map();
+  byTeam.forEach(({ evs }) => {
+    const all = [...evs.values()].sort((a, b) => new Date(a.date) - new Date(b.date));
+    const past = all.filter(e => e.state === 'post').slice(-3), live = all.filter(e => e.state === 'in'), next = all.filter(e => e.state === 'pre').slice(0, 3);
+    [...past, ...live, ...next].forEach(e => out.set(e.league + e.id, e));
+  });
+  state.events = [...out.values()].sort((a, b) => new Date(a.date) - new Date(b.date));
+  state.error = favs.length && !res.some(r => r.status === 'fulfilled') ? 'Nepodařilo se načíst data.' : null;
+  state.loading = false; state.favLoaded = true;
+  if (topView() === 'list') render();
+}
 async function loadList(silent) {
+  if (state.league === 'fav') return loadFavs(silent);
   const L = LEAGUES[state.league];
   const my = ++reqId;
   if (!silent) { state.loading = true; state.error = null; state.events = []; render(); }
@@ -383,24 +417,38 @@ function render() {
 const logoImg = src => src ? `<img src="${esc(src)}" alt="" onerror="this.style.visibility='hidden'">` : '<span class="ph"></span>';
 
 function renderList() {
+  const fav = state.league === 'fav';
   const tabs = Object.entries(LEAGUES).map(([k, v]) =>
-    `<button class="pill ${k === state.league ? 'on' : ''}" data-league="${k}">${v.name}</button>`).join('');
+    `<button class="pill ${k === state.league ? 'on' : ''}" data-league="${k}">${v.name}</button>`).join('') +
+    `<button class="pill star ${fav ? 'on' : ''}" data-league="fav" aria-label="Oblíbené">${STAR_SVG}</button>`;
   let body;
   if (state.loading && !state.events.length) body = msg('Načítám…');
   else if (state.error && !state.events.length) body = `<div class="msg">${esc(state.error)}<br><button data-refresh>Zkusit znovu</button></div>`;
-  else if (!state.events.length) body = msg('V tento den nejsou žádné zápasy.');
+  else if (fav && !getFavs().length) body = msg('Zatím žádné oblíbené týmy. Otevři tým a klikni na hvězdičku vedle názvu.');
+  else if (!state.events.length) body = msg(fav ? 'Žádné poslední ani nadcházející zápasy.' : 'V tento den nejsou žádné zápasy.');
+  else if (fav) {
+    let last = '', firstUp = true;
+    body = state.events.map(e => {
+      const d = new Date(e.date), day = DAYS[d.getDay()] + ' ' + d.getDate() + '.' + (d.getMonth() + 1) + '.';
+      let h = '';
+      if (day !== last) { h += `<div class="sec">${day}</div>`; last = day; }
+      const mark = firstUp && e.state !== 'post' ? (firstUp = false, ' data-first="1"') : '';
+      return h + `<div class="fwrap"${mark}>${cardHTML(e)}</div>`;
+    }).join('');
+  }
   else body = state.events.map(cardHTML).join('');
   let strip = '';
-  for (let i = -30; i <= 30; i++) {
+  for (let i = -30; !fav && i <= 30; i++) {
     const d = addDays(state.date, i);
     strip += `<button class="dy ${i === 0 ? 'on' : ''}" data-date="${ymd(d)}"><small>${DAYS[d.getDay()]}</small>${d.getDate()}.${d.getMonth()+1}.</button>`;
   }
   $app.innerHTML = `
     <header><div class="tabs">${tabs}<span class="grow"></span><button class="icon" data-search aria-label="Hledat">${SEARCH_SVG}</button></div>
-    <div class="strip" id="strip">${strip}</div></header>
+    ${fav ? '' : `<div class="strip" id="strip">${strip}</div>`}</header>
     <main>${body}<div class="foot">Data: ESPN (neoficiální API)</div></main>`;
   const s = document.getElementById('strip'), on = s && s.querySelector('.on');
   if (on) s.scrollLeft = on.offsetLeft - (s.clientWidth - on.offsetWidth) / 2;
+  if (fav && !state.favScrolled && state.events.length) { const f = document.querySelector('[data-first]'); if (f) { state.favScrolled = true; window.scrollTo(0, Math.max(0, f.getBoundingClientRect().top + window.scrollY - 190)); } }
 }
 function cardHTML(e) {
   const row = t => {
@@ -408,7 +456,7 @@ function cardHTML(e) {
     return `<div class="row ${lose ? 'lose' : ''}">${logoImg(t.logo)}<span class="nm">${esc(t.name)}${t.record ? `<span class="rec">(${esc(t.record)})</span>` : ''}</span>
       <span class="sc">${e.state === 'pre' ? '' : esc(t.score)}</span><span class="arr">${e.state === 'post' && t.winner ? '◀' : ''}</span></div>`;
   };
-  return `<div class="card" data-game="${e.id}"><div class="top"><span class="${e.state === 'in' ? 'live' : ''}">${esc(statusText(e))}</span></div>${row(e.away)}${row(e.home)}</div>`;
+  return `<div class="card" data-game="${e.id}" data-gl="${e.league || state.league}"><div class="top"><span class="${e.state === 'in' ? 'live' : ''}">${esc(statusText(e))}</span>${e.league && state.league === 'fav' ? `<span class="lgt">${e.league.toUpperCase()}</span>` : ''}</div>${row(e.away)}${row(e.home)}</div>`;
 }
 
 function renderGame() {
@@ -655,14 +703,31 @@ async function loadPost(p) {
   if (state.player === p && topView() === 'player') render();
 }
 const fnum = v => { const n = parseFloat(String(v).replace(/,/g, '')); return isNaN(n) ? null : n; };
+const toSec = v => { const m = String(v).match(/^(\d+):(\d+)$/); return m ? +m[1] * 60 + +m[2] : null; };
+const fmtSec = n => Math.floor(n / 60) + ':' + String(Math.round(n % 60)).padStart(2, '0');
+const gpIdx = (labels, cols) => cols.findIndex(k => labels[k] === 'GP') >= 0 ? cols.findIndex(k => labels[k] === 'GP') : cols.findIndex(k => labels[k] === 'G' && false);
+function wavg(x, y, wx, wy, dec, time) {
+  if (x == null || y == null || !(wx + wy)) return '-';
+  const v = (x * wx + y * wy) / (wx + wy);
+  if (time) return fmtSec(v);
+  return v.toFixed(dec);
+}
 function combine(labels, cols, reg, post) {
+  const gi = gpIdx(labels, cols), wx = gi >= 0 ? fnum(reg[gi]) || 0 : 0, wy = gi >= 0 ? fnum(post[gi]) || 0 : 0;
   return cols.map((k, ci) => {
     const a = reg[ci], b = post[ci];
     if (b == null || b === '') return a;
+    if (/^LNG$/i.test(labels[k])) { const x = fnum(a), y = fnum(b); return x != null && y != null ? String(Math.max(x, y)) : a; }
+    if (NOSUM.test(labels[k])) {
+      const ta = toSec(a), tb = toSec(b);
+      if (ta != null && tb != null) return wavg(ta, tb, wx, wy, 0, true);
+      const x = fnum(a), y = fnum(b), dec = /^\./.test(String(a)) ? 3 : (String(a).split('.')[1] || '').length;
+      const r = wavg(x, y, wx, wy, dec, false);
+      return /^\./.test(String(a)) && r !== '-' ? r.replace(/^0/, '') : r;
+    }
     const x = fnum(a), y = fnum(b);
-    if (/^LNG$/i.test(labels[k])) return x != null && y != null ? String(Math.max(x, y)) : a;
-    if (NOSUM.test(labels[k]) || x == null || y == null) return '-';
-    const sum = x + y; return String(Math.round(sum * 100) / 100);
+    if (x == null || y == null) return '-';
+    return String(Math.round((x + y) * 100) / 100);
   });
 }
 function statsTabHTML(p) {
@@ -718,7 +783,8 @@ function renderTeam() {
   $app.innerHTML = `
     <header class="d"><div class="tabs"><button class="back" data-back aria-label="Zpět">‹</button></div></header>
     <main><div class="phero">${h.logo ? `<img class="tl" src="${esc(h.logo)}" alt="" onerror="this.style.visibility='hidden'">` : ''}
-      <div><div class="pname up">${esc(h.name)}</div><div class="psub">${esc(h.sub)}</div></div></div>
+      <div class="grow"><div class="pname up">${esc(h.name)}</div><div class="psub">${esc(h.sub)}</div></div>
+      <button class="fstar ${isFav(t.league, t.id) ? 'on' : ''}" data-fav="${esc(t.id)}" data-fl="${t.league}" data-fn="${esc(h.name)}" data-flogo="${esc(h.logo)}" aria-label="Oblíbený tým">${STAR_SVG}</button></div>
       <div class="dtabs sm">${tab('roster', 'Roster')}${tab('sched', 'Schedule')}${tab('stats', 'Stats')}</div>
       <div class="pane t">${body}</div></main>`;
   const ms = document.getElementById('mstrip'), on = ms && ms.querySelector('.on');
@@ -869,7 +935,8 @@ async function searchPlayers(q, league) {
   if (!ok && lastErr) throw lastErr;
   return out;
 }
-const leagueOrder = () => [state.league, ...Object.keys(LEAGUES).filter(k => k !== state.league)];
+const curLeague = () => LEAGUES[state.league] ? state.league : 'nhl';
+const leagueOrder = () => [curLeague(), ...Object.keys(LEAGUES).filter(k => k !== curLeague())];
 function runPlayerSearch() {
   clearTimeout(sTimer);
   const q = state.sq.trim();
@@ -901,8 +968,8 @@ function paintSearch() {
       const words = [x.name, x.abbr, x.loc, x.short].join(' ').toLowerCase().split(/[\s.\-]+/);
       return toks.every(k => words.some(w => w.startsWith(k)));
     });
-    else if (l !== state.league) t = [];
-    t.forEach(x => rows.push(`<div class="res-row" data-topen="${esc(x.id)}" data-tl="${l}" data-tn="${esc(x.name)}" data-tlogo="${esc(x.logo)}">${logoImg(x.logo)}<div><div class="rn">${esc(x.name)}</div><div class="rs">${l.toUpperCase()}</div></div></div>`));
+    else if (l !== curLeague()) t = [];
+    t.forEach(x => rows.push(`<div class="res-row" data-topen="${esc(x.id)}" data-tl="${l}" data-tn="${esc(x.name)}" data-tlogo="${esc(x.logo)}">${logoImg(x.logo)}<div class="grow"><div class="rn">${esc(x.name)}</div><div class="rs">${l.toUpperCase()}</div></div><button class="fstar ${isFav(l, x.id) ? 'on' : ''}" data-fav="${esc(x.id)}" data-fl="${l}" data-fn="${esc(x.name)}" data-flogo="${esc(x.logo)}" aria-label="Oblíbený tým">${STAR_SVG}</button></div>`));
   });
   let html = '';
   if (rows.length) html += '<div class="sec">Týmy</div>' + rows.join('');
@@ -933,7 +1000,7 @@ function renderSearch() {
 
 /* ---------- navigace ---------- */
 function openGame(league, id) {
-  state.league = league;
+  if (state.league !== 'fav') state.league = league;
   state.game = { league, id, sum: null, ev: null, tab: 'stats', team: 0, err: null };
   state.open.clear(); state.closed.clear();
   render(); loadGame();
@@ -975,11 +1042,15 @@ window.addEventListener('hashchange', route);
 
 const $app = document.getElementById('app');
 $app.addEventListener('click', ev => {
-  const b = ev.target.closest('[data-league],[data-game],[data-date],[data-tab],[data-ptab],[data-xp],[data-ttab],[data-sort],[data-team],[data-player],[data-topen],[data-search],[data-month],[data-refresh],[data-back]');
+  const b = ev.target.closest('[data-league],[data-game],[data-date],[data-tab],[data-ptab],[data-xp],[data-ttab],[data-sort],[data-fav],[data-team],[data-player],[data-topen],[data-search],[data-month],[data-refresh],[data-back]');
   if (!b) return;
   const d = b.dataset;
-  if (d.league) {
-    state.league = d.league; store.set('league', d.league);
+  if (d.fav !== undefined) {
+    toggleFav({ l: d.fl, id: d.fav, name: d.fn || '', logo: d.flogo || '' });
+    if (topView() === 'search') paintSearch(); else render();
+  } else if (d.league) {
+    state.league = d.league; if (d.league !== 'fav') store.set('league', d.league);
+    state.favScrolled = false;
     setDate(todayET()); loadList();
   } else if (d.player) {
     playerNav(d);
