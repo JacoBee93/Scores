@@ -82,8 +82,10 @@ header.d + main{padding-top:0}
 .hero{background:var(--card);border-radius:22px;padding:16px 0;display:grid;grid-template-columns:repeat(5,1fr);align-items:center;justify-items:center;margin:0 4px}
 .hero.hw{padding-top:10px}
 .hero .s{position:relative;white-space:nowrap}
-.hero .s.ab{font-size:42px;cursor:pointer}
-.hero .s.ab4{font-size:33px}
+.hero .s.ab{font-size:38px;cursor:pointer}
+.hero .s.ab4{font-size:30px}
+.hero .m .pd{text-transform:uppercase;font-family:var(--num);font-weight:700;font-size:19px;line-height:1.15;display:inline-block}
+.hero .m .fin{font-family:var(--num);font-weight:700;font-size:19px;text-transform:uppercase;color:#fff}
 .hero.hpre .t .rc{margin-top:2px}
 .hero.hpre .m span{font-weight:600}
 .hero .wa{position:absolute;top:50%;margin-top:-7px;width:0;height:0;border-top:7px solid transparent;border-bottom:7px solid transparent}
@@ -92,7 +94,7 @@ header.d + main{padding-top:0}
 .hero .wk{grid-column:1 / -1;font-size:13px;font-weight:600;color:var(--mut);letter-spacing:.3px;margin-bottom:6px;text-align:center}
 .hero .t{display:flex;flex-direction:column;align-items:center;gap:5px;font-weight:600;font-size:14.5px}
 .hero .t img,.hero .t .ph{width:42px;height:42px;object-fit:contain}
-.hero .s{font-family:var(--num);font-weight:700;font-size:50px;line-height:1}
+.hero .s{font-family:var(--num);font-weight:700;font-size:42px;line-height:1}
 .hero .s.lose{color:var(--mut)}
 .hero .m{text-align:center;font-size:14.5px;font-weight:500;line-height:1.35}
 .hero .m.live{color:var(--live)}
@@ -458,7 +460,7 @@ const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt
 const pad = n => String(n).padStart(2, '0');
 const ymd = d => d.getFullYear() + pad(d.getMonth()+1) + pad(d.getDate());
 const addDays = (d, n) => { const x = new Date(d); x.setDate(x.getDate() + n); return x; };
-const DAYS = ['Ne','Po','Út','St','Čt','Pá','So'];
+const DAYS = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
 const fmtTime = iso => new Date(iso).toLocaleTimeString('cs-CZ', { hour:'2-digit', minute:'2-digit' });
 const fmtShort = iso => { const d = new Date(iso); return d.getDate() + '.' + (d.getMonth()+1) + '.'; };
 const dayWord = iso => ymd(new Date(iso)) === ymd(new Date()) ? 'Today' : fmtShort(iso);
@@ -803,17 +805,19 @@ function renderGame() {
   const side = (t, na) => `<div class="t" data-topen="${esc(t.id)}" data-tl="${g.league}" data-tn="${esc(t.name)}" data-tlogo="${esc(t.logo)}">${logoImg(t.logo)}${na ? '' : `<span>${esc(t.abbr)}</span>`}${t.record ? `<span class="rc">${esc(String(t.record).replace(/,\s*\d+\s*pts?\b/i, ''))}</span>` : ''}</div>`;
   let hero = '';
   if (e) {
-    const mid = e.state === 'post' ? `Final${e.short.replace('Final', '')}<br><span>${dayWord(e.date)}</span>`
-              : e.state === 'pre' ? `<span>${dayWord(e.date)}<br>${fmtTime(e.date)}</span>`
+    const dd = new Date(e.date), dn = Math.round((new Date(ymd(dd)) - new Date(ymd(new Date()))) / 864e5);
+    const preDay = dn === 0 ? 'Today' : dn > 0 && dn < 7 ? DAYS[dd.getDay()] : fmtShort(e.date);
+    const mid = e.state === 'post' ? `<span class="fin">${esc(e.short || 'Final')}</span>`
+              : e.state === 'pre' ? `<span class="pd">${esc(preDay)}<br>${fmtTime(e.date)}</span>`
               : esc(e.short).replace(' - ', '<br>');
     const hd = (g.sum && g.sum.header) || {}, hc = (hd.competitions && hd.competitions[0]) || {};
     const wk = e.week || hd.week, st = e.stype || (hd.season && hd.season.type), note = e.note || (hc.notes && hc.notes[0] && hc.notes[0].headline) || '';
     const wlab = (st === 3 || (!wk && note)) ? note : g.league === 'nfl' && wk ? (st === 1 ? 'Preseason · Week ' + wk : 'Week ' + wk) : '';
     const pre = e.state === 'pre', ab = t => `<span class="s ab ${String(t.abbr || '').length > 3 ? 'ab4' : ''}" data-topen="${esc(t.id)}" data-tl="${g.league}" data-tn="${esc(t.name)}" data-tlogo="${esc(t.logo)}">${esc(t.abbr || '')}</span>`;
     hero = `<div class="hero${wlab ? ' hw' : ''}${pre ? ' hpre' : ''}">${wlab ? `<div class="wk">${esc(wlab)}</div>` : ''}${side(e.away, pre)}
-      ${pre ? ab(e.away) : `<span class="s ${e.state === 'post' && !e.away.winner ? 'lose' : ''}">${esc(e.away.score)}${e.state === 'post' && e.away.winner ? '<i class="wa l"></i>' : ''}</span>`}
+      ${pre ? ab(e.away) : `<span class="s ${e.state === 'post' && !e.away.winner ? 'lose' : ''}">${esc(e.away.score)}</span>`}
       <div class="m ${e.state === 'in' ? 'live' : ''}">${mid}</div>
-      ${pre ? ab(e.home) : `<span class="s ${e.state === 'post' && !e.home.winner ? 'lose' : ''}">${e.state === 'post' && e.home.winner ? '<i class="wa r"></i>' : ''}${esc(e.home.score)}</span>`}
+      ${pre ? ab(e.home) : `<span class="s ${e.state === 'post' && !e.home.winner ? 'lose' : ''}">${esc(e.home.score)}</span>`}
       ${side(e.home, pre)}</div>`;
   }
   $app.innerHTML = `
@@ -2113,6 +2117,20 @@ async function loadLeaders() {
   v.loading = true;
   const L = LEAGUES[v.league], parts = L.path.split('/');
   await ensureTeams(v.league).catch(() => {});
+  if (v.league === 'nfl' && (/qbr/i.test(v.cat) || /^qbr$/i.test(v.lab || ''))) {
+    try {
+      const j = await getJson('https://site.web.api.espn.com/apis/fitt/v3/sports/football/nfl/qbr?region=us&lang=en&qbrType=seasons&seasontype=2&isqualified=true&sort=schedAdjQBR:desc&limit=100&season=' + seasonYear('nfl'));
+      const rc = j.categories || [], cols = [];
+      rc.forEach(c => (c.labels || []).forEach((l, k) => { const nm = (c.names || [])[k] || l; if (!/^(RK|rank)$/i.test(l) && !/^rank$/i.test(nm)) cols.push({ label: l, name: nm, ci: c.name, k }); }));
+      const rows = (j.athletes || []).map(a => { const ac = a.categories || []; return { a: a.athlete || {}, vals: cols.map(col => { const x = ac.find(q => q.name === col.ci) || ac[0]; const arr = (x && (x.totals || x.values)) || []; return arr[col.k] != null ? arr[col.k] : ''; }) }; });
+      if (rows.length && cols.length) {
+        v.data = { cols, rows };
+        const qi = cols.findIndex(c => /schedAdjQBR/i.test(c.name)), li = cols.findIndex(c => /^QBR$/i.test(c.label));
+        if (v.sk == null) v.sk = qi >= 0 ? qi : li >= 0 ? li : 0;
+        v.loading = false; if (state.lv === v) render(); return;
+      }
+    } catch (e) {}
+  }
   const [cg, sort] = byAthQuery(v.league, v.cat);
   const u = 'https://site.web.api.espn.com/apis/common/v3/sports/' + L.path + '/statistics/byathlete?region=us&lang=en&contentorigin=espn&isqualified=true&page=1&limit=100' + (cg ? '&category=' + cg : '') + (sort ? '&sort=' + sort + ':desc' : '');
   try {
