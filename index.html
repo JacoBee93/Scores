@@ -603,7 +603,7 @@ const LEAGUES = {
 const NFL_GROUPS = { passing:'Passing', rushing:'Rushing', receiving:'Receiving', fumbles:'Fumbles', defensive:'Defensive',
   interceptions:'Interceptions', kickReturns:'Kick Returns', puntReturns:'Punt Returns', kicking:'Kicking', punting:'Punting' };
 // sloupce: [zobrazený název, možné názvy v datech]
-const NHL_SKATER = [['PTS',['PTS','P']],['G',['G']],['A',['A']],['+/-',['+/-']],['PIM',['PIM']],['S',['S','SOG']],['HIT',['HIT','HT']],['BKS',['BKS','BS']],['TOI',['TOI']]];
+const NHL_SKATER = [['G',['G']],['A',['A']],['+/-',['+/-']],['PIM',['PIM']],['S',['S','SOG']],['HIT',['HIT','HT']],['BKS',['BKS','BS']],['TOI',['TOI']]];
 const NHL_GOALIE = [['SA',['SA']],['SV',['SV']],['GA',['GA']],['SV%',['SV%']],['TOI',['TOI']]];
 const NBA_COLS = [['MIN',['MIN']],['PTS',['PTS']],['REB',['REB']],['AST',['AST']],['FG',['FG']],['3PT',['3PT']],['FT',['FT']],['STL',['STL']],['BLK',['BLK']],['TO',['TO']],['PF',['PF']],['+/-',['+/-']]];
 const GL_COLS = { nba:['MIN','PTS','REB','AST','STL','BLK','FG','3PT','FT','TO'], nhl:['G','A','PTS','+/-','PIM','SOG','S','TOI'] };
@@ -1083,6 +1083,7 @@ function linescoreHTML(g) {
 }
 function penaltiesHTML(g) {
   const isPen = p => { const t = String((p.type && (p.type.text || '')) || ''), ab = String((p.type && p.type.abbreviation) || ''), tx = String(p.text || '');
+    if (/challenge|review|stoppage|goal\b.*\binterference - goal/i.test(t + ' ' + tx)) return false;
     return (/penalt/i.test(t) && !/shot/i.test(t)) || /^PEN/i.test(ab) || p.penalty || p.penaltyMinutes || /\b\d+\s*(minutes?|mins?)\b/i.test(tx) || /\b(hooking|tripping|slashing|roughing|holding|interference|high-?sticking|cross-?checking|boarding|fighting|unsportsmanlike|delay of game|too many men|misconduct|elbowing|charging|kneeing|embellishment|instigat|spearing|butt-?ending|closing hand|throwing|clipping|diving)\b/i.test(tx + ' ' + t); };
   const sum = g.sum; let plays = getPlays(sum).filter(isPen);
   if (!plays.length) { if (!g.cplays) { if (!g.cpl) loadCorePlays(g); return msg('Loading…'); } plays = g.cplays.filter(isPen); }
@@ -1279,7 +1280,6 @@ function statsHTML(g) {
   if (g.league === 'nhl') {
     const all = mergedAthletes(t);
     const posOf = m => (m.a.position && m.a.position.abbreviation) || '';
-    all.forEach(m => { if (m.vals.PTS === undefined && m.vals.G !== undefined && m.vals.A !== undefined) { const gg = parseInt(m.vals.G), aa = parseInt(m.vals.A); if (!isNaN(gg) && !isNaN(aa)) m.vals.PTS = String(gg + aa); } });
     const sets = [['Forwards', all.filter(m => !['D', 'G'].includes(posOf(m))), NHL_SKATER],
                   ['D-Men', all.filter(m => posOf(m) === 'D'), NHL_SKATER],
                   ['Goalies', all.filter(m => posOf(m) === 'G'), NHL_GOALIE]];
@@ -2515,6 +2515,7 @@ async function loadLV() {
         const picked = ORD.map(re => cats.find(c => re.test(String(c.name)))).filter(Boolean);
         if (picked.length >= 4) { cats.length = 0; picked.forEach(c => cats.push(c)); }
       }
+      if (v.league === 'nhl') { const pri = n => /^points$/i.test(n) ? 0 : /^goals$/i.test(n) ? 1 : /^assists$/i.test(n) ? 2 : 3; cats.sort((a, b) => pri(String(a.name)) - pri(String(b.name))); }
       const all = cats.flatMap(c => c.rows).filter(r => r.ref);
       state.lvC[key] = { cats, loading: true };
       let i = 0;
@@ -2553,7 +2554,7 @@ async function loadBracket(v) {
     await Promise.all(Array.from({ length: 8 }, worker));
     if (more.length > evs.length) evs = evs.concat(more);
   }
-  const seen = new Set(); evs = evs.filter(e => e && e.home && e.away && e.home.id && e.away.id && +e.stype === 3 && !/play-?in/i.test(e.note || '') && !/^(AFC|NFC)$/i.test(e.home.abbr) && !seen.has(e.id) && seen.add(e.id));
+  const seen = new Set(); evs = evs.filter(e => e && e.home && e.away && e.home.id && e.away.id && +e.stype === 3 && confOf[e.home.id] && confOf[e.away.id] && !/^TBD$/i.test(e.home.abbr) && !/^TBD$/i.test(e.away.abbr) && !/play-?in/i.test(e.note || '') && !/^(AFC|NFC)$/i.test(e.home.abbr) && !seen.has(e.id) && seen.add(e.id));
   return { confs, confOf, seedOf, entOf, evs, y, ts: Date.now() };
 }
 function brProjected(v, c) {
