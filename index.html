@@ -332,6 +332,7 @@ async function loadTeam() {
     });
   });
   t.done = true;
+  if (t.tab === 'stats') loadTeamPlayers(t);
   if (state.team === t && topView() === 'team') render();
 }
 
@@ -663,15 +664,59 @@ function scheduleHTML(t) {
   flush();
   return `<div class="mstrip" id="mstrip">${strip}</div>${html}`;
 }
+const CAT_NAME = { skating: 'Skaters', goaltending: 'Goalies', general: 'General' };
+const PREF = { nhl: ['GP','G','A','PTS','+/-','PIM','SOG','S','GS','W','L','OTL','GAA','SV%'], nba: ['GP','MIN','PTS','REB','AST','STL','BLK','FG%','3P%','FT%'] };
+const shortNm = n => { const p = String(n || '').trim().split(/\s+/); return p.length > 1 ? p[0][0] + '. ' + p.slice(1).join(' ') : n; };
+async function loadTeamPlayers(t) {
+  if (t.ps) return;
+  const ps = t.ps = { loading: true, cats: new Map() };
+  const all = [];
+  ((t.roster && t.roster.athletes) || []).forEach(a => { if (!a) return; if (Array.isArray(a.items)) a.items.forEach(x => all.push(x)); else all.push(a); });
+  const base = WEB + LEAGUES[t.league].path + '/athletes/';
+  let i = 0;
+  const rows = [];
+  const worker = async () => {
+    while (i < all.length) {
+      const a = all[i++];
+      try {
+        const j = await getJson(base + a.id + '/stats');
+        statCats(j, t.league).forEach(c => {
+          const r = c.rows[c.rows.length - 1]; if (!r) return;
+          rows.push({ a, cat: c.title, labels: c.labels, season: String(r.n), vals: r.vals });
+        });
+      } catch (e) {}
+    }
+  };
+  await Promise.all(Array.from({ length: 8 }, worker));
+  const cnt = {}; rows.forEach(r => cnt[r.season] = (cnt[r.season] || 0) + 1);
+  const cur = Object.keys(cnt).sort((x, y) => cnt[y] - cnt[x])[0];
+  rows.filter(r => r.season === cur).forEach(r => {
+    if (!ps.cats.has(r.cat)) ps.cats.set(r.cat, { labels: r.labels, rows: [] });
+    ps.cats.get(r.cat).rows.push(r);
+  });
+  ps.loading = false; ps.season = cur;
+  if (state.team === t && t.tab === 'stats') render();
+}
 function teamStatsHTML(t) {
-  const j = t.stats;
-  if (t.statsErr || !j) return msg('Statistiky týmu se nepodařilo načíst' + (t.statsErr ? ' (' + t.statsErr + ')' : '.'));
-  const cats = (j.results && j.results.stats && j.results.stats.categories) || (j.stats && j.stats.categories) || (j.splits && j.splits.categories) || j.categories || [];
-  const out = cats.filter(c => c.stats && c.stats.length).map(c => {
-    const trs = c.stats.map(x => `<tr><td class="n"><span class="pn" style="max-width:none">${esc(x.displayName || x.name || '')}</span></td><td>${esc(x.displayValue ?? x.value ?? '')}</td><td class="mu">${esc(x.rankDisplayValue || (x.rank ? '#' + x.rank : ''))}</td></tr>`).join('');
-    return `<section class="blk"><div class="tw"><table class="stt"><thead><tr><th class="n">${esc(c.displayName || c.name || '')}</th><th></th><th>RANK</th></tr></thead><tbody>${trs}</tbody></table></div></section>`;
+  if (!t.ps) return msg('Načítám…');
+  if (t.ps.loading) return msg('Načítám statistiky hráčů…');
+  if (!t.ps.cats.size) return msg('Statistiky hráčů nejsou k dispozici.');
+  const tn = teamHead(t).name;
+  return [...t.ps.cats.entries()].map(([title, c]) => {
+    const pref = PREF[t.league];
+    let cols = pref ? pref.map(l => c.labels.indexOf(l)).filter(x => x >= 0) : [];
+    cols = [...new Set(cols)];
+    if (cols.length < 3) cols = c.labels.map((_, k) => k);
+    cols = cols.slice(0, 8);
+    const sk = cols.find(k => ['PTS', 'YDS'].includes(c.labels[k])) ?? cols[Math.min(1, cols.length - 1)];
+    const num = v => { const n = parseFloat(String(v).replace(/,/g, '')); return isNaN(n) ? -1e9 : n; };
+    const rows = [...c.rows].sort((x, y) => num(y.vals[sk]) - num(x.vals[sk]));
+    const trs = rows.map(r => {
+      const a = r.a, pos = (a.position && a.position.abbreviation) || '';
+      return `<tr data-player="${esc(a.id)}" data-pl="${t.league}" data-pn="${esc(a.displayName || '')}" data-pp="${esc(pos)}" data-pj="${esc(a.jersey || '')}" data-pt="${esc(tn)}"><td class="n"><span class="pn">${esc(shortNm(a.displayName || a.fullName))}</span></td>${cols.map(k => `<td>${nv(r.vals[k])}</td>`).join('')}</tr>`;
+    }).join('');
+    return `<section class="blk"><div class="tw"><table><thead><tr><th class="n">${esc(CAT_NAME[String(title).toLowerCase()] || title)}</th>${cols.map(k => `<th>${esc(c.labels[k])}</th>`).join('')}</tr></thead><tbody>${trs}</tbody></table></div></section>`;
   }).join('');
-  return out || msg('Statistiky týmu nejsou k dispozici.');
 }
 
 /* ---------- hledání ---------- */
@@ -679,29 +724,36 @@ const SEARCH_SVG = '<svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><pat
 let sTimer = null;
 async function searchPlayers(q, league) {
   const parts = LEAGUES[league].path.split('/'), qq = encodeURIComponent(q);
+  const H = 'https://site.web.api.espn.com/apis/';
   const urls = [
-    'https://site.web.api.espn.com/apis/common/v3/search?query=' + qq + '&limit=12&mode=prefix&type=player&sport=' + parts[0] + '&league=' + parts[1],
-    'https://site.web.api.espn.com/apis/search/v2?query=' + qq + '&limit=12&type=player'
+    H + 'common/v3/search?query=' + qq + '&limit=20&mode=prefix&type=player&sport=' + parts[0] + '&league=' + parts[1],
+    H + 'common/v3/search?query=' + qq + '&limit=20&type=player&sport=' + parts[0] + '&league=' + parts[1],
+    H + 'search/v2?query=' + qq + '&limit=20&type=player',
+    H + 'common/v3/search?query=' + qq + '&limit=20&type=player'
   ];
-  let lastErr = null;
-  for (const u of urls) {
-    try {
-      const j = await getJson(u);
-      const raw = j.items || (j.results || []).flatMap(r => r.contents || r.items || []);
-      const out = [];
-      raw.forEach(i => {
-        if (i.type && i.type !== 'player') return;
-        const lg = i.league || i.defaultLeagueSlug || '';
-        if (lg && lg !== parts[1]) return;
-        const id = i.id || ((String(i.uid || '').match(/a:(\d+)/) || [])[1]);
-        const name = i.displayName || i.name || i.fullName;
-        if (id && name) out.push({ id: String(id), name, sub: (typeof i.subtitle === 'string' && i.subtitle) || (typeof i.description === 'string' ? i.description : '') });
-      });
-      if (out.length) return out;
-    } catch (e) { lastErr = e; }
-  }
-  if (lastErr) throw lastErr;
-  return [];
+  const settled = await Promise.allSettled(urls.map(getJson));
+  const seen = new Set(), out = [];
+  let ok = false, lastErr = null;
+  settled.forEach(r => {
+    if (r.status !== 'fulfilled') { lastErr = r.reason; return; }
+    ok = true;
+    const j = r.value;
+    const raw = j.items || (j.results || []).flatMap(x => (x.contents || x.items || []).map(c => Object.assign({ type: x.type }, c)));
+    raw.forEach(i => {
+      if (i.type && i.type !== 'player') return;
+      const uid = String(i.uid || '');
+      const lg = i.league || i.defaultLeagueSlug || '';
+      if (lg && lg !== parts[1]) return;
+      if (!lg && (i.sport && i.sport !== parts[0])) return;
+      const id = (uid.match(/a:(\d+)/) || [])[1] || (/^\d+$/.test(String(i.id || '')) ? String(i.id) : '');
+      const name = i.displayName || i.name || i.fullName;
+      if (!id || !name || seen.has(id)) return;
+      seen.add(id);
+      out.push({ id, name, sub: (typeof i.subtitle === 'string' && i.subtitle) || (typeof i.description === 'string' ? i.description : '') || (i.isActive === false ? 'Retired' : '') });
+    });
+  });
+  if (!ok && lastErr) throw lastErr;
+  return out;
 }
 const leagueOrder = () => [state.league, ...Object.keys(LEAGUES).filter(k => k !== state.league)];
 function runPlayerSearch() {
@@ -834,7 +886,7 @@ $app.addEventListener('click', ev => {
   } else if (d.ptab) {
     state.player.tab = d.ptab; render();
   } else if (d.ttab) {
-    state.team.tab = d.ttab; render();
+    state.team.tab = d.ttab; if (d.ttab === 'stats' && state.team.done) loadTeamPlayers(state.team); render();
   } else if (d.team !== undefined) {
     state.game.team = parseInt(d.team); render();
   } else if (d.refresh !== undefined) {
