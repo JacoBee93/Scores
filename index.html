@@ -256,8 +256,8 @@ details[open] summary::after{content:'⌃'}
 .glt thead tr:first-child th{border-bottom:0;padding-bottom:0}
 .glt th.grp{text-align:left;padding-left:8px;color:var(--mut);font-size:10px;letter-spacing:.5px;border-bottom:0;padding-bottom:2px}
 .glt td.n small{margin-left:3px}
-.glt td.n .pn{display:inline-block;width:44px}
-.glt td.n small{display:inline-block;width:16px;text-align:center;margin-left:0 !important}
+.glt td.n .pn{display:inline-block;width:41px}
+.glt td.n small{display:inline-block;width:15px;text-align:center;margin-left:0 !important}
 .bio{width:100%;border-collapse:collapse}
 .bio td{text-align:left;padding:6px 0;font-size:15px;vertical-align:top}
 .bio td:first-child{color:var(--mut);text-transform:uppercase;font-size:13px;width:110px;letter-spacing:.3px}
@@ -1313,7 +1313,7 @@ function gamelogHTML(p) {
     totRow = `<tr class="tot"><td class="n">Total</td><td class="rs2"></td>${tv.map(x => `<td>${nv(x)}</td>`).join('')}</tr>`;
   }
   const ghead = groups && groups.length > 1 ? `<tr><th class="n gh" colspan="2"></th>${groups.map(g => `<th class="grp" colspan="${g[1]}">${esc(g[0])}</th>`).join('')}</tr>` : '';
-  return strip + `<section class="blk" style="margin-top:6px"><div class="tw"><table class="nfx sep glt" style="width:max(100%, ${tw}px)"><colgroup><col style="width:84px"><col style="width:92px">${cols.map(c => `<col style="width:${w(c[0])}px">`).join('')}</colgroup><thead>${ghead}<tr><th class="n">Gamelog</th><th></th>${cols.map(c => `<th>${esc(c[0])}</th>`).join('')}</tr></thead><tbody>${trs}${totRow}</tbody></table></div></section>`;
+  return strip + `<section class="blk" style="margin-top:6px"><div class="tw"><table class="nfx sep glt" style="width:${tw}px"><colgroup><col style="width:84px"><col style="width:92px">${cols.map(c => `<col style="width:${w(c[0])}px">`).join('')}</colgroup><thead>${ghead}<tr><th class="n">Gamelog</th><th></th>${cols.map(c => `<th>${esc(c[0])}</th>`).join('')}</tr></thead><tbody>${trs}${totRow}</tbody></table></div></section>`;
 }
 function statCats(j, league) {
   return ((j && j.categories) || []).filter(c => c.statistics && c.statistics.length).map(c => ({
@@ -1403,7 +1403,7 @@ function bioHTML(p) {
   teams.sort((x, y) => y.y1 - x.y1);
   const tname = t => { const x = (state.teamList[p.league] || []).find(z => z.abbr === t.ab || z.id === String(t.tid)); return x ? x.name : t.ab; };
   const yr = y => p.league === 'nfl' ? String(y) : (y - 1) + '-' + String(y).slice(2);
-  const hist = teams.length ? `<section class="blk"><div class="sec" style="margin-left:0">Career history</div>${teams.map(t => `<div class="bh">${logoImg(teamLogoOf(p.league, { id: t.tid, abbr: t.ab }))}<div><div class="bt">${esc(tname(t))}</div><div class="bs">${esc(t.y0 === t.y1 ? yr(t.y0) : yr(t.y0) + ' – ' + yr(t.y1))}</div></div></div>`).join('')}</section>` : '';
+  const hist = teams.length ? `<section class="blk"><div class="sec" style="margin-left:0">Career history</div>${teams.map(t => `<div class="bh">${logoImg(teamLogoOf(p.league, { id: t.tid, abbr: t.ab }))}<div><div class="bt">${esc(tname(t))}</div><div class="bs">${esc(p.league === 'nfl' ? (t.y0 === t.y1 ? String(t.y0) : t.y0 + ' – ' + t.y1) : (t.y0 - 1) + ' – ' + t.y1)}</div></div></div>`).join('')}</section>` : '';
   if (!rows.length && !hist) return msg('Bio není k dispozici.');
   return `<section class="blk"><table class="bio">${rows.map(r => `<tr><td>${esc(r[0])}</td><td>${r[0] === 'Status' ? r[1] : esc(r[1])}</td></tr>`).join('')}</table></section>${hist}`;
 }
@@ -1434,12 +1434,19 @@ function careerHTML(p, cats) {
   const pv = (c, pm, k) => { const nm = c.names && c.names[k]; if (!nm || !pm) return null; if (pm[nm] != null) return pm[nm]; if (/-/.test(nm)) { const q = nm.split('-'); if (pm[q[0]] != null && pm[q[1]] != null) { const f = x => /\./.test(String(x)) ? (+x).toFixed(1) : x; return f(pm[q[0]]) + '-' + f(pm[q[1]]); } } return null; };
   const out = list.map(c => {
     const cols = p.league === 'nba' ? NBA_ALL.map(([l, d, w]) => [c.labels.indexOf(l === '3P%' && !c.labels.includes('3P%') ? '3PT%' : l), d, w]).filter(x => x[0] >= 0)
-      : c.labels.map((l, k) => [k, dl(l, p.league), 56]);
+      : c.labels.map((l, k) => [k, dl(l, p.league), 53]);
     const tw = 112 + cols.reduce((a, x) => a + x[2], 0);
     let rows, tot = null;
     if (mode !== 'post') {
       rows = [...c.rows].reverse().map(r => ({ n: r.n, sub: r.sub, tid: r.tid, v: cols.map(x => r.vals[x[0]]) }));
-      if (c.totals) tot = cols.map(x => c.totals[x[0]]);
+      if (c.totals) tot = cols.map((x, i) => {
+        const v = c.totals[x[0]];
+        if (v != null && v !== '' && v !== '-') return v;
+        const ns = rows.map(r => fnum(r.v[i])).filter(n => n != null);
+        if (!ns.length) return v;
+        const dec = (String(rows.find(r => fnum(r.v[i]) != null).v[i]).split('.')[1] || '').length;
+        return (ns.reduce((a, b) => a + b, 0) / ns.length).toFixed(dec || 1);
+      });
     } else {
       rows = [...c.rows].reverse().filter(r => p.post && r.year && p.post[r.year]).map(r => ({ n: r.n, sub: r.sub, tid: r.tid, v: cols.map(x => pv(c, p.post[r.year], x[0])) })).filter(r => r.v.some(v => v != null && v !== ''));
       if (rows.length > 1) tot = cols.map((x, i) => {
@@ -1455,8 +1462,8 @@ function careerHTML(p, cats) {
     const title = p.league === 'nba' ? (mode === 'reg' ? 'Season' : 'Playoffs') : catName(c.title, c.labels, p.league);
     const sk = mode + '|' + c.title, so = (p.csort || {})[sk];
     if (so) { const num = x => { const n = parseFloat(String(x == null ? '' : x).replace(/,/g, '')); return isNaN(n) ? -1e12 : n; }; rows = [...rows].sort((a, b) => (so.asc ? 1 : -1) * (num(a.v[so.i]) - num(b.v[so.i]))); }
-    const tw2 = 80 + cols.reduce((a, x) => a + x[2], 0);
-    return `<section class="blk"><div class="tw"><table class="nfx sep" style="width:max(100%, ${tw2}px)"><colgroup><col style="width:80px">${cols.map(x => `<col style="width:${x[2]}px">`).join('')}</colgroup><thead><tr><th class="n">${esc(title)}</th>${cols.map((x, i) => `<th data-csort="${i}" data-cs="${esc(sk)}" class="${so && so.i === i ? 'on' : ''}">${esc(x[1])}</th>`).join('')}</tr></thead><tbody>${rows.map(r => `<tr><td class="n"><span class="pn">${esc(r.n)}</span>${mode === 'ncaa' ? (r.tid ? `<img class="slg" src="https://a.espncdn.com/i/teamlogos/ncaa/500-dark/${esc(r.tid)}.png" alt="" onerror="if(!this.dataset.f){this.dataset.f=1;this.src=this.src.replace('500-dark','500')}else this.remove()">` : '') : seasonLogo(p.league, r)}</td>${r.v.map((v, i) => `<td class="${so && so.i === i ? 'on' : ''}">${nv(clean(v))}</td>`).join('')}</tr>`).join('')}${tot ? `<tr class="tot"><td class="n">Career</td>${tot.map(v => `<td>${nv(clean(v))}</td>`).join('')}</tr>` : ''}</tbody></table></div></section>`;
+    const fc = p.league === 'nba' ? 112 : 80, tw2 = fc + cols.reduce((a, x) => a + x[2], 0);
+    return `<section class="blk"><div class="tw"><table class="nfx sep" style="width:max(100%, ${tw2}px)"><colgroup><col style="width:${fc}px">${cols.map(x => `<col style="width:${x[2]}px">`).join('')}</colgroup><thead><tr><th class="n">${esc(title)}</th>${cols.map((x, i) => `<th data-csort="${i}" data-cs="${esc(sk)}" class="${so && so.i === i ? 'on' : ''}">${esc(x[1])}</th>`).join('')}</tr></thead><tbody>${rows.map(r => `<tr><td class="n"><span class="pn">${esc(r.n)}</span>${mode === 'ncaa' ? (r.tid ? `<img class="slg" src="https://a.espncdn.com/i/teamlogos/ncaa/500-dark/${esc(r.tid)}.png" alt="" onerror="if(!this.dataset.f){this.dataset.f=1;this.src=this.src.replace('500-dark','500')}else this.remove()">` : '') : seasonLogo(p.league, r)}</td>${r.v.map((v, i) => `<td class="${so && so.i === i ? 'on' : ''}">${nv(clean(v))}</td>`).join('')}</tr>`).join('')}${tot ? `<tr class="tot"><td class="n">Career</td>${tot.map(v => `<td>${nv(clean(v))}</td>`).join('')}</tr>` : ''}</tbody></table></div></section>`;
   }).join('');
   if (!out) return seg + msg(mode === 'ncaa' ? 'Statistiky z NCAA nejsou k dispozici.' : mode === 'post' ? (p.postDone ? 'Žádné zápasy v play-off.' : 'Načítám play-off…') : 'Statistiky nejsou k dispozici.');
   return seg + out;
