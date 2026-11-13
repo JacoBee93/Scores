@@ -38,6 +38,8 @@ header.d{padding:calc(env(safe-area-inset-top) + 30px) 12px 7px}
 .fstar svg{width:26px;height:26px;fill:none;stroke:var(--mut);stroke-width:2;stroke-linejoin:round}
 .fstar.on svg{fill:#ffd60a;stroke:#ffd60a}
 .row .nm.fv{color:#ffd60a}
+.row.lose .nm.fv{color:#a88a12}
+.rcx{background:none;border:0;color:var(--mut);font-size:13px;font-weight:600;float:right;margin-top:-2px;font-family:inherit}
 .qb{display:flex;gap:8px;margin:10px 0 0}
 .qb button{flex:1;background:var(--card);border-radius:12px;padding:9px 0;font-weight:700;font-size:14px;color:#fff;border:0;font-family:inherit}
 .fstar:active{opacity:.6}
@@ -1694,6 +1696,8 @@ function runPlayerSearch() {
     if (state.sp === my) paintSearch();
   }, 350);
 }
+const getRecent = () => { try { return JSON.parse(localStorage.getItem('recent') || '[]'); } catch (e) { return []; } };
+function addRecent(it) { try { const l = getRecent().filter(x => !(x.k === it.k && x.l === it.l && x.id === it.id)); l.unshift(it); localStorage.setItem('recent', JSON.stringify(l.slice(0, 10))); } catch (e) {} }
 function paintSearch() {
   const res = document.getElementById('sres'); if (!res) return;
   const q = state.sq.trim().toLowerCase(), toks = q.split(/\s+/).filter(Boolean), order = leagueOrder();
@@ -1708,10 +1712,18 @@ function paintSearch() {
       const words = [x.name, x.abbr, x.loc, x.short].join(' ').toLowerCase().split(/[\s.\-]+/);
       return toks.every(k => words.some(w => w.startsWith(k)));
     });
-    else if (l !== curLeague()) t = [];
+    else t = [];
     t.forEach(x => rows.push(`<div class="res-row" data-topen="${esc(x.id)}" data-tl="${l}" data-tn="${esc(x.name)}" data-tlogo="${esc(x.logo)}">${logoImg(x.logo)}<div class="grow"><div class="rn">${esc(x.name)}</div><div class="rs">${l.toUpperCase()}</div></div><button class="fstar ${isFav(l, x.id) ? 'on' : ''}" data-fav="${esc(x.id)}" data-fl="${l}" data-fn="${esc(x.name)}" data-flogo="${esc(x.logo)}" aria-label="Oblíbený tým">${STAR_SVG}</button></div>`));
   });
   let html = '';
+  if (!toks.length) {
+    const rc = getRecent();
+    if (rc.length) html += `<div class="sec">Recent <button class="rcx" data-rclear>Clear</button></div>` + rc.map(x => x.k === 't'
+      ? `<div class="res-row" data-topen="${esc(x.id)}" data-tl="${x.l}" data-tn="${esc(x.name)}" data-tlogo="${esc(x.logo || '')}">${logoImg(x.logo)}<div class="grow"><div class="rn">${esc(x.name)}</div><div class="rs">${x.l.toUpperCase()}</div></div></div>`
+      : `<div class="res-row" data-player="${esc(x.id)}" data-pl="${x.l}" data-pn="${esc(x.name)}" data-pp="" data-pj="" data-pt="${esc(x.sub || '')}"><img class="hs" src="https://a.espncdn.com/i/headshots/${x.l}/players/full/${esc(x.id)}.png" alt="" onerror="this.style.visibility='hidden'"><div><div class="rn">${esc(x.name)}</div><div class="rs">${esc(x.l.toUpperCase() + (x.sub ? ' · ' + x.sub : ''))}</div></div></div>`).join('');
+    else html += msg('Zatím žádná historie hledání.');
+    res.innerHTML = html; return;
+  }
   if (rows.length) html += '<div class="sec">Týmy</div>' + rows.join('');
   if (!loaded) html += failed ? msg('Týmy se nepodařilo načíst (' + state.teamErrText + ').') : msg('Načítám…');
   if (q.length >= 2) {
@@ -1946,11 +1958,26 @@ function renderLeaders() {
     m.addEventListener('click', e => { const b = e.target.closest('[data-go]'); if (!b) return; close(); window._fromList = true; location.hash = '#/' + b.dataset.go + '/' + lg; });
     document.body.append(o, m);
   };
-  const pill = e => { const p = e.target.closest && e.target.closest('.pill[data-league]'); return p && LEAGUES[p.dataset.league] ? p : null; };
-  document.addEventListener('touchstart', e => { const p = pill(e); if (!p) return; sx = e.touches[0].clientX; sy = e.touches[0].clientY; clearTimeout(tmr); tmr = setTimeout(() => open(p), 480); }, { passive: true });
+  const pill = e => { const p = e.target.closest && e.target.closest('.pill[data-league]'); return p && (LEAGUES[p.dataset.league] || p.dataset.league === 'fav') ? p : null; };
+  const openCache = el => {
+    window._lpAt = Date.now(); close();
+    const r = el.getBoundingClientRect();
+    const o = document.createElement('div'); o.className = 'lpo';
+    const m = document.createElement('div'); m.className = 'lpm';
+    m.style.top = (r.bottom + 8) + 'px'; m.style.left = Math.min(r.left, window.innerWidth - 216) + 'px';
+    m.innerHTML = `<button data-cc>Vymazat cache</button>`;
+    o.addEventListener('click', close);
+    m.addEventListener('click', () => {
+      try { Object.keys(localStorage).forEach(k => { if (/^(lgs\d*_|tps_|athc$)/.test(k)) localStorage.removeItem(k); }); } catch (e) {}
+      state.lgs = {}; state.athC = {}; state.lvC = {}; state.std = {}; _prefetched = {};
+      m.innerHTML = '<button>Cache vymazána ✓</button>'; setTimeout(close, 900);
+    });
+    document.body.append(o, m);
+  };
+  document.addEventListener('touchstart', e => { const p = pill(e); if (!p) return; sx = e.touches[0].clientX; sy = e.touches[0].clientY; clearTimeout(tmr); tmr = p.dataset.league === 'fav' ? setTimeout(() => openCache(p), 2000) : setTimeout(() => open(p), 480); }, { passive: true });
   document.addEventListener('touchmove', e => { if (tmr && (Math.abs(e.touches[0].clientX - sx) > 8 || Math.abs(e.touches[0].clientY - sy) > 8)) { clearTimeout(tmr); tmr = null; } }, { passive: true });
   document.addEventListener('touchend', () => { clearTimeout(tmr); tmr = null; });
-  document.addEventListener('contextmenu', e => { const p = pill(e); if (p) { e.preventDefault(); open(p); } });
+  document.addEventListener('contextmenu', e => { const p = pill(e); if (p) { e.preventDefault(); if (p.dataset.league === 'fav') openCache(p); else open(p); } });
 })();
 function renderSearch() {
   if (!document.getElementById('sq')) {
@@ -2013,9 +2040,11 @@ window.addEventListener('hashchange', route);
 const $app = document.getElementById('app');
 $app.addEventListener('click', ev => {
   if (window._lpAt && Date.now() - window._lpAt < 900) { const lb = ev.target.closest('[data-league]'); if (lb) { ev.preventDefault(); return; } }
-  const b = ev.target.closest('[data-go2],[data-home],[data-csort],[data-glm],[data-league],[data-game],[data-date],[data-wk],[data-pst],[data-smode],[data-cl],[data-lsort],[data-drv],[data-pm],[data-tab],[data-ptab],[data-xp],[data-ttab],[data-pvt],[data-sort],[data-fav],[data-team],[data-player],[data-topen],[data-search],[data-month],[data-refresh],[data-back]');
+  const b = ev.target.closest('[data-rclear],[data-go2],[data-home],[data-csort],[data-glm],[data-league],[data-game],[data-date],[data-wk],[data-pst],[data-smode],[data-cl],[data-lsort],[data-drv],[data-pm],[data-tab],[data-ptab],[data-xp],[data-ttab],[data-pvt],[data-sort],[data-fav],[data-team],[data-player],[data-topen],[data-search],[data-month],[data-refresh],[data-back]');
   if (!b) return;
   const d = b.dataset;
+  if (topView() === 'search' && !ev.target.closest('.fstar')) { if (d.topen) addRecent({ k: 't', l: d.tl, id: d.topen, name: d.tn || '', logo: d.tlogo || '' }); else if (d.player) addRecent({ k: 'p', l: d.pl, id: d.player, name: d.pn || '', sub: d.pt || '' }); }
+  if (d.rclear !== undefined) { try { localStorage.removeItem('recent'); } catch (e) {} paintSearch(); return; }
   if (d.fav !== undefined) {
     toggleFav({ l: d.fl, id: d.fav, name: d.fn || '', logo: d.flogo || '' });
     if (topView() === 'search') paintSearch(); else render();
