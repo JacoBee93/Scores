@@ -84,6 +84,8 @@ header.d + main{padding-top:0}
 .hero .m{text-align:center;font-size:14.5px;font-weight:500;line-height:1.35}
 .hero .m.live{color:var(--live)}
 .hero .m span{color:#fff}
+.hero .m.pre{grid-column:2 / span 3}
+.hero .m .dt1{font-family:var(--num);font-weight:700;font-size:22px;letter-spacing:.3px;white-space:nowrap}
 .dtabs{display:flex;gap:21px;border-bottom:1px solid #3a3a3c;margin:4px -16px 0;padding:0 20px;overflow-x:auto;scrollbar-width:none}
 .dtabs::-webkit-scrollbar{display:none}
 .dtabs button{flex:none;padding:12px 0 13px;font-weight:600;font-size:16px;letter-spacing:1px;color:var(--mut);border-bottom:3px solid transparent;margin-bottom:-1px;white-space:nowrap}
@@ -99,6 +101,8 @@ header.d + main{padding-top:0}
 .seg + .blk{margin-top:8px}
 .pv{margin-bottom:6px}
 .pv .sec{margin:22px 0 8px;font-size:15px}
+.pane > .pv:first-child .sec{margin-top:6px}
+.pane.pvp{padding-top:14px}
 .lhd{display:flex;align-items:center;gap:8px;margin:2px 0 10px;font-family:var(--num);font-weight:700;font-size:19px;letter-spacing:.5px}
 .lhd img{width:26px;height:26px;object-fit:contain}
 .lc{padding:10px 0;border-top:1px solid #2c2c2e}
@@ -251,14 +255,17 @@ details[open] summary::after{content:'⌃'}
 .glt td.rs2 b{font-family:var(--num);font-weight:600;font-size:16px}
 .glt thead tr:first-child th{border-bottom:0;padding-bottom:0}
 .glt th.grp{text-align:left;padding-left:8px;color:var(--mut);font-size:10px;letter-spacing:.5px;border-bottom:0;padding-bottom:2px}
-.glt td.n small{margin-left:4px}
+.glt td.n small{margin-left:3px}
+.glt td.n .pn{font-size:15px}
+.glt td.rs2 b{letter-spacing:-.2px}
 .glt td.n .pn{font-size:15.5px}
-.glt tbody td:nth-child(2),.glt thead tr:last-child th:nth-child(2){position:sticky;left:88px;padding-left:0;background:var(--card);z-index:1}
+.glt tbody td:nth-child(2),.glt thead tr:last-child th:nth-child(2){position:sticky;left:80px;padding-left:0;background:var(--card);z-index:1}
 .glt td.n,.glt th.n{z-index:2}
 .glt tbody tr{cursor:pointer}
 .glt tbody tr:active td{background:#2a2a2e}
 .glt td.rs2 b{font-family:inherit;font-weight:400;font-size:15px}
-.glt td.rs2 .W,.glt td.rs2 .L{font-family:inherit;font-weight:700;font-size:15px;width:14px}
+.glt td.rs2 .W,.glt td.rs2 .L,.glt td.rs2 .T{font-family:inherit;font-weight:700;font-size:15px;width:14px;display:inline-block}
+.glt td.rs2 .T{color:var(--mut)}
 .glt td.rs2 small{font-size:11px;font-weight:400;font-family:inherit;color:inherit}
 td.n .slg{width:20px;height:20px;object-fit:contain;vertical-align:-4px;margin-left:6px}
 .nfx tr.tot td.n{font-family:var(--num)}
@@ -696,7 +703,7 @@ function renderList() {
 function cardHTML(e) {
   const row = t => {
     const lose = e.state === 'post' && !t.winner;
-    return `<div class="row ${lose ? 'lose' : ''}">${logoImg(t.logo)}<span class="nm ${isFav(e.league || state.league, t.id) ? 'fv' : ''}">${esc(t.name)}${t.record ? `<span class="rec">(${esc(String(t.record).replace(/,\s*\d+\s*pts?\b/i, ''))})</span>` : ''}</span>
+    return `<div class="row ${lose ? 'lose' : ''}">${logoImg(t.logo)}<span class="nm ${state.league !== 'fav' && isFav(e.league || state.league, t.id) ? 'fv' : ''}">${esc(t.name)}${t.record ? `<span class="rec">(${esc(String(t.record).replace(/,\s*\d+\s*pts?\b/i, ''))})</span>` : ''}</span>
       <span class="sc">${e.state === 'pre' ? '' : esc(t.score)}</span><span class="arr">${e.state === 'post' && t.winner ? '◀' : ''}</span></div>`;
   };
   return `<div class="card" data-game="${e.id}" data-gl="${e.league || state.league}"><div class="top"><span class="${e.state === 'in' ? 'live' : ''}">${esc(statusText(e))}</span>${e.league && state.league === 'fav' ? `<span class="lgt">${e.league.toUpperCase()}</span>` : ''}</div>${row(e.away)}${row(e.home)}</div>`;
@@ -713,19 +720,19 @@ function renderGame() {
   let hero = '';
   if (e) {
     const mid = e.state === 'post' ? `Final${e.short.replace('Final', '')}<br><span>${dayWord(e.date)}</span>`
-              : e.state === 'pre' ? `${fmtTime(e.date)}<br><span>${dayWord(e.date)}</span>`
+              : e.state === 'pre' ? `<span class="dt1">${dayWord(e.date)} – ${fmtTime(e.date)}</span>`
               : esc(e.short).replace(' - ', '<br>');
     hero = `<div class="hero">${side(e.away)}
-      <span class="s ${e.state === 'post' && !e.away.winner ? 'lose' : ''}">${e.state === 'pre' ? '' : esc(e.away.score)}</span>
-      <div class="m ${e.state === 'in' ? 'live' : ''}">${mid}</div>
-      <span class="s ${e.state === 'post' && !e.home.winner ? 'lose' : ''}">${e.state === 'pre' ? '' : esc(e.home.score)}</span>
+      ${e.state === 'pre' ? '' : `<span class="s ${e.state === 'post' && !e.away.winner ? 'lose' : ''}">${esc(e.away.score)}</span>`}
+      <div class="m ${e.state === 'in' ? 'live' : ''} ${e.state === 'pre' ? 'pre' : ''}">${mid}</div>
+      ${e.state === 'pre' ? '' : `<span class="s ${e.state === 'post' && !e.home.winner ? 'lose' : ''}">${esc(e.home.score)}</span>`}
       ${side(e.home)}</div>`;
   }
   $app.innerHTML = `
     <header class="d"><div class="tabs"><button class="back" data-back aria-label="Zpět">‹</button><button class="home" data-home aria-label="Domů"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"><path d="M3 10.5 12 3l9 7.5"/><path d="M5.5 9v11h13V9"/><path d="M10 20v-6h4v6"/></svg></button><button class="home" data-refresh aria-label="Obnovit"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12a8 8 0 1 1-2.34-5.66"/><path d="M20 4v5h-5"/></svg></button></div></header>
     <main>${hero}
       ${g.tabInit ? `<div class="dtabs"><button data-tab="preview" class="${g.tab === 'preview' ? 'on' : ''}">Preview</button><button data-tab="stats" class="${g.tab === 'stats' ? 'on' : ''}">Stats</button><button data-tab="plays" class="${g.tab === 'plays' ? 'on' : ''}">Plays</button></div>` : '<div class="dtabs"></div>'}
-      <div class="pane ${g.tab === 'plays' ? 't' : ''}">${body}</div></main>`;
+      <div class="pane ${g.tab !== 'stats' ? 't' : ''}">${body}</div></main>`;
 }
 
 /* ----- tabulka statistik ----- */
@@ -1258,13 +1265,13 @@ function gamelogHTML(p) {
     cols = (GL_COLS[p.league] || []).filter(l => !(l === 'S' && labels.includes('SOG'))).map(l => [l, labels.indexOf(l)]).filter(c => c[1] >= 0);
     if (cols.length < 3) cols = labels.map((l, i) => [l, i]);
   }
-  const w = l => /\//.test(l) ? 58 : String(l).length > 3 ? 52 : /^(FG|3PT|FT|TOI)$/.test(l) ? 52 : 44;
-  const tw = 88 + 92 + cols.reduce((a, c) => a + w(c[0]), 0);
+  const w = l => /\//.test(l) ? 56 : String(l).length > 3 ? 50 : /^(FG|3PT|FT|TOI)$/.test(l) ? 50 : 43;
+  const tw = 80 + 82 + cols.reduce((a, c) => a + w(c[0]), 0);
   const trs = shown.map(r => {
     const m = r.m, opp = (m.opponent && (m.opponent.abbreviation || m.opponent.displayName)) || '';
     const sm = String(m.score || '').match(/^(\S+)\s*(.*)$/) || [];
     const wl = m.gameResult || '';
-    return `<tr data-game="${esc(r.id)}" data-gl="${p.league}"><td class="n"><span class="pn">${m.gameDate ? esc(fmtShort(m.gameDate)) : ''}</span><small>${esc((m.atVs || '') + ' ' + opp)}</small></td><td class="rs2"><span class="${wl === 'W' || wl === 'L' ? wl : ''}">${esc(wl)}</span> <b>${esc(sm[1] || '')}</b>${sm[2] ? ` <small class="mut">${esc(sm[2])}</small>` : ''}</td>${cols.map(c => `<td>${nv(String(r.s[c[1]] == null ? '' : r.s[c[1]]).replace(/,/g, ''))}</td>`).join('')}</tr>`;
+    return `<tr data-game="${esc(r.id)}" data-gl="${p.league}"><td class="n"><span class="pn">${m.gameDate ? esc(fmtShort(m.gameDate)) : ''}</span><small>${esc((m.atVs || '') + ' ' + opp)}</small></td><td class="rs2"><span class="${wl === 'W' || wl === 'L' ? wl : 'T'}">${esc(wl)}</span> <b>${esc(sm[1] || '')}</b>${sm[2] ? ` <small class="mut">${esc(sm[2])}</small>` : ''}</td>${cols.map(c => `<td>${nv(String(r.s[c[1]] == null ? '' : r.s[c[1]]).replace(/,/g, ''))}</td>`).join('')}</tr>`;
   }).join('');
   let totRow = '';
   if (false) {
@@ -1283,7 +1290,7 @@ function gamelogHTML(p) {
     totRow = `<tr class="tot"><td class="n">Total</td><td class="rs2"></td>${tv.map(x => `<td>${nv(x)}</td>`).join('')}</tr>`;
   }
   const ghead = groups && groups.length > 1 ? `<tr><th class="n"></th><th></th>${groups.map(g => `<th class="grp" colspan="${g[1]}">${esc(g[0])}</th>`).join('')}</tr>` : '';
-  return strip + `<section class="blk" style="margin-top:6px"><div class="tw"><table class="nfx sep glt" style="width:max(100%, ${tw}px)"><colgroup><col style="width:88px"><col style="width:92px">${cols.map(c => `<col style="width:${w(c[0])}px">`).join('')}</colgroup><thead>${ghead}<tr><th class="n">Gamelog</th><th></th>${cols.map(c => `<th>${esc(c[0])}</th>`).join('')}</tr></thead><tbody>${trs}${totRow}</tbody></table></div></section>`;
+  return strip + `<section class="blk" style="margin-top:6px"><div class="tw"><table class="nfx sep glt" style="width:max(100%, ${tw}px)"><colgroup><col style="width:80px"><col style="width:82px">${cols.map(c => `<col style="width:${w(c[0])}px">`).join('')}</colgroup><thead>${ghead}<tr><th class="n">Gamelog</th><th></th>${cols.map(c => `<th>${esc(c[0])}</th>`).join('')}</tr></thead><tbody>${trs}${totRow}</tbody></table></div></section>`;
 }
 function statCats(j, league) {
   return ((j && j.categories) || []).filter(c => c.statistics && c.statistics.length).map(c => ({
@@ -1615,7 +1622,13 @@ function teamStatsHTML(t) {
   if (!t.ps.cats.size) return msg('Statistiky hráčů nejsou k dispozici.');
   const tn = teamHead(t).name;
   if (t.league === 'nba') return nbaPlayersHTML(t, tn);
-  return [...t.ps.cats.values()].map(c => {
+  let catList = [...t.ps.cats.values()];
+  if (t.league === 'nfl') {
+    const ORD = [/pass/i, /rush/i, /receiv/i, /defens|tackl/i, /intercept/i, /kick/i, /punt/i, /return/i];
+    const oi = c => { const n = String(c.name || ''); const k = ORD.findIndex(re => re.test(n)); return k < 0 ? 99 : k; };
+    catList = catList.filter(c => !/scor/i.test(String(c.name || ''))).sort((a, b) => oi(a) - oi(b));
+  }
+  return catList.map(c => {
     const title = c.name;
     const cols = pickStatCols(c.labels, t.league, 7, c.names);
     const gk = title + '|' + c.labels.join(',');
@@ -1623,12 +1636,14 @@ function teamStatsHTML(t) {
     const defK = cols.find(k => ['PTS', 'YDS', 'W'].includes(c.labels[k])) ?? cols[Math.min(1, cols.length - 1)];
     const sk = sel.k != null && cols.includes(sel.k) ? sel.k : defK, asc = !!sel.asc;
     const num = v => { const x = String(v).replace(/,/g, ''); if (/^\d+:\d+$/.test(x)) { const m = x.split(':'); return +m[0] * 60 + +m[1]; } const n = parseFloat(x); return isNaN(n) ? -1e9 : n; };
-    const rows = [...c.rows].sort((x, y) => (asc ? 1 : -1) * (num(x.vals[sk]) - num(y.vals[sk])));
+    let rows = [...c.rows].sort((x, y) => (asc ? 1 : -1) * (num(x.vals[sk]) - num(y.vals[sk])));
+    const manual = sel.k != null;
+    if (t.league === 'nfl' && /pass/i.test(String(c.name || ''))) { const ai = c.labels.indexOf('ATT'); if (ai >= 0) rows = rows.filter(r => num(r.vals[ai]) > 0); }
     const trs = rows.map(r => {
       const a = r.a, pos = (a.position && a.position.abbreviation) || '';
-      return `<tr data-player="${esc(a.id)}" data-pl="${t.league}" data-pn="${esc(a.displayName || '')}" data-pp="${esc(pos)}" data-pj="${esc(a.jersey || '')}" data-pt="${esc(tn)}"><td class="n"><span class="pn" style="max-width:none">${esc(shortNm(a.displayName || a.fullName))}</span><small>${esc(pos)}</small></td>${cols.map(k => k === sk ? cell(r.vals[k]).replace('<td class="', '<td class="on ') : `${cell(r.vals[k])}`).join('')}</tr>`;
+      return `<tr data-player="${esc(a.id)}" data-pl="${t.league}" data-pn="${esc(a.displayName || '')}" data-pp="${esc(pos)}" data-pj="${esc(a.jersey || '')}" data-pt="${esc(tn)}"><td class="n"><span class="pn" style="max-width:none">${esc(shortNm(a.displayName || a.fullName))}</span><small>${esc(pos)}</small></td>${cols.map(k => manual && k === sk ? cell(r.vals[k]).replace('<td class="', '<td class="on ') : `${cell(r.vals[k])}`).join('')}</tr>`;
     }).join('');
-    return `<section class="blk"><div class="tw"><table class="fx sep"><colgroup><col style="width:124px"></colgroup><thead><tr><th class="n">${esc(CAT_NAME[String(title).toLowerCase()] || title)}</th>${cols.map(k => `<th data-sort="${k}" data-sg="${esc(gk)}" class="${k === sk ? 'on' + (asc ? ' asc' : '') : ''}">${esc(dl(c.labels[k], t.league))}</th>`).join('')}</tr></thead><tbody>${trs}</tbody></table></div></section>`;
+    return `<section class="blk"><div class="tw"><table class="fx sep"><colgroup><col style="width:124px"></colgroup><thead><tr><th class="n">${esc(CAT_NAME[String(title).toLowerCase()] || title)}</th>${cols.map(k => `<th data-sort="${k}" data-sg="${esc(gk)}" class="${manual && k === sk ? 'on' + (asc ? ' asc' : '') : ''}">${esc(dl(c.labels[k], t.league))}</th>`).join('')}</tr></thead><tbody>${trs}</tbody></table></div></section>`;
   }).join('');
 }
 
