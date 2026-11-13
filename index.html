@@ -136,6 +136,27 @@ details[open] summary::after{content:'⌃'}
 .stt{white-space:normal}
 .stt td.n{min-width:0}
 .mu{color:var(--mut)}
+.per{border-bottom:1px solid #3a3a3c;padding-bottom:6px}
+.per:last-child{border-bottom:0}
+.phd{font-family:var(--wide);font-stretch:112%;font-weight:800;font-size:12px;letter-spacing:.5px;padding:16px 0 4px}
+.pname.up{text-transform:uppercase}
+.phero .tl{width:72px;height:72px}
+.ros th,.ros td{padding-left:4.5px;padding-right:4.5px}
+.ros th.n,.ros td.n{padding-left:0}
+.ros .pn{max-width:calc(100vw - 244px)}
+.ros th:not(.n),.ros td:not(.n){font-size:14.5px}
+.ros th:not(.n){font-size:11px}
+.mstrip{position:relative;display:flex;gap:4px;overflow-x:auto;margin:0 -16px;padding:0 16px 12px;scrollbar-width:none;border-bottom:1px solid #3a3a3c;-webkit-overflow-scrolling:touch}
+.mstrip::-webkit-scrollbar{display:none}
+.mo{flex:none;min-width:66px;padding:6px 10px;border-radius:12px;color:var(--mut);font-weight:600;font-size:13px;line-height:1.25;display:flex;flex-direction:column;align-items:center}
+.mo.on{background:var(--acc);color:#fff}
+.mstrip + .blk{margin-top:10px}
+.sch .rs b{font-weight:600;font-family:var(--num);font-size:19px}
+.sch .rs .W,.sch .rs .L{font-family:var(--num);font-size:19px;margin-right:6px}
+.sch .rs .ar{font-style:normal;font-size:9px;margin:0 5px;vertical-align:middle}
+.sch .rs .mu{color:var(--mut)}
+.sch .rs .sf{color:var(--mut);font-size:10px;margin-left:4px;font-weight:600}
+.sch .rs .live{color:var(--live);font-weight:600}
 </style>
 </head>
 <body>
@@ -174,7 +195,7 @@ async function getJson(url) { const r = await fetch(url); if (!r.ok) throw new E
 const state = {
   league: LEAGUES[store.get('league')] ? store.get('league') : 'nba',
   date: todayET(), isToday: true, events: [], loading: false, error: null,
-  game: null, player: null, pmeta: null, teams: {}, teamList: {}, search: false, sq: '', sleague: null, sp: null, team: null, lastView: '', open: new Set(), closed: new Set()
+  game: null, player: null, pmeta: null, teams: {}, teamList: {}, search: false, sq: '', sleague: null, sp: null, team: null, lastView: '', teamErrs: {}, teamErrText: '', tmeta: null, open: new Set(), closed: new Set()
 };
 function setDate(d) { state.date = d; state.isToday = ymd(d) === ymd(todayET()); }
 let reqId = 0;
@@ -237,20 +258,47 @@ async function loadGame() {
   if (state.game === g && topView() === 'game') render();
 }
 const teamsP = {};
+function parseTeams(j) {
+  const out = [];
+  const add = tm => {
+    if (tm && tm.id && !out.some(x => x.id === String(tm.id)))
+      out.push({ id: String(tm.id), name: tm.displayName || '', abbr: tm.abbreviation || '', loc: tm.location || '', short: tm.shortDisplayName || tm.name || '', slug: tm.slug || '',
+        logo: tm.logo || (tm.logos && tm.logos[0] && tm.logos[0].href) || '' });
+  };
+  (((j.sports || [])[0] || {}).leagues || []).forEach(l => (l.teams || []).forEach(t => add(t.team || t)));
+  if (!out.length) (j.teams || []).forEach(t => add(t.team || t));
+  if (!out.length) {
+    const walk = n => { if (!n) return; ((n.standings && n.standings.entries) || n.entries || []).forEach(e => add(e.team)); (n.children || []).forEach(walk); };
+    walk(j);
+  }
+  return out;
+}
 function ensureTeams(league) {
   if (state.teamList[league]) return Promise.resolve(state.teamList[league]);
-  if (!teamsP[league]) teamsP[league] = getJson(API + LEAGUES[league].path + '/teams?limit=100').then(j => {
-    const list = [], m = {};
-    (((j.sports || [])[0] || {}).leagues || []).forEach(l => (l.teams || []).forEach(t => {
-      const tm = t.team || {};
-      list.push({ id: String(tm.id), name: tm.displayName || '', abbr: tm.abbreviation || '', loc: tm.location || '', short: tm.shortDisplayName || '',
-        logo: tm.logo || (tm.logos && tm.logos[0] && tm.logos[0].href) || '' });
-      if (tm.abbreviation) { m['id' + tm.id] = tm.abbreviation; if (tm.slug) m[tm.slug] = tm.abbreviation; }
-    }));
-    list.sort((a, b) => a.name.localeCompare(b.name));
-    state.teamList[league] = list; state.teams[league] = m;
-    return list;
-  }).catch(e => { delete teamsP[league]; throw e; });
+  if (!teamsP[league]) {
+    const path = LEAGUES[league].path;
+    const urls = [API + path + '/teams', API + path + '/teams?limit=100',
+      'https://site.web.api.espn.com/apis/site/v2/sports/' + path + '/teams',
+      'https://site.api.espn.com/apis/v2/sports/' + path + '/standings',
+      'https://site.web.api.espn.com/apis/v2/sports/' + path + '/standings'];
+    teamsP[league] = (async () => {
+      let lastErr = null;
+      for (const u of urls) {
+        try {
+          const list = parseTeams(await getJson(u));
+          if (list.length) {
+            list.sort((a, b) => a.name.localeCompare(b.name));
+            const m = {};
+            list.forEach(x => { if (x.abbr) { m['id' + x.id] = x.abbr; if (x.slug) m[x.slug] = x.abbr; } });
+            state.teamList[league] = list; state.teams[league] = m; state.teamErrs[league] = false;
+            return list;
+          }
+          lastErr = new Error('prázdná odpověď');
+        } catch (e) { lastErr = e; }
+      }
+      throw lastErr || new Error('chyba');
+    })().catch(e => { delete teamsP[league]; throw e; });
+  }
   return teamsP[league];
 }
 async function loadPlayer() {
@@ -267,11 +315,22 @@ async function loadPlayer() {
 async function loadTeam() {
   const t = state.team; if (!t) return;
   const base = API + LEAGUES[t.league].path + '/teams/' + t.id;
-  const res = await Promise.allSettled([getJson(base), getJson(base + '/roster'), getJson(base + '/schedule'), getJson(base + '/statistics'), ensureTeams(t.league)]);
+  const res = await Promise.allSettled([getJson(base), getJson(base + '/roster'), getJson(base + '/schedule'), getJson(base + '/statistics'),
+    getJson(base + '/schedule?seasontype=1'), getJson(base + '/schedule?seasontype=3'), ensureTeams(t.league)]);
   const val = r => r.status === 'fulfilled' ? r.value : null;
   const er = r => r.status === 'rejected' ? String((r.reason && r.reason.message) || r.reason) : null;
   t.info = val(res[0]); t.roster = val(res[1]); t.rosterErr = er(res[1]);
   t.sched = val(res[2]); t.schedErr = er(res[2]); t.stats = val(res[3]); t.statsErr = er(res[3]);
+  const seen = new Set(); t.events = [];
+  [res[2], res[4], res[5]].forEach(r => {
+    const j = val(r);
+    ((j && j.events) || []).forEach(ev => {
+      if (!ev || seen.has(ev.id)) return;
+      seen.add(ev.id);
+      const e = normEvent(ev); e.stype = (ev.seasonType && ev.seasonType.name) || '';
+      t.events.push(e);
+    });
+  });
   t.done = true;
   if (state.team === t && topView() === 'team') render();
 }
@@ -323,7 +382,7 @@ function renderGame() {
   if (g.err && !g.sum) body = `<div class="msg">${esc(g.err)}<br><button data-refresh>Zkusit znovu</button></div>`;
   else if (!g.sum) body = msg('Načítám…');
   else body = g.tab === 'stats' ? statsHTML(g) : playsHTML(g);
-  const side = t => `<div class="t" data-topen="${esc(t.id)}" data-tl="${g.league}">${logoImg(t.logo)}<span>${esc(t.abbr)}</span></div>`;
+  const side = t => `<div class="t" data-topen="${esc(t.id)}" data-tl="${g.league}" data-tn="${esc(t.name)}" data-tlogo="${esc(t.logo)}">${logoImg(t.logo)}<span>${esc(t.abbr)}</span></div>`;
   let hero = '';
   if (e) {
     const mid = e.state === 'post' ? `Final${e.short.replace('Final', '')}<br><span>${dayWord(e.date)}</span>`
@@ -443,7 +502,7 @@ function scoringHTML(g) {
       return `<div class="play g"><span class="pl">${lg ? `<img src="${esc(lg)}" alt="" onerror="this.style.visibility='hidden'">` : ''}</span>
         <span class="clk">${esc((p.clock && p.clock.displayValue) || '')}</span><span class="txt">${esc(p.text || p.shortText || '')}${sc}</span></div>`;
     }).join('');
-    return `<details data-period="${k}" ${state.closed.has(k) ? '' : 'open'}><summary>${periodLabel(g.league, k)}</summary>${rows}</details>`;
+    return `<section class="per"><div class="phd">${periodLabel(g.league, k)}</div>${rows}</section>`;
   }).join('');
 }
 function playsHTML(g) {
@@ -536,65 +595,73 @@ function careerHTML(p) {
 }
 
 /* ---------- tým ---------- */
-function renderTeam() {
-  const t = state.team;
+const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+function teamHead(t) {
   const meta = (state.teamList[t.league] || []).find(x => x.id === t.id) || {};
-  const ti = (t.info && t.info.team) || {};
-  const name = ti.displayName || meta.name || '';
-  const logo = (ti.logos && ti.logos[0] && ti.logos[0].href) || meta.logo || '';
-  const rec = (ti.record && ti.record.items && ti.record.items[0] && ti.record.items[0].summary) || '';
-  const sub = [rec, ti.standingSummary].filter(Boolean).join(' · ');
+  const pre = t.pre || {};
+  const objs = [t.info && t.info.team, t.roster && t.roster.team, t.sched && t.sched.team].filter(Boolean);
+  const pick = f => { for (const o of objs) { const v = f(o); if (v) return v; } return ''; };
+  const name = pick(o => o.displayName) || meta.name || pre.name || '';
+  const logo = pick(o => o.logo || (o.logos && o.logos[0] && o.logos[0].href)) || meta.logo || pre.logo || '';
+  const rec = pick(o => o.recordSummary || (o.record && o.record.items && o.record.items[0] && o.record.items[0].summary) || (typeof o.record === 'string' ? o.record : ''));
+  const stand = pick(o => o.standingSummary);
+  return { name, logo, sub: [rec, stand].filter(Boolean).join(' • ') };
+}
+function renderTeam() {
+  const t = state.team, h = teamHead(t);
   const tab = (k, l) => `<button data-ttab="${k}" class="${t.tab === k ? 'on' : ''}">${l}</button>`;
   const body = !t.done ? msg('Načítám…') : t.tab === 'roster' ? rosterHTML(t) : t.tab === 'sched' ? scheduleHTML(t) : teamStatsHTML(t);
   $app.innerHTML = `
     <header class="d"><div class="tabs"><button class="back" data-back aria-label="Zpět">‹</button></div></header>
-    <main><div class="phero">${logo ? `<img class="tl" src="${esc(logo)}" alt="" onerror="this.style.visibility='hidden'">` : ''}
-      <div><div class="pname">${esc(name)}</div><div class="psub">${esc(sub)}</div></div></div>
+    <main><div class="phero">${h.logo ? `<img class="tl" src="${esc(h.logo)}" alt="" onerror="this.style.visibility='hidden'">` : ''}
+      <div><div class="pname up">${esc(h.name)}</div><div class="psub">${esc(h.sub)}</div></div></div>
       <div class="dtabs sm">${tab('roster', 'Roster')}${tab('sched', 'Schedule')}${tab('stats', 'Stats')}</div>
       <div class="pane t">${body}</div></main>`;
+  const ms = document.getElementById('mstrip'), on = ms && ms.querySelector('.on');
+  if (on) ms.scrollLeft = on.offsetLeft - (ms.clientWidth - on.offsetWidth) / 2;
 }
 function rosterHTML(t) {
   if (t.rosterErr || !t.roster) return msg('Soupisku se nepodařilo načíst' + (t.rosterErr ? ' (' + t.rosterErr + ')' : '.'));
-  const groups = [];
-  (t.roster.athletes || []).forEach(a => {
-    if (!a) return;
-    if (Array.isArray(a.items)) {
-      const raw = typeof a.position === 'string' ? a.position : (a.position && a.position.displayName) || '';
-      groups.push({ title: raw ? raw.charAt(0).toUpperCase() + raw.slice(1) : 'Players', items: a.items });
-    } else {
-      let g = groups.find(x => x.flat);
-      if (!g) { g = { title: 'Players', items: [], flat: true }; groups.push(g); }
-      g.items.push(a);
-    }
-  });
-  if (!groups.length) return msg('Soupiska není k dispozici.');
-  const tn = (t.info && t.info.team && t.info.team.displayName) || '';
-  return groups.map(g => {
-    const trs = g.items.map(a => {
-      const pos = (a.position && a.position.abbreviation) || '', nm = a.displayName || a.fullName || '';
-      return `<tr data-player="${esc(a.id)}" data-pl="${t.league}" data-pn="${esc(nm)}" data-pp="${esc(pos)}" data-pj="${esc(a.jersey || '')}" data-pt="${esc(tn)}">
-        <td class="n"><span class="jn">${esc(a.jersey || '')}</span><span class="pn">${esc(a.shortName || nm)}</span><small>${esc(pos)}</small></td>
-        <td>${esc(a.age)}</td><td>${esc(a.displayHeight || '')}</td><td>${esc(a.displayWeight || '')}</td></tr>`;
-    }).join('');
-    return `<section class="blk"><div class="tw"><table><thead><tr><th class="n">${esc(g.title)}</th><th>AGE</th><th>HT</th><th>WT</th></tr></thead><tbody>${trs}</tbody></table></div></section>`;
+  const all = [];
+  (t.roster.athletes || []).forEach(a => { if (!a) return; if (Array.isArray(a.items)) a.items.forEach(x => all.push(x)); else all.push(a); });
+  if (!all.length) return msg('Soupiska není k dispozici.');
+  const tn = teamHead(t).name;
+  const trs = all.map(a => {
+    const pos = (a.position && a.position.abbreviation) || '', nm = a.displayName || a.fullName || '';
+    const exp = a.experience && a.experience.years != null ? a.experience.years : '';
+    const ht = String(a.displayHeight || '').replace(/\s/g, ''), wt = String(a.displayWeight || '').replace(/\s*lbs?\.?/i, '');
+    return `<tr data-player="${esc(a.id)}" data-pl="${t.league}" data-pn="${esc(nm)}" data-pp="${esc(pos)}" data-pj="${esc(a.jersey || '')}" data-pt="${esc(tn)}">
+      <td class="n"><span class="pn">${esc(nm)}</span></td><td>${esc(pos)}</td><td>${esc(a.jersey || '')}</td><td>${esc(exp)}</td><td>${esc(ht)}</td><td>${esc(wt)}</td><td>${esc(a.age)}</td></tr>`;
   }).join('');
+  return `<section class="blk"><div class="tw"><table class="ros"><thead><tr><th class="n">Roster</th><th>POS</th><th>#</th><th>EXP</th><th>HT</th><th>WT</th><th>AGE</th></tr></thead><tbody>${trs}</tbody></table></div></section>`;
 }
 function scheduleHTML(t) {
-  if (t.schedErr || !t.sched) return msg('Rozpis se nepodařilo načíst' + (t.schedErr ? ' (' + t.schedErr + ')' : '.'));
-  const evs = (t.sched.events || []).map(normEvent);
-  if (!evs.length) return msg('Rozpis není k dispozici.');
+  const evs = t.events || [];
+  if (!evs.length) return msg(t.schedErr ? 'Rozpis se nepodařilo načíst (' + t.schedErr + ').' : 'Rozpis není k dispozici.');
+  const key = e => { const d = new Date(e.date); return d.getFullYear() + '-' + pad(d.getMonth() + 1); };
+  const sorted = [...evs].sort((a, b) => new Date(a.date) - new Date(b.date));
+  const months = [...new Set(sorted.map(key))];
+  const now = new Date(), nk = now.getFullYear() + '-' + pad(now.getMonth() + 1);
+  if (!t.month || !months.includes(t.month)) t.month = months.includes(nk) ? nk : (months.filter(m => m < nk).pop() || months[0]);
+  const strip = months.map(m => { const p = m.split('-'); return `<button class="mo ${m === t.month ? 'on' : ''}" data-month="${m}"><span>${MONTHS[+p[1] - 1]}</span><span>${p[0]}</span></button>`; }).join('');
   const row = e => {
     const mine = e.home.id === t.id ? e.home : e.away, opp = mine === e.home ? e.away : e.home;
     const d = new Date(e.date), when = DAYS[d.getDay()] + ' ' + d.getDate() + '.' + (d.getMonth() + 1) + '.';
-    const res = e.state === 'pre' ? esc(fmtTime(e.date)) : e.state === 'in' ? esc(e.short)
-      : `<span class="${mine.winner ? 'W' : 'L'}">${mine.winner ? 'W' : 'L'}</span> ${esc(mine.score)}-${esc(opp.score)}`;
+    let res;
+    if (e.state === 'pre') res = esc(fmtTime(e.date));
+    else if (e.state === 'in') res = `<span class="live">${esc(e.short)}</span>`;
+    else {
+      const w = mine.winner, sfx = e.short.replace(/^Final\/?/, '');
+      res = `<span class="${w ? 'W' : 'L'}">${w ? 'W' : 'L'}</span> <b class="${w ? '' : 'mu'}">${esc(mine.score)}</b><i class="ar">${w ? '◂' : '▸'}</i><b class="${w ? 'mu' : ''}">${esc(opp.score)}</b>${sfx ? `<small class="sf">${esc(sfx)}</small>` : ''}`;
+    }
     return `<tr data-game="${esc(e.id)}" data-gl="${t.league}"><td class="n"><span class="pn">${when}</span></td>
       <td class="opp"><small>${mine === e.home ? 'vs' : '@'}</small>${logoImg(opp.logo)}<b>${esc(opp.abbr)}</b></td><td class="rs">${res}</td></tr>`;
   };
-  const sec = (title, list) => list.length ? `<section class="blk"><div class="tw"><table class="sch"><thead><tr><th class="n">${title}</th><th></th><th></th></tr></thead><tbody>${list.map(row).join('')}</tbody></table></div></section>` : '';
-  const up = evs.filter(e => e.state !== 'post').sort((a, b) => new Date(a.date) - new Date(b.date));
-  const done = evs.filter(e => e.state === 'post').sort((a, b) => new Date(b.date) - new Date(a.date));
-  return sec('Upcoming', up) + sec('Results', done);
+  let html = '', cur = null, rows = '';
+  const flush = () => { if (cur !== null && rows) html += `<section class="blk"><div class="tw"><table class="sch"><thead><tr><th class="n">${esc(cur || 'Games')}</th><th></th><th></th></tr></thead><tbody>${rows}</tbody></table></div></section>`; rows = ''; };
+  sorted.filter(e => key(e) === t.month).forEach(e => { const st = e.stype || ''; if (st !== cur) { flush(); cur = st; } rows += row(e); });
+  flush();
+  return `<div class="mstrip" id="mstrip">${strip}</div>${html}`;
 }
 function teamStatsHTML(t) {
   const j = t.stats;
@@ -636,48 +703,66 @@ async function searchPlayers(q, league) {
   if (lastErr) throw lastErr;
   return [];
 }
+const leagueOrder = () => [state.league, ...Object.keys(LEAGUES).filter(k => k !== state.league)];
 function runPlayerSearch() {
   clearTimeout(sTimer);
-  const q = state.sq.trim(), sl = state.sleague || state.league;
+  const q = state.sq.trim();
   if (q.length < 2) { state.sp = null; paintSearch(); return; }
-  const my = state.sp = { q, loading: true, items: [], err: null };
+  const my = state.sp = { q, loading: true, items: [], errs: [] };
   paintSearch();
   sTimer = setTimeout(async () => {
-    try { my.items = await searchPlayers(q, sl); } catch (e) { my.err = String((e && e.message) || e); }
+    const order = leagueOrder();
+    const res = await Promise.allSettled(order.map(l => searchPlayers(q, l)));
+    res.forEach((r, i) => {
+      if (r.status === 'fulfilled') r.value.slice(0, 10).forEach(x => my.items.push(Object.assign({}, x, { league: order[i] })));
+      else my.errs.push(order[i]);
+    });
     my.loading = false;
     if (state.sp === my) paintSearch();
   }, 350);
 }
 function paintSearch() {
-  const pills = document.getElementById('spills'), res = document.getElementById('sres');
-  if (!pills || !res) return;
-  const sl = state.sleague || state.league;
-  pills.innerHTML = Object.entries(LEAGUES).map(([k, v]) => `<button class="pill ${k === sl ? 'on' : ''}" data-sleague="${k}">${v.name}</button>`).join('');
-  const q = state.sq.trim().toLowerCase(), list = state.teamList[sl];
+  const res = document.getElementById('sres'); if (!res) return;
+  const q = state.sq.trim().toLowerCase(), toks = q.split(/\s+/).filter(Boolean), order = leagueOrder();
+  let loaded = 0, failed = 0;
+  const rows = [];
+  order.forEach(l => {
+    const list = state.teamList[l];
+    if (!list) { if (state.teamErrs[l]) failed++; return; }
+    loaded++;
+    let t = list;
+    if (toks.length) t = list.filter(x => {
+      const words = [x.name, x.abbr, x.loc, x.short].join(' ').toLowerCase().split(/[\s.\-]+/);
+      return toks.every(k => words.some(w => w.startsWith(k)));
+    });
+    else if (l !== state.league) t = [];
+    t.forEach(x => rows.push(`<div class="res-row" data-topen="${esc(x.id)}" data-tl="${l}" data-tn="${esc(x.name)}" data-tlogo="${esc(x.logo)}">${logoImg(x.logo)}<div><div class="rn">${esc(x.name)}</div><div class="rs">${l.toUpperCase()}</div></div></div>`));
+  });
   let html = '';
-  if (!list) html += state.teamErr ? msg('Týmy se nepodařilo načíst.') : msg('Načítám…');
-  else {
-    const t = q ? list.filter(x => [x.name, x.abbr, x.loc, x.short].some(v => v && v.toLowerCase().includes(q))) : list;
-    if (t.length) html += '<div class="sec">Týmy</div>' + t.map(x => `<div class="res-row" data-topen="${esc(x.id)}" data-tl="${sl}">${logoImg(x.logo)}<div><div class="rn">${esc(x.name)}</div><div class="rs">${esc(x.abbr)}</div></div></div>`).join('');
-  }
+  if (rows.length) html += '<div class="sec">Týmy</div>' + rows.join('');
+  if (!loaded) html += failed ? msg('Týmy se nepodařilo načíst (' + state.teamErrText + ').') : msg('Načítám…');
   if (q.length >= 2) {
     html += '<div class="sec">Hráči</div>';
     const sp = state.sp;
     if (!sp || sp.loading) html += msg('Hledám…');
-    else if (sp.err) html += msg('Hledání hráčů se nepodařilo (' + sp.err + ').');
-    else if (!sp.items.length) html += msg('Žádní hráči.');
-    else html += sp.items.map(i => `<div class="res-row" data-player="${esc(i.id)}" data-pl="${sl}" data-pn="${esc(i.name)}" data-pp="" data-pj="" data-pt="${esc(i.sub)}">
-      <img class="hs" src="https://a.espncdn.com/i/headshots/${sl}/players/full/${esc(i.id)}.png" alt="" onerror="this.style.visibility='hidden'"><div><div class="rn">${esc(i.name)}</div><div class="rs">${esc(i.sub)}</div></div></div>`).join('');
+    else if (!sp.items.length) html += msg(sp.errs.length >= order.length ? 'Hledání hráčů se nepodařilo.' : 'Žádní hráči.');
+    else html += sp.items.map(i => {
+      const sub = i.league.toUpperCase() + (i.sub ? ' · ' + i.sub : '');
+      return `<div class="res-row" data-player="${esc(i.id)}" data-pl="${i.league}" data-pn="${esc(i.name)}" data-pp="" data-pj="" data-pt="${esc(i.sub)}">
+      <img class="hs" src="https://a.espncdn.com/i/headshots/${i.league}/players/full/${esc(i.id)}.png" alt="" onerror="this.style.visibility='hidden'"><div><div class="rn">${esc(i.name)}</div><div class="rs">${esc(sub)}</div></div></div>`;
+    }).join('');
   }
   res.innerHTML = html;
 }
 function renderSearch() {
   if (!document.getElementById('sq')) {
-    $app.innerHTML = `<header class="d"><div class="tabs"><button class="back" data-back aria-label="Zpět">‹</button><input id="sq" class="sinp" type="search" placeholder="Hledat tým nebo hráče" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" enterkeyhint="search" value="${esc(state.sq)}"></div><div class="tabs" id="spills" style="margin:10px 0 0"></div></header><main><div id="sres"></div></main>`;
+    $app.innerHTML = `<header class="d"><div class="tabs"><button class="back" data-back aria-label="Zpět">‹</button><input id="sq" class="sinp" type="search" placeholder="Hledat tým nebo hráče" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" enterkeyhint="search" value="${esc(state.sq)}"></div></header><main><div id="sres"></div></main>`;
     if (!state.sq) { const el = document.getElementById('sq'); setTimeout(() => el && el.focus(), 80); }
   }
   paintSearch();
-  ensureTeams(state.sleague || state.league).then(paintSearch, () => { state.teamErr = true; paintSearch(); });
+  Object.keys(LEAGUES).forEach(l => {
+    if (!state.teamList[l]) ensureTeams(l).then(paintSearch, e => { state.teamErrs[l] = true; state.teamErrText = String((e && e.message) || e); paintSearch(); });
+  });
 }
 
 /* ---------- navigace ---------- */
@@ -689,7 +774,7 @@ function openGame(league, id) {
 }
 function openTeam(league, id) {
   if (state.team && state.team.id === id && state.team.league === league) { render(); return; }
-  state.team = { league, id, tab: 'roster', done: false };
+  state.team = { league, id, tab: 'roster', done: false, pre: (state.tmeta && state.tmeta.id === id) ? state.tmeta : null };
   render(); loadTeam();
 }
 function playerNav(d) {
@@ -724,7 +809,7 @@ window.addEventListener('hashchange', route);
 
 const $app = document.getElementById('app');
 $app.addEventListener('click', ev => {
-  const b = ev.target.closest('[data-league],[data-game],[data-date],[data-tab],[data-ptab],[data-ttab],[data-team],[data-player],[data-topen],[data-search],[data-sleague],[data-refresh],[data-back]');
+  const b = ev.target.closest('[data-league],[data-game],[data-date],[data-tab],[data-ptab],[data-ttab],[data-team],[data-player],[data-topen],[data-search],[data-month],[data-refresh],[data-back]');
   if (!b) return;
   const d = b.dataset;
   if (d.league) {
@@ -733,11 +818,12 @@ $app.addEventListener('click', ev => {
   } else if (d.player) {
     playerNav(d);
   } else if (d.topen) {
+    state.tmeta = { league: d.tl, id: d.topen, name: d.tn || '', logo: d.tlogo || '' };
     window._fromList = true; location.hash = '#/team/' + d.tl + '/' + d.topen;
   } else if (d.search !== undefined) {
     state.sleague = state.league; window._fromList = true; location.hash = '#/search';
-  } else if (d.sleague) {
-    state.sleague = d.sleague; state.sp = null; state.teamErr = false; renderSearch(); runPlayerSearch();
+  } else if (d.month) {
+    state.team.month = d.month; render();
   } else if (d.game !== undefined) {
     window._fromList = true; location.hash = '#/game/' + (d.gl || state.league) + '/' + d.game;
   } else if (d.date) {
