@@ -102,7 +102,7 @@ header.d + main{padding-top:0}
 .hero .m span{color:#fff}
 .hero .m.pre{grid-column:2 / span 3}
 .hero .m .dt1{font-family:var(--num);font-weight:700;font-size:22px;letter-spacing:.3px;white-space:nowrap}
-.dtabs{display:flex;gap:21px;border-bottom:1px solid #3a3a3c;margin:4px -16px 0;padding:0 20px;overflow-x:auto;scrollbar-width:none}
+.dtabs{display:flex;gap:21px;border-bottom:1px solid #3a3a3c;margin:4px -16px 0;padding:0 20px;overflow:hidden;touch-action:pan-y;overscroll-behavior:none}
 .dtabs::-webkit-scrollbar{display:none}
 .dtabs button{flex:none;padding:12px 0 13px;font-weight:600;font-size:16px;letter-spacing:1px;color:var(--mut);border-bottom:3px solid transparent;margin-bottom:-1px;white-space:nowrap}
 .dtabs button.on{color:#fff;border-color:#fff}
@@ -215,7 +215,8 @@ details[open] summary::after{content:'⌃'}
 .play .sco{display:block;color:var(--mut);font-size:12px;margin-top:2px;font-weight:600}
 .play.g{align-items:flex-start;padding:11px 0}
 .play.g .txt{font-weight:500}
-.play.g .sco{color:#fff;font-weight:700;font-size:12.5px;margin-top:4px}
+.play.g .sco{color:#fff;font-weight:700;font-family:var(--num);font-size:17px;margin:0 0 3px;letter-spacing:.3px}
+.play.g .txt{font-size:14.5px}
 /* hráč */
 .cmpin{display:flex;flex-direction:column;gap:8px;margin:10px 0 14px}
 .cmpi{position:relative}
@@ -235,6 +236,7 @@ details[open] summary::after{content:'⌃'}
 .cmpt td.win{color:#fff}
 .cmpt td.mut{font-size:13px;font-family:inherit;font-weight:500}
 .cmpt td.cl{text-align:center;color:var(--mut);font-size:13px;font-weight:600}
+.stn{width:44px;flex:none;color:#ffd60a;font-size:13px;letter-spacing:-1px}
 .lsc{width:100%}
 .lsc th,.lsc td{text-align:center;padding:9px 4px;font-size:15px}
 .lsc th{font-size:12px;color:var(--mut)}
@@ -249,8 +251,19 @@ details[open] summary::after{content:'⌃'}
 .wpt b{font-family:var(--num);font-size:19px}
 .wpt span{color:var(--mut);font-size:13px}
 .wpx{font-size:13.5px;line-height:1.35;margin-top:3px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
-.wpw{position:relative;height:150px;touch-action:none}
+.wpw{position:relative;height:150px;cursor:pointer}
+.wpexp{position:absolute;right:8px;top:4px;color:var(--mut);font-size:16px;pointer-events:none}
+.wph{font-size:11.5px;color:var(--mut);text-align:center;margin-top:5px}
+#wpov{position:fixed;inset:0;z-index:200;background:#000;display:flex;align-items:center;justify-content:center}
+#wpov .wpbox{width:100vw;height:100vh;padding:14px 18px calc(14px + env(safe-area-inset-bottom));box-sizing:border-box;display:flex;flex-direction:column;background:var(--card)}
+#wpov.rot .wpbox{position:absolute;left:50%;top:50%;flex:none;width:100vh;height:100vw;transform:translate(-50%,-50%) rotate(90deg);padding:16px max(18px, env(safe-area-inset-top)) 14px}
+#wpov .wptop{display:flex;align-items:flex-start;gap:10px}
+#wpov .wpi{flex:1;min-height:62px}
+#wpov .wpclose{width:38px;height:38px;border-radius:12px;background:#2c2c2e;font-size:24px;flex:none}
+#wpov .wpw.big{flex:1;height:auto;min-height:0;touch-action:none;cursor:crosshair}
+#wpov .wpw.big svg{position:absolute;inset:0;width:100%;height:100%}
 .wpw svg{width:100%;height:150px;display:block;border-radius:8px;background:#161618}
+#wpov .wpw svg{height:100%}
 .wpl{position:absolute;left:8px;font-size:11px;font-weight:700;color:var(--mut);pointer-events:none}
 .wpl.t{top:6px}.wpl.b{bottom:6px}
 .tsh{display:flex;align-items:center;gap:8px;margin:4px 0 6px;font-family:var(--num);font-size:19px}
@@ -865,7 +878,7 @@ function renderGame() {
   if (g.err && !g.sum) body = `<div class="msg">${esc(g.err)}<br><button data-refresh>Zkusit znovu</button></div>`;
   else if (!g.sum) body = msg('Načítám…');
   else if (!g.tabInit) body = msg('Načítám…');
-  else { const live = g.ev && g.ev.state !== 'pre'; if (!live && (g.tab === 'summary' || g.tab === 'tstats')) g.tab = 'preview'; if (live && g.league === 'nhl' && g.tab === 'plays') g.tab = 'summary';
+  else { const live = g.ev && g.ev.state !== 'pre'; if (!live && (g.tab === 'summary' || g.tab === 'tstats')) g.tab = 'preview'; if (live && g.league === 'nhl' && g.tab === 'plays') g.tab = 'summary'; if (g.ev && g.ev.state === 'post' && g.tab === 'preview') g.tab = 'summary';
     body = g.tab === 'preview' ? previewHTML(g) : g.tab === 'summary' ? summaryGameHTML(g) : g.tab === 'tstats' ? teamStatsGameHTML(g) : g.tab === 'stats' ? statsHTML(g) : playsHTML(g); }
   const side = (t, na) => `<div class="t" data-topen="${esc(t.id)}" data-tl="${g.league}" data-tn="${esc(t.name)}" data-tlogo="${esc(t.logo)}">${logoImg(t.logo)}${na ? '' : `<span>${esc(t.abbr)}</span>`}${t.record ? `<span class="rc">${esc(String(t.record).replace(/,\s*\d+\s*pts?\b/i, ''))}</span>` : ''}</div>`;
   let hero = '';
@@ -949,7 +962,7 @@ function toRows(list, cols, ti) {
 function gTabs(g) {
   const live = g.ev && g.ev.state !== 'pre';
   if (!live) return [['preview', 'Preview'], ['stats', 'Stats'], ['plays', 'Plays']];
-  const t = [['preview', 'Preview'], ['summary', 'Summary'], ['stats', 'Stats'], ['tstats', 'Team Stats']];
+  const t = [...(g.ev.state === 'post' ? [] : [['preview', 'Preview']]), ['summary', 'Summary'], ['stats', 'Stats'], ['tstats', 'Team Stats']];
   if (g.league !== 'nhl') t.push(['plays', 'Plays']);
   return t;
 }
@@ -967,7 +980,8 @@ function linescoreHTML(g) {
 function summaryGameHTML(g) {
   let out = linescoreHTML(g);
   if (g.league === 'nfl' || g.league === 'nhl') { const sp = scoringHTML(g); if (sp && !/class="msg"/.test(sp.slice(0, 30))) out += `<section class="pv"><div class="sec">Scoring plays</div>${sp}</section>`; }
-  out += pvLeaders(g, true) || '';
+  const st = g.league === 'nhl' && g.ev.state === 'post' ? starsHTML(g) : null;
+  out += st != null ? st : (pvLeaders(g, true) || '');
   out += wpHTML(g);
   return out || msg('Souhrn zatím není k dispozici.');
 }
@@ -981,14 +995,27 @@ function wpHTML(g) {
   window._wp = { pts, W, e: { a: e.away.abbr, h: e.home.abbr }, league: g.league };
   const line = pts.map(p => p.x.toFixed(1) + ',' + p.y.toFixed(1)).join(' ');
   const poly = `0,${mid} ${line} ${W},${mid}`;
-  return `<section class="pv"><div class="sec">Win probability</div><div class="wpi" id="wpi">${wpInfo(pts.length - 1)}</div>
-  <div class="wpw"><svg id="wpsvg" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none"><defs><clipPath id="wpt"><rect x="0" y="0" width="${W}" height="${mid}"/></clipPath><clipPath id="wpb"><rect x="0" y="${mid}" width="${W}" height="${mid}"/></clipPath></defs>
+  const html = `<section class="pv"><div class="sec">Win probability</div><div class="wpw" data-wpopen="1"><svg id="wpsvg" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none"><defs><clipPath id="wpt"><rect x="0" y="0" width="${W}" height="${mid}"/></clipPath><clipPath id="wpb"><rect x="0" y="${mid}" width="${W}" height="${mid}"/></clipPath></defs>
   <polygon points="${poly}" fill="${col(e.home)}" opacity=".55" clip-path="url(#wpt)"/><polygon points="${poly}" fill="${col(e.away)}" opacity=".55" clip-path="url(#wpb)"/>
   <line x1="0" y1="${mid}" x2="${W}" y2="${mid}" stroke="#555" stroke-width="1" vector-effect="non-scaling-stroke"/>
   <polyline points="${line}" fill="none" stroke="#fff" stroke-width="2" vector-effect="non-scaling-stroke"/>
-  <line id="wpcur" x1="${W}" y1="0" x2="${W}" y2="${H}" stroke="#fff" stroke-width="1" vector-effect="non-scaling-stroke" opacity=".7"/></svg>
-  <div class="wpl t">${esc(e.home.abbr)}</div><div class="wpl b">${esc(e.away.abbr)}</div></div></section>`;
+  <line class="wpcur" x1="${W}" y1="0" x2="${W}" y2="${H}" stroke="#fff" stroke-width="1" vector-effect="non-scaling-stroke" opacity="0"/></svg>
+  <div class="wpl t">${esc(e.home.abbr)}</div><div class="wpl b">${esc(e.away.abbr)}</div><div class="wpexp">⤢</div></div><div class="wph">Klepni pro detail</div></section>`;
+  return html;
 }
+function openWp() {
+  const src = document.getElementById('wpsvg'), W = window._wp; if (!src || !W) return;
+  closeWp();
+  const ov = document.createElement('div'); ov.id = 'wpov';
+  ov.innerHTML = `<div class="wpbox"><div class="wptop"><div class="wpi" id="wpi">${wpInfo(W.pts.length - 1)}</div><button class="wpclose" data-wpclose="1">×</button></div><div class="wpw big">${src.outerHTML.replace('id="wpsvg"', 'id="wpsvg2"')}<div class="wpl t">${esc(W.e.h)}</div><div class="wpl b">${esc(W.e.a)}</div></div></div>`;
+  document.body.appendChild(ov); document.body.style.overflow = 'hidden';
+  const c = ov.querySelector('.wpcur'); if (c) c.setAttribute('opacity', '.8');
+  fitWp();
+}
+function fitWp() { const ov = document.getElementById('wpov'); if (!ov) return; ov.classList.toggle('rot', window.innerHeight > window.innerWidth); }
+window.addEventListener('resize', fitWp);
+function closeWp() { const ov = document.getElementById('wpov'); if (ov) ov.remove(); document.body.style.overflow = ''; }
+document.addEventListener('click', ev => { if (ev.target.closest('[data-wpclose]')) { closeWp(); return; } if (ev.target.closest('[data-wpopen]')) openWp(); });
 function wpInfo(i) {
   const W = window._wp; if (!W) return ''; const p = W.pts[i]; if (!p) return '';
   const lead = p.hp >= .5 ? W.e.h : W.e.a, pc = Math.round(Math.max(p.hp, 1 - p.hp) * 100);
@@ -997,16 +1024,17 @@ function wpInfo(i) {
   return `<div class="wpt"><b>${esc(lead)} ${pc}%</b><span>${esc([per, p.clk, sc].filter(Boolean).join(' · '))}</span></div><div class="wpx">${esc(p.text)}</div>`;
 }
 function wpMove(ev) {
-  const svg = document.getElementById('wpsvg'), W = window._wp; if (!svg || !W) return;
-  const r = svg.getBoundingClientRect(), cx = (ev.touches ? ev.touches[0].clientX : ev.clientX) - r.left;
-  const i = Math.max(0, Math.min(W.pts.length - 1, Math.round(cx / r.width * (W.pts.length - 1))));
-  const cur = document.getElementById('wpcur'); if (cur) { cur.setAttribute('x1', W.pts[i].x); cur.setAttribute('x2', W.pts[i].x); }
+  const svg = document.getElementById('wpsvg2'), W = window._wp; if (!svg || !W) return;
+  const r = svg.getBoundingClientRect(), P = ev.touches ? ev.touches[0] : ev, rot = document.getElementById('wpov').classList.contains('rot');
+  const f = rot ? (P.clientY - r.top) / r.height : (P.clientX - r.left) / r.width;
+  const i = Math.max(0, Math.min(W.pts.length - 1, Math.round(f * (W.pts.length - 1))));
+  const cur = svg.querySelector('.wpcur'); if (cur) { cur.setAttribute('x1', W.pts[i].x); cur.setAttribute('x2', W.pts[i].x); }
   const inf = document.getElementById('wpi'); if (inf) inf.innerHTML = wpInfo(i);
   if (ev.cancelable && ev.touches) ev.preventDefault();
 }
-document.addEventListener('touchmove', ev => { if (ev.target.closest && ev.target.closest('#wpsvg')) wpMove(ev); }, { passive: false });
-document.addEventListener('touchstart', ev => { if (ev.target.closest && ev.target.closest('#wpsvg')) wpMove(ev); }, { passive: false });
-document.addEventListener('pointermove', ev => { if (ev.pointerType === 'mouse' && ev.target.closest && ev.target.closest('#wpsvg')) wpMove(ev); });
+document.addEventListener('touchmove', ev => { if (ev.target.closest && ev.target.closest('#wpsvg2')) wpMove(ev); }, { passive: false });
+document.addEventListener('touchstart', ev => { if (ev.target.closest && ev.target.closest('#wpsvg2')) wpMove(ev); }, { passive: false });
+document.addEventListener('pointermove', ev => { if (ev.pointerType === 'mouse' && ev.target.closest && ev.target.closest('#wpsvg2')) wpMove(ev); });
 function teamStatsGameHTML(g) {
   const ts = (g.sum.boxscore && g.sum.boxscore.teams) || [];
   if (ts.length < 2) return msg('Týmové statistiky zatím nejsou k dispozici.');
@@ -1017,7 +1045,8 @@ function teamStatsGameHTML(g) {
   const rows = (A.statistics || []).map(x => {
     const y = hv.get(x.name || x.label); if (!y) return '';
     const a = num(x.displayValue), b = num(y.displayValue);
-    const bar = a != null && b != null && a >= 0 && b >= 0 && (a + b) > 0 && !/-/.test(String(x.displayValue).replace(/^-/, '')) ? `<div class="tsb"><i style="width:${(a / (a + b) * 100).toFixed(1)}%;background:${col(e.away)}"></i><i style="width:${(b / (a + b) * 100).toFixed(1)}%;background:${col(e.home)}"></i></div>` : '';
+    const sm = (a || 0) + (b || 0), pa = sm > 0 ? a / sm * 100 : 50;
+    const bar = a != null && b != null && a >= 0 && b >= 0 && !/-/.test(String(x.displayValue).replace(/^-/, '')) ? `<div class="tsb"><i style="width:${pa.toFixed(1)}%;background:${col(e.away)}"></i><i style="width:${(100 - pa).toFixed(1)}%;background:${col(e.home)}"></i></div>` : '';
     return `<div class="tsr"><div class="tsv">${esc(x.displayValue)}</div><div class="tsl">${esc(x.label || x.name)}</div><div class="tsv r">${esc(y.displayValue)}</div>${bar}</div>`;
   }).join('');
   return `<section class="pv"><div class="tsh">${logoImg(e.away.logo)}<b>${esc(e.away.abbr)}</b><span class="grow"></span><b>${esc(e.home.abbr)}</b>${logoImg(e.home.logo)}</div>${rows || msg('Týmové statistiky zatím nejsou k dispozici.')}</section>`;
@@ -1157,6 +1186,43 @@ async function loadSeasonLeaders(g) {
   if (state.game === g && topView() === 'game' && g.tab === 'preview') render();
 }
 const hsOf = (a, league) => (a && a.headshot && (a.headshot.href || a.headshot)) || (a && a.id ? `https://a.espncdn.com/i/headshots/${league}/players/full/${a.id}.png` : '');
+function boxLeaders(g) {
+  const e = g.ev, ps = (g.sum.boxscore && g.sum.boxscore.players) || [];
+  const of = id => ps.find(x => String(x.team && x.team.id) === String(id));
+  const best = (tp, test, lab, fmt) => { if (!tp) return null; let top = null;
+    (tp.statistics || []).filter(st => test(st)).forEach(st => { const L = st.labels || st.names || [], k = L.indexOf(lab); if (k < 0) return;
+      (st.athletes || []).forEach(a => { const v = parseFloat(String((a.stats || [])[k]).replace(/,/g, '')); if (!isNaN(v) && v > 0 && (!top || v > top.v)) top = { v, a, L, st: a.stats }; }); });
+    return top ? { mainStat: { value: top.v, label: lab }, summary: fmt(top), athlete: top.a.athlete } : null; };
+  const out = [[], []], add = (name, displayName, test, lab, fmt) => {
+    const r = [e.away, e.home].map(t => best(of(t.id), test, lab, fmt)); if (!r[0] && !r[1]) return;
+    r.forEach((x, i) => { if (x) out[i].push({ name, displayName, leaders: [x] }); }); };
+  if (g.league === 'nfl') add('interceptions', 'Interceptions', st => st.name === 'interceptions', 'INT', t => { const y = t.L.indexOf('YDS'); return y >= 0 && t.st[y] != null ? t.st[y] + ' YDS' : ''; });
+  if (g.league === 'nba') { add('steals', 'Steals', () => true, 'STL', () => ''); add('blocks', 'Blocks', () => true, 'BLK', () => ''); }
+  return out;
+}
+function findStars(o, d) {
+  if (!o || typeof o !== 'object' || d > 5) return null;
+  for (const k of Object.keys(o)) { const v = o[k]; if (/star/i.test(k) && Array.isArray(v) && v.length && v.some(x => x && (x.athlete || x.$ref))) return v; }
+  for (const k of Object.keys(o)) { const r = findStars(o[k], d + 1); if (r) return r; }
+  return null;
+}
+async function loadStars(g) {
+  g.starsL = true;
+  let arr = findStars(g.sum, 0);
+  if (!arr) try { const c = await getJson('https://sports.core.api.espn.com/v2/sports/hockey/leagues/nhl/events/' + g.id + '/competitions/' + g.id + '?lang=en&region=us'); arr = findStars(c, 0); } catch (e) {}
+  const out = [];
+  if (arr) for (const x of arr.slice(0, 3)) { try { let a = x.athlete || x; if (a.$ref && !a.displayName) a = await getJson(String(a.$ref).replace(/^http:/, 'https:')); out.push({ a, x }); } catch (e) {} }
+  g.stars = out; g.starsL = false;
+  if (state.game === g && topView() === 'game') render();
+}
+function starsHTML(g) {
+  if (g.stars === undefined) { if (!g.starsL) loadStars(g); return ''; }
+  if (!g.stars.length) return null;
+  const tn = id => { const t = [g.ev.away, g.ev.home].find(z => String(z.id) === String(id)); return t || {}; };
+  return `<section class="pv"><div class="sec">Three stars</div>${g.stars.map(({ a, x }, i) => { const tid = (a.team && (a.team.id || ((a.team.$ref || '').match(/teams\/(\d+)/) || [])[1])) || ''; const t = tn(tid), pos = (a.position && a.position.abbreviation) || '';
+    const line = x.displayValue || x.summary || (x.statistics && x.statistics.map(q => q.displayValue + ' ' + (q.abbreviation || '')).join(', ')) || '';
+    return `<div class="ir" data-player="${esc(a.id)}" data-pl="nhl" data-pn="${esc(a.displayName || '')}" data-pp="${esc(pos)}" data-pj="${esc(a.jersey || '')}" data-pt="${esc(t.name || '')}"><div class="stn">${'★'.repeat(i + 1)}</div><img class="hs" src="${esc(hsOf(a, 'nhl'))}" alt="" onerror="this.style.visibility='hidden'"><div class="grow"><div class="ln">${esc(a.displayName || '')}</div><div class="ls">${esc([t.abbr, pos].filter(Boolean).join(' · '))}</div></div><div class="is"><div class="ls">${esc(line)}</div></div></div>`; }).join('')}</section>`;
+}
 function pvLeaders(g, gm) {
   const sum = g.sum, e = g.ev, comps = (sum.header && sum.header.competitions && sum.header.competitions[0] && sum.header.competitions[0].competitors) || [];
   let arr = (sum.leaders || []).filter(x => x && x.leaders && x.leaders.length);
@@ -1167,6 +1233,7 @@ function pvLeaders(g, gm) {
   let useSl = false;
   if (gm) {} else if (g.sl && g.sl[0] && g.sl[1] && (g.sl[0].length || g.sl[1].length)) { la = g.sl[0]; lh = g.sl[1]; useSl = true; }
   else if (e.state !== 'pre') { la = []; lh = []; }
+  if (gm) { const ex = boxLeaders(g); la = [...la, ...ex[0]]; lh = [...lh, ...ex[1]]; }
   const names = []; [...la, ...lh].forEach(c => { if (c && c.name && !names.includes(c.name)) names.push(c.name); });
   const ord = (SL_CATS[g.league] || []).map(x => x[1]); names.sort((a, b) => (ord.indexOf(a) + 99) % 99 - (ord.indexOf(b) + 99) % 99);
   if (useSl) { names.length = 0; ord.forEach(x => names.push(x)); }
@@ -1178,7 +1245,7 @@ function pvLeaders(g, gm) {
     return `<div class="ld ${right ? 'r' : ''}" data-player="${esc(a.id)}" data-pl="${g.league}" data-pn="${esc(a.displayName || a.shortName || '')}" data-pp="${esc(pos)}" data-pj="${esc(a.jersey || '')}" data-pt="${esc((tm && tm.name) || '')}"><img class="hs" src="${esc(hsOf(a, g.league))}" alt="" onerror="this.style.visibility='hidden'">
       <div class="lt"><div class="ln ${String(a.shortName || a.displayName || '').length > 13 ? 'lg2' : ''}">${right ? `<small class="pl">${esc(pos)}</small>` : ''}${esc(a.shortName || a.displayName || '')}${right ? '' : `<small>${esc(pos)}</small>`}</div><div class="lv">${esc(String(val).trim())}</div>${sub ? `<div class="ls">${esc(sub)}</div>` : ''}</div></div>`;
   };
-  const rows = names.slice(0, 4).map(n => {
+  const rows = names.slice(0, gm ? 8 : 4).map(n => {
     const ca = la.find(c => c.name === n), ch = lh.find(c => c.name === n), t = ca || ch;
     return `<div class="lc"><div class="lh">${esc(((t && t.displayName) || n).replace(/ Leader$/i, ''))}</div><div class="lg">${side(ca && ca.leaders && ca.leaders[0], false, e.away)}${side(ch && ch.leaders && ch.leaders[0], true, e.home)}</div></div>`;
   }).join('');
@@ -1397,7 +1464,7 @@ function scoringHTML(g) {
       const lg = p.team && logos[p.team.id];
       const sc = p.awayScore != null && ev ? `<span class="sco">${esc(ev.away.abbr)} ${esc(p.awayScore)} – ${esc(ev.home.abbr)} ${esc(p.homeScore)}</span>` : '';
       return `<div class="play g"><span class="pl">${lg ? `<img src="${esc(lg)}" alt="" onerror="this.style.visibility='hidden'">` : ''}</span>
-        <span class="clk">${esc((p.clock && p.clock.displayValue) || '')}</span><span class="txt">${esc(p.text || p.shortText || '')}${sc}</span></div>`;
+        <span class="clk">${esc((p.clock && p.clock.displayValue) || '')}</span><span class="txt">${sc}${esc(p.text || p.shortText || '')}</span></div>`;
     }).join('');
     return `<section class="per"><div class="phd">${periodLabel(g.league, k)}</div>${rows}</section>`;
   }).join('');
@@ -1878,14 +1945,16 @@ function teamInjHTML(t) {
 }
 function renderTeam() {
   const t = state.team, h = teamHead(t);
-  const tab = (k, l) => `<button data-ttab="${k}" class="${t.tab === k ? 'on' : ''}">${l}</button>`;
-  const body = !t.done ? msg('Načítám…') : t.tab === 'roster' ? rosterHTML(t) : t.tab === 'sched' ? scheduleHTML(t) : t.tab === 'tstats' ? teamTabStatsHTML(t) : t.tab === 'inj' ? teamInjHTML(t) : teamStatsHTML(t);
+  const tab = (k, l, x) => `<button data-ttab="${k}" class="${t.tab === k || x ? 'on' : ''}">${l}</button>`;
+  const sseg = `<div class="seg pseg" style="max-width:240px"><button data-ttab="stats" class="${t.tab === 'stats' ? 'on' : ''}">Players</button><button data-ttab="tstats" class="${t.tab === 'tstats' ? 'on' : ''}">Team</button></div>`;
+  const body0 = !t.done ? msg('Načítám…') : t.tab === 'roster' ? rosterHTML(t) : t.tab === 'sched' ? scheduleHTML(t) : t.tab === 'tstats' ? teamTabStatsHTML(t) : t.tab === 'inj' ? teamInjHTML(t) : teamStatsHTML(t);
+  const body = t.done && (t.tab === 'stats' || t.tab === 'tstats') ? sseg + body0 : body0;
   $app.innerHTML = `
     <header class="d"><div class="tabs"><button class="back" data-back aria-label="Zpět">‹</button><button class="home" data-home aria-label="Domů"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"><path d="M3 10.5 12 3l9 7.5"/><path d="M5.5 9v11h13V9"/><path d="M10 20v-6h4v6"/></svg></button><button class="home" data-refresh aria-label="Obnovit"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12a8 8 0 1 1-2.34-5.66"/><path d="M20 4v5h-5"/></svg></button></div></header>
     <main><div class="phero">${h.logo ? `<img class="tl" src="${esc(h.logo)}" alt="" onerror="this.style.visibility='hidden'">` : ''}
       <div class="grow"><div class="pname up">${esc(h.name)}</div><div class="psub">${esc(h.sub)}</div></div>
       <button class="fstar ${isFav(t.league, t.id) ? 'on' : ''}" data-fav="${esc(t.id)}" data-fl="${t.league}" data-fn="${esc(h.name)}" data-flogo="${esc(h.logo)}" aria-label="Oblíbený tým">${STAR_SVG}</button></div>
-      <div class="dtabs sm">${tab('roster', 'Roster')}${tab('sched', 'Schedule')}${tab('stats', 'Player stats')}${tab('tstats', 'Team stats')}${tab('inj', 'Injuries')}</div>
+      <div class="dtabs sm">${tab('roster', 'Roster')}${tab('sched', 'Schedule')}${tab('stats', 'Stats', t.tab === 'tstats')}${tab('inj', 'Injuries')}</div>
       <div class="pane t">${body}</div></main>`;
   const ms = document.getElementById('mstrip'), on = ms && ms.querySelector('.on');
   if (on) ms.scrollLeft = on.offsetLeft - (ms.clientWidth - on.offsetWidth) / 2;
@@ -2271,7 +2340,7 @@ function lstatsHTML(v, c) {
 }
 async function loadCmp(i) {
   const c = state.cmp, sel = c.sel[i]; if (!sel) return;
-  const base = WEB + LEAGUES[c.league].path + '/athletes/' + sel.id;
+  const base = WEB + LEAGUES[sel.league || c.league].path + '/athletes/' + sel.id;
   const [a, st] = await Promise.allSettled([getJson(base), getJson(base + '/stats')]);
   if (c.sel[i] !== sel) return;
   const at = a.status === 'fulfilled' ? (a.value.athlete || a.value) : null;
@@ -2284,7 +2353,7 @@ function renderCompare() {
     const lseg = `<div class="seg pseg" style="max-width:260px">${Object.entries(LEAGUES).map(([k, v]) => `<button data-cmpl="${k}" class="${c.league === k ? 'on' : ''}">${v.name}</button>`).join('')}</div>`;
     const inp = i => `<div class="cmpi"><input id="cq${i}" class="sinp" type="search" autocomplete="off" placeholder="Hráč ${i + 1}" value="${esc(c.q[i])}"><button class="cmpx" data-cmpx="${i}" aria-label="Smazat">×</button><div class="cmpr" id="cr${i}"></div></div>`;
     $app.innerHTML = `<header class="d"><div class="tabs"><button class="back" data-back aria-label="Zpět">‹</button><button class="home" data-home aria-label="Domů"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"><path d="M3 10.5 12 3l9 7.5"/><path d="M5.5 9v11h13V9"/><path d="M10 20v-6h4v6"/></svg></button></div></header>
-    <main id="cmpw"><div class="lvt">Compare players</div>${lseg}<div class="cmpin">${inp(0)}${inp(1)}</div><div class="pane t" id="cmpbody"></div></main>`;
+    <main id="cmpw"><div class="lvt">Compare players</div><div class="cmpin">${inp(0)}${inp(1)}</div><div class="pane t" id="cmpbody"></div></main>`;
   }
   paintCompare();
 }
@@ -2296,9 +2365,10 @@ function cmpRows(rows) {
 }
 function paintCompare() {
   const c = state.cmp; if (!c) return;
-  [0, 1].forEach(i => { const el = document.getElementById('cr' + i); if (el) el.innerHTML = c.res[i].length ? c.res[i].map(r => `<div class="cmpo" data-cmpp="${i}" data-cid="${esc(r.id)}" data-cn="${esc(r.name)}"><img class="hs" src="https://a.espncdn.com/i/headshots/${c.league}/players/full/${esc(r.id)}.png" alt="" onerror="this.style.visibility='hidden'"><div><div class="ln">${esc(r.name)}</div><div class="ls">${esc(r.sub || '')}</div></div></div>`).join('') : ''; });
+  [0, 1].forEach(i => { const el = document.getElementById('cr' + i); if (el) el.innerHTML = c.res[i].length ? c.res[i].map(r => `<div class="cmpo" data-cmpp="${i}" data-cid="${esc(r.id)}" data-cn="${esc(r.name)}" data-clg="${r.league}"><img class="hs" src="https://a.espncdn.com/i/headshots/${r.league}/players/full/${esc(r.id)}.png" alt="" onerror="this.style.visibility='hidden'"><div><div class="ln">${esc(r.name)}</div><div class="ls">${esc([LEAGUES[r.league].name, r.sub].filter(Boolean).join(' · '))}</div></div></div>`).join('') : ''; });
   const body = document.getElementById('cmpbody'); if (!body) return;
-  if (!c.sel[0] || !c.sel[1]) { body.innerHTML = msg('Vyber dva hráče ze stejné ligy.'); return; }
+  [0, 1].forEach(i => { const el = document.getElementById('cq' + i); if (el) el.placeholder = i && c.sel[0] ? 'Hráč 2 (' + LEAGUES[c.sel[0].league].name + ')' : !i && c.sel[1] ? 'Hráč 1 (' + LEAGUES[c.sel[1].league].name + ')' : 'Hráč ' + (i + 1); });
+  if (!c.sel[0] || !c.sel[1]) { body.innerHTML = msg('Vyber dva hráče. Druhý se hledá ve stejné lize jako první.'); return; }
   if (!c.data[0] || !c.data[1]) { body.innerHTML = msg('Načítám…'); return; }
   const [A, B] = c.data, lg = c.league;
   const head = [A, B].map((d, i) => { const a = d.bio, pos = (a.position && a.position.abbreviation) || '', tm = (a.team && (a.team.displayName || a.team.name)) || '';
@@ -2627,7 +2697,8 @@ $app.addEventListener('click', ev => {
   } else if (d.cmpl) {
     const c = state.cmp; if (c.league !== d.cmpl) { c.league = d.cmpl; c.q = ['', '']; c.res = [[], []]; c.sel = [null, null]; c.data = [null, null]; state.lastView = null; $app.innerHTML = ''; } render();
   } else if (d.cmpp !== undefined) {
-    const c = state.cmp, i = +d.cmpp; c.sel[i] = { id: d.cid, name: d.cn }; c.q[i] = d.cn; c.res[i] = []; c.data[i] = null;
+    const c = state.cmp, i = +d.cmpp; c.sel[i] = { id: d.cid, name: d.cn, league: d.clg }; c.league = d.clg;
+    if (c.sel[1 - i] && c.sel[1 - i].league !== d.clg) { c.sel[1 - i] = null; c.data[1 - i] = null; c.q[1 - i] = ''; const o = document.getElementById('cq' + (1 - i)); if (o) o.value = ''; } c.q[i] = d.cn; c.res[i] = []; c.data[i] = null;
     const inp = document.getElementById('cq' + i); if (inp) { inp.value = d.cn; inp.blur(); }
     loadCmp(i); paintCompare();
   } else if (d.cmpx !== undefined) {
@@ -2643,7 +2714,11 @@ $app.addEventListener('click', ev => {
 });
 $app.addEventListener('input', ev => {
   if (ev.target.id === 'sq') { state.sq = ev.target.value; runPlayerSearch(); }
-  else if (/^cq[01]$/.test(ev.target.id)) { const i = +ev.target.id[2], c = state.cmp; c.q[i] = ev.target.value; c.sel[i] = null; c.data[i] = null; clearTimeout(c.t); const q = c.q[i].trim(); if (q.length < 2) { c.res[i] = []; paintCompare(); return; } c.t = setTimeout(async () => { try { const r = await searchPlayers(q, c.league); if (c.q[i].trim() === q) { c.res[i] = r.slice(0, 6); paintCompare(); } } catch (e) {} }, 300); }
+  else if (/^cq[01]$/.test(ev.target.id)) { const i = +ev.target.id[2], c = state.cmp; c.q[i] = ev.target.value; c.sel[i] = null; c.data[i] = null; clearTimeout(c.t); const q = c.q[i].trim(); if (q.length < 2) { c.res[i] = []; paintCompare(); return; }
+    c.t = setTimeout(async () => { const o = c.sel[1 - i], lgs = o ? [o.league] : Object.keys(LEAGUES);
+      const rs = await Promise.allSettled(lgs.map(l => searchPlayers(q, l).then(r => r.map(x => Object.assign(x, { league: l })))));
+      const all = []; rs.forEach(r => { if (r.status === 'fulfilled') all.push(...r.value.slice(0, 5)); });
+      if (c.q[i].trim() === q) { c.res[i] = all.slice(0, 8); paintCompare(); } }, 300); }
 });
 $app.addEventListener('toggle', ev => {
   const el = ev.target; if (!el.dataset || !el.dataset.period) return;
