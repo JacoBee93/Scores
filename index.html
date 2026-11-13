@@ -272,14 +272,20 @@ details[open] summary::after{content:'⌃'}
 .sch .rs .mu{color:var(--mut)}
 .sch .rs .sf{display:inline-block;width:24px;text-align:left;color:var(--mut);font-size:10px;margin-left:3px;font-weight:600}
 .sch .rs .live{color:var(--live);font-weight:600}
-.sch .rg{display:inline-grid;grid-template-columns:22px 84px;align-items:center;vertical-align:middle}
-.sch .rg .tm{grid-column:1 / span 2;text-align:right !important}
+.sch .rg{display:inline-grid;grid-template-columns:86px 24px 24px;align-items:center;vertical-align:middle}
+.sch .rg .W,.sch .rg .L{text-align:center !important}
+.sch td.n .pn{font-size:18px}
+.sch .opp b{font-size:18px}
+.sch .opp img{width:28px;height:28px}
+.sch td{padding-top:9px;padding-bottom:9px}
+.sch .rs .sf{text-align:left;font-size:11px}
 .sch .rg .W,.sch .rg .L{width:auto;margin:0}
-.sch .sc2{display:grid;grid-template-columns:1fr 12px 36px;align-items:center}
+.sch .sc2{display:grid;grid-template-columns:1fr 12px 1fr;align-items:center}
+.sch .sc2 b{font-size:20px}
 .sch .sc2 b:first-child{text-align:right}
 .sch .sc2 b:last-child{text-align:left}
 .sch .sc2 i{font-style:normal;text-align:center;font-family:var(--num);font-weight:600;font-size:17px;color:var(--mut)}
-.sch .rg .tm{text-align:center;font-family:var(--num);font-weight:600;font-size:18px}
+.sch .rg .tm{text-align:center;font-family:var(--num);font-weight:600;font-size:20px}
 .sch .rg .sf{width:auto;margin-left:3px}
 </style>
 </head>
@@ -1271,6 +1277,10 @@ function rosterHTML(t) {
   }).join('');
   return `<section class="blk"><div class="tw"><table class="ros"><thead><tr><th class="n">Roster</th><th>POS</th><th>#</th><th>EXP</th><th>HT</th><th>WT</th><th>AGE</th></tr></thead><tbody>${trs}</tbody></table></div></section>`;
 }
+function teamShortOf(league, tm) {
+  const x = (state.teamList[league] || []).find(y => y.id === String(tm.id));
+  return (x && x.short) || tm.name || tm.abbr || '';
+}
 function teamLogoOf(league, tm) {
   const x = (state.teamList[league] || []).find(y => y.id === String(tm.id));
   return (x && x.logo) || (tm.abbr ? `https://a.espncdn.com/i/teamlogos/${league}/500/${String(tm.abbr).toLowerCase()}.png` : '');
@@ -1288,14 +1298,14 @@ function scheduleHTML(t) {
     const mine = e.home.id === t.id ? e.home : e.away, opp = mine === e.home ? e.away : e.home;
     const d = new Date(e.date), when = DAYS[d.getDay()] + ' ' + d.getDate() + '.' + (d.getMonth() + 1) + '.';
     let res;
-    if (e.state === 'pre') res = `<span class="rg"><span class="tm">${esc(fmtTime(e.date))}</span></span>`;
+    if (e.state === 'pre') res = `<span class="rg"><span class="tm">${esc(fmtTime(e.date))}</span><i></i><i></i></span>`;
     else if (e.state === 'in') res = `<span class="live">${esc(e.short)}</span>`;
     else {
       const w = mine.winner, sfx = e.short.replace(/^Final\/?/, '');
-      res = `<span class="rg"><span class="${w ? 'W' : 'L'}">${w ? 'W' : 'L'}</span><span class="sc2"><b class="${w ? '' : 'mu'}">${esc(mine.score)}</b><i>:</i><b class="${w ? 'mu' : ''}">${esc(opp.score)}</b></span></span>`;
+      res = `<span class="rg"><span class="sc2"><b class="${w ? '' : 'mu'}">${esc(mine.score)}</b><i>:</i><b class="${w ? 'mu' : ''}">${esc(opp.score)}</b></span><span class="${w ? 'W' : 'L'}">${w ? 'W' : 'L'}</span><small class="sf">${esc(sfx)}</small></span>`;
     }
     return `<tr data-game="${esc(e.id)}" data-gl="${t.league}"><td class="n"><span class="pn">${when}</span></td>
-      <td class="opp"><small>${mine === e.home ? 'vs' : '@'}</small>${logoImg(opp.logo || teamLogoOf(t.league, opp))}<b>${esc(opp.abbr)}</b></td><td class="rs">${res}</td></tr>`;
+      <td class="opp"><small>${mine === e.home ? 'vs' : '@'}</small>${logoImg(opp.logo || teamLogoOf(t.league, opp))}<b>${esc(teamShortOf(t.league, opp))}</b></td><td class="rs">${res}</td></tr>`;
   };
   let html = '', cur = null, rows = '';
   const flush = () => { if (cur !== null && rows) html += `<section class="blk"><div class="tw"><table class="sch"><thead><tr><th class="n">${esc(cur || 'Games')}</th><th></th><th></th></tr></thead><tbody>${rows}</tbody></table></div></section>`; rows = ''; };
