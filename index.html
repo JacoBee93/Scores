@@ -256,6 +256,17 @@ details[open] summary::after{content:'⌃'}
 .glt thead tr:first-child th{border-bottom:0;padding-bottom:0}
 .glt th.grp{text-align:left;padding-left:8px;color:var(--mut);font-size:10px;letter-spacing:.5px;border-bottom:0;padding-bottom:2px}
 .glt td.n small{margin-left:3px}
+.glt td.n .pn{display:inline-block;width:44px}
+.glt td.n small{display:inline-block;width:16px;text-align:center;margin-left:0 !important}
+.bio{width:100%;border-collapse:collapse}
+.bio td{padding:11px 0;font-size:15px;vertical-align:top}
+.bio td:first-child{color:var(--mut);text-transform:uppercase;font-size:13px;width:120px;letter-spacing:.3px}
+.bdot{display:inline-block;width:9px;height:9px;border-radius:50%;background:#8e8e93;margin-right:6px}
+.bdot.on{background:#30d158}
+.bh{display:flex;align-items:center;gap:10px;padding:8px 0}
+.bh img{width:28px;height:28px;object-fit:contain}
+.bh .bt{font-weight:600;font-size:15px}
+.bh .bs{color:var(--mut);font-size:12.5px}
 .glt td.n .glo{width:20px;height:20px;object-fit:contain;vertical-align:-4px;margin-left:2px}
 .glt td.n{text-overflow:clip !important}
 .glt td.n .pn{font-size:15px}
@@ -568,6 +579,7 @@ async function loadPlayer() {
   try {
     const aj = res[3].status === 'fulfilled' ? res[3].value : null, at = aj && (aj.athlete || aj);
     if (at) {
+      p.bio = at;
       p.name = p.name || at.displayName || at.fullName || '';
       p.pos = p.pos || (at.position && at.position.abbreviation) || '';
       p.jersey = p.jersey || at.jersey || '';
@@ -1204,14 +1216,14 @@ function playsHTML(g) {
 /* ----- stránka hráče ----- */
 function renderPlayer() {
   const p = state.player;
-  const body = !p.done ? msg('Načítám…') : p.tab === 'gl' ? gamelogHTML(p) : statsTabHTML(p);
+  const body = !p.done ? msg('Načítám…') : p.tab === 'gl' ? gamelogHTML(p) : p.tab === 'bio' ? bioHTML(p) : statsTabHTML(p);
   const sub = [p.jersey ? '#' + p.jersey : '', p.pos, p.team].filter(Boolean).join(' · ');
   const tab = (k, l) => `<button data-ptab="${k}" class="${p.tab === k ? 'on' : ''}">${l}</button>`;
   $app.innerHTML = `
     <header class="d"><div class="tabs"><button class="back" data-back aria-label="Zpět">‹</button><button class="home" data-home aria-label="Domů"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"><path d="M3 10.5 12 3l9 7.5"/><path d="M5.5 9v11h13V9"/><path d="M10 20v-6h4v6"/></svg></button><button class="home" data-refresh aria-label="Obnovit"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12a8 8 0 1 1-2.34-5.66"/><path d="M20 4v5h-5"/></svg></button></div></header>
     <main><div class="phero pp"><img class="hs" src="https://a.espncdn.com/i/headshots/${p.league}/players/full/${esc(p.id)}.png" alt="" onerror="this.style.visibility='hidden'">
       <div><div class="pname">${esc(p.name || 'Hráč')}</div><div class="psub">${esc(sub)}</div></div></div>
-      <div class="dtabs sm">${tab('gl', 'Gamelog')}${tab('stats', 'Stats')}</div>
+      <div class="dtabs sm">${tab('gl', 'Gamelog')}${tab('stats', 'Stats')}${tab('bio', 'Bio')}</div>
       <div class="pane t">${body}</div></main>`;
   const gs = document.getElementById('glstrip'), go = gs && gs.querySelector('.on');
   if (go) gs.scrollLeft = go.offsetLeft - (gs.clientWidth - go.offsetWidth) / 2;
@@ -1369,9 +1381,44 @@ function seasonLogo(league, r) {
   if (!r.tid && !ab) return `<small class="tot2">TOT</small>`;
   return u ? `<img class="slg" src="${esc(u)}" alt="" onerror="this.replaceWith(Object.assign(document.createElement('small'),{textContent:'${esc(ab)}'}))">` : (ab ? `<small>${esc(ab)}</small>` : '');
 }
+function bioHTML(p) {
+  const a = p.bio || {};
+  const bp = a.birthPlace || {}, place = a.displayBirthPlace || [bp.city, bp.state || bp.country].filter(Boolean).join(', ');
+  const dob = a.dateOfBirth ? (() => { const d = new Date(a.dateOfBirth); return d.getUTCDate() + '. ' + (d.getUTCMonth() + 1) + '. ' + d.getUTCFullYear(); })() : (a.displayDOB || '');
+  const hw = [a.displayHeight, a.displayWeight].filter(Boolean).join(', ');
+  const exp = a.displayExperience || (a.experience && a.experience.years != null ? (a.experience.years ? a.experience.years + '. sezóna' : 'Rookie') : '');
+  const st = (a.status && (a.status.name || a.status.type)) || '';
+  const draft = a.displayDraft || (a.draft && (a.draft.displayText || [a.draft.year, a.draft.round ? 'Rd ' + a.draft.round : '', a.draft.selection ? 'Pk ' + a.draft.selection : ''].filter(Boolean).join(', '))) || '';
+  const rows = [['Team', (a.team && a.team.displayName) || p.team], ['Position', (a.position && (a.position.displayName || a.position.name)) || p.pos], ['Jersey', a.jersey ? '#' + a.jersey : ''], ['HT/WT', hw], ['Birthdate', dob + (a.age ? ' (' + a.age + ')' : '')], ['Birthplace', place], ['College', (a.college && (a.college.name || a.college.shortName)) || ''], ['Draft', draft], ['Experience', exp], ['Shoots', a.hand && a.hand.displayValue], ['Status', st ? `<span class="bdot ${/active/i.test(st) ? 'on' : ''}"></span>${esc(st)}` : '']].filter(r => r[1]);
+  const teams = [];
+  statCats(p.st, p.league).forEach(c => c.rows.forEach(r => { if (!r.year || !r.sub || !/^[A-Z]{2,4}$/.test(r.sub)) return; let t = teams.find(x => x.ab === r.sub); if (!t) teams.push(t = { ab: r.sub, tid: r.tid, y0: r.year, y1: r.year }); t.y0 = Math.min(t.y0, r.year); t.y1 = Math.max(t.y1, r.year); }));
+  teams.sort((x, y) => y.y1 - x.y1);
+  const tname = t => { const x = (state.teamList[p.league] || []).find(z => z.abbr === t.ab || z.id === String(t.tid)); return x ? x.name : t.ab; };
+  const yr = y => p.league === 'nfl' ? String(y) : (y - 1) + '-' + String(y).slice(2);
+  const hist = teams.length ? `<section class="blk"><div class="sec" style="margin-left:0">Career history</div>${teams.map(t => `<div class="bh">${logoImg(teamLogoOf(p.league, { id: t.tid, abbr: t.ab }))}<div><div class="bt">${esc(tname(t))}</div><div class="bs">${esc(t.y0 === t.y1 ? yr(t.y0) : yr(t.y0) + ' – ' + yr(t.y1))}</div></div></div>`).join('')}</section>` : '';
+  if (!rows.length && !hist) return msg('Bio není k dispozici.');
+  return `<section class="blk"><table class="bio">${rows.map(r => `<tr><td>${esc(r[0])}</td><td>${r[0] === 'Status' ? r[1] : esc(r[1])}</td></tr>`).join('')}</table></section>${hist}`;
+}
+async function loadNcaa(p) {
+  if (p.ncaa || p.ncaaLoading) return;
+  p.ncaaLoading = true; p.ncaaErr = null;
+  try {
+    let cid = p.bio && p.bio.collegeAthlete && (p.bio.collegeAthlete.id || ((p.bio.collegeAthlete.$ref || '').match(/athletes\/(\d+)/) || [])[1]);
+    if (!cid) { const c = await getJson('https://sports.core.api.espn.com/v2/sports/football/leagues/nfl/athletes/' + p.id + '?lang=en&region=us'); const ca = c && c.collegeAthlete; cid = ca && (ca.id || ((ca.$ref || '').match(/athletes\/(\d+)/) || [])[1]); }
+    if (!cid) throw new Error('none');
+    p.ncaa = await getJson(WEB + 'football/college-football/athletes/' + cid + '/stats');
+  } catch (e) { p.ncaaErr = 'Statistiky z NCAA nejsou k dispozici.'; }
+  p.ncaaLoading = false;
+  if (state.player === p && topView() === 'player') render();
+}
 function careerHTML(p, cats) {
   const mode = p.pst || 'reg';
-  const seg = `<div class="seg pseg"><button data-pst="reg" class="${mode === 'reg' ? 'on' : ''}">Regular season</button><button data-pst="post" class="${mode === 'post' ? 'on' : ''}">Playoffs</button></div>`;
+  const seg = `<div class="seg pseg" style="${p.league === 'nfl' ? 'max-width:340px' : ''}"><button data-pst="reg" class="${mode === 'reg' ? 'on' : ''}">Regular season</button><button data-pst="post" class="${mode === 'post' ? 'on' : ''}">Playoffs</button>${p.league === 'nfl' ? `<button data-pst="ncaa" class="${mode === 'ncaa' ? 'on' : ''}">NCAA</button>` : ''}<span style="display:none"></span></div>`;
+  if (mode === 'ncaa') {
+    if (!p.ncaa) return seg + msg(p.ncaaErr || 'Načítám NCAA…');
+    cats = statCats(p.ncaa, 'nfl');
+    if (!cats.length) return seg + msg('Statistiky z NCAA nejsou k dispozici.');
+  }
   let list = cats;
   if (p.league === 'nfl' && p.pos) { const f = cats.filter(c => nflRelevant(p.pos, c.title)); if (f.length) list = f; }
   if (p.league === 'nba') { const c = cats.find(x => /averag/i.test(x.title) && x.labels.includes('PTS')) || cats.find(x => x.labels.includes('PTS') && x.labels.includes('MIN')) || cats[0]; list = [c]; }
@@ -1382,7 +1429,7 @@ function careerHTML(p, cats) {
       : c.labels.map((l, k) => [k, dl(l, p.league), String(l).length > 4 ? 64 : /^(YDS|ATT|CMP|CAR|REC|TGTS|TOI|SA|SV|MIN|PTS)$/.test(l) ? 60 : 50]);
     const tw = 112 + cols.reduce((a, x) => a + x[2], 0);
     let rows, tot = null;
-    if (mode === 'reg') {
+    if (mode !== 'post') {
       rows = [...c.rows].reverse().map(r => ({ n: r.n, sub: r.sub, tid: r.tid, v: cols.map(x => r.vals[x[0]]) }));
       if (c.totals) tot = cols.map(x => c.totals[x[0]]);
     } else {
@@ -1401,9 +1448,9 @@ function careerHTML(p, cats) {
     const sk = mode + '|' + c.title, so = (p.csort || {})[sk];
     if (so) { const num = x => { const n = parseFloat(String(x == null ? '' : x).replace(/,/g, '')); return isNaN(n) ? -1e12 : n; }; rows = [...rows].sort((a, b) => (so.asc ? 1 : -1) * (num(a.v[so.i]) - num(b.v[so.i]))); }
     const tw2 = 92 + cols.reduce((a, x) => a + x[2], 0);
-    return `<section class="blk"><div class="tw"><table class="nfx sep" style="width:max(100%, ${tw2}px)"><colgroup><col style="width:92px">${cols.map(x => `<col style="width:${x[2]}px">`).join('')}</colgroup><thead><tr><th class="n">${esc(title)}</th>${cols.map((x, i) => `<th data-csort="${i}" data-cs="${esc(sk)}" class="${so && so.i === i ? 'on' : ''}">${esc(x[1])}</th>`).join('')}</tr></thead><tbody>${rows.map(r => `<tr><td class="n"><span class="pn">${esc(r.n)}</span>${seasonLogo(p.league, r)}</td>${r.v.map((v, i) => `<td class="${so && so.i === i ? 'on' : ''}">${nv(clean(v))}</td>`).join('')}</tr>`).join('')}${tot ? `<tr class="tot"><td class="n">Career</td>${tot.map(v => `<td>${nv(clean(v))}</td>`).join('')}</tr>` : ''}</tbody></table></div></section>`;
+    return `<section class="blk"><div class="tw"><table class="nfx sep" style="width:max(100%, ${tw2}px)"><colgroup><col style="width:92px">${cols.map(x => `<col style="width:${x[2]}px">`).join('')}</colgroup><thead><tr><th class="n">${esc(title)}</th>${cols.map((x, i) => `<th data-csort="${i}" data-cs="${esc(sk)}" class="${so && so.i === i ? 'on' : ''}">${esc(x[1])}</th>`).join('')}</tr></thead><tbody>${rows.map(r => `<tr><td class="n"><span class="pn">${esc(r.n)}</span>${mode === 'ncaa' ? (r.tid ? `<img class="slg" src="https://a.espncdn.com/i/teamlogos/ncaa/500-dark/${esc(r.tid)}.png" alt="" onerror="if(!this.dataset.f){this.dataset.f=1;this.src=this.src.replace('500-dark','500')}else this.remove()">` : '') : seasonLogo(p.league, r)}</td>${r.v.map((v, i) => `<td class="${so && so.i === i ? 'on' : ''}">${nv(clean(v))}</td>`).join('')}</tr>`).join('')}${tot ? `<tr class="tot"><td class="n">Career</td>${tot.map(v => `<td>${nv(clean(v))}</td>`).join('')}</tr>` : ''}</tbody></table></div></section>`;
   }).join('');
-  if (!out) return seg + msg(mode === 'post' ? (p.postDone ? 'Žádné zápasy v play-off.' : 'Načítám play-off…') : 'Statistiky nejsou k dispozici.');
+  if (!out) return seg + msg(mode === 'ncaa' ? 'Statistiky z NCAA nejsou k dispozici.' : mode === 'post' ? (p.postDone ? 'Žádné zápasy v play-off.' : 'Načítám play-off…') : 'Statistiky nejsou k dispozici.');
   return seg + out;
 }
 function nbaCareerHTML(p, cats) {
@@ -2086,7 +2133,7 @@ $app.addEventListener('click', ev => {
   } else if (d.lsort !== undefined) {
     const v = state.lv, k = +d.lsort; v.asc = v.sk === k ? !v.asc : false; v.sk = k; render();
   } else if (d.pst) {
-    state.player.pst = d.pst; render();
+    state.player.pst = d.pst; if (d.pst === 'ncaa') loadNcaa(state.player); render();
   } else if (d.smode) {
     state.lv.mode = d.smode; render(); loadLV();
   } else if (d.drv !== undefined) {
