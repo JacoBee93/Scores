@@ -197,7 +197,8 @@ details[open] summary::after{content:'⌃'}
 .jn{display:inline-block;width:24px;color:var(--mut);font-family:-apple-system,sans-serif;font-size:11px;font-weight:600}
 .pane > .blk:first-child{margin-top:6px}
 .sch th.n,.sch td.n{width:auto;min-width:92px}
-.sch{table-layout:fixed}
+.sch{table-layout:fixed;width:100%}
+.schw{overflow:hidden}
 .sch .opp{width:auto;text-align:left;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .sch .opp small{color:var(--mut);font-size:11px;font-weight:600;display:inline-block;width:18px}
 .sch .opp img{width:22px;height:22px;vertical-align:middle;margin:0 7px 0 2px;object-fit:contain}
@@ -726,8 +727,9 @@ function teamColor(c, fb) {
   const ok = x => /^[0-9a-f]{6}$/i.test(String(x || '').replace('#', ''));
   let h = ok(t.color) ? t.color.replace('#', '') : (ok(t.alternateColor) ? t.alternateColor.replace('#', '') : '');
   if (!h) return fb;
-  if (lumOf(h) < 0.3 && ok(t.alternateColor) && lumOf(t.alternateColor.replace('#', '')) >= 0.3) h = t.alternateColor.replace('#', '');
-  if (lumOf(h) < 0.3) { const n = parseInt(h, 16); const mix = v => Math.round(v + (255 - v) * 0.45); h = [n >> 16, (n >> 8) & 255, n & 255].map(mix).map(v => v.toString(16).padStart(2, '0')).join(''); }
+  const sat = x => { const n = parseInt(x, 16), r = n >> 16, g2 = (n >> 8) & 255, b = n & 255; return Math.max(r, g2, b) - Math.min(r, g2, b); };
+  if (lumOf(h) < 0.3 && sat(h) < 40 && ok(t.alternateColor) && sat(t.alternateColor.replace('#', '')) >= 40) h = t.alternateColor.replace('#', '');
+  if (lumOf(h) < 0.25) { const n = parseInt(h, 16), ch = [n >> 16, (n >> 8) & 255, n & 255], mx = Math.max(...ch, 1), L = Math.max(lumOf(h), 0.02), f = Math.min(255 / mx, 0.25 / L); h = sat(h) < 40 ? ch.map(v => Math.round(v + (255 - v) * 0.3)).map(v => v.toString(16).padStart(2, '0')).join('') : ch.map(v => Math.min(255, Math.round(v * f))).map(v => v.toString(16).padStart(2, '0')).join(''); }
   return '#' + h;
 }
 const SL_CATS = {
@@ -1311,7 +1313,7 @@ function scheduleHTML(t) {
       <td class="opp"><small>${mine === e.home ? 'vs' : '@'}</small>${logoImg(opp.logo || teamLogoOf(t.league, opp))}<b>${esc(teamShortOf(t.league, opp))}</b></td><td class="rs">${res}</td></tr>`;
   };
   let html = '', cur = null, rows = '';
-  const flush = () => { if (cur !== null && rows) html += `<section class="blk"><div class="tw"><table class="sch"><colgroup><col style="width:76px"><col><col style="width:118px"></colgroup><thead><tr><th class="n">${esc(cur || 'Games')}</th><th></th><th></th></tr></thead><tbody>${rows}</tbody></table></div></section>`; rows = ''; };
+  const flush = () => { if (cur !== null && rows) html += `<section class="blk"><div class="schw"><table class="sch"><colgroup><col style="width:74px"><col><col style="width:126px"></colgroup><thead><tr><th class="n">${esc(cur || 'Games')}</th><th></th><th></th></tr></thead><tbody>${rows}</tbody></table></div></section>`; rows = ''; };
   sorted.filter(e => key(e) === t.month).forEach(e => { const st = e.stype || ''; if (st !== cur) { flush(); cur = st; } rows += row(e); });
   flush();
   return `<div class="mstrip" id="mstrip">${strip}</div>${html}`;
