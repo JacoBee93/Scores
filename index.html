@@ -58,14 +58,14 @@ header.d + main{padding-top:0}
 .msg button{margin-top:12px;background:var(--card);padding:9px 16px;border-radius:12px;color:#fff}
 .foot{color:var(--mut);font-size:12px;text-align:center;margin-top:20px;padding-bottom:30px}
 /* detail zápasu */
-.hero{background:var(--card);border-radius:22px;padding:26px 0 24px;display:grid;grid-template-columns:repeat(5,1fr);align-items:center;justify-items:center;margin:0 4px}
-.hero .t{display:flex;flex-direction:column;align-items:center;gap:7px;font-weight:600;font-size:16px}
-.hero .t img,.hero .t .ph{width:54px;height:54px;object-fit:contain}
+.hero{background:var(--card);border-radius:22px;padding:16px 0;display:grid;grid-template-columns:repeat(5,1fr);align-items:center;justify-items:center;margin:0 4px}
+.hero .t{display:flex;flex-direction:column;align-items:center;gap:5px;font-weight:600;font-size:14.5px}
+.hero .t img,.hero .t .ph{width:42px;height:42px;object-fit:contain}
 .hero .s{font-family:var(--num);font-weight:700;font-size:50px;line-height:1}
 .hero .s.lose{color:var(--mut)}
-.hero .m{text-align:center;font-size:20px;font-weight:600;line-height:1.5}
+.hero .m{text-align:center;font-size:14.5px;font-weight:500;line-height:1.35}
 .hero .m.live{color:var(--live)}
-.hero .m span{color:var(--mut);font-size:14px;font-weight:500}
+.hero .m span{color:#fff}
 .dtabs{display:flex;gap:21px;border-bottom:1px solid #3a3a3c;margin:4px -16px 0;padding:0 20px;overflow-x:auto;scrollbar-width:none}
 .dtabs::-webkit-scrollbar{display:none}
 .dtabs button{flex:none;padding:12px 0 13px;font-weight:600;font-size:16px;letter-spacing:1px;color:var(--mut);border-bottom:3px solid transparent;margin-bottom:-1px;white-space:nowrap}
@@ -98,7 +98,7 @@ header.d + main{padding-top:0}
 .ls{color:var(--mut);font-size:11.5px;line-height:1.25}
 .ld .ls{white-space:nowrap;font-size:10.5px;letter-spacing:-.1px}
 .ld[data-player]{cursor:pointer}
-.hero .t .rc{font-size:14px;font-weight:500;color:var(--mut)}
+.hero .t .rc{white-space:nowrap;font-size:12px;font-weight:500;color:var(--mut)}
 .lhd .rc{font-family:-apple-system,sans-serif;font-size:12px;font-weight:500;color:var(--mut);letter-spacing:0}
 .tt th.hd{text-align:left;vertical-align:middle}
 .tt th.hd .sec{margin:0}
@@ -448,6 +448,7 @@ async function loadTeam() {
   const er = r => r.status === 'rejected' ? String((r.reason && r.reason.message) || r.reason) : null;
   t.info = val(res[0]); t.roster = val(res[1]); t.rosterErr = er(res[1]);
   t.sched = val(res[2]); t.schedErr = er(res[2]); t.stats = val(res[3]); t.statsErr = er(res[3]);
+  if (t.league === 'nhl') { const c = await coreTeamStats('nhl', t.id, seasonYear('nhl')); if (c) { t.stats = t.stats || {}; t.stats._core = c; } }
   const seen = new Set(); t.events = [];
   [res[2], res[4], res[5]].forEach(r => {
     const j = val(r);
@@ -525,7 +526,7 @@ function renderGame() {
   else if (!g.sum) body = msg('Načítám…');
   else if (!g.tabInit) body = msg('Načítám…');
   else body = g.tab === 'preview' ? previewHTML(g) : g.tab === 'stats' ? statsHTML(g) : playsHTML(g);
-  const side = t => `<div class="t" data-topen="${esc(t.id)}" data-tl="${g.league}" data-tn="${esc(t.name)}" data-tlogo="${esc(t.logo)}">${logoImg(t.logo)}<span>${esc(t.abbr)}</span>${t.record ? `<span class="rc">${esc(t.record)}</span>` : ''}</div>`;
+  const side = t => `<div class="t" data-topen="${esc(t.id)}" data-tl="${g.league}" data-tn="${esc(t.name)}" data-tlogo="${esc(t.logo)}">${logoImg(t.logo)}<span>${esc(t.abbr)}</span>${t.record ? `<span class="rc">${esc(String(t.record).replace(/,\s*\d+\s*pts?\b/i, ''))}</span>` : ''}</div>`;
   let hero = '';
   if (e) {
     const mid = e.state === 'post' ? `Final${e.short.replace('Final', '')}<br><span>${dayWord(e.date)}</span>`
@@ -620,6 +621,11 @@ async function loadPreviewStats(g) {
   const e = g.ev, base = API + LEAGUES[g.league].path + '/teams/';
   const res = await Promise.allSettled([e.away.id, e.home.id].map(id => getJson(base + id + '/statistics')));
   g.ts = res.map(r => r.status === 'fulfilled' ? r.value : null);
+  if (g.league === 'nhl') {
+    const hs = g.sum && g.sum.header && g.sum.header.season, y = (hs && hs.year) || seasonYear('nhl', e.date);
+    const cr = await Promise.all([e.away.id, e.home.id].map(id => coreTeamStats('nhl', id, y)));
+    g.ts = g.ts.map((j, i) => { const o = j || {}; o._core = cr[i]; return o; });
+  }
   g.tsLoading = false;
   if (state.game === g && topView() === 'game') render();
 }
@@ -649,7 +655,7 @@ async function loadSeasonLeaders(g) {
     }
     if (!cats) return null;
     const out = await Promise.all(SL_CATS[g.league].map(async ([re, title, lab]) => {
-      const c = cats.find(x => re.test(String(x.name || '')) || re.test(String(x.displayName || '').replace(/[^a-z]/gi, ''))), l = c && c.leaders && c.leaders[0];
+      const c = cats.find(x => re.test(String(x.name || '')) || re.test(String(x.displayName || '').replace(/[^a-z]/gi, ''))), l = c && (c.leaders || []).find(x => x && x.athlete && x.athlete.$ref);
       if (!l || !l.athlete || !l.athlete.$ref) return null;
       try {
         const a = await getJson(https(l.athlete.$ref));
@@ -695,7 +701,7 @@ function pvLeaders(g) {
     return `<div class="ld ${right ? 'r' : ''}" data-player="${esc(a.id)}" data-pl="${g.league}" data-pn="${esc(a.displayName || a.shortName || '')}" data-pp="${esc(pos)}" data-pj="${esc(a.jersey || '')}" data-pt="${esc((tm && tm.name) || '')}"><img class="hs" src="${esc(hsOf(a, g.league))}" alt="" onerror="this.style.visibility='hidden'">
       <div class="lt"><div class="ln">${right ? `<small class="pl">${esc(pos)}</small>` : ''}${esc(a.shortName || a.displayName || '')}${right ? '' : `<small>${esc(pos)}</small>`}</div><div class="lv">${esc(String(val).trim())}</div>${sub ? `<div class="ls">${esc(sub)}</div>` : ''}</div></div>`;
   };
-  const rows = names.slice(0, 4).map(n => {
+  const rows = names.filter(n => la.some(c => c.name === n) && lh.some(c => c.name === n)).slice(0, 4).map(n => {
     const ca = la.find(c => c.name === n), ch = lh.find(c => c.name === n), t = ca || ch;
     return `<div class="lc"><div class="lh">${esc((t.displayName || n).replace(/ Leader$/i, ''))}</div><div class="lg">${side(ca && ca.leaders && ca.leaders[0], false, e.away)}${side(ch && ch.leaders && ch.leaders[0], true, e.home)}</div></div>`;
   }).join('');
@@ -706,24 +712,40 @@ const PV_STATS = {
   nfl: [['Pts Scored per Game', /^(avg)?(total)?points ?per ?game|^points ?per ?game|avgpoints$/i], ['Pts Allowed per Game', /(opp|against|allowed).*points ?per ?game|pointsAgainstPerGame|pointsAllowed/i, true], ['Yds per Game', /total ?yards ?per ?game|^yards ?per ?game|avg.*total ?yards/i], ['Pass Yds per Game', /passing ?yards ?per ?game|net passing yards per game/i], ['Rush Yds per Game', /rushing ?yards ?per ?game/i], ['3rd Down Efficiency Percentage', /third ?down.*(pct|percent|conv)|3rd down/i], ['Sacks', /^sacks$/i], ['Interceptions', /^(passing)?interceptions$/i]],
   nba: [['Points per Game', /avgpoints$|points ?per ?game|^points$/i], ['Rebounds per Game', /avgrebounds$|rebounds ?per ?game/i], ['Assists per Game', /avgassists$|assists ?per ?game/i], ['FG %', /fieldgoalpct|field goal (pct|percent)|fg ?%/i], ['3P %', /threepointfieldgoalpct|three point (pct|percent)|3p ?%/i], ['FT %', /freethrowpct|free throw (pct|percent)/i], ['Turnovers per Game', /avgturnovers$|turnovers ?per ?game/i, true]]
 };
-const NHL_TABLE = [
-  ['Goals For per Game', /^avgGoals$|^goals ?(for )?per ?game|^goals for/i],
-  ['Goals Against Average', /goalsAgainstAverage|avgGoalsAgainst|goals against (avg|average|per game)/i],
-  ['Shots per Game', /^avgShots$|^shots per game/i],
-  ['Shots Against per Game', /avgShotsAgainst|shots against per game/i],
-  ['Penalty Minutes', /^penaltyMinutes$|^penalty minutes/i],
-  ['Power Play Goals', /^powerPlayGoals$|^power play goals$/i],
-  ['Power Play Percentage', /powerPlayPct|power play percentage/i],
-  ['Power Play Goals Against', /powerPlayGoalsAgainst|power play goals against/i],
-  ['Penalty Kill Percentage', /penaltyKillPct|penalty kill percentage/i],
-  ['Short Handed Goals', /^shortHandedGoals$|^short handed goals$/i],
-  ['Short Handed Goals Against', /shortHandedGoalsAgainst|short handed goals against/i]];
+const seasonYear = (league, d) => { d = d ? new Date(d) : new Date(); const y = d.getFullYear(), m = d.getMonth(); return league === 'nfl' ? (m < 2 ? y - 1 : y) : (m >= 7 ? y + 1 : y); };
+async function coreTeamStats(league, id, year) {
+  const parts = LEAGUES[league].path.split('/');
+  try { return await getJson('https://sports.core.api.espn.com/v2/sports/' + parts[0] + '/leagues/' + parts[1] + '/seasons/' + year + '/types/2/teams/' + id + '/statistics?lang=en&region=us'); } catch (e) { return null; }
+}
+function nhlRows(L) {
+  const lc = x => String(x || '').toLowerCase();
+  const get = (names, re) => { for (const n of names) { const st = L.find(x => lc(x.name) === lc(n)); if (st) return st; } return re ? L.find(x => re.test(String(x.displayName || ''))) : null; };
+  const v = st => numOf(st), dv = st => st.displayValue != null ? String(st.displayValue) : String(st.value);
+  const gp = get(['gamesPlayed', 'games'], /^games played$/i), GP = gp ? v(gp) : NaN;
+  const per = (avg, avgRe, tot, totRe, dec) => { const a = get(avg, avgRe); if (a) return dv(a); const t = get(tot, totRe); return t && GP > 0 ? (v(t) / GP).toFixed(dec) : null; };
+  const ppg = get(['powerPlayGoals'], /^power play goals$/i), ppga = get(['powerPlayGoalsAgainst'], /^power play goals against$/i);
+  const pct = (names, re, calc) => { const a = get(names, re); if (a) { const n = v(a); return n > 0 && n < 1 ? (n * 100).toFixed(1) : dv(a); } return calc(); };
+  const R = [
+    ['Goals For per Game', per(['avgGoals', 'goalsPerGame', 'goalsForPerGame'], /^goals (for )?per game$/i, ['goals', 'goalsFor', 'totalGoals'], null, 2)],
+    ['Goals Against Average', per(['avgGoalsAgainst', 'goalsAgainstAverage', 'goalsAgainstPerGame'], /^goals against (avg|average|per game)$/i, ['goalsAgainst'], /^goals against$/i, 2)],
+    ['Shots per Game', per(['avgShots', 'shotsPerGame'], /^shots per game$/i, ['shotsTotal', 'shots', 'totalShots'], /^(total )?shots$/i, 1)],
+    ['Shots Against per Game', per(['avgShotsAgainst', 'shotsAgainstPerGame'], /^shots against per game$/i, ['shotsAgainst'], /^shots against$/i, 1)],
+    ['Penalty Minutes', (s => s && dv(s))(get(['penaltyMinutes'], /^penalty minutes$/i))],
+    ['Power Play Goals', ppg && dv(ppg)],
+    ['Power Play Percentage', pct(['powerPlayPct', 'powerPlayPercentage'], /^power play (pct|percentage)$/i, () => { const o = get(['powerPlayOpportunities'], /^power play opportunities$/i); return ppg && o && v(o) > 0 ? (v(ppg) / v(o) * 100).toFixed(1) : null; })],
+    ['Power Play Goals Against', ppga && dv(ppga)],
+    ['Penalty Kill Percentage', pct(['penaltyKillPct', 'penaltyKillPercentage'], /^penalty kill (pct|percentage)$/i, () => { const o = get(['timesShortHanded', 'powerPlayOpportunitiesAgainst', 'shortHandedOpportunities'], /times short ?handed/i); return ppga && o && v(o) > 0 ? ((1 - v(ppga) / v(o)) * 100).toFixed(1) : null; })],
+    ['Short Handed Goals', (s => s && dv(s))(get(['shortHandedGoals'], /^short ?handed goals$/i))],
+    ['Short Handed Goals Against', (s => s && dv(s))(get(['shortHandedGoalsAgainst'], /^short ?handed goals against$/i))]
+  ];
+  return R;
+}
 const nrm = x => String(x || '').replace(/[^a-z0-9]/gi, '').toLowerCase();
 const findNhl = (list, re) => list.find(x => re.test(String(x.name || ''))) || list.find(x => re.test(String(x.displayName || ''))) || list.find(x => re.test(nrm(x.displayName))) || list.find(x => re.test(nrm(x.shortDisplayName)));
 function flatStats(j) {
   if (!j) return [];
   const cats = (j.results && j.results.stats && j.results.stats.categories) || (j.stats && j.stats.categories) || (j.splits && j.splits.categories) || j.categories || [];
-  return cats.flatMap(c => c.stats || []);
+  return cats.flatMap(c => c.stats || []).concat(j._core ? flatStats(j._core) : []);
 }
 const findStat = (list, re) => list.find(x => re.test(String(x.name || ''))) || list.find(x => re.test(String(x.displayName || '')));
 const numOf = st => { if (!st) return NaN; const v = st.value != null && st.value !== '' ? +st.value : parseFloat(String(st.displayValue).replace(/,/g, '')); return v; };
@@ -752,14 +774,10 @@ function ensureLeagueStats(league, cb) {
   })();
 }
 function pvTeamTable(g) {
-  const e = g.ev, A = flatStats(g.ts[0]), H = flatStats(g.ts[1]);
-  let rows = NHL_TABLE.map(([t, re]) => { const a = findNhl(A, re), h = findNhl(H, re); return a && h ? [t, a, h] : null; }).filter(Boolean);
-  if (rows.length < 9) {
-    const used = new Set(rows.map(r => r[1].name));
-    A.filter(a => !used.has(a.name) && a.displayName).forEach(a => { const h = H.find(x => x.name === a.name); if (h && rows.length < 14) { rows.push([a.displayName, a, h]); used.add(a.name); } });
-  }
+  const e = g.ev, A = nhlRows(flatStats(g.ts[0])), H = nhlRows(flatStats(g.ts[1]));
+  const rows = A.map((r, i) => [r[0], r[1], H[i][1]]).filter(r => r[1] != null || r[2] != null);
   if (!rows.length) return '';
-  return `<section class="pv"><table class="tt"><thead><tr><th class="hd"><div class="sec">Team stats</div></th><th>${logoImg(e.away.logo)}</th><th>${logoImg(e.home.logo)}</th></tr></thead><tbody>${rows.map(r => `<tr><td>${esc(r[0])}</td><td>${esc(r[1].displayValue)}</td><td>${esc(r[2].displayValue)}</td></tr>`).join('')}</tbody></table></section>`;
+  return `<section class="pv"><table class="tt"><thead><tr><th class="hd"><div class="sec">Team stats</div></th><th>${logoImg(e.away.logo)}</th><th>${logoImg(e.home.logo)}</th></tr></thead><tbody>${rows.map(r => `<tr><td>${esc(r[0])}</td><td>${esc(r[1] != null ? r[1] : '-')}</td><td>${esc(r[2] != null ? r[2] : '-')}</td></tr>`).join('')}</tbody></table></section>`;
 }
 function pvStats(g) {
   const e = g.ev;
@@ -1140,7 +1158,7 @@ function teamTabStatsHTML(t) {
   const L = flatStats(t.stats);
   if (!L.length) return msg('Statistiky týmu nejsou k dispozici.');
   let rows;
-  if (t.league === 'nhl') rows = NHL_TABLE.map(([n, re]) => [n, findNhl(L, re)]).filter(r => r[1]);
+  if (t.league === 'nhl') rows = nhlRows(L).filter(r => r[1] != null).map(r => [r[0], { displayValue: r[1] }]);
   else {
     const lg = state.lgs[t.league];
     if (!lg) ensureLeagueStats(t.league, () => { if (state.team === t && t.tab === 'tstats' && topView() === 'team') render(); });
