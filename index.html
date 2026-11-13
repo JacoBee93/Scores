@@ -268,6 +268,8 @@ details[open] summary::after{content:'⌃'}
 .fx.stk th.n,.fx.stk td.n{position:sticky;left:0;z-index:1;background:var(--card)}
 .bdot{display:inline-block;width:9px;height:9px;border-radius:50%;background:#8e8e93;margin-right:6px}
 .bdot.on{background:#30d158}
+.bdot.out{background:#ff453a}
+.bdot.dtd{background:#ff9f0a}
 .bh{display:flex;align-items:center;gap:10px;padding:5px 0}
 .bh img{width:28px;height:28px;object-fit:contain}
 .bh .bt{font-weight:600;font-size:15px}
@@ -752,7 +754,7 @@ function renderGame() {
   let hero = '';
   if (e) {
     const mid = e.state === 'post' ? `Final${e.short.replace('Final', '')}<br><span>${dayWord(e.date)}</span>`
-              : e.state === 'pre' ? `<span class="dt1">${dayWord(e.date)} – ${fmtTime(e.date)}</span>`
+              : e.state === 'pre' ? `${fmtTime(e.date)}<br><span>${dayWord(e.date)}</span>`
               : esc(e.short).replace(' - ', '<br>');
     hero = `<div class="hero">${side(e.away)}
       ${e.state === 'pre' ? '' : `<span class="s ${e.state === 'post' && !e.away.winner ? 'lose' : ''}">${esc(e.away.score)}</span>`}
@@ -763,7 +765,7 @@ function renderGame() {
   $app.innerHTML = `
     <header class="d"><div class="tabs"><button class="back" data-back aria-label="Zpět">‹</button><button class="home" data-home aria-label="Domů"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"><path d="M3 10.5 12 3l9 7.5"/><path d="M5.5 9v11h13V9"/><path d="M10 20v-6h4v6"/></svg></button><button class="home" data-refresh aria-label="Obnovit"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12a8 8 0 1 1-2.34-5.66"/><path d="M20 4v5h-5"/></svg></button></div></header>
     <main>${hero}
-      ${g.tabInit ? `<div class="dtabs"><button data-tab="preview" class="${g.tab === 'preview' ? 'on' : ''}">Preview</button><button data-tab="stats" class="${g.tab === 'stats' ? 'on' : ''}">Stats</button><button data-tab="plays" class="${g.tab === 'plays' ? 'on' : ''}">Plays</button></div>` : '<div class="dtabs"></div>'}
+      ${g.tabInit ? `<div class="dtabs sm"><button data-tab="preview" class="${g.tab === 'preview' ? 'on' : ''}">Preview</button><button data-tab="stats" class="${g.tab === 'stats' ? 'on' : ''}">Stats</button><button data-tab="plays" class="${g.tab === 'plays' ? 'on' : ''}">Plays</button></div>` : '<div class="dtabs sm"></div>'}
       <div class="pane t">${body}</div></main>`;
 }
 
@@ -951,7 +953,7 @@ function pvLeaders(g) {
     return `<div class="lc"><div class="lh">${esc(((t && t.displayName) || n).replace(/ Leader$/i, ''))}</div><div class="lg">${side(ca && ca.leaders && ca.leaders[0], false, e.away)}${side(ch && ch.leaders && ch.leaders[0], true, e.home)}</div></div>`;
   }).join('');
   if (!rows) return '';
-  return `<section class="pv"><div class="sec">Season leaders</div><div class="lhd">${logoImg(e.away.logo)}<b>${esc(e.away.abbr)}</b><span class="grow"></span><b>${esc(e.home.abbr)}</b>${logoImg(e.home.logo)}</div>${rows}</section>`;
+  return `<section class="pv"><div class="sec">Season leaders</div>${rows}</section>`;
 }
 const PV_STATS = {
   nfl: [['Pts Scored per Game', /^(avg)?(total)?points ?per ?game|^points ?per ?game|avgpoints$/i], ['Pts Allowed per Game', /(opp|against|allowed).*points ?per ?game|pointsAgainstPerGame|pointsAllowed/i, true], ['Yds per Game', /total ?yards ?per ?game|^yards ?per ?game|avg.*total ?yards/i], ['Pass Yds per Game', /passing ?yards ?per ?game|net passing yards per game/i], ['Rush Yds per Game', /rushing ?yards ?per ?game/i], ['3rd Down Efficiency Percentage', /third ?down.*(pct|percent|conv)|3rd down/i], ['Sacks', /^sacks$/i, false, /defens/i], ['Interceptions', /^interceptions$/i, false, /defens|intercept/i]],
@@ -1086,8 +1088,10 @@ function pvStats(g) {
   return `<section class="pv"><div class="sec">League rankings</div>${picks.map(p => `<div class="cc"><div class="ct">${esc(p[0])}</div>${row(e.away.logo, p[0], p[1], cA, p[3])}${row(e.home.logo, p[0], p[2], cH, p[3])}</div>`).join('')}</section>`;
 }
 const ordinal = n => { const v = n % 100, s = ['th', 'st', 'nd', 'rd']; return n + (s[(v - 20) % 10] || s[v] || s[0]); };
+const injMap = {};
 function pvInjuries(g) {
   const e = g.ev, inj = (g.sum.injuries || []).filter(x => x && x.injuries);
+  inj.forEach(x => x.injuries.forEach(i => { const id = i && i.athlete && i.athlete.id; if (id) injMap[String(id)] = i; }));
   if (!inj.length) return '';
   const teams = [e.away, e.home], idx = Math.min(g.pvTeam || 0, 1), t = teams[idx];
   const mine = (inj.find(x => String(x.team && x.team.id) === String(t.id)) || {}).injuries || [];
@@ -1405,9 +1409,13 @@ function bioHTML(p) {
   const dob = a.dateOfBirth ? (() => { const d = new Date(a.dateOfBirth); return d.getUTCDate() + '. ' + (d.getUTCMonth() + 1) + '. ' + d.getUTCFullYear(); })() : (a.displayDOB || '');
   const hw = [a.displayHeight, a.displayWeight].filter(Boolean).join(', ');
   const exp = a.displayExperience || (a.experience && a.experience.years != null ? (a.experience.years ? a.experience.years + '. sezóna' : 'Rookie') : '');
-  const st = (a.status && (a.status.name || a.status.type)) || '';
+  const st0 = (a.status && (a.status.name || a.status.type)) || '';
+  const ij = (Array.isArray(a.injuries) && a.injuries.find(x => x && (x.status || x.type))) || injMap[String(p.id)];
+  const ijs = ij ? String(ij.status || (ij.type && (ij.type.description || ij.type.name)) || '') : '';
+  const ijd = ij ? ((ij.details && (ij.details.type || ij.details.detail)) || '') : '';
+  const st = ijs && !/^active$/i.test(ijs) ? ijs + (ijd ? ' (' + ijd + ')' : '') : st0;
   const draft = a.displayDraft || (a.draft && (a.draft.displayText || [a.draft.year, a.draft.round ? 'Rd ' + a.draft.round : '', a.draft.selection ? 'Pk ' + a.draft.selection : ''].filter(Boolean).join(', '))) || '';
-  const rows = [['Team', (a.team && a.team.displayName) || p.team], ['Position', (a.position && (a.position.displayName || a.position.name)) || p.pos], ['HT/WT', hw], ['Birthdate', dob + (a.age ? ' (' + a.age + ')' : '')], ['College', (a.college && (a.college.name || a.college.shortName)) || ''], ['Draft Info', draft], ['Status', st ? `<span class="bdot ${/active/i.test(st) ? 'on' : ''}"></span>${esc(st)}` : ''], ['Experience', exp], ['Birthplace', place]].filter(r => r[1]);
+  const rows = [['Team', (a.team && a.team.displayName) || p.team], ['Position', (a.position && (a.position.displayName || a.position.name)) || p.pos], ['HT/WT', hw], ['Birthdate', dob + (a.age ? ' (' + a.age + ')' : '')], ['College', (a.college && (a.college.name || a.college.shortName)) || ''], ['Draft Info', draft], ['Status', st ? `<span class="bdot ${/^active/i.test(st) ? 'on' : /out|^ir|injured|suspen/i.test(st) ? 'out' : 'dtd'}"></span>${esc(st)}` : ''], ['Experience', exp], ['Birthplace', place]].filter(r => r[1]);
   const teams = [];
   statCats(p.st, p.league).forEach(c => c.rows.forEach(r => { if (!r.year || !r.sub || !/^[A-Z]{2,4}$/.test(r.sub)) return; let t = teams.find(x => x.ab === r.sub); if (!t) teams.push(t = { ab: r.sub, tid: r.tid, y0: r.year, y1: r.year }); t.y0 = Math.min(t.y0, r.year); t.y1 = Math.max(t.y1, r.year); }));
   teams.sort((x, y) => y.y1 - x.y1);
@@ -1705,7 +1713,7 @@ function teamStatsHTML(t) {
   }
   return catList.map(c => {
     const title = c.name;
-    const cols = c.labels.map((_, k) => k).filter(k => !(t.league === 'nhl' && ((c.labels[k] === 'SOG' && c.labels.includes('S')) || c.labels[k] === 'PROD'))); const cw = k => t.league === 'nhl' ? (String(c.labels[k]).length > 3 ? 46 : 36) : 50; const fcw = t.league === 'nfl' ? 108 : 124;
+    const cols = c.labels.map((_, k) => k).filter(k => !(t.league === 'nhl' && ((c.labels[k] === 'SOG' && c.labels.includes('S')) || c.labels[k] === 'PROD'))); const cw = k => t.league === 'nhl' ? (title === 'Goalies' && /^(GA|GAA|SA|SV|SV%|SO)$/.test(c.labels[k]) ? 52 : String(c.labels[k]).length > 3 ? 46 : 36) : 50; const fcw = t.league === 'nfl' ? 108 : 124;
     const gk = title + '|' + c.labels.join(',');
     const sel = (t.sort && t.sort[gk]) || {};
     const defK = cols.find(k => ['PTS', 'YDS', 'W'].includes(c.labels[k])) ?? cols[Math.min(1, cols.length - 1)];
