@@ -213,6 +213,29 @@ details[open] summary::after{content:'⌃'}
 .fx tr.xp{cursor:pointer}
 .fx tr.sub td{color:var(--mut);font-size:13px}
 .fx tr.sub td.n{font-family:-apple-system,sans-serif;font-weight:600;font-size:12px}
+.sec.dh{font-size:14.5px;margin:22px 4px 6px}
+.nfx{table-layout:fixed}
+.nfx th:not(.n),.nfx td:not(.n){text-align:center;padding-left:2px;padding-right:2px}
+.nfx td.n .pn{max-width:100%}
+.nfx td{padding-top:8px;padding-bottom:8px}
+.nfx th.n,.nfx td.n{overflow:hidden;text-overflow:ellipsis}
+.pseg{margin:4px auto 10px}
+.drv{display:flex;align-items:center;gap:12px;padding:13px 0;border-bottom:1px solid #2c2c2e;cursor:pointer}
+.drv>img,.pc .ph img{width:34px;height:34px;object-fit:contain;flex:none}
+.drv .dt{flex:1;min-width:0}
+.drv .dr,.pc .pt{font-weight:700;font-size:16px}
+.drv .dd,.pc .pk{color:var(--mut);font-size:13px;margin-top:2px}
+.dsc{display:grid;grid-template-columns:38px 38px;text-align:center;line-height:1.1;flex:none}
+.dsc b{font-family:var(--num);font-size:19px}
+.dsc small{font-size:10.5px;color:var(--mut);font-weight:600}
+.drv .chev{margin:0 4px 0 2px}
+.dpl{padding:2px 0 8px;border-bottom:1px solid #2c2c2e}
+.pc{border:1px solid #3a3a3c;border-radius:14px;padding:12px 14px;margin:10px 0}
+.pc .ph{display:flex;align-items:center;gap:12px}
+.pc .ph .dt{flex:1;min-width:0}
+.pc .px{font-size:14px;line-height:1.35;margin-top:6px}
+.pc .pd{color:var(--mut);font-size:12.5px;margin-top:6px}
+.pc.scr{border-color:#5a5a5e}
 .chev{display:inline-block;width:7px;height:7px;border:solid var(--mut);border-width:0 2px 2px 0;transform:rotate(45deg);margin-left:7px;vertical-align:3px}
 .chev.up{transform:rotate(-135deg);vertical-align:-2px}
 .sep tbody tr:last-child td{border-bottom:0}
@@ -514,7 +537,7 @@ function renderList() {
     let last = '';
     body = state.events.slice().sort((a, b) => new Date(a.date) - new Date(b.date)).map(e => {
       const d = new Date(e.date), day = DAYS[d.getDay()] + ' ' + d.getDate() + '.' + (d.getMonth() + 1) + '.';
-      let h = ''; if (day !== last) { h = `<div class="sec">${day}</div>`; last = day; }
+      let h = ''; if (day !== last) { h = `<div class="sec dh">${day}</div>`; last = day; }
       return h + cardHTML(e);
     }).join('');
   }
@@ -595,6 +618,13 @@ function tbl(title, labels, rows) {
     <td class="n"><span class="pn">${esc(r.short)}</span><small>${esc(r.pos)}</small></td>${r.vals.map(v => `<td>${nv(v)}</td>`).join('')}</tr>`).join('');
   return `<section class="blk"><div class="tw"><table><thead><tr><th class="n">${esc(title)}</th>${labels.map(l => `<th>${esc(l)}</th>`).join('')}</tr></thead><tbody>${trs}</tbody></table></div></section>`;
 }
+function nflTbl(title, labels, rows) {
+  const w = l => /\//.test(l) ? 62 : String(l).length > 4 ? 58 : 46;
+  const tw = 128 + labels.reduce((a, l) => a + w(l), 0);
+  const trs = rows.map(r => `<tr data-player="${esc(r.id)}" data-pn="${esc(r.name)}" data-pp="${esc(r.pos)}" data-pj="${esc(r.jersey)}" data-pl="nfl" data-pt="${esc(teamNameOf(r.ti))}">
+    <td class="n"><span class="pn">${esc(r.short)}</span><small>${esc(r.pos)}</small></td>${r.vals.map(v => `<td>${nv(v)}</td>`).join('')}</tr>`).join('');
+  return `<section class="blk"><div class="tw"><table class="nfx" style="width:max(100%, ${tw}px)"><colgroup><col>${labels.map(l => `<col style="width:${w(l)}px">`).join('')}</colgroup><thead><tr><th class="n">${esc(title)}</th>${labels.map(l => `<th>${esc(l)}</th>`).join('')}</tr></thead><tbody>${trs}</tbody></table></div></section>`;
+}
 function mergedAthletes(t) {
   const map = new Map();
   (t.statistics || []).forEach(grp => {
@@ -649,7 +679,7 @@ function statsHTML(g) {
       if (!ath.length) return;
       const rows = ath.map(a => ({ id: a.athlete.id, name: a.athlete.displayName || '', short: a.athlete.shortName || a.athlete.displayName || '',
         pos: (a.athlete.position && a.athlete.position.abbreviation) || '', jersey: a.athlete.jersey || '', ti: idx, vals: a.stats }));
-      out += tbl(NFL_GROUPS[grp.name] || grp.text || grp.name || '', labels, rows);
+      out += nflTbl(NFL_GROUPS[grp.name] || grp.text || grp.name || '', labels, rows);
     });
   }
   return seg + (out || msg('Statistiky zatím nejsou k dispozici.'));
@@ -921,8 +951,46 @@ function scoringHTML(g) {
     return `<section class="per"><div class="phd">${periodLabel(g.league, k)}</div>${rows}</section>`;
   }).join('');
 }
+function nflPlayTitle(p) {
+  const t = (p.type && p.type.text) || '', y = p.statYardage;
+  if (p.scoringPlay && p.scoringType && p.scoringType.displayName) return p.scoringType.displayName;
+  if (y != null && /^rush/i.test(t)) return y + '-yd Run';
+  if (y != null && /pass reception/i.test(t)) return y + '-yd Pass';
+  return t || 'Play';
+}
+const perShort = n => n <= 4 ? ['1st', '2nd', '3rd', '4th'][n - 1] : 'OT';
+function drivesHTML(g) {
+  const sum = g.sum, e = g.ev, A = e.away.abbr, H = e.home.abbr;
+  const drives = [].concat(sum.drives.previous || [], sum.drives.current ? [sum.drives.current] : []).filter(d => d && d.plays);
+  if (!drives.length) return msg(e.state === 'pre' ? 'Zápas ještě nezačal.' : 'Záznam hry zatím není k dispozici.');
+  const logos = {};
+  ((sum.header && sum.header.competitions && sum.header.competitions[0] && sum.header.competitions[0].competitors) || [])
+    .forEach(c => { if (c.team) logos[c.team.id] = c.team.logo || (c.team.logos && c.team.logos[0] && c.team.logos[0].href) || ''; });
+  const lg = t => { const u = (t && (logos[t.id] || t.logo || (t.logos && t.logos[0] && t.logos[0].href))) || ''; return u ? `<img src="${esc(u)}" alt="" onerror="this.style.visibility='hidden'">` : '<span style="width:34px"></span>'; };
+  const scoreOf = (pl, d) => { const x = [...pl].reverse().find(p => p.awayScore != null) || {}; return [x.awayScore != null ? x.awayScore : '', x.homeScore != null ? x.homeScore : '']; };
+  const dsc = sc => `<div class="dsc"><b>${esc(sc[0])}</b><b>${esc(sc[1])}</b><small>${esc(A)}</small><small>${esc(H)}</small></div>`;
+  const card = p => `<div class="pc ${p.scoringPlay ? 'scr' : ''}"><div class="pt">${esc(nflPlayTitle(p))}</div><div class="pk">${esc(((p.clock && p.clock.displayValue) || '') + (p.period && p.period.number ? ' - ' + perShort(p.period.number) : ''))}</div><div class="px">${esc(p.text || '')}</div>${p.start && p.start.downDistanceText ? `<div class="pd">${esc(p.start.downDistanceText)}</div>` : ''}</div>`;
+  const mode = g.pmode || 'all';
+  const seg = `<div class="seg pseg"><button data-pm="all" class="${mode === 'all' ? 'on' : ''}">All Plays</button><button data-pm="scoring" class="${mode === 'scoring' ? 'on' : ''}">Scoring Plays</button></div>`;
+  const groups = new Map(), add = (n, h) => { if (!groups.has(n)) groups.set(n, []); groups.get(n).push(h); };
+  g.dOpen = g.dOpen || new Set();
+  if (mode === 'scoring') {
+    drives.forEach(d => d.plays.filter(p => p.scoringPlay).forEach(p => {
+      add((p.period && p.period.number) || 1, `<div class="pc"><div class="ph">${lg(p.team || d.team)}<div class="dt"><div class="pt">${esc(nflPlayTitle(p))}</div><div class="pk">${esc(((p.clock && p.clock.displayValue) || '') + ' - ' + perShort((p.period && p.period.number) || 1))}</div></div>${dsc([p.awayScore, p.homeScore])}</div><div class="px">${esc(p.text || '')}</div>${d.description ? `<div class="pd">${esc(d.description)}</div>` : ''}</div>`);
+    }));
+    if (!groups.size) return seg + msg('Zatím žádné body.');
+  } else {
+    drives.forEach((d, i) => {
+      const id = String(d.id || i), open = g.dOpen.has(id), n = (d.start && d.start.period && d.start.period.number) || (d.plays[0] && d.plays[0].period && d.plays[0].period.number) || 1;
+      const res = d.displayResult || d.result || (d.isScore ? 'Score' : '') || 'Drive';
+      add(n, `<div class="drv" data-drv="${esc(id)}">${lg(d.team)}<div class="dt"><div class="dr">${esc(res)}</div><div class="dd">${esc(d.description || '')}</div></div>${dsc(scoreOf(d.plays, d))}<i class="chev ${open ? 'up' : ''}"></i></div>${open ? `<div class="dpl">${d.plays.map(card).join('')}</div>` : ''}`);
+    });
+  }
+  return seg + [...groups.keys()].sort((a, b) => a - b).map(k => `<section class="per"><div class="phd">${periodLabel('nfl', k)}</div>${groups.get(k).join('')}</section>`).join('');
+}
 function playsHTML(g) {
   if (g.league === 'nhl') return scoringHTML(g);
+  if (g.league === 'nfl' && g.sum.drives) return drivesHTML(g);
   const plays = getPlays(g.sum);
   if (!plays.length) return msg('Záznam hry zatím není k dispozici.');
   const logos = {};
@@ -1395,7 +1463,7 @@ window.addEventListener('hashchange', route);
 
 const $app = document.getElementById('app');
 $app.addEventListener('click', ev => {
-  const b = ev.target.closest('[data-league],[data-game],[data-date],[data-wk],[data-tab],[data-ptab],[data-xp],[data-ttab],[data-pvt],[data-sort],[data-fav],[data-team],[data-player],[data-topen],[data-search],[data-month],[data-refresh],[data-back]');
+  const b = ev.target.closest('[data-league],[data-game],[data-date],[data-wk],[data-drv],[data-pm],[data-tab],[data-ptab],[data-xp],[data-ttab],[data-pvt],[data-sort],[data-fav],[data-team],[data-player],[data-topen],[data-search],[data-month],[data-refresh],[data-back]');
   if (!b) return;
   const d = b.dataset;
   if (d.fav !== undefined) {
@@ -1416,6 +1484,10 @@ $app.addEventListener('click', ev => {
     state.team.month = d.month; render();
   } else if (d.game !== undefined) {
     window._fromList = true; location.hash = '#/game/' + (d.gl || state.league) + '/' + d.game;
+  } else if (d.drv !== undefined) {
+    const s2 = state.game.dOpen = state.game.dOpen || new Set(); if (s2.has(d.drv)) s2.delete(d.drv); else s2.add(d.drv); render();
+  } else if (d.pm) {
+    state.game.pmode = d.pm; render();
   } else if (d.wk) {
     const [t, w] = d.wk.split('-').map(Number); state.nflw.sel = { t, w }; loadList();
   } else if (d.date) {
