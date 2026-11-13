@@ -272,9 +272,10 @@ details[open] summary::after{content:'⌃'}
 .sch .rs .mu{color:var(--mut)}
 .sch .rs .sf{display:inline-block;width:24px;text-align:left;color:var(--mut);font-size:10px;margin-left:3px;font-weight:600}
 .sch .rs .live{color:var(--live);font-weight:600}
-.sch .rg{display:inline-grid;grid-template-columns:20px 74px 22px;align-items:center;vertical-align:middle}
+.sch .rg{display:inline-grid;grid-template-columns:22px 84px;align-items:center;vertical-align:middle}
+.sch .rg .tm{grid-column:1 / span 2;text-align:right !important}
 .sch .rg .W,.sch .rg .L{width:auto;margin:0}
-.sch .sc2{display:grid;grid-template-columns:1fr 10px 1fr;align-items:center}
+.sch .sc2{display:grid;grid-template-columns:1fr 12px 36px;align-items:center}
 .sch .sc2 b:first-child{text-align:right}
 .sch .sc2 b:last-child{text-align:left}
 .sch .sc2 i{font-style:normal;text-align:center;font-family:var(--num);font-weight:600;font-size:17px;color:var(--mut)}
@@ -799,7 +800,7 @@ const PV_STATS = {
 };
 const NFL_TEAM = {
   Offensive: [['Pts Scored per Game', /^(avg)?(total)?points ?per ?game|^points ?per ?game|avgpoints$/i], ['Yds per Game', /total ?yards ?per ?game|^yards ?per ?game|avg.*total ?yards/i], ['Pass Yds per Game', /passing ?yards ?per ?game|net passing yards per game/i], ['Rush Yds per Game', /rushing ?yards ?per ?game/i], ['3rd Down Efficiency Percentage', /third ?down.*(pct|percent|conv)|3rd down/i], ['4th Down Efficiency Percentage', /fourth ?down.*(pct|percent|conv)|4th down/i]],
-  Defensive: [['Pts Allowed per Game', /(opp|against|allowed).*points ?per ?game|pointsAgainstPerGame|pointsAllowed/i, true], ['Pass Yds Allowed per Game', /(opp|allowed|against).*pass.*yards|pass.*yards.*(allowed|against)/i, true], ['Rush Yds Allowed per Game', /(opp|allowed|against).*rush.*yards|rush.*yards.*(allowed|against)/i, true], ['Sacks', /^sacks$/i, false, /defens/i], ['Interceptions', /^interceptions$/i, false, /defens|intercept/i], ['Forced Fumbles', /fumblesForced|forcedFumbles|^forced fumbles$/i]]
+  Defensive: [['Pts Allowed per Game', /(opp|against|allowed).*points ?per ?game|pointsAgainstPerGame|pointsAllowed/i, true], ['Pass Yds Allowed per Game', /^netPassingYardsPerGame$|^passingYardsPerGame$|net passing yards per game/i, true, null, true], ['Rush Yds Allowed per Game', /^rushingYardsPerGame$|rushing yards per game/i, true, null, true], ['Sacks', /^sacks$/i, false, /defens/i], ['Interceptions', /^interceptions$/i, false, /defens|intercept/i], ['Forced Fumbles', /fumblesForced|forcedFumbles|^forced fumbles$/i]]
 };
 const seasonYear = (league, d) => { d = d ? new Date(d) : new Date(); const y = d.getFullYear(), m = d.getMonth(); return league === 'nfl' ? (m < 2 ? y - 1 : y) : (m >= 7 ? y + 1 : y); };
 async function coreTeamStats(league, id, year) {
@@ -838,28 +839,51 @@ function flatStats(j) {
 }
 const findStat = (list, re, cre) => { if (cre) list = list.filter(x => cre.test(String(x._cat || ''))); return list.find(x => re.test(String(x.name || ''))) || list.find(x => re.test(String(x.displayName || ''))); };
 const numOf = st => { if (!st) return NaN; const v = st.value != null && st.value !== '' ? +st.value : parseFloat(String(st.displayValue).replace(/,/g, '')); return v; };
-function compactLeague(list, league) {
+function compactLeague(list, league, opp) {
   const o = {};
-  [...(PV_STATS[league] || []), ...(league === 'nfl' ? [...NFL_TEAM.Offensive, ...NFL_TEAM.Defensive] : [])].forEach(([t, re, low, cre]) => { if (o[t] != null) return; const st = findStat(list, re, cre); if (st) o[t] = numOf(st); });
+  [...(PV_STATS[league] || []), ...(league === 'nfl' ? [...NFL_TEAM.Offensive, ...NFL_TEAM.Defensive] : [])].forEach(([t, re, low, cre, isOpp]) => { if (o[t] != null) return; const st = findStat(isOpp ? (opp || []) : list, re, cre); if (st) o[t] = numOf(st); });
   return o;
 }
 state.lgs = {};
+function oppList(j) {
+  if (!j) return [];
+  const r = j.results || {}, o = r.opponent || j.opponent || (r.stats && r.stats.opponent);
+  if (!o) return [];
+  const cats = Array.isArray(o) ? o.flatMap(x => x.categories || (x.stats ? [x] : [])) : (o.categories || (o.stats && o.stats.categories) || []);
+  return cats.flatMap(c => (c.stats || []).map(x => { x._cat = c.name || ''; return x; }));
+}
 function ensureLeagueStats(league, cb) {
-  if (state.lgs[league]) { if (state.lgs[league].data && cb) cb(); return; }
-  const ent = state.lgs[league] = { data: null };
-  try { const st = JSON.parse(localStorage.getItem('lgs3_' + league) || 'null'); if (st && Date.now() - st.t < 12 * 3600e3 && Object.keys(st.d || {}).length > 10) { ent.data = st.d; if (cb) cb(); return; } } catch (e) {}
+  const ex = state.lgs[league];
+  if (ex) { if (ex.data) { if (cb) cb(); } else if (cb) ex.cbs.push(cb); return; }
+  const ent = state.lgs[league] = { data: null, cbs: cb ? [cb] : [] };
+  const done = () => { const c = ent.cbs; ent.cbs = []; c.forEach(f => { try { f(); } catch (e) {} }); };
+  try { const st = JSON.parse(localStorage.getItem('lgs4_' + league) || 'null'); if (st && Date.now() - st.t < 12 * 3600e3 && Object.keys(st.d || {}).length > 10) { ent.data = st.d; done(); return; } } catch (e) {}
   (async () => {
     try {
       await ensureTeams(league);
       const ids = (state.teamList[league] || []).map(t => t.id), d = {};
       let i = 0;
       const base = API + LEAGUES[league].path + '/teams/';
-      const worker = async () => { while (i < ids.length) { const id = ids[i++]; try { d[id] = compactLeague(flatStats(await getJson(base + id + '/statistics')), league); } catch (e) {} } };
+      const worker = async () => { while (i < ids.length) { const id = ids[i++]; try { const j = await getJson(base + id + '/statistics'); d[id] = compactLeague(flatStats(j), league, oppList(j)); } catch (e) {} } };
       await Promise.all(Array.from({ length: 8 }, worker));
+      if (league === 'nfl') { const sd = await ensureStandings(league); Object.keys(d).forEach(id => { if (d[id]['Pts Allowed per Game'] == null && sd[id] && sd[id].gp) d[id]['Pts Allowed per Game'] = sd[id].pa / sd[id].gp; }); }
       ent.data = d;
-      try { localStorage.setItem('lgs3_' + league, JSON.stringify({ t: Date.now(), d })); } catch (e) {}
-      if (cb) cb();
+      try { localStorage.setItem('lgs4_' + league, JSON.stringify({ t: Date.now(), d })); } catch (e) {}
+      done();
     } catch (e) { delete state.lgs[league]; }
+  })();
+}
+state.std = {};
+function ensureStandings(league) {
+  if (state.std[league]) return state.std[league];
+  return state.std[league] = (async () => {
+    const m = {};
+    try {
+      const j = await getJson('https://site.api.espn.com/apis/v2/sports/' + LEAGUES[league].path + '/standings');
+      const walk = n => { (n.standings && n.standings.entries || []).forEach(en => { const g = k => { const x = (en.stats || []).find(y => y.name === k || y.type === k); return x ? +x.value : NaN; }; const w = g('wins'), l = g('losses'), t = g('ties') || 0, pa = g('pointsAgainst'); if (en.team && !isNaN(pa)) m[String(en.team.id)] = { pa, gp: (w || 0) + (l || 0) + (t || 0) }; }); (n.children || []).forEach(walk); };
+      walk(j);
+    } catch (e) {}
+    return m;
   })();
 }
 function tstTable(title, heads, rows) {
@@ -880,7 +904,7 @@ function pvStats(g) {
   const comps = (g.sum.header && g.sum.header.competitions && g.sum.header.competitions[0] && g.sum.header.competitions[0].competitors) || [];
   const cA = teamColor(comps.find(c => String(c.team.id) === String(e.away.id)), '#4aa3ff'), cH = teamColor(comps.find(c => String(c.team.id) === String(e.home.id)), '#d9c27a');
   const lg = state.lgs[g.league];
-  if (!lg) ensureLeagueStats(g.league, () => { if (state.game === g && topView() === 'game' && g.tab === 'preview') render(); });
+  if (!lg || !lg.data) ensureLeagueStats(g.league, () => { if (state.game === g && topView() === 'game' && g.tab === 'preview') render(); });
   const data = lg && lg.data;
   let picks = (PV_STATS[g.league] || []).map(([t, re, low, cre]) => [t, findStat(A, re, cre), findStat(H, re, cre), low]).filter(p => p[1] && p[2]);
   if (picks.length < 3) picks = A.slice(0, 8).map(x => [x.displayName || x.name, x, H.find(y => y.name === x.name)]).filter(p => p[2]);
@@ -1160,10 +1184,22 @@ function combine(labels, cols, reg, post) {
     return String(Math.round((x + y) * 100) / 100);
   });
 }
+function nbaCareerHTML(p, cats) {
+  const c = cats.find(x => /averag/i.test(x.title) && x.labels.includes('PTS')) || cats.find(x => x.labels.includes('PTS') && x.labels.includes('MIN')) || cats[0];
+  const cols = NBA_ALL.map(([l, d, w]) => [c.labels.indexOf(l === '3P%' && !c.labels.includes('3P%') ? '3PT%' : l), d, w]).filter(x => x[0] >= 0);
+  const tw = 120 + cols.reduce((a, x) => a + x[2], 0);
+  const pv = (pm, k) => { const nm = c.names && c.names[k]; if (!nm) return null; if (pm[nm] != null) return pm[nm]; if (/-/.test(nm)) { const q = nm.split('-'); if (pm[q[0]] != null && pm[q[1]] != null) return (+pm[q[0]]).toFixed(1) + '-' + (+pm[q[1]]).toFixed(1); } return null; };
+  const clean = v => String(v == null || v === '' ? '-' : v).replace(/,/g, '');
+  const table = (title, rows, tot) => `<section class="blk"><div class="tw"><table class="nfx sep" style="width:max(100%, ${tw}px)"><colgroup><col>${cols.map(x => `<col style="width:${x[2]}px">`).join('')}</colgroup><thead><tr><th class="n">${esc(title)}</th>${cols.map(x => `<th>${esc(x[1])}</th>`).join('')}</tr></thead><tbody>${rows.map(r => `<tr><td class="n"><span class="pn">${esc(r.n)}</span><small>${esc(r.sub || '')}</small></td>${r.v.map(v => `<td>${nv(clean(v))}</td>`).join('')}</tr>`).join('')}${tot ? `<tr class="tot"><td class="n">Career</td>${tot.map(v => `<td>${nv(clean(v))}</td>`).join('')}</tr>` : ''}</tbody></table></div></section>`;
+  const reg = [...c.rows].reverse().map(r => ({ n: r.n, sub: r.sub, v: cols.map(x => r.vals[x[0]]) }));
+  const post = [...c.rows].reverse().filter(r => p.post && r.year && p.post[r.year]).map(r => ({ n: r.n, sub: r.sub, v: cols.map(x => pv(p.post[r.year], x[0])) })).filter(r => r.v.some(v => v != null && v !== ''));
+  return table('Regular season', reg, c.totals ? cols.map(x => c.totals[x[0]]) : null) + (post.length ? table('Postseason', post) : (p.postDone ? '' : msg('Načítám play-off…')));
+}
 function statsTabHTML(p) {
   if (p.stErr) return msg('Statistiky se nepodařilo načíst (' + p.stErr + ').');
   const cats = statCats(p.st, p.league);
   if (!cats.length) return msg('Statistiky nejsou k dispozici.');
+  if (p.league === 'nba') return nbaCareerHTML(p, cats);
   p.exp = p.exp || new Set();
   return cats.map((c, ci) => {
     const cols = pickStatCols(c.labels, p.league, 7, c.names);
@@ -1252,11 +1288,11 @@ function scheduleHTML(t) {
     const mine = e.home.id === t.id ? e.home : e.away, opp = mine === e.home ? e.away : e.home;
     const d = new Date(e.date), when = DAYS[d.getDay()] + ' ' + d.getDate() + '.' + (d.getMonth() + 1) + '.';
     let res;
-    if (e.state === 'pre') res = `<span class="rg"><i></i><span class="tm">${esc(fmtTime(e.date))}</span><i></i></span>`;
+    if (e.state === 'pre') res = `<span class="rg"><span class="tm">${esc(fmtTime(e.date))}</span></span>`;
     else if (e.state === 'in') res = `<span class="live">${esc(e.short)}</span>`;
     else {
       const w = mine.winner, sfx = e.short.replace(/^Final\/?/, '');
-      res = `<span class="rg"><span class="${w ? 'W' : 'L'}">${w ? 'W' : 'L'}</span><span class="sc2"><b class="${w ? '' : 'mu'}">${esc(mine.score)}</b><i>:</i><b class="${w ? 'mu' : ''}">${esc(opp.score)}</b></span><small class="sf">${esc(sfx)}</small></span>`;
+      res = `<span class="rg"><span class="${w ? 'W' : 'L'}">${w ? 'W' : 'L'}</span><span class="sc2"><b class="${w ? '' : 'mu'}">${esc(mine.score)}</b><i>:</i><b class="${w ? 'mu' : ''}">${esc(opp.score)}</b></span></span>`;
     }
     return `<tr data-game="${esc(e.id)}" data-gl="${t.league}"><td class="n"><span class="pn">${when}</span></td>
       <td class="opp"><small>${mine === e.home ? 'vs' : '@'}</small>${logoImg(opp.logo || teamLogoOf(t.league, opp))}<b>${esc(opp.abbr)}</b></td><td class="rs">${res}</td></tr>`;
@@ -1309,12 +1345,16 @@ function teamTabStatsHTML(t) {
   if (t.league === 'nhl') rows = nhlRows(L).filter(r => r[1] != null).map(r => [r[0], { displayValue: r[1] }]);
   else {
     const lg = state.lgs[t.league];
-    if (!lg) ensureLeagueStats(t.league, () => { if (state.team === t && t.tab === 'tstats' && topView() === 'team') render(); });
+    if (!lg || !lg.data) ensureLeagueStats(t.league, () => { if (state.team === t && t.tab === 'tstats' && topView() === 'team') render(); });
     const data = lg && lg.data;
-    const mk = list => list.map(([n, re, low, cre]) => {
-      const st = findStat(L, re, cre);
+    const OL = oppList(t.stats);
+    if (t.league === 'nfl' && !t.std) { t.std = 1; ensureStandings('nfl').then(m => { t.std = m; if (state.team === t && t.tab === 'tstats' && topView() === 'team') render(); }); }
+    const mk = list => list.map(([n, re, low, cre, isOpp]) => {
+      let st = findStat(isOpp ? OL : L, re, cre);
+      if (!st && n === 'Pts Allowed per Game' && t.std && t.std[t.id] && t.std[t.id].gp) st = { value: t.std[t.id].pa / t.std[t.id].gp, displayValue: (t.std[t.id].pa / t.std[t.id].gp).toFixed(1) };
       let rk = '';
-      if (st && data) { const mine = numOf(st), vals = Object.values(data).map(o => o[n]).filter(v => v != null && !isNaN(v)); if (vals.length && !isNaN(mine)) rk = ordinal(1 + vals.filter(v => low ? v < mine : v > mine).length); }
+      if (st && st.rank != null && !isNaN(+st.rank) && +st.rank > 0) rk = ordinal(+st.rank);
+      else if (st && data) { const mine = numOf(st), vals = Object.values(data).map(o => o[n]).filter(v => v != null && !isNaN(v)); if (vals.length && !isNaN(mine)) rk = ordinal(1 + vals.filter(v => low ? v < mine : v > mine).length); }
       return [n, st ? (st.displayValue != null ? st.displayValue : st.value) : '', rk];
     });
     const out = r => { r.rk = true; return r; };
