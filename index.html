@@ -268,7 +268,7 @@ details[open] summary::after{content:'⌃'}
 .bh img{width:28px;height:28px;object-fit:contain}
 .bh .bt{font-weight:600;font-size:15px}
 .bh .bs{color:var(--mut);font-size:12.5px}
-.glt td.n .glo{width:20px;height:20px;object-fit:contain;vertical-align:-4px;margin-left:2px}
+.glt td.n .glo{width:20px;height:20px;object-fit:contain;vertical-align:-6px;margin-left:2px}
 .glt td.n{text-overflow:clip !important}
 .glt td.n .pn{font-size:15px}
 .glt td.rs2 b{letter-spacing:-.2px}
@@ -291,7 +291,7 @@ details[open] summary::after{content:'⌃'}
 .glt th.n,.glt td.n,.glt tbody td:nth-child(2),.glt thead tr:last-child th:nth-child(2){-webkit-transform:translate3d(0,0,0);transform:translate3d(0,0,0)}
 .glt td.rs2 .T{color:var(--mut)}
 .glt td.rs2 small{font-size:11px;font-weight:400;font-family:inherit;color:inherit}
-td.n .slg{width:20px;height:20px;object-fit:contain;vertical-align:-4px;margin-left:6px}
+td.n .slg{width:20px;height:20px;object-fit:contain;vertical-align:-6px;margin-left:6px}
 .nfx tr.tot td.n{font-family:var(--num)}
 .nfx th.n,.nfx td.n{overflow:hidden;text-overflow:ellipsis}
 .pseg{margin:4px auto 10px}
@@ -388,7 +388,8 @@ td.n .slg{width:20px;height:20px;object-fit:contain;vertical-align:-4px;margin-l
 .sch .opp b{font-size:16.5px}
 .sch .opp img{width:24px;height:24px;margin:0 6px 0 0}
 .sch td{padding-top:7px;padding-bottom:7px}
-.sch .rs .sf{font-size:10px;margin:0 4px 0 0;width:auto;color:var(--mut);font-family:-apple-system,sans-serif;font-weight:600;vertical-align:2px}
+.sch .rs .sf.sfb{margin:0 4px 0 0}
+.sch .rs .sf{font-size:10px;margin:0 0 0 4px;width:auto;color:var(--mut);font-family:-apple-system,sans-serif;font-weight:600;vertical-align:2px}
 .sch .opp small{width:16px}
 .sch .rg .W,.sch .rg .L{width:auto;margin:0}
 .sch .sc2{display:grid;grid-template-columns:1fr 12px 1fr;align-items:center}
@@ -639,7 +640,7 @@ const GLOSS = {
   all: { GP: 'Games Played', G: 'Games / Goals', W: 'Wins', L: 'Losses', T: 'Ties', OTL: 'Overtime Losses', PCT: 'Winning Percentage', GB: 'Games Behind', HOME: 'Home Record', AWAY: 'Away Record', DIV: 'Division Record', CONF: 'Conference Record', DIFF: 'Differential', STRK: 'Current Streak', L10: 'Last 10 Games', TOT: 'Total', AVG: 'Average', YDS: 'Yards', TD: 'Touchdowns', INT: 'Interceptions', LNG: 'Longest', LONG: 'Longest', MIN: 'Minutes', RK: 'Rank' },
   nfl: { PF: 'Points For', PA: 'Points Against', CMP: 'Completions', ATT: 'Attempts', 'CMP%': 'Completion Percentage', 'C/ATT': 'Completions / Attempts', SACK: 'Sacks', SACKS: 'Sacks', RTG: 'Passer Rating', QBR: 'Total QBR', CAR: 'Carries', REC: 'Receptions', TGTS: 'Targets', YAC: 'Yards After Catch', FD: 'First Downs', FUM: 'Fumbles', LST: 'Fumbles Lost', SOLO: 'Solo Tackles', AST: 'Assisted Tackles', TFL: 'Tackles For Loss', PD: 'Passes Defended', 'QB HTS': 'QB Hits', FF: 'Forced Fumbles', FR: 'Fumble Recoveries', BIG: 'Big Plays (20+ yds)', 'YDS/G': 'Yards Per Game', SYL: 'Sack Yards Lost', FG: 'Field Goals', XP: 'Extra Points', PTS: 'Points', NO: 'Number', YDSL: 'Yards Lost', G: 'Games' },
   nba: { G: 'Games', PTS: 'Points', Pts: 'Points', REB: 'Rebounds', AST: 'Assists', STL: 'Steals', BLK: 'Blocks', TO: 'Turnovers', PF: 'Personal Fouls', FG: 'Field Goals Made-Attempted', 'FG%': 'Field Goal Percentage', '3PT': '3-Point FG Made-Attempted', '3P%': '3-Point Percentage', '3PT%': '3-Point Percentage', FT: 'Free Throws Made-Attempted', 'FT%': 'Free Throw Percentage', OFF: 'Offensive Rebounds', OR: 'Offensive Rebounds', DR: 'Defensive Rebounds', DD2: 'Double Doubles', TD3: 'Triple Doubles', FGM: 'Field Goals Made', FGA: 'Field Goals Attempted', '3PM': '3-Pointers Made', '3PA': '3-Pointers Attempted', FTM: 'Free Throws Made', FTA: 'Free Throws Attempted', PPG: 'Points Per Game', 'OPP PPG': 'Opponent Points Per Game', GS: 'Games Started' },
-  nhl: { G: 'Goals', A: 'Assists', PTS: 'Points', '+/-': 'Plus/Minus Rating', PIM: 'Penalty Minutes', SOG: 'Shots On Goal', S: 'Shots', HIT: 'Hits', BKS: 'Blocked Shots', TOI: 'Time On Ice', 'TOI/G': 'Time On Ice Per Game', PPG: 'Power Play Goals', PPA: 'Power Play Assists', SHG: 'Short Handed Goals', SHA: 'Short Handed Assists', GWG: 'Game-Winning Goals', 'S%': 'Shooting Percentage', SPCT: 'Shooting Percentage', RW: 'Regulation Wins', ROW: 'Regulation + OT Wins', GF: 'Goals For', GA: 'Goals Against', GAA: 'Goals Against Average', 'SV%': 'Save Percentage', SV: 'Saves', SA: 'Shots Against', SO: 'Shutouts', GS: 'Games Started', FW: 'Faceoffs Won', FL: 'Faceoffs Lost', 'FO%': 'Faceoff Percentage', PROD: 'Production' }
+  nhl: { G: 'Goals', A: 'Assists', PTS: 'Points', '+/-': 'Plus/Minus Rating', PIM: 'Penalty Minutes', SOG: 'Shots On Goal', S: 'Shots', HIT: 'Hits', BKS: 'Blocked Shots', TOI: 'Time On Ice', 'TOI/G': 'Time On Ice Per Game', PPG: 'Power Play Goals', PPA: 'Power Play Assists', SHG: 'Short Handed Goals', SHA: 'Short Handed Assists', GWG: 'Game-Winning Goals', 'S%': 'Shooting Percentage', SPCT: 'Shooting Percentage', RW: 'Regulation Wins', ROW: 'Regulation + OT Wins', GF: 'Goals For', GA: 'Goals Against', GAA: 'Goals Against Average', 'SV%': 'Save Percentage', SV: 'Saves', SA: 'Shots Against', SO: 'Shutouts', GS: 'Games Started', FW: 'Faceoffs Won', FL: 'Faceoffs Lost', 'FO%': 'Faceoff Percentage' }
 };
 function addGlossary(v) {
   if (!['player', 'team', 'lv', 'game'].includes(v)) return;
@@ -1257,7 +1258,7 @@ function pickStatCols(labels, league, n, names) {
   return cols.slice(0, n || 7);
 }
 const dl = (l, league) => league === 'nhl' && l === 'S' ? 'SOG' : l;
-const cell = v => { const t = String(v == null ? '' : v).replace(/,/g, ''); return `<td class="${t.length > 4 ? 'sm' : ''}">${nv(t)}</td>`; };
+const cell = v => { const t = String(v == null ? '' : v).replace(/,/g, ''); return `<td>${nv(t)}</td>`; };
 function simpleTable(title, labels, rows, totals, league, names) {
   const cols = pickStatCols(labels, league, 7, names);
   const trs = rows.map(r => `<tr><td class="n"><span class="pn">${esc(r.n)}</span><small>${esc(r.sub || '')}</small></td>${cols.map(k => cell(r.vals[k])).join('')}</tr>`).join('');
@@ -1289,7 +1290,7 @@ function gamelogHTML(p) {
     if (!idx.length) { labels.forEach((_, k) => idx.push(k)); groups = null; }
     cols = idx.map(k => [labels[k], k]);
   } else {
-    if (p.league === 'nhl') cols = labels.map((l, i) => [dl(l, 'nhl'), i]).filter(c => !(labels[c[1]] === 'SOG' && labels.includes('S')));
+    if (p.league === 'nhl') cols = labels.map((l, i) => [dl(l, 'nhl'), i]).filter(c => !(labels[c[1]] === 'SOG' && labels.includes('S')) && labels[c[1]] !== 'PROD');
     else cols = (GL_COLS[p.league] || []).filter(l => !(l === 'S' && labels.includes('SOG'))).map(l => [l, labels.indexOf(l)]).filter(c => c[1] >= 0);
     if (cols.length < 3) cols = labels.map((l, i) => [l, i]);
   }
@@ -1439,7 +1440,7 @@ function careerHTML(p, cats) {
   const pv = (c, pm, k) => { const nm = c.names && c.names[k]; if (!nm || !pm) return null; if (pm[nm] != null) return pm[nm]; if (/-/.test(nm)) { const q = nm.split('-'); if (pm[q[0]] != null && pm[q[1]] != null) { const f = x => /\./.test(String(x)) ? (+x).toFixed(1) : x; return f(pm[q[0]]) + '-' + f(pm[q[1]]); } } return null; };
   const out = list.map(c => {
     const cols = p.league === 'nba' ? NBA_ALL.map(([l, d, w]) => [c.labels.indexOf(l === '3P%' && !c.labels.includes('3P%') ? '3PT%' : l), d, w]).filter(x => x[0] >= 0)
-      : c.labels.map((l, k) => [k, dl(l, p.league), p.league === 'nhl' ? (String(l).length > 3 ? 46 : 36) : 53]).filter(x => !(p.league === 'nhl' && c.labels[x[0]] === 'SOG' && c.labels.includes('S')));
+      : c.labels.map((l, k) => [k, dl(l, p.league), p.league === 'nhl' ? (String(l).length > 3 ? 46 : 36) : 53]).filter(x => !(p.league === 'nhl' && ((c.labels[x[0]] === 'SOG' && c.labels.includes('S')) || c.labels[x[0]] === 'PROD')));
     const tw = 112 + cols.reduce((a, x) => a + x[2], 0);
     let rows, tot = null;
     if (mode !== 'post') {
@@ -1585,7 +1586,7 @@ function scheduleHTML(t) {
     else if (e.state === 'in') res = `<span class="live">${esc(e.short)}</span>`;
     else {
       const tie = String(mine.score) !== '' && String(mine.score) === String(opp.score), w = mine.winner, sfx = e.short.replace(/^Final\/?/, '');
-      res = `<span class="rg"><span class="sc2"><b class="${w ? '' : 'mu'}">${sfx ? `<small class="sf">${esc(sfx)}</small>` : ''}${esc(mine.score)}</b><i>:</i><b class="${w ? 'mu' : ''}">${esc(opp.score)}</b></span><span class="${tie ? 'T' : w ? 'W' : 'L'}">${tie ? 'T' : w ? 'W' : 'L'}</span></span>`;
+      res = `<span class="rg"><span class="sc2"><b class="${w ? '' : 'mu'}">${esc(mine.score)}</b><i>:</i><b class="${w ? 'mu' : ''}">${esc(opp.score)}${sfx ? `<small class="sf">${esc(sfx)}</small>` : ''}</b></span><span class="${tie ? 'T' : w ? 'W' : 'L'}">${tie ? 'T' : w ? 'W' : 'L'}</span></span>`;
     }
     return `<tr data-game="${esc(e.id)}" data-gl="${t.league}"><td class="n"><span class="pn">${when}</span></td>
       <td class="opp"><small>${mine === e.home ? 'vs' : '@'}</small>${logoImg(opp.logo || teamLogoOf(t.league, opp))}<b>${esc(teamShortOf(t.league, opp))}</b></td><td class="rs">${res}</td></tr>`;
@@ -1700,7 +1701,7 @@ function teamStatsHTML(t) {
   }
   return catList.map(c => {
     const title = c.name;
-    const cols = c.labels.map((_, k) => k).filter(k => !(t.league === 'nhl' && c.labels[k] === 'SOG' && c.labels.includes('S'))); const cw = k => t.league === 'nhl' ? (String(c.labels[k]).length > 3 ? 46 : 36) : 53;
+    const cols = c.labels.map((_, k) => k).filter(k => !(t.league === 'nhl' && ((c.labels[k] === 'SOG' && c.labels.includes('S')) || c.labels[k] === 'PROD'))); const cw = k => t.league === 'nhl' ? (String(c.labels[k]).length > 3 ? 46 : 36) : 53;
     const gk = title + '|' + c.labels.join(',');
     const sel = (t.sort && t.sort[gk]) || {};
     const defK = cols.find(k => ['PTS', 'YDS', 'W'].includes(c.labels[k])) ?? cols[Math.min(1, cols.length - 1)];
