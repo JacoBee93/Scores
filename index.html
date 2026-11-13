@@ -37,6 +37,9 @@ header.d{padding:calc(env(safe-area-inset-top) + 30px) 12px 7px}
 .fstar{flex:none;width:44px;height:44px;display:flex;align-items:center;justify-content:center;border-radius:12px}
 .fstar svg{width:26px;height:26px;fill:none;stroke:var(--mut);stroke-width:2;stroke-linejoin:round}
 .fstar.on svg{fill:#ffd60a;stroke:#ffd60a}
+.row .nm.fv{color:#ffd60a}
+.qb{display:flex;gap:8px;margin:10px 0 0}
+.qb button{flex:1;background:var(--card);border-radius:12px;padding:9px 0;font-weight:700;font-size:14px;color:#fff;border:0;font-family:inherit}
 .fstar:active{opacity:.6}
 .card .top{display:flex;justify-content:space-between}
 .card .top .lgt{font-family:var(--num);font-weight:700;letter-spacing:.5px;font-size:13px}
@@ -625,7 +628,7 @@ function render() {
   if (tws) document.querySelectorAll('.tw').forEach((x, i) => { if (tws[i]) x.scrollLeft = tws[i]; });
   window.scrollTo(0, y);
 }
-const dk = u => String(u || '').replace(/(\/teamlogos\/\w+\/)500\/([\w-]+\.png)/, '$1500-dark/$2');
+const dk = u => String(u || '').replace(/(\/teamlogos\/\w+\/)500\/(?:scoreboard\/)?([\w-]+\.png)/, '$1500-dark/$2');
 const logoImg = src => src ? `<img src="${esc(src)}" alt="" onerror="this.style.visibility='hidden'">` : '<span class="ph"></span>';
 
 function renderList() {
@@ -678,7 +681,7 @@ function renderList() {
   state.stripKey = skey;
   $app.innerHTML = `
     <header><div class="tabs">${tabs}<span class="grow"></span><button class="icon" data-search aria-label="Hledat">${SEARCH_SVG}</button></div>
-    ${strip ? `<div class="strip" id="strip">${strip}</div>` : ''}</header>
+    ${strip ? `<div class="strip" id="strip">${strip}</div>` : ''}${!fav && LEAGUES[state.league] ? `<div class="qb"><button data-go2="lstats">Player stats</button><button data-go2="standings">Standings</button></div>` : ''}</header>
     <main>${body}<div class="foot">Data: ESPN (neoficiální API)</div></main>`;
   const s = document.getElementById('strip'), on = s && s.querySelector('.on');
   if (on) {
@@ -691,7 +694,7 @@ function renderList() {
 function cardHTML(e) {
   const row = t => {
     const lose = e.state === 'post' && !t.winner;
-    return `<div class="row ${lose ? 'lose' : ''}">${logoImg(t.logo)}<span class="nm">${esc(t.name)}${t.record ? `<span class="rec">(${esc(t.record)})</span>` : ''}</span>
+    return `<div class="row ${lose ? 'lose' : ''}">${logoImg(t.logo)}<span class="nm ${isFav(e.league || state.league, t.id) ? 'fv' : ''}">${esc(t.name)}${t.record ? `<span class="rec">(${esc(String(t.record).replace(/,\s*\d+\s*pts?\b/i, ''))})</span>` : ''}</span>
       <span class="sc">${e.state === 'pre' ? '' : esc(t.score)}</span><span class="arr">${e.state === 'post' && t.winner ? '◀' : ''}</span></div>`;
   };
   return `<div class="card" data-game="${e.id}" data-gl="${e.league || state.league}"><div class="top"><span class="${e.state === 'in' ? 'live' : ''}">${esc(statusText(e))}</span>${e.league && state.league === 'fav' ? `<span class="lgt">${e.league.toUpperCase()}</span>` : ''}</div>${row(e.away)}${row(e.home)}</div>`;
@@ -2010,7 +2013,7 @@ window.addEventListener('hashchange', route);
 const $app = document.getElementById('app');
 $app.addEventListener('click', ev => {
   if (window._lpAt && Date.now() - window._lpAt < 900) { const lb = ev.target.closest('[data-league]'); if (lb) { ev.preventDefault(); return; } }
-  const b = ev.target.closest('[data-home],[data-csort],[data-glm],[data-league],[data-game],[data-date],[data-wk],[data-pst],[data-smode],[data-cl],[data-lsort],[data-drv],[data-pm],[data-tab],[data-ptab],[data-xp],[data-ttab],[data-pvt],[data-sort],[data-fav],[data-team],[data-player],[data-topen],[data-search],[data-month],[data-refresh],[data-back]');
+  const b = ev.target.closest('[data-go2],[data-home],[data-csort],[data-glm],[data-league],[data-game],[data-date],[data-wk],[data-pst],[data-smode],[data-cl],[data-lsort],[data-drv],[data-pm],[data-tab],[data-ptab],[data-xp],[data-ttab],[data-pvt],[data-sort],[data-fav],[data-team],[data-player],[data-topen],[data-search],[data-month],[data-refresh],[data-back]');
   if (!b) return;
   const d = b.dataset;
   if (d.fav !== undefined) {
@@ -2076,6 +2079,8 @@ $app.addEventListener('click', ev => {
     pl.csort[d.cs] = cur && cur.i === i ? (cur.asc ? null : { i, asc: true }) : { i, asc: false }; render();
   } else if (d.glm) {
     state.player.glm = d.glm; render();
+  } else if (d.go2) {
+    window._fromList = true; location.hash = '#/' + d.go2 + '/' + state.league;
   } else if (d.home !== undefined) {
     state.player = null; state.game = null; state.team = null; state.lv = null; state.search = false; window._fromList = false; location.hash = '';
     render(); window.scrollTo(0, 0);
