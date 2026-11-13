@@ -158,7 +158,7 @@ tbody tr:first-child td{padding-top:11px}
 td.n{text-align:left;padding-left:0;position:sticky;left:0;background:var(--card);font-family:var(--num);font-weight:700;font-size:16.5px;line-height:1.1}
 .pn{display:inline-block;max-width:118px;overflow:hidden;text-overflow:ellipsis;vertical-align:bottom}
 td.n small{color:var(--mut);font-family:-apple-system,sans-serif;font-size:10px;font-weight:600;margin-left:4px}
-.neg{position:absolute;margin-left:-.45em}
+.neg{display:inline-block;width:.45em;margin-left:-.45em;text-align:right}
 tr[data-player]{cursor:pointer}
 tr[data-player]:active td,tr[data-topen]:active td{background:#2a2a2e}
 .res{text-align:left;white-space:nowrap;padding:4.8px 10px 4.8px 4px}
@@ -236,6 +236,10 @@ details[open] summary::after{content:'⌃'}
 .glt thead tr:first-child th{border-bottom:0;padding-bottom:0}
 .glt th.grp{text-align:left;padding-left:8px;color:var(--mut);font-size:10px;letter-spacing:.5px;border-bottom:0;padding-bottom:2px}
 .glt td.n small{margin-left:5px}
+.glt tbody td:nth-child(2),.glt thead tr:last-child th:nth-child(2){position:sticky;left:110px;background:var(--card);z-index:1}
+.glt td.n,.glt th.n{z-index:2}
+.glt tbody tr{cursor:pointer}
+.glt tbody tr:active td{background:#2a2a2e}
 .glt td.rs2 b{font-family:inherit;font-weight:400;font-size:15px}
 .glt td.rs2 .W,.glt td.rs2 .L{font-family:inherit;font-weight:700;font-size:15px;width:14px}
 .glt td.rs2 small{font-size:10px}
@@ -1145,6 +1149,8 @@ function renderPlayer() {
       <div><div class="pname">${esc(p.name || 'Hráč')}</div><div class="psub">${esc(sub)}</div></div></div>
       <div class="dtabs sm">${tab('gl', 'Gamelog')}${tab('stats', 'Stats')}</div>
       <div class="pane t">${body}</div></main>`;
+  const gs = document.getElementById('glstrip'), go = gs && gs.querySelector('.on');
+  if (go) gs.scrollLeft = go.offsetLeft - (gs.clientWidth - go.offsetWidth) / 2;
 }
 const TEAM_EXTRA = {'arizona-coyotes':'ARI','phoenix-coyotes':'PHX','atlanta-thrashers':'ATL','utah-hockey-club':'UTA','seattle-supersonics':'SEA','new-orleans-hornets':'NOH','new-jersey-nets':'NJN','charlotte-bobcats':'CHA','oakland-raiders':'OAK','san-diego-chargers':'SD','st-louis-rams':'STL','washington-redskins':'WSH','washington-football-team':'WSH'};
 function teamAbbr(league, id, slug) {
@@ -1177,10 +1183,15 @@ function gamelogHTML(p) {
   const seen = new Set(), rows = [];
   (j.seasonTypes || []).forEach(st => (st.categories || []).forEach(cat => (cat.events || []).forEach(e => {
     if (seen.has(e.eventId) || !e.stats) return;
-    seen.add(e.eventId); rows.push({ m: meta[e.eventId] || {}, s: e.stats });
+    seen.add(e.eventId); rows.push({ id: e.eventId, m: meta[e.eventId] || {}, s: e.stats });
   })));
   if (!rows.length) return msg('Žádné odehrané zápasy.');
   rows.sort((a, b) => new Date(b.m.gameDate || 0) - new Date(a.m.gameDate || 0));
+  const mk = r => { const d = new Date(r.m.gameDate || 0); return d.getFullYear() + '-' + pad(d.getMonth() + 1); };
+  const months = [...new Set(rows.map(mk))].sort();
+  if (!p.glm || !months.includes(p.glm)) p.glm = months[months.length - 1];
+  const strip = months.length > 1 ? `<div class="mstrip" id="glstrip">${months.map(m => { const q = m.split('-'); return `<button class="mo ${m === p.glm ? 'on' : ''}" data-glm="${m}"><span>${MONTHS[+q[1] - 1]}</span><span>${q[0]}</span></button>`; }).join('')}</div>` : '';
+  const shown = rows.filter(r => mk(r) === p.glm);
   let cols, groups = null;
   if (p.league === 'nfl') {
     const gc = (j.categories || []).filter(c => c && c.count), idx = [];
@@ -1195,14 +1206,14 @@ function gamelogHTML(p) {
   }
   const w = l => String(l).length > 4 ? 62 : /^(YDS|ATT|CMP|CAR|REC|MIN|FG|3PT|FT|TOI|C\/ATT)$/.test(l) ? 58 : 46;
   const tw = 110 + 86 + cols.reduce((a, c) => a + w(c[0]), 0);
-  const trs = rows.slice(0, 20).map(r => {
+  const trs = shown.map(r => {
     const m = r.m, opp = (m.opponent && (m.opponent.abbreviation || m.opponent.displayName)) || '';
     const sm = String(m.score || '').match(/^(\S+)\s*(.*)$/) || [];
     const wl = m.gameResult || '';
-    return `<tr><td class="n"><span class="pn">${m.gameDate ? esc(fmtShort(m.gameDate)) : ''}</span><small>${esc((m.atVs || '') + ' ' + opp)}</small></td><td class="rs2"><span class="${wl === 'W' || wl === 'L' ? wl : ''}">${esc(wl)}</span> <b>${esc(sm[1] || '')}</b>${sm[2] ? ` <small class="mut">${esc(sm[2])}</small>` : ''}</td>${cols.map(c => `<td>${nv(String(r.s[c[1]] == null ? '' : r.s[c[1]]).replace(/,/g, ''))}</td>`).join('')}</tr>`;
+    return `<tr data-game="${esc(r.id)}" data-gl="${p.league}"><td class="n"><span class="pn">${m.gameDate ? esc(fmtShort(m.gameDate)) : ''}</span><small>${esc((m.atVs || '') + ' ' + opp)}</small></td><td class="rs2"><span class="${wl === 'W' || wl === 'L' ? wl : ''}">${esc(wl)}</span> <b>${esc(sm[1] || '')}</b>${sm[2] ? ` <small class="mut">${esc(sm[2])}</small>` : ''}</td>${cols.map(c => `<td>${nv(String(r.s[c[1]] == null ? '' : r.s[c[1]]).replace(/,/g, ''))}</td>`).join('')}</tr>`;
   }).join('');
   const ghead = groups && groups.length > 1 ? `<tr><th class="n"></th><th></th>${groups.map(g => `<th class="grp" colspan="${g[1]}">${esc(g[0])}</th>`).join('')}</tr>` : '';
-  return `<section class="blk" style="margin-top:6px"><div class="tw"><table class="nfx sep glt" style="width:max(100%, ${tw}px)"><colgroup><col style="width:110px"><col style="width:86px">${cols.map(c => `<col style="width:${w(c[0])}px">`).join('')}</colgroup><thead>${ghead}<tr><th class="n">Gamelog</th><th></th>${cols.map(c => `<th>${esc(c[0])}</th>`).join('')}</tr></thead><tbody>${trs}</tbody></table></div></section>`;
+  return strip + `<section class="blk" style="margin-top:6px"><div class="tw"><table class="nfx sep glt" style="width:max(100%, ${tw}px)"><colgroup><col style="width:110px"><col style="width:86px">${cols.map(c => `<col style="width:${w(c[0])}px">`).join('')}</colgroup><thead>${ghead}<tr><th class="n">Gamelog</th><th></th>${cols.map(c => `<th>${esc(c[0])}</th>`).join('')}</tr></thead><tbody>${trs}</tbody></table></div></section>`;
 }
 function statCats(j, league) {
   return ((j && j.categories) || []).filter(c => c.statistics && c.statistics.length).map(c => ({
@@ -1900,7 +1911,7 @@ window.addEventListener('hashchange', route);
 const $app = document.getElementById('app');
 $app.addEventListener('click', ev => {
   if (window._lpAt && Date.now() - window._lpAt < 900) { const lb = ev.target.closest('[data-league]'); if (lb) { ev.preventDefault(); return; } }
-  const b = ev.target.closest('[data-home],[data-league],[data-game],[data-date],[data-wk],[data-pst],[data-smode],[data-cl],[data-lsort],[data-drv],[data-pm],[data-tab],[data-ptab],[data-xp],[data-ttab],[data-pvt],[data-sort],[data-fav],[data-team],[data-player],[data-topen],[data-search],[data-month],[data-refresh],[data-back]');
+  const b = ev.target.closest('[data-home],[data-glm],[data-league],[data-game],[data-date],[data-wk],[data-pst],[data-smode],[data-cl],[data-lsort],[data-drv],[data-pm],[data-tab],[data-ptab],[data-xp],[data-ttab],[data-pvt],[data-sort],[data-fav],[data-team],[data-player],[data-topen],[data-search],[data-month],[data-refresh],[data-back]');
   if (!b) return;
   const d = b.dataset;
   if (d.fav !== undefined) {
@@ -1956,6 +1967,8 @@ $app.addEventListener('click', ev => {
   } else if (d.refresh !== undefined) {
     const v = topView();
     if (v === 'player') { state.player.done = false; render(); loadPlayer(); } else if (v === 'game') loadGame(); else if (v === 'list') loadList();
+  } else if (d.glm) {
+    state.player.glm = d.glm; render();
   } else if (d.home !== undefined) {
     state.player = null; state.game = null; state.team = null; state.lv = null; state.search = false; window._fromList = false; location.hash = '';
     render(); window.scrollTo(0, 0);
@@ -1989,7 +2002,6 @@ if (/^#\/(game|team|search|player)/.test(location.hash)) route(); else loadList(
 ['gesturestart', 'gesturechange', 'gestureend'].forEach(t => document.addEventListener(t, e => e.preventDefault(), { passive: false }));
 document.addEventListener('touchmove', e => { if (e.touches.length > 1) e.preventDefault(); }, { passive: false });
 
-window.addEventListener('scroll', () => { if (window.scrollX) window.scrollTo(0, window.scrollY); }, { passive: true });
 document.addEventListener('scroll', e => { const t = e.target; if (t && t.nodeType === 1 && (t.id === 'app' || t.classList.contains('pane') || t.tagName === 'MAIN') && t.scrollLeft) t.scrollLeft = 0; }, { capture: true, passive: true });
 </script>
 </body>
