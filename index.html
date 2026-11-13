@@ -368,6 +368,7 @@ async function loadGame() {
     if (!g.tabInit) { g.tabInit = true; g.tab = g.ev && g.ev.state === 'pre' ? 'preview' : 'stats'; }
     else if (g.ev && g.ev.state !== 'pre' && g.tab === 'preview' && !g.tabSet) g.tab = 'stats';
     if (g.ev && !g.ts && !g.tsLoading) loadPreviewStats(g);
+    if (g.ev && !g.sl && !g.slLoading) loadSeasonLeaders(g);
   } catch (e) { g.err = 'Nepodařilo se načíst zápas (' + (e.message || e) + ').'; }
   if (state.game === g && topView() === 'game') render();
 }
@@ -632,13 +633,47 @@ function teamColor(c, fb) {
   if (lumOf(h) < 0.3) { const n = parseInt(h, 16); const mix = v => Math.round(v + (255 - v) * 0.45); h = [n >> 16, (n >> 8) & 255, n & 255].map(mix).map(v => v.toString(16).padStart(2, '0')).join(''); }
   return '#' + h;
 }
+const SL_CATS = {
+  nfl: [[/^passingYards$/i, 'Passing Yards', 'YDS'], [/^rushingYards$/i, 'Rushing Yards', 'YDS'], [/^receivingYards$/i, 'Receiving Yards', 'YDS'], [/^sacks$/i, 'Sacks', 'SACKS']],
+  nba: [[/^pointsPerGame$|^avgPoints$/i, 'Points', 'PPG'], [/^reboundsPerGame$|^avgRebounds$/i, 'Rebounds', 'RPG'], [/^assistsPerGame$|^avgAssists$/i, 'Assists', 'APG'], [/^stealsPerGame$|^avgSteals$/i, 'Steals', 'SPG']],
+  nhl: [[/^goals$/i, 'Goals', 'G'], [/^assists$/i, 'Assists', 'A'], [/^points$/i, 'Points', 'PTS'], [/^plusMinus$/i, 'Plus/Minus', '']]
+};
+async function loadSeasonLeaders(g) {
+  const e = g.ev, parts = LEAGUES[g.league].path.split('/'), hs = g.sum && g.sum.header && g.sum.header.season;
+  const y = (hs && hs.year) || new Date(e.date).getFullYear();
+  const https = u => String(u).replace(/^http:/, 'https:');
+  const one = async team => {
+    let cats = null;
+    for (const ty of [2, (hs && hs.type) || 3]) {
+      try { const j = await getJson('https://sports.core.api.espn.com/v2/sports/' + parts[0] + '/leagues/' + parts[1] + '/seasons/' + y + '/types/' + ty + '/teams/' + team.id + '/leaders?lang=en&region=us'); if (j && j.categories && j.categories.length) { cats = j.categories; break; } } catch (err) {}
+    }
+    if (!cats) return null;
+    const out = await Promise.all(SL_CATS[g.league].map(async ([re, title, lab]) => {
+      const c = cats.find(x => re.test(String(x.name || ''))), l = c && c.leaders && c.leaders[0];
+      if (!l || !l.athlete || !l.athlete.$ref) return null;
+      try {
+        const a = await getJson(https(l.athlete.$ref));
+        const dv = String(l.displayValue != null ? l.displayValue : l.value);
+        return { name: title, displayName: title, leaders: [{ athlete: { id: a.id, displayName: a.displayName, shortName: a.shortName || a.displayName, position: a.position, jersey: a.jersey, headshot: a.headshot }, mainStat: { value: /[a-z]/i.test(dv) ? dv : dv, label: /[a-z]/i.test(dv) ? '' : lab } }] };
+      } catch (err) { return null; }
+    }));
+    return out.filter(Boolean);
+  };
+  g.slLoading = true;
+  const r = await Promise.all([one(e.away), one(e.home)]);
+  g.sl = r; g.slLoading = false;
+  if (state.game === g && topView() === 'game' && g.tab === 'preview') render();
+}
 const hsOf = (a, league) => (a && a.headshot && (a.headshot.href || a.headshot)) || (a && a.id ? `https://a.espncdn.com/i/headshots/${league}/players/full/${a.id}.png` : '');
 function pvLeaders(g) {
   const sum = g.sum, e = g.ev, comps = (sum.header && sum.header.competitions && sum.header.competitions[0] && sum.header.competitions[0].competitors) || [];
   let arr = (sum.leaders || []).filter(x => x && x.leaders && x.leaders.length);
   if (!arr.length) arr = comps.map(c => ({ team: c.team, leaders: c.leaders || [] })).filter(x => x.leaders.length);
   const of = id => ((arr.find(x => String(x.team && x.team.id) === String(id)) || {}).leaders) || [];
-  const la = of(e.away.id), lh = of(e.home.id);
+  let la = of(e.away.id), lh = of(e.home.id);
+  if (g.slLoading) return `<section class="pv"><div class="sec">Season leaders</div>${msg('Načítám…')}</section>`;
+  if (g.sl && g.sl[0] && g.sl[1] && (g.sl[0].length || g.sl[1].length)) { la = g.sl[0]; lh = g.sl[1]; }
+  else if (e.state !== 'pre') { la = []; lh = []; }
   const names = []; [...la, ...lh].forEach(c => { if (c && c.name && !names.includes(c.name)) names.push(c.name); });
   const side = (top, right, tm) => {
     if (!top || !top.athlete) return '<div class="ld"></div>';
