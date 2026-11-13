@@ -162,8 +162,8 @@ header.d + main{padding-top:0}
 .l5r:last-child{border-bottom:0}
 .l5r:active{opacity:.6}
 .l5r .rw{width:16px;font-weight:800;font-family:var(--num);font-size:18px}
-.l5r .ro i{font-style:normal;width:15px;text-align:center}
-.l5r .ro{width:44px;display:flex;align-items:center;gap:3px;font-family:var(--num);font-weight:700;font-size:16px;color:var(--mut);white-space:nowrap;flex:none}
+.l5r .ro i{font-style:normal;width:17px;text-align:left}
+.l5r .ro{width:49px;display:flex;align-items:center;gap:8px;font-family:var(--num);font-weight:700;font-size:16px;color:var(--mut);white-space:nowrap;flex:none}
 .l5r img,.l5r .ph{width:24px;height:24px;object-fit:contain;flex:none}
 .l5r .rs2{margin-left:auto;font-family:var(--num);font-size:17px;white-space:nowrap}
 .l5r .rs2 u{text-decoration:none;margin:0 4px}
@@ -204,6 +204,18 @@ details[open] summary::after{content:'⌃'}
 .play.g .txt{font-weight:500}
 .play.g .sco{color:#fff;font-weight:700;font-size:12.5px;margin-top:4px}
 /* hráč */
+.ssum{background:#2c2c2e;border-radius:12px;overflow:hidden;margin:6px 0 18px}
+.ssh{padding:7px 10px;text-align:center;font-family:var(--wide);font-stretch:112%;font-weight:800;font-size:12px;letter-spacing:.5px;text-transform:uppercase;color:#fff}
+.ssg{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;padding:10px 4px 12px;text-align:center}
+.ssl{font-size:13px;color:var(--mut);font-weight:500}
+.ssv{font-family:var(--num);font-weight:700;font-size:30px;line-height:1.15;font-kerning:none}
+.ssr{font-size:12.5px;color:var(--mut)}
+.glt tr.mb td{border-top:2px solid #48484a}
+.ysel{position:relative;margin:2px 0 6px}
+.ybtn{display:inline-flex;align-items:center;gap:8px;background:#2c2c2e;border-radius:12px;padding:7px 14px;font-weight:600;font-size:15px}
+.ylist{position:absolute;z-index:20;top:calc(100% + 6px);left:0;background:#2c2c2e;border-radius:12px;max-height:300px;overflow-y:auto;min-width:140px;box-shadow:0 10px 30px rgba(0,0,0,.5)}
+.ylist button{display:block;width:100%;text-align:left;padding:10px 16px;font-size:15px;border-bottom:1px solid #3a3a3c}
+.ylist button.on{color:var(--acc);font-weight:700}
 .phero{display:flex;align-items:center;gap:14px;margin:4px 4px 14px}
 .phero .hs{width:68px;height:68px;border-radius:50%;background:var(--card);object-fit:cover;flex:none}
 .phero.pp{flex-direction:row-reverse;justify-content:space-between;margin-left:0}
@@ -1148,7 +1160,7 @@ function pvLast5(g) {
       const res = ev.gameResult || '', opp = ev.opponent || {}, own = String(ev.score || '');
       const sc = own.match(/(\d+)\D+(\d+)/); let a = '', b = '';
       if (sc) { const hi = Math.max(+sc[1], +sc[2]), lo = Math.min(+sc[1], +sc[2]); if (res === 'L') { a = lo; b = hi; } else { a = hi; b = lo; } }
-      return `<div class="l5r" data-game="${esc(ev.id)}" data-gl="${g.league}"><span class="${res === 'W' ? 'W' : res === 'L' ? 'L' : ''} rw">${esc(res)}</span><span class="ro"><i>${ev.atVs === '@' ? '@' : ''}</i>${logoImg(opp.logo)}</span><span class="rs2">${res === 'L' ? `<i>${a}</i><u>-</u><b>${b}</b>` : `<b>${a}</b><u>-</u><i>${b}</i>`}</span></div>`;
+      return `<div class="l5r" data-game="${esc(ev.id)}" data-gl="${g.league}"><span class="${res === 'W' ? 'W' : res === 'L' ? 'L' : ''} rw">${esc(res)}</span><span class="ro"><i>${ev.atVs === '@' ? '@' : 'vs'}</i>${logoImg(opp.logo)}</span><span class="rs2">${res === 'L' ? `<i>${a}</i><u>-</u><b>${b}</b>` : `<b>${a}</b><u>-</u><i>${b}</i>`}</span></div>`;
     }).join('')}</div>`;
   };
   return `<section class="pv"><div class="sec">Recent games</div><div class="lhd">${logoImg(e.away.logo)}<b>${esc(e.away.abbr)}</b><span class="grow"></span><b>${esc(e.home.abbr)}</b>${logoImg(e.home.logo)}</div><div class="l5">${col(e.away)}${col(e.home)}</div></section>`;
@@ -1259,14 +1271,14 @@ function playsHTML(g) {
 /* ----- stránka hráče ----- */
 function renderPlayer() {
   const p = state.player;
-  const body = !p.done ? msg('Načítám…') : p.tab === 'gl' ? gamelogHTML(p) : p.tab === 'bio' ? bioHTML(p) : statsTabHTML(p);
+  const body = !p.done ? msg('Načítám…') : p.tab === 'ov' ? overviewHTML(p) : p.tab === 'gl' ? gamelogFull(p) : p.tab === 'bio' ? bioHTML(p) : statsTabHTML(p);
   const sub = [p.jersey ? '#' + p.jersey : '', p.pos, p.team].filter(Boolean).join(' · ');
   const tab = (k, l) => `<button data-ptab="${k}" class="${p.tab === k ? 'on' : ''}">${l}</button>`;
   $app.innerHTML = `
     <header class="d"><div class="tabs"><button class="back" data-back aria-label="Zpět">‹</button><button class="home" data-home aria-label="Domů"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"><path d="M3 10.5 12 3l9 7.5"/><path d="M5.5 9v11h13V9"/><path d="M10 20v-6h4v6"/></svg></button><button class="home" data-refresh aria-label="Obnovit"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12a8 8 0 1 1-2.34-5.66"/><path d="M20 4v5h-5"/></svg></button></div></header>
     <main><div class="phero pp"><img class="hs" src="https://a.espncdn.com/i/headshots/${p.league}/players/full/${esc(p.id)}.png" alt="" onerror="this.style.visibility='hidden'">
       <div><div class="pname">${esc(p.name || 'Hráč')}</div><div class="psub">${esc(sub)}</div></div></div>
-      <div class="dtabs sm">${tab('gl', 'Gamelog')}${tab('stats', 'Stats')}${tab('bio', 'Bio')}</div>
+      <div class="dtabs sm">${tab('ov', 'Overview')}${tab('stats', 'Stats')}${tab('gl', 'Gamelog')}${tab('bio', 'Bio')}</div>
       <div class="pane t">${body}</div></main>`;
   const gs = document.getElementById('glstrip'), go = gs && gs.querySelector('.on');
   if (go) gs.scrollLeft = go.offsetLeft - (gs.clientWidth - go.offsetWidth) / 2;
@@ -1295,10 +1307,12 @@ function simpleTable(title, labels, rows, totals, league, names) {
   const tot = totals ? `<tr><td class="n">Career</td>${cols.map(k => `<td${String(totals[k]).replace(/,/g, '').length > 4 ? ' class="sm"' : ''}><b>${esc(String(totals[k]).replace(/,/g, ''))}</b></td>`).join('')}</tr>` : '';
   return `<section class="blk"><div class="tw"><table class="fx sep"><colgroup><col style="width:104px"></colgroup><thead><tr><th class="n">${esc(catName(title, labels, league))}</th>${cols.map(k => `<th>${esc(dl(labels[k], league))}</th>`).join('')}</tr></thead><tbody>${trs}${tot}</tbody></table></div></section>`;
 }
-function gamelogHTML(p) {
-  if (p.glErr) return msg('Gamelog se nepodařilo načíst (' + p.glErr + ').');
-  if (!p.gl) return msg('Gamelog není k dispozici.');
-  const j = p.gl, labels = j.labels || j.names || [], meta = j.events || {};
+function gamelogHTML(p, o) {
+  o = o || {};
+  const J = o.j !== undefined ? o.j : p.gl;
+  if (o.j === undefined && p.glErr) return msg('Gamelog se nepodařilo načíst (' + p.glErr + ').');
+  if (!J) return msg('Gamelog není k dispozici.');
+  const j = J, labels = j.labels || j.names || [], meta = j.events || {};
   const seen = new Set(), rows = [];
   (j.seasonTypes || []).forEach(st => (st.categories || []).forEach(cat => (cat.events || []).forEach(e => {
     if (seen.has(e.eventId) || !e.stats) return;
@@ -1307,10 +1321,9 @@ function gamelogHTML(p) {
   if (!rows.length) return msg('Žádné odehrané zápasy.');
   rows.sort((a, b) => new Date(b.m.gameDate || 0) - new Date(a.m.gameDate || 0));
   const mk = r => { const d = new Date(r.m.gameDate || 0); return d.getFullYear() + '-' + pad(d.getMonth() + 1); };
-  const months = [...new Set(rows.map(mk))].sort();
-  if (!p.glm || !months.includes(p.glm)) p.glm = months[months.length - 1];
-  const strip = months.length > 1 ? `<div class="mstrip" id="glstrip">${months.map(m => { const q = m.split('-'); return `<button class="mo ${m === p.glm ? 'on' : ''}" data-glm="${m}"><span>${MONTHS[+q[1] - 1]}</span><span>${q[0]}</span></button>`; }).join('')}</div>` : '';
-  const shown = rows.filter(r => mk(r) === p.glm);
+  const strip = '';
+  const shown = o.limit ? rows.slice(0, o.limit) : rows;
+  const strip0 = false ? `<div class="mstrip" id="glstrip">${months.map(m => { const q = m.split('-'); return `<button class="mo ${m === p.glm ? 'on' : ''}" data-glm="${m}"><span>${MONTHS[+q[1] - 1]}</span><span>${q[0]}</span></button>`; }).join('')}</div>` : '';
   let cols, groups = null;
   if (p.league === 'nfl') {
     const gc = (j.categories || []).filter(c => c && c.count), idx = [];
@@ -1326,11 +1339,12 @@ function gamelogHTML(p) {
   }
   const w = l => p.league === 'nhl' ? (String(l).length > 3 || l === 'TOI' ? 46 : 36) : /\//.test(l) ? 56 : String(l).length > 3 ? 50 : /^(FG|3PT|FT|TOI)$/.test(l) ? 50 : 43;
   const rw = p.league === 'nhl' ? 84 : 92, tw = 84 + rw + cols.reduce((a, c) => a + w(c[0]), 0);
-  const trs = shown.map(r => {
+  const trs = shown.map((r, ri) => {
+    const mb = !o.limit && ri > 0 && mk(r) !== mk(shown[ri - 1]);
     const m = r.m, opp = (m.opponent && (m.opponent.abbreviation || m.opponent.displayName)) || '', ol = m.opponent ? dk((m.opponent.logo) || teamLogoOf(p.league, { id: m.opponent.id, abbr: m.opponent.abbreviation })) : '';
     const sm = String(m.score || '').match(/^(\S+)\s*(.*)$/) || [];
     const wl = m.gameResult || '';
-    return `<tr data-game="${esc(r.id)}" data-gl="${p.league}"><td class="n"><span class="pn">${m.gameDate ? esc(fmtShort(m.gameDate)) : ''}</span><small>${esc(m.atVs === '@' ? '@' : 'vs')}</small>${ol ? `<img class="glo" src="${esc(ol)}" alt="${esc(opp)}" onerror="this.replaceWith(Object.assign(document.createElement('small'),{textContent:'${esc(opp)}'}))">` : `<small>${esc(opp)}</small>`}</td><td class="rs2"><span class="${wl === 'W' || wl === 'L' ? wl : 'T'}">${esc(wl)}</span> <b>${esc(sm[1] || '')}</b>${sm[2] ? ` <small class="mut">${esc(sm[2])}</small>` : ''}</td>${cols.map(c => `<td>${nv(String(r.s[c[1]] == null ? '' : r.s[c[1]]).replace(/,/g, ''))}</td>`).join('')}</tr>`;
+    return `<tr data-game="${esc(r.id)}" data-gl="${p.league}"${mb ? ' class="mb"' : ''}><td class="n"><span class="pn">${m.gameDate ? esc(fmtShort(m.gameDate)) : ''}</span><small>${esc(m.atVs === '@' ? '@' : 'vs')}</small>${ol ? `<img class="glo" src="${esc(ol)}" alt="${esc(opp)}" onerror="this.replaceWith(Object.assign(document.createElement('small'),{textContent:'${esc(opp)}'}))">` : `<small>${esc(opp)}</small>`}</td><td class="rs2"><span class="${wl === 'W' || wl === 'L' ? wl : 'T'}">${esc(wl)}</span> <b>${esc(sm[1] || '')}</b>${sm[2] ? ` <small class="mut">${esc(sm[2])}</small>` : ''}</td>${cols.map(c => `<td>${nv(String(r.s[c[1]] == null ? '' : r.s[c[1]]).replace(/,/g, ''))}</td>`).join('')}</tr>`;
   }).join('');
   let totRow = '';
   if (false) {
@@ -1349,7 +1363,46 @@ function gamelogHTML(p) {
     totRow = `<tr class="tot"><td class="n">Total</td><td class="rs2"></td>${tv.map(x => `<td>${nv(x)}</td>`).join('')}</tr>`;
   }
   const ghead = groups && groups.length > 1 ? `<tr><th class="n gh" colspan="2"></th>${groups.map(g => `<th class="grp" colspan="${g[1]}">${esc(g[0])}</th>`).join('')}</tr>` : '';
-  return strip + `<section class="blk" style="margin-top:6px"><div class="tw"><table class="nfx sep glt" style="width:${tw}px"><colgroup><col style="width:84px"><col style="width:${rw}px">${cols.map(c => `<col style="width:${w(c[0])}px">`).join('')}</colgroup><thead>${ghead}<tr><th class="n">Gamelog</th><th></th>${cols.map(c => `<th>${esc(c[0])}</th>`).join('')}</tr></thead><tbody>${trs}${totRow}</tbody></table></div></section>`;
+  return (o.head || '') + `<section class="blk" style="margin-top:6px"><div class="tw"><table class="nfx sep glt" style="width:${tw}px"><colgroup><col style="width:84px"><col style="width:${rw}px">${cols.map(c => `<col style="width:${w(c[0])}px">`).join('')}</colgroup><thead>${ghead}<tr><th class="n">${esc(o.title || 'Gamelog')}</th><th></th>${cols.map(c => `<th>${esc(c[0])}</th>`).join('')}</tr></thead><tbody>${trs}${totRow}</tbody></table></div></section>`;
+}
+function seasonLbl(p, y) { y = +y; return p.league === 'nfl' ? String(y) : (y - 1) + '-' + String(y).slice(2); }
+function glSeasons(p) {
+  const f = ((p.gl && p.gl.filters) || []).find(x => x && /season$/i.test(x.name || '') && Array.isArray(x.options));
+  let L = f ? f.options.map(x => ({ y: String(x.value), t: x.displayValue || seasonLbl(p, x.value) })).filter(x => /^\d{4}$/.test(x.y)) : [];
+  if (!L.length) L = [...new Set(statCats(p.st, p.league).flatMap(c => c.rows.map(r => r.year)).filter(Boolean))].map(y => ({ y: String(y), t: seasonLbl(p, y) }));
+  const cur = f && f.value ? String(f.value) : (L[0] && L[0].y);
+  L.sort((a, b) => b.y - a.y);
+  return { L, cur };
+}
+async function loadGlSeason(p, y) {
+  p.glBy = p.glBy || {};
+  if (p.glBy[y]) return;
+  p.glBy[y] = { loading: true };
+  try { p.glBy[y] = { j: await getJson(WEB + LEAGUES[p.league].path + '/athletes/' + p.id + '/gamelog?season=' + y) }; }
+  catch (e) { p.glBy[y] = { err: String((e && e.message) || e) }; }
+  if (state.player === p && topView() === 'player') render();
+}
+function gamelogFull(p) {
+  const { L, cur } = glSeasons(p), sel = p.glY || cur;
+  const lbl = (L.find(x => x.y === sel) || {}).t || (sel ? seasonLbl(p, sel) : '');
+  const head = L.length ? `<div class="ysel"><button class="ybtn" data-glyo="1">${esc(lbl)}<i class="chev ${p.glYOpen ? 'up' : ''}"></i></button>${p.glYOpen ? `<div class="ylist">${L.map(x => `<button data-gly="${x.y}" class="${x.y === sel ? 'on' : ''}">${esc(x.t)}</button>`).join('')}</div>` : ''}</div>` : '';
+  if (!sel || sel === cur) return gamelogHTML(p, { head });
+  const g = (p.glBy || {})[sel];
+  if (!g) { loadGlSeason(p, sel); return head + msg('Načítám…'); }
+  if (g.loading) return head + msg('Načítám…');
+  if (g.err) return head + msg('Gamelog se nepodařilo načíst.');
+  return gamelogHTML(p, { head, j: g.j });
+}
+function summaryHTML(p) {
+  const a = p.bio || {}, ss = a.statsSummary, st = ((ss && ss.statistics) || []).filter(x => x && x.displayValue != null).slice(0, 4);
+  if (!st.length) return '';
+  const col = a.team && a.team.color ? '#' + String(a.team.color).replace('#', '') : 'var(--acc)';
+  return `<section class="ssum"><div class="ssh" style="background:${esc(col)}">${esc(ss.displayName || 'Season stats')}</div><div class="ssg">${st.map(x => `<div><div class="ssl">${esc(x.abbreviation || x.shortDisplayName || x.displayName || '')}</div><div class="ssv">${esc(x.displayValue)}</div><div class="ssr">${esc(x.rankDisplayValue || '')}</div></div>`).join('')}</div></section>`;
+}
+function overviewHTML(p) {
+  const sum = summaryHTML(p);
+  const gl = p.gl ? gamelogHTML(p, { limit: 5, title: ' ', head: '<div class="sec" style="margin:4px 0 0">Recent games</div>' }) : '';
+  return (sum + gl) || msg('Přehled není k dispozici.');
 }
 function statCats(j, league) {
   return ((j && j.categories) || []).filter(c => c.statistics && c.statistics.length).map(c => ({
@@ -1708,7 +1761,7 @@ function teamTabStatsHTML(t) {
   if (!rows.length) return msg('Statistiky týmu nejsou k dispozici.');
   return tstTable('Team stats', ['Value'], rows.map(r => [r[0], r[1].displayValue != null ? r[1].displayValue : r[1].value]));
 }
-const NBA_ALL = [['GP', 'G', 40], ['MIN', 'Min', 46], ['PTS', 'Pts', 48], ['FG%', 'FG%', 52], ['FG', 'FG', 70], ['3P%', '3PT%', 54], ['3PT', '3PT', 64], ['FT%', 'FT%', 54], ['FT', 'FT', 64], ['OR', 'Off', 44], ['REB', 'Reb', 46], ['AST', 'Ast', 46], ['TO', 'TO', 44], ['STL', 'Stl', 44], ['BLK', 'Blk', 44], ['PF', 'PF', 44]];
+const NBA_ALL = [['GP', 'G', 40], ['MIN', 'Min', 46], ['PTS', 'Pts', 48], ['FG%', 'FG%', 52], ['FG', 'FG', 84], ['3P%', '3PT%', 54], ['3PT', '3PT', 74], ['FT%', 'FT%', 54], ['FT', 'FT', 74], ['OR', 'Off', 44], ['REB', 'Reb', 46], ['AST', 'Ast', 46], ['TO', 'TO', 44], ['STL', 'Stl', 44], ['BLK', 'Blk', 44], ['PF', 'PF', 44]];
 function nbaPlayersHTML(t, tn) {
   const cats = [...t.ps.cats.values()];
   const c = cats.find(x => /averag/i.test(x.name) && x.labels.includes('PTS')) || cats.find(x => x.labels.includes('PTS') && x.labels.includes('MIN')) || cats[0];
@@ -2124,7 +2177,7 @@ function openTeam(league, id) {
   render(); loadTeam();
 }
 function playerNav(d) {
-  state.pmeta = { league: d.pl, id: d.player, name: d.pn || '', pos: d.pp || '', jersey: d.pj || '', team: d.pt || '', tab: 'gl', loaded: false, done: false };
+  state.pmeta = { league: d.pl, id: d.player, name: d.pn || '', pos: d.pp || '', jersey: d.pj || '', team: d.pt || '', tab: 'ov', loaded: false, done: false };
   window._fromList = true;
   location.hash = '#/player/' + d.pl + '/' + d.player;
 }
@@ -2134,7 +2187,7 @@ function route() {
   if (m && LEAGUES[m[1]]) {
     if (!state.player || state.player.id !== m[2]) {
       state.player = (state.pmeta && state.pmeta.id === m[2]) ? state.pmeta
-        : { league: m[1], id: m[2], name: '', pos: '', jersey: '', team: '', tab: 'gl', loaded: false, done: false };
+        : { league: m[1], id: m[2], name: '', pos: '', jersey: '', team: '', tab: 'ov', loaded: false, done: false };
     }
     render();
     if (!state.player.loaded) loadPlayer();
@@ -2161,7 +2214,7 @@ window.addEventListener('hashchange', route);
 const $app = document.getElementById('app');
 $app.addEventListener('click', ev => {
   if (window._lpAt && Date.now() - window._lpAt < 900) { const lb = ev.target.closest('[data-league]'); if (lb) { ev.preventDefault(); return; } }
-  const b = ev.target.closest('[data-rclear],[data-go2],[data-home],[data-csort],[data-glm],[data-league],[data-game],[data-date],[data-wk],[data-pst],[data-smode],[data-cl],[data-lsort],[data-drv],[data-pm],[data-tab],[data-ptab],[data-xp],[data-ttab],[data-pvt],[data-sort],[data-fav],[data-team],[data-player],[data-topen],[data-search],[data-month],[data-refresh],[data-back]');
+  const b = ev.target.closest('[data-rclear],[data-go2],[data-home],[data-csort],[data-glm],[data-glyo],[data-gly],[data-league],[data-game],[data-date],[data-wk],[data-pst],[data-smode],[data-cl],[data-lsort],[data-drv],[data-pm],[data-tab],[data-ptab],[data-xp],[data-ttab],[data-pvt],[data-sort],[data-fav],[data-team],[data-player],[data-topen],[data-search],[data-month],[data-refresh],[data-back]');
   if (!b) return;
   const d = b.dataset;
   if (topView() === 'search' && !ev.target.closest('.fstar')) { if (d.topen) addRecent({ k: 't', l: d.tl, id: d.topen, name: d.tn || '', logo: d.tlogo || '' }); else if (d.player) addRecent({ k: 'p', l: d.pl, id: d.player, name: d.pn || '', sub: d.pt || '' }); }
@@ -2227,6 +2280,10 @@ $app.addEventListener('click', ev => {
   } else if (d.csort !== undefined) {
     const pl = state.player; pl.csort = pl.csort || {}; const cur = pl.csort[d.cs], i = +d.csort;
     pl.csort[d.cs] = cur && cur.i === i ? (cur.asc ? null : { i, asc: true }) : { i, asc: false }; render();
+  } else if (d.glyo) {
+    state.player.glYOpen = !state.player.glYOpen; render();
+  } else if (d.gly) {
+    state.player.glY = d.gly; state.player.glYOpen = false; render();
   } else if (d.glm) {
     state.player.glm = d.glm; render();
   } else if (d.go2) {
