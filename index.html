@@ -226,7 +226,7 @@ details[open] summary::after{content:'⌃'}
 .nfx{table-layout:fixed}
 .nfx th:not(.n),.nfx td:not(.n){text-align:center;padding-left:2px;padding-right:2px}
 .nfx td.n .pn{max-width:100%}
-.nfx td{padding-top:8px;padding-bottom:8px}
+.nfx td{padding-top:8px;padding-bottom:8px;font-variant-numeric:tabular-nums}
 .nfx tr.tot td{font-weight:700}
 .nfx th.n,.nfx td.n{width:auto}
 .tw{max-width:100%}
@@ -272,12 +272,12 @@ td.n .slg{width:20px;height:20px;object-fit:contain;vertical-align:-4px;margin-l
 .stn tr{cursor:pointer}
 .stn tr.cut td{border-bottom:2px solid #e5484d !important}
 .stn td.n .tc{display:flex;align-items:center;gap:8px;min-width:0}
-.stn td.n .rk{color:var(--mut);font-family:-apple-system,sans-serif;font-size:12px;font-weight:600;width:16px;text-align:right;flex:none}
+.stn td.n .rk{color:#aeaeb2;width:18px !important;font-family:-apple-system,sans-serif;font-size:12px;font-weight:600;width:16px;text-align:right;flex:none}
 .stn td.n img{width:22px;height:22px;object-fit:contain;flex:none}
 .stn td.n .pn{overflow:hidden;text-overflow:ellipsis}
 .ldr{display:flex;align-items:center;gap:10px;padding:8px 0;cursor:pointer}
 .ldr + .ldr{border-top:1px solid #2c2c2e}
-.ldr .rk{width:16px;color:var(--mut);font-size:13px;font-weight:600;text-align:right;flex:none}
+.ldr .rk{width:16px;color:#aeaeb2;font-size:13px;font-weight:600;text-align:right;flex:none}
 .ldr .hsw{position:relative;flex:none;width:42px;height:38px}
 .ldr .hs{width:38px;height:38px;border-radius:50%;background:#2c2c2e;object-fit:cover}
 .ldr .tlb{position:absolute;right:-2px;bottom:-2px;width:20px;height:20px;object-fit:contain;filter:drop-shadow(0 0 2px #000)}
@@ -285,12 +285,13 @@ td.n .slg{width:20px;height:20px;object-fit:contain;vertical-align:-4px;margin-l
 .ldr .lv2{font-family:var(--num);font-weight:700;font-size:19px;flex:none}
 .ldr.top .lv2{color:#fff}
 .lcat{margin-top:22px}
+.ldr .lpos{color:var(--mut);font-size:11px;font-weight:600;margin-left:6px}
 .cl{display:block;width:100%;padding:12px 0 4px;font-weight:700;font-size:15px;color:#fff;background:none;border:0;border-top:1px solid #2c2c2e;font-family:inherit;cursor:pointer}
 .lbt th{cursor:pointer}
 .lbt th.on{color:var(--acc2,#8ab4ff);text-decoration:underline}
 .lbt td.on{background:#26314a}
 .lbt td.n .tc{display:flex;align-items:center;gap:7px;min-width:0}
-.lbt td.n .rk{color:var(--mut);font-family:-apple-system,sans-serif;font-size:12px;font-weight:600;width:20px;text-align:right;flex:none}
+.lbt td.n .rk{color:#aeaeb2;font-family:-apple-system,sans-serif;font-size:12px;font-weight:600;width:20px;text-align:right;flex:none}
 .lbt td.n img{width:20px;height:20px;object-fit:contain;flex:none}
 .lbt td.n small{flex:none}
 .lcat .lh2{font-family:var(--wide);font-stretch:112%;font-weight:800;font-size:12px;letter-spacing:.5px;text-transform:uppercase;padding-bottom:8px;border-bottom:1px solid #3a3a3c;margin-bottom:2px}
@@ -1757,7 +1758,7 @@ function lstatsHTML(v, c) {
   if (!c.cats || !c.cats.length) return msg(c.err || 'Statistiky ligy nejsou k dispozici.');
   return c.cats.map(cat => `<section class="lcat"><div class="lh2">${esc(cat.title)}</div>${cat.rows.map((r, i) => {
     const a = r.a || {}, tid = r.tid && r.tid[1], tm = (state.teamList[v.league] || []).find(x => x.id === tid) || {}, pos = (a.position && a.position.abbreviation) || '';
-    return `<div class="ldr ${i === 0 ? 'top' : ''}" data-player="${esc(a.id || '')}" data-pl="${v.league}" data-pn="${esc(a.displayName || '')}" data-pp="${esc(pos)}" data-pj="${esc(a.jersey || '')}" data-pt="${esc(tm.name || '')}"><span class="rk">${i + 1}</span><span class="hsw"><img class="hs" src="${esc(hsOf(a, v.league))}" alt="" onerror="this.style.visibility='hidden'">${tm.logo || tm.abbr ? `<img class="tlb" src="${esc(teamLogoOf(v.league, { id: tm.id, abbr: tm.abbr }))}" alt="" onerror="this.remove()">` : ''}</span><div class="ln"><span class="pn" style="font-family:var(--num);font-weight:700;font-size:17px">${esc(a.displayName ? shortNm(a.displayName) : '…')}</span></div><span class="lv2">${esc(r.val)}</span></div>`;
+    return `<div class="ldr ${i === 0 ? 'top' : ''}" data-player="${esc(a.id || '')}" data-pl="${v.league}" data-pn="${esc(a.displayName || '')}" data-pp="${esc(pos)}" data-pj="${esc(a.jersey || '')}" data-pt="${esc(tm.name || '')}"><span class="rk">${i + 1}</span><span class="hsw"><img class="hs" src="${esc(hsOf(a, v.league))}" alt="" onerror="this.style.visibility='hidden'">${tm.logo || tm.abbr ? `<img class="tlb" src="${esc(teamLogoOf(v.league, { id: tm.id, abbr: tm.abbr }))}" alt="" onerror="this.remove()">` : ''}</span><div class="ln"><span class="pn" style="font-family:var(--num);font-weight:700;font-size:17px">${esc(a.displayName ? shortNm(a.displayName) : '…')}</span>${v.league === 'nhl' && pos ? `<small class="lpos">${esc(pos)}</small>` : ''}</div><span class="lv2">${esc(r.val)}</span></div>`;
   }).join('')}<button class="cl" data-cl="${esc(cat.name || '')}">Complete leaders</button></section>`).join('');
 }
 function renderLV() {
@@ -1799,13 +1800,14 @@ async function loadLeaders() {
     const j = await getJson(u);
     const rc = j.categories || [];
     let cols = [];
-    rc.forEach((c, ci) => (c.labels || []).forEach((l, k) => { if (!cols.some(x => x.label === l)) cols.push({ label: l, name: (c.names || [])[k] || l, ci: c.name, k }); }));
+    rc.forEach((c, ci) => (c.labels || []).forEach((l, k) => { cols.push({ label: l, name: (c.names || [])[k] || l, ci: c.name, k }); }));
     const WANT = {
       nba: ['gamesPlayed', 'avgMinutes', 'avgPoints', 'avgFieldGoalsMade', 'avgFieldGoalsAttempted', 'fieldGoalPct', 'avgThreePointFieldGoalsMade', 'avgThreePointFieldGoalsAttempted', 'threePointFieldGoalPct', 'avgFreeThrowsMade', 'avgFreeThrowsAttempted', 'freeThrowPct', 'avgRebounds', 'avgAssists', 'avgSteals', 'avgBlocks', 'avgTurnovers', 'doubleDouble', 'tripleDouble'],
       nhl: cg === 'goaltending' ? ['gamesPlayed', 'wins', 'losses', 'overtimeLosses', 'otLosses', 'goalsAgainstAverage', 'savePct', 'saves', 'shotsAgainst', 'shutouts'] : ['gamesPlayed', 'goals', 'assists', 'points', 'plusMinus', 'penaltyMinutes', 'shotsTotal', 'shootingPct', 'powerPlayGoals', 'shortHandedGoals', 'gameWinningGoals', 'timeOnIcePerGame']
     };
-    if (WANT[v.league]) { const f = WANT[v.league].map(n => cols.find(c => c.name === n)).filter(Boolean); if (f.length >= 3) cols = f; }
-    else if (v.league === 'nfl' && cg) { const grp = cg.split(':').pop().replace(/e$/, '').toLowerCase(); const f = cols.filter(c => c.ci === 'general' ? /gamesPlayed/i.test(c.name) : String(c.ci).toLowerCase().indexOf(grp) === 0 || (grp === 'defens' && /defensive/i.test(c.ci))); if (f.length >= 3) cols = f; }
+    if (WANT[v.league]) { const f = WANT[v.league].map(n => cols.find(c => c.name === n)).filter(Boolean); if (f.length >= 3) cols = f; else { const seen = new Set(); cols = cols.filter(c => !seen.has(c.label) && seen.add(c.label)); } }
+    else if (v.league === 'nfl' && cg) { const grp = cg.split(':').pop().replace(/e$/, '').toLowerCase(); let gpDone = false; const f = cols.filter(c => c.ci === 'general' ? (/gamesPlayed/i.test(c.name) && !gpDone && (gpDone = true)) : String(c.ci).toLowerCase().indexOf(grp) === 0 || (grp === 'defens' && /defensive/i.test(c.ci))); const seen = new Set(); cols = (f.length >= 3 ? f : cols).filter(c => { const k = c.label + '|' + (f.length >= 3 ? c.ci : ''); return !seen.has(k) && seen.add(k); }); }
+    else { const seen = new Set(); cols = cols.filter(c => !seen.has(c.label) && seen.add(c.label)); }
     const rows = (j.athletes || []).map(a => {
       const ac = a.categories || [];
       const vals = cols.map(col => { const x = ac.find(q => q.name === col.ci); if (!x) return ''; const arr = x.totals || x.values || []; return arr[col.k] != null ? arr[col.k] : ''; });
@@ -1848,7 +1850,7 @@ function renderLeaders() {
       const a = r.a || {}, tid = (r.tid && r.tid[1]) || (a.teamId) || (a.team && a.team.id), tm = (state.teamList[v.league] || []).find(x => x.id === String(tid)) || (state.teamList[v.league] || []).find(x => x.abbr && x.abbr === (a.teamShortName || (a.team && a.team.abbreviation))) || {};
       const ab = tm.abbr || a.teamShortName || '', lg = tm.logo || (ab ? `https://a.espncdn.com/i/teamlogos/${v.league}/500/${ab.toLowerCase()}.png` : '');
       const pos = (a.position && a.position.abbreviation) || '';
-      return `<tr data-player="${esc(a.id || '')}" data-pl="${v.league}" data-pn="${esc(a.displayName || '')}" data-pp="${esc(pos)}" data-pj="${esc(a.jersey || '')}" data-pt="${esc(tm.name || '')}"><td class="n"><div class="tc"><span class="rk">${i + 1}</span>${logoImg(lg)}<span class="pn">${esc(a.shortName || shortNm(a.displayName || ''))}</span></div></td>${r.vals.map((x, k) => `<td class="${k === v.sk ? 'on' : ''}">${nv(String(x == null || x === '' ? '-' : x).replace(/,/g, ''))}</td>`).join('')}</tr>`;
+      return `<tr data-player="${esc(a.id || '')}" data-pl="${v.league}" data-pn="${esc(a.displayName || '')}" data-pp="${esc(pos)}" data-pj="${esc(a.jersey || '')}" data-pt="${esc(tm.name || '')}"><td class="n"><div class="tc"><span class="rk">${i + 1}</span>${logoImg(lg)}<span class="pn">${esc(a.shortName || shortNm(a.displayName || ''))}</span>${v.league === 'nhl' && pos ? `<small>${esc(pos)}</small>` : ''}</div></td>${r.vals.map((x, k) => `<td class="${k === v.sk ? 'on' : ''}">${nv(String(x == null || x === '' ? '-' : x).replace(/,/g, ''))}</td>`).join('')}</tr>`;
     }).join('');
     body = `<section class="blk"><div class="tw"><table class="nfx sep lbt" style="width:max(100%, ${tw}px)"><colgroup><col>${D.cols.map(c => `<col style="width:${w(c.label)}px">`).join('')}</colgroup><thead><tr><th class="n">Name</th>${D.cols.map((c, k) => `<th data-lsort="${k}" class="${k === v.sk ? 'on' : ''}">${esc(c.label)}</th>`).join('')}</tr></thead><tbody>${trs}</tbody></table></div></section>`;
   }
