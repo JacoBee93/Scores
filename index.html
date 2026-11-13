@@ -220,9 +220,12 @@ details[open] summary::after{content:'⌃'}
 .play.g .sco{color:#fff;font-weight:700;font-family:var(--num);font-size:17px;line-height:20px;margin:0 0 3px;letter-spacing:.3px}
 .play.g .clk{line-height:20px}
 .play.g .pl{margin-top:-2px}
+.sco .sbg{font-family:-apple-system,sans-serif;margin-left:8px;vertical-align:2px}
 .sbg{display:inline-block;font-size:10.5px;font-weight:700;color:#ffd60a;border:1px solid #ffd60a;border-radius:5px;padding:0 4px;margin-left:4px;vertical-align:1px}
 .play.g .txt{font-size:14.5px}
 /* hráč */
+.cmptl{display:flex;align-items:center;justify-content:space-between}
+.cmpclr{background:var(--card);border-radius:12px;padding:7px 14px;font-weight:600;font-size:14px}
 .cmpin{display:flex;flex-direction:column;gap:8px;margin:10px 0 14px}
 .cmpi{position:relative}
 .cmpi .sinp{width:100%;padding-right:40px}
@@ -235,6 +238,8 @@ details[open] summary::after{content:'⌃'}
 .cmph{display:flex;flex-direction:column;align-items:center;text-align:center;gap:4px;cursor:pointer}
 .cmph .hs{width:76px;height:76px;border-radius:50%;background:#2c2c2e;object-fit:cover}
 .cmpt{width:100%;border-collapse:collapse}
+.cmpcar{border-top:2px solid #48484a;margin-top:22px}
+.cmpcar .cmps{margin-top:16px}
 .cmps{text-align:center;font-family:var(--wide);font-stretch:112%;font-weight:800;font-size:15px;text-transform:uppercase;letter-spacing:.5px;margin:22px 0 6px}
 .cmpys{display:flex;justify-content:center;margin:20px 0 6px}
 .cmpys .ylist{left:50%;transform:translateX(-50%)}
@@ -268,8 +273,17 @@ details[open] summary::after{content:'⌃'}
 .scf button.on{background:#fff;color:#000}
 .sch2{display:flex;justify-content:space-between;font-size:12.5px;color:var(--mut);margin:10px 2px 6px;font-weight:600}
 .rink{width:100%;display:block}
+.rkw{position:relative;cursor:pointer}
+#wpov.scov .wpbox{gap:4px}
+.scfw{flex:1;display:flex;gap:10px}
+#wpov .scf{margin:0;flex:1;gap:4px}
+#wpov .scf button{font-size:12px;padding:5px 2px}
+#wpov .sch2{margin:6px 2px 4px}
+#wpov .scl{margin-top:4px}
+.rkbig{flex:1;min-height:0;position:relative}
+.rkbig .rink{position:absolute;inset:0;width:100%;height:100%}
 .scl{display:flex;justify-content:center;gap:14px;font-size:11.5px;color:var(--mut);margin-top:8px}
-.scl i{display:inline-block;width:9px;height:9px;border-radius:50%;border:1.5px solid #fff;margin-right:5px;vertical-align:-1px}
+.scl i{display:inline-block;width:9px;height:9px;border-radius:50%;border:1.5px solid #aaa;margin-right:5px;vertical-align:-1px}
 .scl i.g{background:#fff}
 .scl i.m{opacity:.5}
 .lsc{width:100%}
@@ -807,13 +821,15 @@ function topView() { return state.player ? 'player' : state.game ? 'game' : stat
 function viewKey() { return topView() + (state.player ? state.player.id : state.game ? state.game.id : state.team ? state.team.id : state.lv ? state.lv.kind + state.lv.league + (state.lv.cat || '') : ''); }
 const GLOSS = {
   all: { GP: 'Games Played', G: 'Games / Goals', W: 'Wins', L: 'Losses', T: 'Ties', OTL: 'Overtime Losses', PCT: 'Winning Percentage', GB: 'Games Behind', HOME: 'Home Record', AWAY: 'Away Record', DIV: 'Division Record', CONF: 'Conference Record', DIFF: 'Differential', STRK: 'Current Streak', L10: 'Last 10 Games', TOT: 'Total', AVG: 'Average', YDS: 'Yards', TD: 'Touchdowns', INT: 'Interceptions', LNG: 'Longest', LONG: 'Longest', MIN: 'Minutes', RK: 'Rank' },
-  nfl: { PF: 'Points For', PA: 'Points Against', CMP: 'Completions', ATT: 'Attempts', 'CMP%': 'Completion Percentage', 'C/ATT': 'Completions / Attempts', SACK: 'Sacks', SACKS: 'Sacks', RTG: 'Passer Rating', QBR: 'Total QBR', CAR: 'Carries', REC: 'Receptions', TGTS: 'Targets', YAC: 'Yards After Catch', FD: 'First Downs', FUM: 'Fumbles', LST: 'Fumbles Lost', SOLO: 'Solo Tackles', AST: 'Assisted Tackles', TFL: 'Tackles For Loss', PD: 'Passes Defended', 'QB HTS': 'QB Hits', FF: 'Forced Fumbles', FR: 'Fumble Recoveries', BIG: 'Big Plays (20+ yds)', 'YDS/G': 'Yards Per Game', SYL: 'Sack Yards Lost', FG: 'Field Goals', XP: 'Extra Points', PTS: 'Points', NO: 'Number', YDSL: 'Yards Lost', G: 'Games', GS: 'Games Started', SFTY: 'Safeties', BLK: 'Blocked Kicks', KB: 'Kicks Blocked', FGM: 'Field Goals Made', FGA: 'Field Goals Attempted', 'FG%': 'Field Goal Percentage', XPM: 'Extra Points Made', XPA: 'Extra Points Attempted', 'XP%': 'Extra Point Percentage', PUNTS: 'Punts', P: 'Punts', NET: 'Net Punting Average', IN20: 'Punts Inside 20', 'IN 20': 'Punts Inside 20', TB: 'Touchbacks', FC: 'Fair Catches', RET: 'Returns', KR: 'Kick Returns', PR: 'Punt Returns', 'Y/R': 'Yards Per Reception', YPC: 'Yards Per Carry', 'Y/A': 'Yards Per Attempt', ADJQBR: 'Adjusted QBR', TCKL: 'Tackles', COMB: 'Combined Tackles', 'INT YDS': 'Interception Return Yards', 'INT TD': 'Interception Touchdowns', DEFTD: 'Defensive Touchdowns', FUML: 'Fumbles Lost', 'FG ATT': 'Field Goal Attempts', '1-19': 'FG Made 1-19 yds', '20-29': 'FG Made 20-29 yds', '30-39': 'FG Made 30-39 yds', '40-49': 'FG Made 40-49 yds', '50+': 'FG Made 50+ yds', FUMR: 'Fumble Recoveries', 'SCK YDS': 'Sack Yards' },
+  nfl: { PF: 'Points For', PA: 'Points Against', CMP: 'Completions', ATT: 'Attempts', 'CMP%': 'Completion Percentage', 'C/ATT': 'Completions / Attempts', SACK: 'Sacks', SACKS: 'Sacks', RTG: 'Passer Rating', QBR: 'Total QBR', CAR: 'Carries', REC: 'Receptions', TGTS: 'Targets', YAC: 'Yards After Catch', FD: 'First Downs', FUM: 'Fumbles', LOST: 'Fumbles Lost', SOLO: 'Solo Tackles', AST: 'Assisted Tackles', TFL: 'Tackles For Loss', PD: 'Passes Defended', 'QB HTS': 'QB Hits', FF: 'Forced Fumbles', FR: 'Fumble Recoveries', BIG: 'Big Plays (20+ yds)', 'YDS/G': 'Yards Per Game', SYL: 'Sack Yards Lost', FG: 'Field Goals', XP: 'Extra Points', PTS: 'Points', NO: 'Number', YDSL: 'Yards Lost', G: 'Games', GS: 'Games Started', SFTY: 'Safeties', BLK: 'Blocked Kicks', KB: 'Kicks Blocked', FGM: 'Field Goals Made', FGA: 'Field Goals Attempted', 'FG%': 'Field Goal Percentage', XPM: 'Extra Points Made', XPA: 'Extra Points Attempted', 'XP%': 'Extra Point Percentage', PUNTS: 'Punts', P: 'Punts', NET: 'Net Punting Average', IN20: 'Punts Inside 20', 'IN 20': 'Punts Inside 20', TB: 'Touchbacks', FC: 'Fair Catches', RET: 'Returns', KR: 'Kick Returns', PR: 'Punt Returns', 'Y/R': 'Yards Per Reception', YPC: 'Yards Per Carry', 'Y/A': 'Yards Per Attempt', ADJQBR: 'Adjusted QBR', TCKL: 'Tackles', COMB: 'Combined Tackles', 'INT YDS': 'Interception Return Yards', 'INT TD': 'Interception Touchdowns', DEFTD: 'Defensive Touchdowns', FUML: 'Fumbles Lost', 'FG ATT': 'Field Goal Attempts', '1-19': 'FG Made 1-19 yds', '20-29': 'FG Made 20-29 yds', '30-39': 'FG Made 30-39 yds', '40-49': 'FG Made 40-49 yds', '50+': 'FG Made 50+ yds', FUMR: 'Fumble Recoveries', 'SCK YDS': 'Sack Yards' },
   nba: { G: 'Games', PTS: 'Points', Pts: 'Points', REB: 'Rebounds', AST: 'Assists', STL: 'Steals', BLK: 'Blocks', TO: 'Turnovers', PF: 'Personal Fouls', FG: 'Field Goals Made-Attempted', 'FG%': 'Field Goal Percentage', '3PT': '3-Point FG Made-Attempted', '3P%': '3-Point Percentage', '3PT%': '3-Point Percentage', FT: 'Free Throws Made-Attempted', 'FT%': 'Free Throw Percentage', OFF: 'Offensive Rebounds', OR: 'Offensive Rebounds', DR: 'Defensive Rebounds', DD2: 'Double Doubles', TD3: 'Triple Doubles', FGM: 'Field Goals Made', FGA: 'Field Goals Attempted', '3PM': '3-Pointers Made', '3PA': '3-Pointers Attempted', FTM: 'Free Throws Made', FTA: 'Free Throws Attempted', PPG: 'Points Per Game', 'OPP PPG': 'Opponent Points Per Game', GS: 'Games Started' },
   nhl: { G: 'Goals', A: 'Assists', PTS: 'Points', '+/-': 'Plus/Minus Rating', PIM: 'Penalty Minutes', SOG: 'Shots On Goal', S: 'Shots', HIT: 'Hits', BKS: 'Blocked Shots', TOI: 'Time On Ice', 'TOI/G': 'Time On Ice Per Game', PPG: 'Power Play Goals', PPA: 'Power Play Assists', SHG: 'Short Handed Goals', SHA: 'Short Handed Assists', GWG: 'Game-Winning Goals', 'S%': 'Shooting Percentage', SPCT: 'Shooting Percentage', RW: 'Regulation Wins', ROW: 'Regulation + OT Wins', GF: 'Goals For', GA: 'Goals Against', GAA: 'Goals Against Average', 'SV%': 'Save Percentage', SV: 'Saves', SA: 'Shots Against', SO: 'Shutouts', GS: 'Games Started', FW: 'Faceoffs Won', FL: 'Faceoffs Lost', 'FO%': 'Faceoff Percentage' }
 };
+function relabel(root) { root.querySelectorAll('th, .cmpt td.cl').forEach(el => { if (el.children.length === 0 && el.textContent.trim() === 'LST') el.textContent = 'LOST'; }); }
 function addGlossary(v) {
   if (!['player', 'team', 'lv', 'game', 'cmp'].includes(v)) return;
   const pane = $app.querySelector('.pane'); if (!pane) return;
+  pane.querySelectorAll('.gloss').forEach(x => x.remove());
   const lg = v === 'cmp' ? state.cmp && (state.cmp.sel[0] || state.cmp.sel[1] || {}).league : (state.player && state.player.league) || (state.game && state.game.league) || (state.team && state.team.league) || (state.lv && state.lv.league);
   const D = Object.assign({}, GLOSS.all, GLOSS[lg] || {});
   if (v === 'lv' && state.lv && state.lv.kind === 'standings') Object.assign(D, { PF: 'Points For', PA: 'Points Against', PTS: 'Points', GP: 'Games Played' });
@@ -829,6 +845,7 @@ function render() {
   if (v === 'player') renderPlayer(); else if (v === 'game') renderGame(); else if (v === 'team') renderTeam();
   else if (v === 'lv') renderLV(); else if (v === 'cmp') renderCompare(); else if (v === 'search') renderSearch(); else renderList();
   state.lastView = key;
+  relabel($app);
   addGlossary(v);
   $app.querySelectorAll('img[src*="/teamlogos/"]').forEach(im => { const d = dk(im.getAttribute('src')); if (d !== im.getAttribute('src')) im.setAttribute('src', d); });
   if (tws) document.querySelectorAll('.tw').forEach((x, i) => { if (tws[i]) x.scrollLeft = tws[i]; });
@@ -1012,38 +1029,76 @@ function linescoreHTML(g) {
     return `<tr><td class="n"><span class="lst">${logoImg(lg)}<b>${esc(t.abbreviation || '')}</b></span></td>${Array.from({ length: n }, (_, i) => `<td>${esc(v[i] != null ? v[i] : '-')}</td>`).join('')}<td class="lsT ${c.winner ? '' : 'mut'}">${esc(sc != null ? sc : '')}</td></tr>`; };
   return `<section class="pv"><div class="sec">Score</div><div class="tw"><table class="lsc"><thead><tr><th class="n"></th>${Array.from({ length: n }, (_, i) => `<th>${perHead(g.league, i)}</th>`).join('')}<th>T</th></tr></thead><tbody>${row(away)}${row(home)}</tbody></table></div></section>`;
 }
+function penaltiesHTML(g) {
+  const sum = g.sum, plays = getPlays(sum).filter(p => /penalty/i.test(String((p.type && p.type.text) || '')) && !/shot/i.test(String((p.type && p.type.text) || '')));
+  if (!plays.length) return msg('No penalties.');
+  const logos = {};
+  ((sum.header && sum.header.competitions && sum.header.competitions[0] && sum.header.competitions[0].competitors) || []).forEach(c => { if (c.team) logos[c.team.id] = c.team.logo || (c.team.logos && c.team.logos[0] && c.team.logos[0].href) || ''; });
+  const groups = new Map();
+  plays.forEach(p => { const n = (p.period && p.period.number) || 1; if (!groups.has(n)) groups.set(n, []); groups.get(n).push(p); });
+  return [...groups.keys()].sort((a, b) => a - b).map(k => `<section class="per"><div class="phd">${periodLabel('nhl', k)}</div>${groups.get(k).map(p => { const lg = p.team && logos[p.team.id];
+    const m = String(p.text || '').match(/(\d+)\s*min/i);
+    return `<div class="play g"><span class="pl">${lg ? `<img src="${esc(lg)}" alt="" onerror="this.style.visibility='hidden'">` : ''}</span><span class="clk">${esc((p.clock && p.clock.displayValue) || '')}</span><span class="txt">${m ? `<span class="sco">${esc(m[1])} MIN</span>` : ''}${esc(p.text || p.shortText || '')}</span></div>`; }).join('')}</section>`).join('');
+}
 function summaryGameHTML(g) {
   let out = linescoreHTML(g);
-  if (g.league === 'nfl' || g.league === 'nhl') { const sp = scoringHTML(g); if (sp && !/class="msg"/.test(sp.slice(0, 30))) out += `<section class="pv"><div class="sec">Scoring plays</div>${sp}</section>`; }
+  if (g.league === 'nhl') { const pm = g.spm || 'sc', seg = `<div class="seg pseg" style="max-width:240px"><button data-spm="sc" class="${pm === 'sc' ? 'on' : ''}">Scoring</button><button data-spm="pen" class="${pm === 'pen' ? 'on' : ''}">Penalties</button></div>`;
+    out += `<section class="pv"><div class="sec">${pm === 'pen' ? 'Penalties' : 'Scoring plays'}</div>${seg}${pm === 'pen' ? penaltiesHTML(g) : scoringHTML(g)}</section>`; }
+  else if (g.league === 'nfl') { const sp = scoringHTML(g); if (sp && !/class="msg"/.test(sp.slice(0, 30))) out += `<section class="pv"><div class="sec">Scoring plays</div>${sp}</section>`; }
   if (g.league !== 'nhl') out += pvLeaders(g, true) || '';
   out += wpHTML(g);
   if (g.league === 'nhl') out += shotChartHTML(g);
   return out || msg('Summary not available yet.');
 }
-function shotChartHTML(g) {
-  const e = g.ev, plays = getPlays(g.sum).filter(p => p && p.coordinate && p.coordinate.x != null && p.coordinate.y != null && /shot|goal/i.test(String((p.type && p.type.text) || '')) && !/penalty shot miss/i.test(''));
-  if (!plays.length) return '';
-  const f = g.scF = g.scF || { tm: 'all', ty: 'all', per: 'all' };
-  const col = t => '#' + String(t.color || '888888').replace('#', '');
-  const isGoal = p => p.scoringPlay || /^goal/i.test(String((p.type && p.type.text) || ''));
-  const kind = p => isGoal(p) ? 'g' : /block/i.test(p.type.text) ? 'b' : /miss/i.test(p.type.text) ? 'm' : 's';
-  const pers = [...new Set(plays.map(p => (p.period && p.period.number) || 1))].sort((a, b) => a - b);
-  const sel = plays.filter(p => { const tid = String(p.team && p.team.id), k = kind(p), pn = (p.period && p.period.number) || 1;
+function shotData(g) {
+  return getPlays(g.sum).filter(p => p && p.coordinate && p.coordinate.x != null && p.coordinate.y != null && /shot|goal/i.test(String((p.type && p.type.text) || '')));
+}
+const scKind = p => p.scoringPlay || /^goal/i.test(String((p.type && p.type.text) || '')) ? 'g' : /block/i.test(p.type.text) ? 'b' : /miss/i.test(p.type.text) ? 'm' : 's';
+function rinkSVG(g, plays, f) {
+  const e = g.ev, col = t => '#' + String(t.color || '888888').replace('#', '');
+  const sel = plays.filter(p => { const tid = String(p.team && p.team.id), k = scKind(p), pn = (p.period && p.period.number) || 1;
     return (f.tm === 'all' || f.tm === tid) && (f.ty === 'all' || (f.ty === 'g' ? k === 'g' : k !== 'g')) && (f.per === 'all' || String(pn) === f.per); });
   const dots = sel.map(p => { const home = String(p.team && p.team.id) === String(e.home.id); let x = +p.coordinate.x, y = +p.coordinate.y;
     if ((home && x < 0) || (!home && x > 0)) { x = -x; y = -y; }
-    const cx = (x + 100).toFixed(1), cy = (42.5 - y).toFixed(1), c = col(home ? e.home : e.away), k = kind(p);
-    return k === 'g' ? `<circle cx="${cx}" cy="${cy}" r="2.6" fill="${c}" stroke="#fff" stroke-width=".7"/>` : `<circle cx="${cx}" cy="${cy}" r="1.7" fill="none" stroke="${c}" stroke-width=".8" opacity="${k === 's' ? 1 : .55}"/>`; }).join('');
-  const cnt = (tid, goal) => plays.filter(p => String(p.team && p.team.id) === tid && (f.per === 'all' || String((p.period && p.period.number) || 1) === f.per) && (goal ? kind(p) === 'g' : true)).length;
-  const btn = (k, v, l) => `<button data-scf="${k}" data-scv="${v}" class="${f[k] === v ? 'on' : ''}">${esc(l)}</button>`;
-  const rink = `<svg viewBox="0 0 200 85" class="rink"><rect x=".5" y=".5" width="199" height="84" rx="28" fill="#161618" stroke="#555"/><line x1="100" y1="0" x2="100" y2="85" stroke="#c8102e" stroke-width=".8" opacity=".7"/><line x1="75" y1="0" x2="75" y2="85" stroke="#0a5bd8" stroke-width="1" opacity=".7"/><line x1="125" y1="0" x2="125" y2="85" stroke="#0a5bd8" stroke-width="1" opacity=".7"/><line x1="11" y1="5" x2="11" y2="80" stroke="#c8102e" stroke-width=".5" opacity=".7"/><line x1="189" y1="5" x2="189" y2="80" stroke="#c8102e" stroke-width=".5" opacity=".7"/><circle cx="100" cy="42.5" r="15" fill="none" stroke="#0a5bd8" stroke-width=".5" opacity=".6"/><circle cx="31" cy="20.5" r="15" fill="none" stroke="#c8102e" stroke-width=".4" opacity=".5"/><circle cx="31" cy="64.5" r="15" fill="none" stroke="#c8102e" stroke-width=".4" opacity=".5"/><circle cx="169" cy="20.5" r="15" fill="none" stroke="#c8102e" stroke-width=".4" opacity=".5"/><circle cx="169" cy="64.5" r="15" fill="none" stroke="#c8102e" stroke-width=".4" opacity=".5"/><path d="M11 38.5 h4 a4 4 0 0 1 0 8 h-4z" fill="#0a5bd8" opacity=".35"/><path d="M189 38.5 h-4 a4 4 0 0 0 0 8 h4z" fill="#0a5bd8" opacity=".35"/>${dots}</svg>`;
-  return `<section class="pv"><div class="sec">Shot chart</div>
-    <div class="scf">${btn('tm', 'all', 'Both')}${btn('tm', String(e.away.id), e.away.abbr)}${btn('tm', String(e.home.id), e.home.abbr)}</div>
-    <div class="scf">${btn('ty', 'all', 'All')}${btn('ty', 's', 'Shots')}${btn('ty', 'g', 'Goals')}</div>
-    <div class="scf">${btn('per', 'all', 'All')}${pers.map(n => btn('per', String(n), perHead('nhl', n - 1))).join('')}</div>
-    <div class="sch2"><span>${esc(e.away.abbr)} · ${cnt(String(e.away.id), true)} G / ${cnt(String(e.away.id))} att.</span><span>${esc(e.home.abbr)} · ${cnt(String(e.home.id), true)} G / ${cnt(String(e.home.id))} att.</span></div>
-    ${rink}<div class="scl"><span><i class="g"></i>Goal</span><span><i></i>Shot</span><span><i class="m"></i>Missed / blocked</span></div></section>`;
+    const cx = (x + 100).toFixed(1), cy = (42.5 - y).toFixed(1), c = col(home ? e.home : e.away), k = scKind(p);
+    return k === 'g' ? `<circle cx="${cx}" cy="${cy}" r="2.8" fill="${c}" stroke="#111" stroke-width=".6"/>` : `<circle cx="${cx}" cy="${cy}" r="1.8" fill="#fff" stroke="${c}" stroke-width=".9" opacity="${k === 's' ? 1 : .5}"/>`; }).join('');
+  const R = '#d4202c', B = '#1f5fd1';
+  return `<svg viewBox="0 0 200 85" class="rink" preserveAspectRatio="xMidYMid meet"><defs><clipPath id="rkc${f.big ? 2 : 1}"><rect x="1" y="1" width="198" height="83" rx="27"/></clipPath></defs>
+  <rect x="1" y="1" width="198" height="83" rx="27" fill="#f4f5f7"/>
+  <g clip-path="url(#rkc${f.big ? 2 : 1})"><line x1="100" y1="0" x2="100" y2="85" stroke="${R}" stroke-width="1"/><line x1="75" y1="0" x2="75" y2="85" stroke="${B}" stroke-width="1.2"/><line x1="125" y1="0" x2="125" y2="85" stroke="${B}" stroke-width="1.2"/>
+  <line x1="11" y1="0" x2="11" y2="85" stroke="${R}" stroke-width=".5"/><line x1="189" y1="0" x2="189" y2="85" stroke="${R}" stroke-width=".5"/>
+  <circle cx="100" cy="42.5" r="15" fill="none" stroke="${B}" stroke-width=".5"/><circle cx="100" cy="42.5" r=".9" fill="${B}"/>
+  ${[[31, 20.5], [31, 64.5], [169, 20.5], [169, 64.5]].map(([x, y]) => `<circle cx="${x}" cy="${y}" r="15" fill="none" stroke="${R}" stroke-width=".45"/><circle cx="${x}" cy="${y}" r="1" fill="${R}"/>`).join('')}
+  <path d="M11 38.5 h4 a4 4 0 0 1 0 8 h-4z" fill="#9cc3ff" stroke="${R}" stroke-width=".4"/><path d="M189 38.5 h-4 a4 4 0 0 0 0 8 h4z" fill="#9cc3ff" stroke="${R}" stroke-width=".4"/></g>
+  <rect x="1" y="1" width="198" height="83" rx="27" fill="none" stroke="#999" stroke-width=".8"/>${dots}</svg>`;
 }
+function shotChartHTML(g) {
+  const plays = shotData(g); if (!plays.length) return '';
+  const e = g.ev, gl = tid => plays.filter(p => String(p.team && p.team.id) === tid && scKind(p) === 'g').length;
+  return `<section class="pv"><div class="sec">Shot chart</div><div class="sch2"><span>${esc(e.away.abbr)} · ${gl(String(e.away.id))} goals</span><span>${esc(e.home.abbr)} · ${gl(String(e.home.id))} goals</span></div>
+    <div class="rkw" data-scopen="1">${rinkSVG(g, plays, { tm: 'all', ty: 'g', per: 'all' })}<div class="wpexp">⤢</div></div><div class="wph">Tap for all shots and filters</div></section>`;
+}
+function shotBigInner(g) {
+  const plays = shotData(g), e = g.ev, f = g.scF = g.scF || { tm: 'all', ty: 'all', per: 'all' };
+  const pers = [...new Set(plays.map(p => (p.period && p.period.number) || 1))].sort((a, b) => a - b);
+  const cnt = (tid, goal) => plays.filter(p => String(p.team && p.team.id) === tid && (f.per === 'all' || String((p.period && p.period.number) || 1) === f.per) && (goal ? scKind(p) === 'g' : true)).length;
+  const btn = (k, v, l) => `<button data-scf="${k}" data-scv="${v}" class="${f[k] === v ? 'on' : ''}">${esc(l)}</button>`;
+  return `<div class="wptop"><div class="scfw"><div class="scf">${btn('tm', 'all', 'Both')}${btn('tm', String(e.away.id), e.away.abbr)}${btn('tm', String(e.home.id), e.home.abbr)}</div>
+    <div class="scf">${btn('ty', 'all', 'All')}${btn('ty', 's', 'Shots')}${btn('ty', 'g', 'Goals')}</div>
+    <div class="scf">${btn('per', 'all', 'All')}${pers.map(n => btn('per', String(n), perHead('nhl', n - 1))).join('')}</div></div><button class="wpclose" data-wpclose="1">×</button></div>
+    <div class="sch2"><span>${esc(e.away.abbr)} · ${cnt(String(e.away.id), true)} G / ${cnt(String(e.away.id))} att.</span><span>${esc(e.home.abbr)} · ${cnt(String(e.home.id), true)} G / ${cnt(String(e.home.id))} att.</span></div>
+    <div class="rkbig">${rinkSVG(g, plays, Object.assign({ big: 1 }, f))}</div><div class="scl"><span><i class="g"></i>Goal</span><span><i></i>Shot</span><span><i class="m"></i>Missed / blocked</span></div>`;
+}
+function openShot() {
+  const g = state.game; if (!g) return; closeWp();
+  const ov = document.createElement('div'); ov.id = 'wpov'; ov.className = 'scov';
+  ov.innerHTML = `<div class="wpbox">${shotBigInner(g)}</div>`;
+  document.body.appendChild(ov); document.body.style.overflow = 'hidden'; fitWp();
+}
+document.addEventListener('click', ev => {
+  if (ev.target.closest('[data-scopen]')) { openShot(); return; }
+  const b = ev.target.closest('#wpov [data-scf]'); if (b && state.game) { const g = state.game; g.scF = g.scF || {}; g.scF[b.dataset.scf] = b.dataset.scv; const box = document.querySelector('#wpov .wpbox'); if (box) box.innerHTML = shotBigInner(g); }
+});
 function wpHTML(g) {
   const sum = g.sum, wp = (sum.winprobability || []).filter(x => x && x.homeWinPercentage != null);
   if (wp.length < 2) return '';
@@ -1545,7 +1600,7 @@ function scoringHTML(g) {
       const lg = p.team && logos[p.team.id];
       const sc = p.awayScore != null && ev ? `<span class="sco">${esc(ev.away.abbr)} ${esc(p.awayScore)} – ${esc(ev.home.abbr)} ${esc(p.homeScore)}</span>` : '';
       return `<div class="play g"><span class="pl">${lg ? `<img src="${esc(lg)}" alt="" onerror="this.style.visibility='hidden'">` : ''}</span>
-        <span class="clk">${esc((p.clock && p.clock.displayValue) || '')}</span><span class="txt">${sc}${esc(g.league === 'nhl' ? nhlGoalText(p) : (p.text || p.shortText || ''))}${g.league === 'nhl' ? strBadge(p) : ''}</span></div>`;
+        <span class="clk">${esc((p.clock && p.clock.displayValue) || '')}</span><span class="txt">${sc && g.league === 'nhl' ? sc.replace('</span>', strBadge(p) + '</span>') : sc}${esc(g.league === 'nhl' ? nhlGoalText(p) : (p.text || p.shortText || ''))}${!sc && g.league === 'nhl' ? strBadge(p) : ''}</span></div>`;
     }).join('');
     return `<section class="per"><div class="phd">${periodLabel(g.league, k)}</div>${rows}</section>`;
   }).join('');
@@ -2532,7 +2587,7 @@ function renderCompare() {
     const lseg = `<div class="seg pseg" style="max-width:260px">${Object.entries(LEAGUES).map(([k, v]) => `<button data-cmpl="${k}" class="${c.league === k ? 'on' : ''}">${v.name}</button>`).join('')}</div>`;
     const inp = i => `<div class="cmpi"><input id="cq${i}" class="sinp" type="search" autocomplete="off" placeholder="Player ${i + 1}" value="${esc(c.q[i])}"><button class="cmpx" data-cmpx="${i}" aria-label="Clear">×</button><div class="cmpr" id="cr${i}"></div></div>`;
     $app.innerHTML = `<header class="d"><div class="tabs"><button class="back" data-back aria-label="Back">‹</button><button class="home" data-home aria-label="Home"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"><path d="M3 10.5 12 3l9 7.5"/><path d="M5.5 9v11h13V9"/><path d="M10 20v-6h4v6"/></svg></button></div></header>
-    <main id="cmpw"><div class="lvt">Compare players</div><div class="cmpin">${inp(0)}${inp(1)}</div><div class="pane t" id="cmpbody"></div></main>`;
+    <main id="cmpw"><div class="cmptl"><div class="lvt">Compare players</div><button class="cmpclr" data-cmpclr="1">Clear</button></div><div class="cmpin">${inp(0)}${inp(1)}</div><div class="pane t" id="cmpbody"></div></main>`;
   }
   paintCompare();
 }
@@ -2560,7 +2615,11 @@ function paintCompare() {
   const yl = y => lg === 'nfl' ? String(y) : (y - 1) + '-' + String(y).slice(2);
   if (!c.cy || !Y.includes(c.cy)) c.cy = Y[0];
   const pick = (cat, y) => { const rs = cat.rows.filter(r => r.year === y); if (!rs.length) return null; return (rs.find(r => !r.tid && !/^[A-Z]{2,4}$/.test(String(r.sub || ''))) || rs[rs.length - 1]).vals; };
-  const tab = (x, y, v0, v1) => { const rows = x.labels.map((l, k) => { const j = y.labels.indexOf(l); return j < 0 || /^PROD$/.test(l) ? null : [l, v0[k], v1[j]]; }).filter(Boolean); return rows.length ? `<div class="cmpc">${esc(catName(x.title, x.labels, lg))}</div><table class="cmpt">${cmpRows(rows)}</table>` : ''; };
+  const ORDN = ['GP', 'GS', 'MIN', 'PTS', 'FG%', 'FG', '3P%', '3PT%', '3PT', 'FT%', 'FT', 'OR', 'DR', 'REB', 'AST', 'TO', 'STL', 'BLK', 'PF'];
+  const oi = l => { const k = ORDN.indexOf(l); return k < 0 ? 99 : k; };
+  const tab = (x, y, v0, v1) => { let rows = x.labels.map((l, k) => { const j = y.labels.indexOf(l); return j < 0 || /^PROD$/.test(l) || (lg === 'nhl' && l === 'SOG' && x.labels.includes('S')) ? null : [l, v0[k], v1[j]]; }).filter(Boolean);
+    if (lg === 'nba') rows = rows.map((r, i) => [r, i]).sort((a, b) => (oi(a[0][0]) - oi(b[0][0])) || (a[1] - b[1])).map(r => r[0]);
+    if (lg === 'nhl') rows = rows.map(r => [dl(r[0], 'nhl'), r[1], r[2]]); const ct = common.length > 1 ? (lg === 'nba' ? String(x.title).replace(/regular season\s*/i, '').trim() : catName(x.title, x.labels, lg)) : ''; return rows.length ? `${ct ? `<div class="cmpc">${esc(ct)}</div>` : ''}<table class="cmpt">${cmpRows(rows)}</table>` : ''; };
   if (Y.length) {
     const ysel = `<div class="ysel cmpys"><button class="ybtn" data-cmpyo="1">${esc(yl(c.cy))} Season<i class="chev ${c.yOpen ? 'up' : ''}"></i></button>${c.yOpen ? `<div class="ylist">${Y.map(y => `<button data-cmpy="${y}" class="${y === c.cy ? 'on' : ''}">${esc(yl(y))}</button>`).join('')}</div>` : ''}</div>`;
     let sec = '';
@@ -2568,9 +2627,14 @@ function paintCompare() {
     out += `<section class="pv">${ysel}${sec || msg('No common stats for this season.')}</section>`;
   }
   let car = '';
-  common.forEach(([x, y]) => { const t0 = x.totals || (x.rows.length ? x.rows[x.rows.length - 1].vals : null), t1 = y.totals || (y.rows.length ? y.rows[y.rows.length - 1].vals : null); if (t0 && t1) car += tab(x, y, t0, t1); });
-  if (car) out += `<section class="pv"><div class="cmps">Career</div><div class="cmpn"><span>${ya.size} seasons</span><span>${yb.size} seasons</span></div>${car}</section>`;
+  const fill = cat => { const T = cat.totals ? [...cat.totals] : cat.labels.map(() => null);
+    return T.map((v, k) => { if (v != null && v !== '' && v !== '-') return v; const ns = cat.rows.map(r => fnum(r.vals[k])).filter(n => n != null); if (!ns.length) return v;
+      const lab = cat.labels[k]; if (NOSUM.test(lab)) { const s0 = String(cat.rows.find(r => fnum(r.vals[k]) != null).vals[k]), dec = (s0.split('.')[1] || '').length; return (ns.reduce((a, b) => a + b, 0) / ns.length).toFixed(dec || 1); }
+      return String(Math.round(ns.reduce((a, b) => a + b, 0) * 10) / 10); }); };
+  common.forEach(([x, y]) => { car += tab(x, y, fill(x), fill(y)); });
+  if (car) out += `<section class="pv cmpcar"><div class="cmps">Career</div><div class="cmpn"><span>${ya.size} seasons</span><span>${yb.size} seasons</span></div>${car}</section>`;
   body.innerHTML = out;
+  relabel(body);
   addGlossary('cmp');
 }
 function renderLV() {
@@ -2792,7 +2856,7 @@ window.addEventListener('hashchange', route);
 const $app = document.getElementById('app');
 $app.addEventListener('click', ev => {
   if (window._lpAt && Date.now() - window._lpAt < 900) { const lb = ev.target.closest('[data-league]'); if (lb) { ev.preventDefault(); return; } }
-  const b = ev.target.closest('[data-rclear],[data-go2],[data-home],[data-csort],[data-glm],[data-glyo],[data-cmpyo],[data-cmpy],[data-scf],[data-bryo],[data-bry],[data-cmpgo],[data-cmpl],[data-cmpp],[data-cmpx],[data-gsort],[data-glsrc],[data-ncy],[data-sstat],[data-gly],[data-league],[data-game],[data-date],[data-wk],[data-pst],[data-smode],[data-cl],[data-lsort],[data-drv],[data-pm],[data-tab],[data-ptab],[data-xp],[data-ttab],[data-pvt],[data-sort],[data-fav],[data-team],[data-player],[data-topen],[data-search],[data-month],[data-refresh],[data-back]');
+  const b = ev.target.closest('[data-rclear],[data-go2],[data-home],[data-csort],[data-glm],[data-glyo],[data-cmpclr],[data-spm],[data-cmpyo],[data-cmpy],[data-scf],[data-bryo],[data-bry],[data-cmpgo],[data-cmpl],[data-cmpp],[data-cmpx],[data-gsort],[data-glsrc],[data-ncy],[data-sstat],[data-gly],[data-league],[data-game],[data-date],[data-wk],[data-pst],[data-smode],[data-cl],[data-lsort],[data-drv],[data-pm],[data-tab],[data-ptab],[data-xp],[data-ttab],[data-pvt],[data-sort],[data-fav],[data-team],[data-player],[data-topen],[data-search],[data-month],[data-refresh],[data-back]');
   if (!b) return;
   const d = b.dataset;
   if (topView() === 'search' && !ev.target.closest('.fstar')) { if (d.topen) addRecent({ k: 't', l: d.tl, id: d.topen, name: d.tn || '', logo: d.tlogo || '' }); else if (d.player) addRecent({ k: 'p', l: d.pl, id: d.player, name: d.pn || '', sub: d.pt || '' }); }
@@ -2846,6 +2910,8 @@ $app.addEventListener('click', ev => {
     const e = state.player.exp = state.player.exp || new Set(); if (e.has(d.xp)) e.delete(d.xp); else e.add(d.xp); render();
   } else if (d.ptab) {
     state.player.tab = d.ptab; render();
+  } else if (d.spm) {
+    state.game.spm = d.spm; render();
   } else if (d.scf) {
     const g = state.game; g.scF = g.scF || {}; g.scF[d.scf] = d.scv; render();
   } else if (d.gsort !== undefined) {
@@ -2890,6 +2956,8 @@ $app.addEventListener('click', ev => {
     if (c.sel[1 - i] && c.sel[1 - i].league !== d.clg) { c.sel[1 - i] = null; c.data[1 - i] = null; c.q[1 - i] = ''; const o = document.getElementById('cq' + (1 - i)); if (o) o.value = ''; } c.q[i] = d.cn; c.res[i] = []; c.data[i] = null;
     const inp = document.getElementById('cq' + i); if (inp) { inp.value = d.cn; inp.blur(); }
     loadCmp(i); paintCompare();
+  } else if (d.cmpclr) {
+    const c = state.cmp; c.sel = [null, null]; c.data = [null, null]; c.q = ['', '']; c.res = [[], []]; c.cy = null; [0, 1].forEach(i => { const el = document.getElementById('cq' + i); if (el) el.value = ''; }); paintCompare();
   } else if (d.cmpyo) {
     state.cmp.yOpen = !state.cmp.yOpen; paintCompare();
   } else if (d.cmpy) {
