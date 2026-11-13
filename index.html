@@ -259,11 +259,11 @@ details[open] summary::after{content:'⌃'}
 .glt td.n .pn{display:inline-block;width:44px}
 .glt td.n small{display:inline-block;width:16px;text-align:center;margin-left:0 !important}
 .bio{width:100%;border-collapse:collapse}
-.bio td{padding:11px 0;font-size:15px;vertical-align:top}
-.bio td:first-child{color:var(--mut);text-transform:uppercase;font-size:13px;width:120px;letter-spacing:.3px}
+.bio td{padding:6px 0;font-size:15px;vertical-align:top}
+.bio td:first-child{color:var(--mut);text-transform:uppercase;font-size:13px;width:110px;letter-spacing:.3px}
 .bdot{display:inline-block;width:9px;height:9px;border-radius:50%;background:#8e8e93;margin-right:6px}
 .bdot.on{background:#30d158}
-.bh{display:flex;align-items:center;gap:10px;padding:8px 0}
+.bh{display:flex;align-items:center;gap:10px;padding:5px 0}
 .bh img{width:28px;height:28px;object-fit:contain}
 .bh .bt{font-weight:600;font-size:15px}
 .bh .bs{color:var(--mut);font-size:12.5px}
@@ -277,7 +277,11 @@ details[open] summary::after{content:'⌃'}
 .glt tbody tr{cursor:pointer}
 .glt tbody tr:active td{background:#2a2a2e}
 .glt td.rs2 b{font-family:inherit;font-weight:400;font-size:15px}
-.glt td.rs2 .W,.glt td.rs2 .L,.glt td.rs2 .T{font-family:inherit;font-weight:700;font-size:15px;width:14px;display:inline-block}
+.glt td.rs2 .W,.glt td.rs2 .L,.glt td.rs2 .T{font-family:inherit;font-weight:700;font-size:15px;width:17px;display:inline-block;text-align:left}
+.glt td.rs2{padding-left:6px !important;overflow:hidden}
+.glt th.gh{background:var(--card);z-index:3}
+.glt th.grp{overflow:hidden;white-space:nowrap}
+.glt th.n,.glt td.n,.glt tbody td:nth-child(2),.glt thead tr:last-child th:nth-child(2){-webkit-transform:translate3d(0,0,0);transform:translate3d(0,0,0)}
 .glt td.rs2 .T{color:var(--mut)}
 .glt td.rs2 small{font-size:11px;font-weight:400;font-family:inherit;color:inherit}
 td.n .slg{width:20px;height:20px;object-fit:contain;vertical-align:-4px;margin-left:6px}
@@ -1281,7 +1285,7 @@ function gamelogHTML(p) {
     if (cols.length < 3) cols = labels.map((l, i) => [l, i]);
   }
   const w = l => /\//.test(l) ? 56 : String(l).length > 3 ? 50 : /^(FG|3PT|FT|TOI)$/.test(l) ? 50 : 43;
-  const tw = 84 + 78 + cols.reduce((a, c) => a + w(c[0]), 0);
+  const tw = 84 + 92 + cols.reduce((a, c) => a + w(c[0]), 0);
   const trs = shown.map(r => {
     const m = r.m, opp = (m.opponent && (m.opponent.abbreviation || m.opponent.displayName)) || '', ol = m.opponent ? dk((m.opponent.logo) || teamLogoOf(p.league, { id: m.opponent.id, abbr: m.opponent.abbreviation })) : '';
     const sm = String(m.score || '').match(/^(\S+)\s*(.*)$/) || [];
@@ -1304,8 +1308,8 @@ function gamelogHTML(p) {
     });
     totRow = `<tr class="tot"><td class="n">Total</td><td class="rs2"></td>${tv.map(x => `<td>${nv(x)}</td>`).join('')}</tr>`;
   }
-  const ghead = groups && groups.length > 1 ? `<tr><th class="n"></th><th></th>${groups.map(g => `<th class="grp" colspan="${g[1]}">${esc(g[0])}</th>`).join('')}</tr>` : '';
-  return strip + `<section class="blk" style="margin-top:6px"><div class="tw"><table class="nfx sep glt" style="width:max(100%, ${tw}px)"><colgroup><col style="width:84px"><col style="width:78px">${cols.map(c => `<col style="width:${w(c[0])}px">`).join('')}</colgroup><thead>${ghead}<tr><th class="n">Gamelog</th><th></th>${cols.map(c => `<th>${esc(c[0])}</th>`).join('')}</tr></thead><tbody>${trs}${totRow}</tbody></table></div></section>`;
+  const ghead = groups && groups.length > 1 ? `<tr><th class="n gh" colspan="2"></th>${groups.map(g => `<th class="grp" colspan="${g[1]}">${esc(g[0])}</th>`).join('')}</tr>` : '';
+  return strip + `<section class="blk" style="margin-top:6px"><div class="tw"><table class="nfx sep glt" style="width:max(100%, ${tw}px)"><colgroup><col style="width:84px"><col style="width:92px">${cols.map(c => `<col style="width:${w(c[0])}px">`).join('')}</colgroup><thead>${ghead}<tr><th class="n">Gamelog</th><th></th>${cols.map(c => `<th>${esc(c[0])}</th>`).join('')}</tr></thead><tbody>${trs}${totRow}</tbody></table></div></section>`;
 }
 function statCats(j, league) {
   return ((j && j.categories) || []).filter(c => c.statistics && c.statistics.length).map(c => ({
@@ -1389,7 +1393,7 @@ function bioHTML(p) {
   const exp = a.displayExperience || (a.experience && a.experience.years != null ? (a.experience.years ? a.experience.years + '. sezóna' : 'Rookie') : '');
   const st = (a.status && (a.status.name || a.status.type)) || '';
   const draft = a.displayDraft || (a.draft && (a.draft.displayText || [a.draft.year, a.draft.round ? 'Rd ' + a.draft.round : '', a.draft.selection ? 'Pk ' + a.draft.selection : ''].filter(Boolean).join(', '))) || '';
-  const rows = [['Team', (a.team && a.team.displayName) || p.team], ['Position', (a.position && (a.position.displayName || a.position.name)) || p.pos], ['Jersey', a.jersey ? '#' + a.jersey : ''], ['HT/WT', hw], ['Birthdate', dob + (a.age ? ' (' + a.age + ')' : '')], ['Birthplace', place], ['College', (a.college && (a.college.name || a.college.shortName)) || ''], ['Draft', draft], ['Experience', exp], ['Shoots', a.hand && a.hand.displayValue], ['Status', st ? `<span class="bdot ${/active/i.test(st) ? 'on' : ''}"></span>${esc(st)}` : '']].filter(r => r[1]);
+  const rows = [['Team', (a.team && a.team.displayName) || p.team], ['Position', (a.position && (a.position.displayName || a.position.name)) || p.pos], ['HT/WT', hw], ['Birthdate', dob + (a.age ? ' (' + a.age + ')' : '')], ['College', (a.college && (a.college.name || a.college.shortName)) || ''], ['Draft Info', draft], ['Status', st ? `<span class="bdot ${/active/i.test(st) ? 'on' : ''}"></span>${esc(st)}` : ''], ['Experience', exp], ['Birthplace', place]].filter(r => r[1]);
   const teams = [];
   statCats(p.st, p.league).forEach(c => c.rows.forEach(r => { if (!r.year || !r.sub || !/^[A-Z]{2,4}$/.test(r.sub)) return; let t = teams.find(x => x.ab === r.sub); if (!t) teams.push(t = { ab: r.sub, tid: r.tid, y0: r.year, y1: r.year }); t.y0 = Math.min(t.y0, r.year); t.y1 = Math.max(t.y1, r.year); }));
   teams.sort((x, y) => y.y1 - x.y1);
