@@ -197,7 +197,8 @@ details[open] summary::after{content:'⌃'}
 .jn{display:inline-block;width:24px;color:var(--mut);font-family:-apple-system,sans-serif;font-size:11px;font-weight:600}
 .pane > .blk:first-child{margin-top:6px}
 .sch th.n,.sch td.n{width:auto;min-width:92px}
-.sch .opp{width:100%;text-align:left;white-space:nowrap}
+.sch{table-layout:fixed}
+.sch .opp{width:auto;text-align:left;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .sch .opp small{color:var(--mut);font-size:11px;font-weight:600;display:inline-block;width:18px}
 .sch .opp img{width:22px;height:22px;vertical-align:middle;margin:0 7px 0 2px;object-fit:contain}
 .sch .opp b{font-family:var(--num);font-size:17px}
@@ -272,20 +273,22 @@ details[open] summary::after{content:'⌃'}
 .sch .rs .mu{color:var(--mut)}
 .sch .rs .sf{display:inline-block;width:24px;text-align:left;color:var(--mut);font-size:10px;margin-left:3px;font-weight:600}
 .sch .rs .live{color:var(--live);font-weight:600}
-.sch .rg{display:inline-grid;grid-template-columns:86px 24px 24px;align-items:center;vertical-align:middle}
+.sch .rg{display:inline-grid;grid-template-columns:22px 72px 20px;align-items:center;vertical-align:middle}
 .sch .rg .W,.sch .rg .L{text-align:center !important}
-.sch td.n .pn{font-size:18px}
-.sch .opp b{font-size:18px}
-.sch .opp img{width:28px;height:28px}
-.sch td{padding-top:9px;padding-bottom:9px}
-.sch .rs .sf{text-align:left;font-size:11px}
+.sch td.n .pn{font-size:16.5px}
+.sch th.n,.sch td.n{min-width:78px}
+.sch .opp b{font-size:16.5px}
+.sch .opp img{width:24px;height:24px;margin:0 6px 0 0}
+.sch td{padding-top:7px;padding-bottom:7px}
+.sch .rs .sf{text-align:right;font-size:10px;margin:0 4px 0 0;width:auto}
+.sch .opp small{width:16px}
 .sch .rg .W,.sch .rg .L{width:auto;margin:0}
 .sch .sc2{display:grid;grid-template-columns:1fr 12px 1fr;align-items:center}
-.sch .sc2 b{font-size:20px}
+.sch .sc2 b{font-size:18px}
 .sch .sc2 b:first-child{text-align:right}
 .sch .sc2 b:last-child{text-align:left}
 .sch .sc2 i{font-style:normal;text-align:center;font-family:var(--num);font-weight:600;font-size:17px;color:var(--mut)}
-.sch .rg .tm{text-align:center;font-family:var(--num);font-weight:600;font-size:20px}
+.sch .rg .tm{text-align:center;font-family:var(--num);font-weight:600;font-size:18px}
 .sch .rg .sf{width:auto;margin-left:3px}
 </style>
 </head>
@@ -1298,17 +1301,17 @@ function scheduleHTML(t) {
     const mine = e.home.id === t.id ? e.home : e.away, opp = mine === e.home ? e.away : e.home;
     const d = new Date(e.date), when = DAYS[d.getDay()] + ' ' + d.getDate() + '.' + (d.getMonth() + 1) + '.';
     let res;
-    if (e.state === 'pre') res = `<span class="rg"><span class="tm">${esc(fmtTime(e.date))}</span><i></i><i></i></span>`;
+    if (e.state === 'pre') res = `<span class="rg"><i></i><span class="tm">${esc(fmtTime(e.date))}</span><i></i></span>`;
     else if (e.state === 'in') res = `<span class="live">${esc(e.short)}</span>`;
     else {
       const w = mine.winner, sfx = e.short.replace(/^Final\/?/, '');
-      res = `<span class="rg"><span class="sc2"><b class="${w ? '' : 'mu'}">${esc(mine.score)}</b><i>:</i><b class="${w ? 'mu' : ''}">${esc(opp.score)}</b></span><span class="${w ? 'W' : 'L'}">${w ? 'W' : 'L'}</span><small class="sf">${esc(sfx)}</small></span>`;
+      res = `<span class="rg"><small class="sf">${esc(sfx)}</small><span class="sc2"><b class="${w ? '' : 'mu'}">${esc(mine.score)}</b><i>:</i><b class="${w ? 'mu' : ''}">${esc(opp.score)}</b></span><span class="${w ? 'W' : 'L'}">${w ? 'W' : 'L'}</span></span>`;
     }
     return `<tr data-game="${esc(e.id)}" data-gl="${t.league}"><td class="n"><span class="pn">${when}</span></td>
       <td class="opp"><small>${mine === e.home ? 'vs' : '@'}</small>${logoImg(opp.logo || teamLogoOf(t.league, opp))}<b>${esc(teamShortOf(t.league, opp))}</b></td><td class="rs">${res}</td></tr>`;
   };
   let html = '', cur = null, rows = '';
-  const flush = () => { if (cur !== null && rows) html += `<section class="blk"><div class="tw"><table class="sch"><thead><tr><th class="n">${esc(cur || 'Games')}</th><th></th><th></th></tr></thead><tbody>${rows}</tbody></table></div></section>`; rows = ''; };
+  const flush = () => { if (cur !== null && rows) html += `<section class="blk"><div class="tw"><table class="sch"><colgroup><col style="width:76px"><col><col style="width:118px"></colgroup><thead><tr><th class="n">${esc(cur || 'Games')}</th><th></th><th></th></tr></thead><tbody>${rows}</tbody></table></div></section>`; rows = ''; };
   sorted.filter(e => key(e) === t.month).forEach(e => { const st = e.stype || ''; if (st !== cur) { flush(); cur = st; } rows += row(e); });
   flush();
   return `<div class="mstrip" id="mstrip">${strip}</div>${html}`;
