@@ -1289,11 +1289,12 @@ function gamelogHTML(p) {
     if (!idx.length) { labels.forEach((_, k) => idx.push(k)); groups = null; }
     cols = idx.map(k => [labels[k], k]);
   } else {
-    cols = (GL_COLS[p.league] || []).filter(l => !(l === 'S' && labels.includes('SOG'))).map(l => [l, labels.indexOf(l)]).filter(c => c[1] >= 0);
+    if (p.league === 'nhl') cols = labels.map((l, i) => [dl(l, 'nhl'), i]).filter(c => !(labels[c[1]] === 'SOG' && labels.includes('S')));
+    else cols = (GL_COLS[p.league] || []).filter(l => !(l === 'S' && labels.includes('SOG'))).map(l => [l, labels.indexOf(l)]).filter(c => c[1] >= 0);
     if (cols.length < 3) cols = labels.map((l, i) => [l, i]);
   }
-  const w = l => p.league === 'nhl' ? (String(l).length > 3 || l === 'TOI' ? 48 : 38) : /\//.test(l) ? 56 : String(l).length > 3 ? 50 : /^(FG|3PT|FT|TOI)$/.test(l) ? 50 : 43;
-  const rw = p.league === 'nhl' ? 66 : 92, tw = 84 + rw + cols.reduce((a, c) => a + w(c[0]), 0);
+  const w = l => p.league === 'nhl' ? (String(l).length > 3 || l === 'TOI' ? 46 : 36) : /\//.test(l) ? 56 : String(l).length > 3 ? 50 : /^(FG|3PT|FT|TOI)$/.test(l) ? 50 : 43;
+  const rw = p.league === 'nhl' ? 84 : 92, tw = 84 + rw + cols.reduce((a, c) => a + w(c[0]), 0);
   const trs = shown.map(r => {
     const m = r.m, opp = (m.opponent && (m.opponent.abbreviation || m.opponent.displayName)) || '', ol = m.opponent ? dk((m.opponent.logo) || teamLogoOf(p.league, { id: m.opponent.id, abbr: m.opponent.abbreviation })) : '';
     const sm = String(m.score || '').match(/^(\S+)\s*(.*)$/) || [];
@@ -1438,7 +1439,7 @@ function careerHTML(p, cats) {
   const pv = (c, pm, k) => { const nm = c.names && c.names[k]; if (!nm || !pm) return null; if (pm[nm] != null) return pm[nm]; if (/-/.test(nm)) { const q = nm.split('-'); if (pm[q[0]] != null && pm[q[1]] != null) { const f = x => /\./.test(String(x)) ? (+x).toFixed(1) : x; return f(pm[q[0]]) + '-' + f(pm[q[1]]); } } return null; };
   const out = list.map(c => {
     const cols = p.league === 'nba' ? NBA_ALL.map(([l, d, w]) => [c.labels.indexOf(l === '3P%' && !c.labels.includes('3P%') ? '3PT%' : l), d, w]).filter(x => x[0] >= 0)
-      : c.labels.map((l, k) => [k, dl(l, p.league), p.league === 'nhl' ? (String(l).length > 3 ? 48 : 38) : 53]).filter(x => !(p.league === 'nhl' && c.labels[x[0]] === 'SOG' && c.labels.includes('S')));
+      : c.labels.map((l, k) => [k, dl(l, p.league), p.league === 'nhl' ? (String(l).length > 3 ? 46 : 36) : 53]).filter(x => !(p.league === 'nhl' && c.labels[x[0]] === 'SOG' && c.labels.includes('S')));
     const tw = 112 + cols.reduce((a, x) => a + x[2], 0);
     let rows, tot = null;
     if (mode !== 'post') {
@@ -1699,7 +1700,7 @@ function teamStatsHTML(t) {
   }
   return catList.map(c => {
     const title = c.name;
-    const cols = c.labels.map((_, k) => k).filter(k => !(t.league === 'nhl' && c.labels[k] === 'SOG' && c.labels.includes('S'))); const cw = k => t.league === 'nhl' ? (String(c.labels[k]).length > 3 ? 48 : 38) : 53;
+    const cols = c.labels.map((_, k) => k).filter(k => !(t.league === 'nhl' && c.labels[k] === 'SOG' && c.labels.includes('S'))); const cw = k => t.league === 'nhl' ? (String(c.labels[k]).length > 3 ? 46 : 36) : 53;
     const gk = title + '|' + c.labels.join(',');
     const sel = (t.sort && t.sort[gk]) || {};
     const defK = cols.find(k => ['PTS', 'YDS', 'W'].includes(c.labels[k])) ?? cols[Math.min(1, cols.length - 1)];
