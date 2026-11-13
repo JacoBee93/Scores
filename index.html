@@ -185,7 +185,7 @@ details[open] summary::after{content:'⌃'}
 .phero{display:flex;align-items:center;gap:14px;margin:4px 4px 14px}
 .phero .hs{width:68px;height:68px;border-radius:50%;background:var(--card);object-fit:cover;flex:none}
 .phero.pp{flex-direction:row-reverse;justify-content:space-between;margin-left:0}
-.phero.pp > div{flex:1;min-width:0}
+.phero.pp > div{flex:1;min-width:0;padding-left:10px}
 .phero.pp .hs{width:104px;height:104px}
 .pname{font-family:var(--num);font-weight:700;font-size:28px;line-height:1.05}
 .psub{color:var(--mut);font-size:13px;margin-top:3px}
@@ -246,7 +246,7 @@ details[open] summary::after{content:'⌃'}
 .glt tbody tr:active td{background:#2a2a2e}
 .glt td.rs2 b{font-family:inherit;font-weight:400;font-size:15px}
 .glt td.rs2 .W,.glt td.rs2 .L{font-family:inherit;font-weight:700;font-size:15px;width:14px}
-.glt td.rs2 small{font-size:10px}
+.glt td.rs2 small{font-size:10px;font-weight:700}
 td.n .slg{width:20px;height:20px;object-fit:contain;vertical-align:-4px;margin-left:6px}
 .nfx tr.tot td.n{font-family:var(--num)}
 .nfx th.n,.nfx td.n{overflow:hidden;text-overflow:ellipsis}
@@ -1221,8 +1221,24 @@ function gamelogHTML(p) {
     const wl = m.gameResult || '';
     return `<tr data-game="${esc(r.id)}" data-gl="${p.league}"><td class="n"><span class="pn">${m.gameDate ? esc(fmtShort(m.gameDate)) : ''}</span><small>${esc((m.atVs || '') + ' ' + opp)}</small></td><td class="rs2"><span class="${wl === 'W' || wl === 'L' ? wl : ''}">${esc(wl)}</span> <b>${esc(sm[1] || '')}</b>${sm[2] ? ` <small class="mut">${esc(sm[2])}</small>` : ''}</td>${cols.map(c => `<td>${nv(String(r.s[c[1]] == null ? '' : r.s[c[1]]).replace(/,/g, ''))}</td>`).join('')}</tr>`;
   }).join('');
+  let totRow = '';
+  if (p.league !== 'nfl' && shown.length > 1) {
+    const vals = i => shown.map(r => String(r.s[i] == null ? '' : r.s[i]).replace(/,/g, ''));
+    const sumN = a => a.reduce((m, x) => m + (parseFloat(x) || 0), 0);
+    const base = l => ({ 'FG%': 'FG', '3P%': '3PT', 'FT%': 'FT' })[l];
+    const tv = cols.map(([l, i]) => {
+      const a = vals(i).filter(x => x !== '' && x !== '-');
+      if (!a.length) return '';
+      if (a.every(x => /^\d+-\d+$/.test(x))) { const q = a.map(x => x.split('-').map(Number)); return q.reduce((m, x) => m + x[0], 0) + '-' + q.reduce((m, x) => m + x[1], 0); }
+      if (a.every(x => /^\d+:\d+$/.test(x))) { const t = a.reduce((m, x) => { const q = x.split(':'); return m + (+q[0]) * 60 + (+q[1]); }, 0); return l === 'TOI' ? fmtSec(t / a.length) : fmtSec(t); }
+      if (/%$/.test(l)) { const b = base(l), bc = b && cols.find(c => c[0] === b); if (bc) { const q = vals(bc[1]).filter(x => /^\d+-\d+$/.test(x)).map(x => x.split('-').map(Number)); const mk = q.reduce((m, x) => m + x[0], 0), at = q.reduce((m, x) => m + x[1], 0); return at ? (mk / at * 100).toFixed(1) : '-'; } const av = sumN(a) / a.length; return /^\./.test(a[0]) ? av.toFixed(3).replace(/^0/, '') : av.toFixed(1); }
+      if (/AVG|GAA|SV%/i.test(l)) { const av = sumN(a) / a.length; return /^\./.test(a[0]) ? av.toFixed(3).replace(/^0/, '') : av.toFixed(2); }
+      const sm = sumN(a); return String(Math.round(sm * 10) / 10);
+    });
+    totRow = `<tr class="tot"><td class="n">Total</td><td class="rs2"></td>${tv.map(x => `<td>${nv(x)}</td>`).join('')}</tr>`;
+  }
   const ghead = groups && groups.length > 1 ? `<tr><th class="n"></th><th></th>${groups.map(g => `<th class="grp" colspan="${g[1]}">${esc(g[0])}</th>`).join('')}</tr>` : '';
-  return strip + `<section class="blk" style="margin-top:6px"><div class="tw"><table class="nfx sep glt" style="width:max(100%, ${tw}px)"><colgroup><col style="width:88px"><col style="width:92px">${cols.map(c => `<col style="width:${w(c[0])}px">`).join('')}</colgroup><thead>${ghead}<tr><th class="n">Gamelog</th><th></th>${cols.map(c => `<th>${esc(c[0])}</th>`).join('')}</tr></thead><tbody>${trs}</tbody></table></div></section>`;
+  return strip + `<section class="blk" style="margin-top:6px"><div class="tw"><table class="nfx sep glt" style="width:max(100%, ${tw}px)"><colgroup><col style="width:88px"><col style="width:92px">${cols.map(c => `<col style="width:${w(c[0])}px">`).join('')}</colgroup><thead>${ghead}<tr><th class="n">Gamelog</th><th></th>${cols.map(c => `<th>${esc(c[0])}</th>`).join('')}</tr></thead><tbody>${trs}${totRow}</tbody></table></div></section>`;
 }
 function statCats(j, league) {
   return ((j && j.categories) || []).filter(c => c.statistics && c.statistics.length).map(c => ({
@@ -1326,7 +1342,10 @@ function careerHTML(p, cats) {
     }
     if (!rows.length) return '';
     const title = p.league === 'nba' ? (mode === 'reg' ? 'Season' : 'Playoffs') : catName(c.title, c.labels, p.league);
-    return `<section class="blk"><div class="tw"><table class="nfx sep" style="width:max(100%, ${tw}px)"><colgroup><col>${cols.map(x => `<col style="width:${x[2]}px">`).join('')}</colgroup><thead><tr><th class="n">${esc(title)}</th>${cols.map(x => `<th>${esc(x[1])}</th>`).join('')}</tr></thead><tbody>${rows.map(r => `<tr><td class="n"><span class="pn">${esc(r.n)}</span>${seasonLogo(p.league, r)}</td>${r.v.map(v => `<td>${nv(clean(v))}</td>`).join('')}</tr>`).join('')}${tot ? `<tr class="tot"><td class="n">Career</td>${tot.map(v => `<td>${nv(clean(v))}</td>`).join('')}</tr>` : ''}</tbody></table></div></section>`;
+    const sk = mode + '|' + c.title, so = (p.csort || {})[sk];
+    if (so) { const num = x => { const n = parseFloat(String(x == null ? '' : x).replace(/,/g, '')); return isNaN(n) ? -1e12 : n; }; rows = [...rows].sort((a, b) => (so.asc ? 1 : -1) * (num(a.v[so.i]) - num(b.v[so.i]))); }
+    const tw2 = 92 + cols.reduce((a, x) => a + x[2], 0);
+    return `<section class="blk"><div class="tw"><table class="nfx sep" style="width:max(100%, ${tw2}px)"><colgroup><col style="width:92px">${cols.map(x => `<col style="width:${x[2]}px">`).join('')}</colgroup><thead><tr><th class="n">${esc(title)}</th>${cols.map((x, i) => `<th data-csort="${i}" data-cs="${esc(sk)}" class="${so && so.i === i ? 'on' : ''}">${esc(x[1])}</th>`).join('')}</tr></thead><tbody>${rows.map(r => `<tr><td class="n"><span class="pn">${esc(r.n)}</span>${seasonLogo(p.league, r)}</td>${r.v.map((v, i) => `<td class="${so && so.i === i ? 'on' : ''}">${nv(clean(v))}</td>`).join('')}</tr>`).join('')}${tot ? `<tr class="tot"><td class="n">Career</td>${tot.map(v => `<td>${nv(clean(v))}</td>`).join('')}</tr>` : ''}</tbody></table></div></section>`;
   }).join('');
   if (!out) return seg + msg(mode === 'post' ? (p.postDone ? 'Žádné zápasy v play-off.' : 'Načítám play-off…') : 'Statistiky nejsou k dispozici.');
   return seg + out;
@@ -1950,7 +1969,7 @@ window.addEventListener('hashchange', route);
 const $app = document.getElementById('app');
 $app.addEventListener('click', ev => {
   if (window._lpAt && Date.now() - window._lpAt < 900) { const lb = ev.target.closest('[data-league]'); if (lb) { ev.preventDefault(); return; } }
-  const b = ev.target.closest('[data-home],[data-glm],[data-league],[data-game],[data-date],[data-wk],[data-pst],[data-smode],[data-cl],[data-lsort],[data-drv],[data-pm],[data-tab],[data-ptab],[data-xp],[data-ttab],[data-pvt],[data-sort],[data-fav],[data-team],[data-player],[data-topen],[data-search],[data-month],[data-refresh],[data-back]');
+  const b = ev.target.closest('[data-home],[data-csort],[data-glm],[data-league],[data-game],[data-date],[data-wk],[data-pst],[data-smode],[data-cl],[data-lsort],[data-drv],[data-pm],[data-tab],[data-ptab],[data-xp],[data-ttab],[data-pvt],[data-sort],[data-fav],[data-team],[data-player],[data-topen],[data-search],[data-month],[data-refresh],[data-back]');
   if (!b) return;
   const d = b.dataset;
   if (d.fav !== undefined) {
@@ -2006,6 +2025,9 @@ $app.addEventListener('click', ev => {
   } else if (d.refresh !== undefined) {
     const v = topView();
     if (v === 'player') { state.player.done = false; render(); loadPlayer(); } else if (v === 'game') loadGame(); else if (v === 'list') loadList();
+  } else if (d.csort !== undefined) {
+    const pl = state.player; pl.csort = pl.csort || {}; const cur = pl.csort[d.cs], i = +d.csort;
+    pl.csort[d.cs] = cur && cur.i === i ? (cur.asc ? null : { i, asc: true }) : { i, asc: false }; render();
   } else if (d.glm) {
     state.player.glm = d.glm; render();
   } else if (d.home !== undefined) {
