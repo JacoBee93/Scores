@@ -288,7 +288,7 @@ details[open] summary::after{content:'⌃'}
 .glt td.rs2 .W,.glt td.rs2 .L{font-family:var(--num);font-weight:700;display:inline-block;width:16px}
 .glt td.rs2 b{font-family:var(--num);font-weight:600;font-size:16px}
 .glt thead tr:first-child th{border-bottom:0;padding-bottom:0}
-.glt th.grp{text-align:left;padding-left:8px;color:var(--mut);font-size:10px;letter-spacing:.5px;border-bottom:0;padding-bottom:2px}
+.glt th.grp{text-align:left;padding-left:8px;color:#fff;font-size:12px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;border-bottom:0;padding-bottom:2px}
 .glt td.n small{margin-left:3px}
 .glt td.n .pn{display:inline-block;width:41px}
 .glt td.n small{display:inline-block;width:15px;text-align:center;margin-left:0 !important}
@@ -805,8 +805,7 @@ function renderGame() {
   const side = (t, na) => `<div class="t" data-topen="${esc(t.id)}" data-tl="${g.league}" data-tn="${esc(t.name)}" data-tlogo="${esc(t.logo)}">${logoImg(t.logo)}${na ? '' : `<span>${esc(t.abbr)}</span>`}${t.record ? `<span class="rc">${esc(String(t.record).replace(/,\s*\d+\s*pts?\b/i, ''))}</span>` : ''}</div>`;
   let hero = '';
   if (e) {
-    const dd = new Date(e.date), dn = Math.round((new Date(ymd(dd)) - new Date(ymd(new Date()))) / 864e5);
-    const preDay = dn === 0 ? 'Today' : dn > 0 && dn < 7 ? DAYS[dd.getDay()] : fmtShort(e.date);
+    const dd = new Date(e.date), preDay = ymd(dd) === ymd(new Date()) ? 'Today' : DAYS[dd.getDay()];
     const mid = e.state === 'post' ? `<span class="fin">${esc(e.short || 'Final')}</span>`
               : e.state === 'pre' ? `<span class="pd">${esc(preDay)}<br>${fmtTime(e.date)}</span>`
               : esc(e.short).replace(' - ', '<br>');
@@ -1169,7 +1168,7 @@ async function loadL5(g) {
     const seen = new Set(), evs = [];
     res.forEach(r => { if (r.status !== 'fulfilled') return; (r.value.events || []).forEach(ev => { if (!ev || seen.has(ev.id) || String(ev.id) === String(g.id)) return; seen.add(ev.id); const n = normEvent(ev); if (n.state === 'post' && new Date(n.date).getTime() < t0) evs.push(n); }); });
     evs.sort((a, b) => new Date(b.date) - new Date(a.date));
-    return { team: { id: tm.id }, events: evs.slice(0, 5).map(n => { const mine = String(n.home.id) === String(tm.id) ? n.home : n.away, opp = mine === n.home ? n.away : n.home; return { id: n.id, gameResult: mine.winner ? 'W' : opp.winner ? 'L' : 'T', opponent: { abbreviation: opp.abbr, logo: opp.logo || teamLogoOf(g.league, opp) }, atVs: mine === n.home ? 'vs' : '@', score: mine.score + '-' + opp.score }; }) };
+    return { team: { id: tm.id }, events: evs.slice(0, 5).map(n => { const mine = String(n.home.id) === String(tm.id) ? n.home : n.away, opp = mine === n.home ? n.away : n.home; return { id: n.id, gameDate: n.date, gameResult: mine.winner ? 'W' : opp.winner ? 'L' : 'T', opponent: { abbreviation: opp.abbr, logo: opp.logo || teamLogoOf(g.league, opp) }, atVs: mine === n.home ? 'vs' : '@', score: mine.score + '-' + opp.score }; }) };
   };
   try { g.l5x = await Promise.all([one(e.away), one(e.home)]); } catch (err) { g.l5x = []; }
   g.l5Loading = false;
@@ -1180,7 +1179,8 @@ function pvLast5(g) {
   if (!l5.length) return '';
   const col = t => {
     const m = l5.find(x => String(x.team && x.team.id) === String(t.id)); if (!m) return '<div class="l5c"></div>';
-    return `<div class="l5c">${m.events.slice(0, 5).map(ev => {
+    const evs = [...(m.events || [])].sort((x, y) => new Date(y.gameDate || y.date || 0) - new Date(x.gameDate || x.date || 0));
+    return `<div class="l5c">${evs.slice(0, 5).map(ev => {
       const res = ev.gameResult || '', opp = ev.opponent || {}, own = String(ev.score || '');
       const sc = own.match(/(\d+)\D+(\d+)/); let a = '', b = '';
       if (sc) { const hi = Math.max(+sc[1], +sc[2]), lo = Math.min(+sc[1], +sc[2]); if (res === 'L') { a = lo; b = hi; } else { a = hi; b = lo; } }
@@ -1584,7 +1584,7 @@ async function loadNcaa(p) {
 }
 function careerHTML(p, cats) {
   const mode = p.pst || 'reg';
-  const seg = `<div class="seg pseg" style="${p.league === 'nfl' ? 'max-width:340px' : ''}"><button data-pst="reg" class="${mode === 'reg' ? 'on' : ''}">Regular season</button><button data-pst="post" class="${mode === 'post' ? 'on' : ''}">Playoffs</button>${p.league === 'nfl' ? `<button data-pst="ncaa" class="${mode === 'ncaa' ? 'on' : ''}">NCAA</button>` : ''}<span style="display:none"></span></div>`;
+  const seg = `<div class="seg pseg" style="${p.league === 'nfl' ? 'max-width:320px' : ''}"><button data-pst="reg" class="${mode === 'reg' ? 'on' : ''}">${p.league === 'nfl' ? 'Reg. season' : 'Regular season'}</button><button data-pst="post" class="${mode === 'post' ? 'on' : ''}">Playoffs</button>${p.league === 'nfl' ? `<button data-pst="ncaa" class="${mode === 'ncaa' ? 'on' : ''}">NCAA</button>` : ''}<span style="display:none"></span></div>`;
   if (mode === 'ncaa') {
     if (!p.ncaa) return seg + msg(p.ncaaErr || 'Načítám NCAA…');
     cats = statCats(p.ncaa, 'nfl');
