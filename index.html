@@ -282,6 +282,10 @@ details[open] summary::after{content:'⌃'}
 .glt td.rs2{padding-left:6px !important;overflow:hidden}
 .glt .gsc{position:relative;display:inline-block}
 .glt .gsc sup{position:absolute;right:-1px;top:-8px;font-size:9px;font-weight:700;line-height:1;color:var(--mut);font-family:-apple-system,sans-serif}
+.glt thead tr:first-child th{height:22px;line-height:14px;padding-top:4px;padding-bottom:4px;box-sizing:border-box;vertical-align:bottom}
+.glt thead tr:last-child th{height:44px;line-height:16px;box-sizing:border-box;vertical-align:middle}
+.glt tbody td{line-height:20px}
+.glt td.n .glo{display:inline-block}
 .glt th.gh{background:var(--card);z-index:3}
 .glt th.grp{overflow:hidden;white-space:nowrap}
 .glt th.n,.glt td.n,.glt tbody td:nth-child(2),.glt thead tr:last-child th:nth-child(2){-webkit-transform:translate3d(0,0,0);transform:translate3d(0,0,0)}
@@ -1288,8 +1292,8 @@ function gamelogHTML(p) {
     cols = (GL_COLS[p.league] || []).filter(l => !(l === 'S' && labels.includes('SOG'))).map(l => [l, labels.indexOf(l)]).filter(c => c[1] >= 0);
     if (cols.length < 3) cols = labels.map((l, i) => [l, i]);
   }
-  const w = l => p.league === 'nhl' ? (String(l).length > 3 || l === 'TOI' ? 52 : 42) : /\//.test(l) ? 56 : String(l).length > 3 ? 50 : /^(FG|3PT|FT|TOI)$/.test(l) ? 50 : 43;
-  const tw = 84 + 92 + cols.reduce((a, c) => a + w(c[0]), 0);
+  const w = l => p.league === 'nhl' ? (String(l).length > 3 || l === 'TOI' ? 48 : 38) : /\//.test(l) ? 56 : String(l).length > 3 ? 50 : /^(FG|3PT|FT|TOI)$/.test(l) ? 50 : 43;
+  const rw = p.league === 'nhl' ? 66 : 92, tw = 84 + rw + cols.reduce((a, c) => a + w(c[0]), 0);
   const trs = shown.map(r => {
     const m = r.m, opp = (m.opponent && (m.opponent.abbreviation || m.opponent.displayName)) || '', ol = m.opponent ? dk((m.opponent.logo) || teamLogoOf(p.league, { id: m.opponent.id, abbr: m.opponent.abbreviation })) : '';
     const sm = String(m.score || '').match(/^(\S+)\s*(.*)$/) || [];
@@ -1313,7 +1317,7 @@ function gamelogHTML(p) {
     totRow = `<tr class="tot"><td class="n">Total</td><td class="rs2"></td>${tv.map(x => `<td>${nv(x)}</td>`).join('')}</tr>`;
   }
   const ghead = groups && groups.length > 1 ? `<tr><th class="n gh" colspan="2"></th>${groups.map(g => `<th class="grp" colspan="${g[1]}">${esc(g[0])}</th>`).join('')}</tr>` : '';
-  return strip + `<section class="blk" style="margin-top:6px"><div class="tw"><table class="nfx sep glt" style="width:${tw}px"><colgroup><col style="width:84px"><col style="width:92px">${cols.map(c => `<col style="width:${w(c[0])}px">`).join('')}</colgroup><thead>${ghead}<tr><th class="n">Gamelog</th><th></th>${cols.map(c => `<th>${esc(c[0])}</th>`).join('')}</tr></thead><tbody>${trs}${totRow}</tbody></table></div></section>`;
+  return strip + `<section class="blk" style="margin-top:6px"><div class="tw"><table class="nfx sep glt" style="width:${tw}px"><colgroup><col style="width:84px"><col style="width:${rw}px">${cols.map(c => `<col style="width:${w(c[0])}px">`).join('')}</colgroup><thead>${ghead}<tr><th class="n">Gamelog</th><th></th>${cols.map(c => `<th>${esc(c[0])}</th>`).join('')}</tr></thead><tbody>${trs}${totRow}</tbody></table></div></section>`;
 }
 function statCats(j, league) {
   return ((j && j.categories) || []).filter(c => c.statistics && c.statistics.length).map(c => ({
@@ -1434,7 +1438,7 @@ function careerHTML(p, cats) {
   const pv = (c, pm, k) => { const nm = c.names && c.names[k]; if (!nm || !pm) return null; if (pm[nm] != null) return pm[nm]; if (/-/.test(nm)) { const q = nm.split('-'); if (pm[q[0]] != null && pm[q[1]] != null) { const f = x => /\./.test(String(x)) ? (+x).toFixed(1) : x; return f(pm[q[0]]) + '-' + f(pm[q[1]]); } } return null; };
   const out = list.map(c => {
     const cols = p.league === 'nba' ? NBA_ALL.map(([l, d, w]) => [c.labels.indexOf(l === '3P%' && !c.labels.includes('3P%') ? '3PT%' : l), d, w]).filter(x => x[0] >= 0)
-      : c.labels.map((l, k) => [k, dl(l, p.league), p.league === 'nhl' ? (String(l).length > 3 ? 52 : 42) : 53]).filter(x => !(p.league === 'nhl' && c.labels[x[0]] === 'SOG' && c.labels.includes('S')));
+      : c.labels.map((l, k) => [k, dl(l, p.league), p.league === 'nhl' ? (String(l).length > 3 ? 48 : 38) : 53]).filter(x => !(p.league === 'nhl' && c.labels[x[0]] === 'SOG' && c.labels.includes('S')));
     const tw = 112 + cols.reduce((a, x) => a + x[2], 0);
     let rows, tot = null;
     if (mode !== 'post') {
@@ -1695,7 +1699,7 @@ function teamStatsHTML(t) {
   }
   return catList.map(c => {
     const title = c.name;
-    const cols = c.labels.map((_, k) => k).filter(k => !(t.league === 'nhl' && c.labels[k] === 'SOG' && c.labels.includes('S'))); const cw = k => t.league === 'nhl' ? (String(c.labels[k]).length > 3 ? 52 : 42) : 53;
+    const cols = c.labels.map((_, k) => k).filter(k => !(t.league === 'nhl' && c.labels[k] === 'SOG' && c.labels.includes('S'))); const cw = k => t.league === 'nhl' ? (String(c.labels[k]).length > 3 ? 48 : 38) : 53;
     const gk = title + '|' + c.labels.join(',');
     const sel = (t.sort && t.sort[gk]) || {};
     const defK = cols.find(k => ['PTS', 'YDS', 'W'].includes(c.labels[k])) ?? cols[Math.min(1, cols.length - 1)];
