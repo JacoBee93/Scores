@@ -140,6 +140,11 @@ details[open] summary::after{content:'⌃'}
 .fx td{font-size:15px}
 .fx td.sm{font-size:12.5px}
 .sep tbody td{border-bottom:1px solid #2c2c2e}
+.fx tr.xp{cursor:pointer}
+.fx tr.sub td{color:var(--mut);font-size:13px}
+.fx tr.sub td.n{font-family:-apple-system,sans-serif;font-weight:600;font-size:12px}
+.chev{display:inline-block;width:7px;height:7px;border:solid var(--mut);border-width:0 2px 2px 0;transform:rotate(45deg);margin-left:7px;vertical-align:3px}
+.chev.up{transform:rotate(-135deg);vertical-align:-2px}
 .sep tbody tr:last-child td{border-bottom:0}
 .fx tbody td,.fx tbody tr:first-child td{padding-top:4.8px;padding-bottom:4.8px}
 .fx tbody tr:first-child td{padding-top:8px}
@@ -167,10 +172,12 @@ details[open] summary::after{content:'⌃'}
 .mo.on{background:var(--acc);color:#fff}
 .mstrip + .blk{margin-top:10px}
 .sch .rs b{font-weight:600;font-family:var(--num);font-size:19px}
-.sch .rs .W,.sch .rs .L{font-family:var(--num);font-size:19px;margin-right:6px}
-.sch .rs .ar{font-style:normal;font-size:9px;margin:0 5px;vertical-align:middle}
+.sch .rs .W,.sch .rs .L{font-family:var(--num);font-size:19px;display:inline-block;width:18px;text-align:left;margin-right:4px}
+.sch .rs .ar{display:inline-block;width:16px;text-align:center;font-style:normal;font-size:9px;vertical-align:middle}
+.sch .rs .s1{display:inline-block;width:22px;text-align:right}
+.sch .rs .s2{display:inline-block;width:22px;text-align:left}
 .sch .rs .mu{color:var(--mut)}
-.sch .rs .sf{color:var(--mut);font-size:10px;margin-left:4px;font-weight:600}
+.sch .rs .sf{display:inline-block;width:24px;text-align:left;color:var(--mut);font-size:10px;margin-left:3px;font-weight:600}
 .sch .rs .live{color:var(--live);font-weight:600}
 </style>
 </head>
@@ -337,6 +344,7 @@ async function loadPlayer() {
   p.st = res[1].status === 'fulfilled' ? res[1].value : null; p.stErr = err(res[1]);
   p.done = true;
   if (state.player === p) render();
+  if (p.st) loadPost(p);
 }
 async function loadTeam() {
   const t = state.team; if (!t) return;
@@ -560,14 +568,14 @@ function playsHTML(g) {
 /* ----- stránka hráče ----- */
 function renderPlayer() {
   const p = state.player;
-  const body = !p.done ? msg('Načítám…') : p.tab === 'gl' ? gamelogHTML(p) : p.tab === 'season' ? seasonHTML(p) : careerHTML(p);
+  const body = !p.done ? msg('Načítám…') : p.tab === 'gl' ? gamelogHTML(p) : statsTabHTML(p);
   const sub = [p.jersey ? '#' + p.jersey : '', p.pos, p.team].filter(Boolean).join(' · ');
   const tab = (k, l) => `<button data-ptab="${k}" class="${p.tab === k ? 'on' : ''}">${l}</button>`;
   $app.innerHTML = `
     <header class="d"><div class="tabs"><button class="back" data-back aria-label="Zpět">‹</button></div></header>
     <main><div class="phero"><img class="hs" src="https://a.espncdn.com/i/headshots/${p.league}/players/full/${esc(p.id)}.png" alt="" onerror="this.style.visibility='hidden'">
       <div><div class="pname">${esc(p.name || 'Hráč')}</div><div class="psub">${esc(sub)}</div></div></div>
-      <div class="dtabs sm">${tab('gl', 'Gamelog')}${tab('season', 'Season stats')}${tab('career', 'Career stats')}</div>
+      <div class="dtabs sm">${tab('gl', 'Gamelog')}${tab('stats', 'Stats')}</div>
       <div class="pane t">${body}</div></main>`;
 }
 const TEAM_EXTRA = {'arizona-coyotes':'ARI','phoenix-coyotes':'PHX','atlanta-thrashers':'ATL','utah-hockey-club':'UTA','seattle-supersonics':'SEA','new-orleans-hornets':'NOH','new-jersey-nets':'NJN','charlotte-bobcats':'CHA','oakland-raiders':'OAK','san-diego-chargers':'SD','st-louis-rams':'STL','washington-redskins':'WSH','washington-football-team':'WSH'};
@@ -620,20 +628,74 @@ function gamelogHTML(p) {
 function statCats(j, league) {
   return ((j && j.categories) || []).filter(c => c.statistics && c.statistics.length).map(c => ({
     title: c.displayName || c.name || '', labels: c.labels || c.names || [], names: c.names || [],
-    rows: c.statistics.map(r => ({ n: (r.season && (r.season.displayName || r.season.year)) || '', sub: (r.team && r.team.abbreviation) || teamAbbr(league, r.teamId, r.teamSlug), vals: r.stats || [] })),
+    rows: c.statistics.map(r => ({ year: r.season && r.season.year, n: (r.season && (r.season.displayName || r.season.year)) || '', sub: (r.team && r.team.abbreviation) || teamAbbr(league, r.teamId, r.teamSlug), vals: r.stats || [] })),
     totals: c.totals && c.totals.length ? c.totals : null }));
 }
-function seasonHTML(p) {
-  if (p.stErr) return msg('Statistiky se nepodařilo načíst (' + p.stErr + ').');
+const NOSUM0 = /%|AVG|AVE|GAA|LNG|RTG|PCT|TOI|^Y\/|\//i;
+const NOSUM = { test: l => l !== '+/-' && NOSUM0.test(l) };
+async function loadPost(p) {
+  p.post = {}; p.postDone = false;
   const cats = statCats(p.st, p.league);
-  if (!cats.length) return msg('Statistiky sezóny nejsou k dispozici.');
-  return cats.map(c => simpleTable(c.title, c.labels, [c.rows[c.rows.length - 1]], null, p.league, c.names)).join('');
+  const years = [...new Set(cats.flatMap(c => c.rows.map(r => r.year)).filter(Boolean))].sort((a, b) => b - a).slice(0, 25);
+  const parts = LEAGUES[p.league].path.split('/');
+  let i = 0;
+  const worker = async () => {
+    while (i < years.length) {
+      const y = years[i++];
+      try {
+        const j = await getJson('https://sports.core.api.espn.com/v2/sports/' + parts[0] + '/leagues/' + parts[1] + '/seasons/' + y + '/types/3/athletes/' + p.id + '/statistics/0?lang=en&region=us');
+        const m = {};
+        ((j.splits && j.splits.categories) || []).forEach(c => (c.stats || []).forEach(x => { if (m[x.name] === undefined) m[x.name] = x.displayValue != null ? x.displayValue : x.value; }));
+        if (Object.keys(m).length) p.post[y] = m;
+      } catch (e) {}
+    }
+  };
+  await Promise.all(Array.from({ length: 6 }, worker));
+  p.postDone = true;
+  if (state.player === p && topView() === 'player') render();
 }
-function careerHTML(p) {
+const fnum = v => { const n = parseFloat(String(v).replace(/,/g, '')); return isNaN(n) ? null : n; };
+function combine(labels, cols, reg, post) {
+  return cols.map((k, ci) => {
+    const a = reg[ci], b = post[ci];
+    if (b == null || b === '') return a;
+    const x = fnum(a), y = fnum(b);
+    if (/^LNG$/i.test(labels[k])) return x != null && y != null ? String(Math.max(x, y)) : a;
+    if (NOSUM.test(labels[k]) || x == null || y == null) return '-';
+    const sum = x + y; return String(Math.round(sum * 100) / 100);
+  });
+}
+function statsTabHTML(p) {
   if (p.stErr) return msg('Statistiky se nepodařilo načíst (' + p.stErr + ').');
   const cats = statCats(p.st, p.league);
-  if (!cats.length) return msg('Statistiky kariéry nejsou k dispozici.');
-  return cats.map(c => simpleTable(c.title, c.labels, [...c.rows].reverse(), c.totals, p.league, c.names)).join('');
+  if (!cats.length) return msg('Statistiky nejsou k dispozici.');
+  p.exp = p.exp || new Set();
+  return cats.map((c, ci) => {
+    const cols = pickStatCols(c.labels, p.league, 7, c.names);
+    const nm = k => c.names && c.names[k];
+    const tcols = cols.map(k => c.labels[k]);
+    const sum = Array(cols.length).fill(0), okSum = Array(cols.length).fill(true);
+    let anyPost = false;
+    const rows = [...c.rows].reverse().map((r, ri) => {
+      const reg = cols.map(k => r.vals[k]);
+      const pm = p.post && r.year && p.post[r.year];
+      let post = null;
+      if (pm) { const arr = cols.map(k => nm(k) ? pm[nm(k)] : undefined); if (arr.some(v => v != null && v !== '')) post = arr; }
+      const tot = post ? combine(c.labels, cols, reg, post) : reg;
+      if (post) anyPost = true;
+      tot.forEach((v, i) => { const n = fnum(v); if (n == null) okSum[i] = false; else sum[i] += n; });
+      const key = ci + '|' + r.year + '|' + ri, open = p.exp.has(key);
+      let h = `<tr${post ? ` data-xp="${esc(key)}" class="xp"` : ''}><td class="n"><span class="pn" style="max-width:none">${esc(r.n)}</span><small>${esc(r.sub || '')}</small>${post ? `<i class="chev ${open ? 'up' : ''}"></i>` : ''}</td>${tot.map(cell).join('')}</tr>`;
+      if (post && open) {
+        h += `<tr class="sub"><td class="n">Regular season</td>${reg.map(cell).join('')}</tr><tr class="sub"><td class="n">Playoffs</td>${post.map(v => cell(v == null ? '-' : v)).join('')}</tr>`;
+      }
+      return h;
+    }).join('');
+    let totRow = '';
+    if (c.totals && !anyPost) totRow = `<tr class="tot"><td class="n">Career</td>${cols.map(k => cell(c.totals[k])).join('')}</tr>`;
+    else totRow = `<tr class="tot"><td class="n">Career</td>${cols.map((k, i) => NOSUM.test(c.labels[k]) ? (c.totals ? cell(c.totals[k]) : cell('-')) : cell(okSum[i] ? String(Math.round(sum[i] * 100) / 100) : '-')).join('')}</tr>`;
+    return `<section class="blk"><div class="tw"><table class="fx sep"><colgroup><col style="width:110px"></colgroup><thead><tr><th class="n">${esc(catName(c.title, c.labels, p.league))}</th>${cols.map(k => `<th>${esc(dl(c.labels[k], p.league))}</th>`).join('')}</tr></thead><tbody>${rows}${totRow}</tbody></table></div></section>`;
+  }).join('');
 }
 
 /* ---------- tým ---------- */
@@ -694,7 +756,7 @@ function scheduleHTML(t) {
     else if (e.state === 'in') res = `<span class="live">${esc(e.short)}</span>`;
     else {
       const w = mine.winner, sfx = e.short.replace(/^Final\/?/, '');
-      res = `<span class="${w ? 'W' : 'L'}">${w ? 'W' : 'L'}</span> <b class="${w ? '' : 'mu'}">${esc(mine.score)}</b><i class="ar">${w ? '◂' : '▸'}</i><b class="${w ? 'mu' : ''}">${esc(opp.score)}</b>${sfx ? `<small class="sf">${esc(sfx)}</small>` : ''}`;
+      res = `<span class="${w ? 'W' : 'L'}">${w ? 'W' : 'L'}</span><b class="s1 ${w ? '' : 'mu'}">${esc(mine.score)}</b><i class="ar">${w ? '◂' : '▸'}</i><b class="s2 ${w ? 'mu' : ''}">${esc(opp.score)}</b><small class="sf">${esc(sfx)}</small>`;
     }
     return `<tr data-game="${esc(e.id)}" data-gl="${t.league}"><td class="n"><span class="pn">${when}</span></td>
       <td class="opp"><small>${mine === e.home ? 'vs' : '@'}</small>${logoImg(opp.logo)}<b>${esc(opp.abbr)}</b></td><td class="rs">${res}</td></tr>`;
@@ -913,7 +975,7 @@ window.addEventListener('hashchange', route);
 
 const $app = document.getElementById('app');
 $app.addEventListener('click', ev => {
-  const b = ev.target.closest('[data-league],[data-game],[data-date],[data-tab],[data-ptab],[data-ttab],[data-sort],[data-team],[data-player],[data-topen],[data-search],[data-month],[data-refresh],[data-back]');
+  const b = ev.target.closest('[data-league],[data-game],[data-date],[data-tab],[data-ptab],[data-xp],[data-ttab],[data-sort],[data-team],[data-player],[data-topen],[data-search],[data-month],[data-refresh],[data-back]');
   if (!b) return;
   const d = b.dataset;
   if (d.league) {
@@ -935,6 +997,8 @@ $app.addEventListener('click', ev => {
     loadList();
   } else if (d.tab) {
     state.game.tab = d.tab; window.scrollTo(0, 0); render();
+  } else if (d.xp !== undefined) {
+    const e = state.player.exp = state.player.exp || new Set(); if (e.has(d.xp)) e.delete(d.xp); else e.add(d.xp); render();
   } else if (d.ptab) {
     state.player.tab = d.ptab; render();
   } else if (d.sort !== undefined) {
