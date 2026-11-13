@@ -282,7 +282,7 @@ details[open] summary::after{content:'⌃'}
 .nfx th:not(.n),.nfx td:not(.n){text-align:center;padding-left:2px;padding-right:2px}
 .nfx td.n .pn{max-width:100%}
 .nfx td{padding-top:8px;padding-bottom:8px;font-variant-numeric:tabular-nums}
-.nfx tr.tot td{font-weight:700}
+.nfx tr.tot td{font-weight:700;border-top:1px solid #3a3a3c}
 .nfx th.n,.nfx td.n{width:auto}
 .tw{max-width:100%}
 .glt td.rs2{text-align:left;white-space:nowrap}
@@ -885,6 +885,22 @@ function toRows(list, cols, ti) {
     pos: (m.a.position && m.a.position.abbreviation) || '', jersey: m.a.jersey || '', ti,
     vals: cols.map(c => m.vals[c.key] !== undefined ? m.vals[c.key] : '-') }));
 }
+function ffTbl(g, t, idx) {
+  const sum = g.sum, drives = sum.drives ? [].concat(sum.drives.previous || [], sum.drives.current ? [sum.drives.current] : []) : [];
+  const ath = new Map();
+  (t.statistics || []).forEach(grp => (grp.athletes || []).forEach(a => { if (a.athlete && a.athlete.id) ath.set(a.athlete.id, a.athlete); }));
+  if (!ath.size) return '';
+  const key = n => { const p = String(n || '').replace(/^forced by\s*/i, '').replace(/[^A-Za-z.\s'-]/g, '').trim().split(/[.\s]+/).filter(Boolean); return p.length ? (p[0][0] + p[p.length - 1]).toLowerCase().replace(/[^a-z]/g, '') : ''; };
+  const byKey = new Map(); ath.forEach(a => { const k = key(a.displayName || a.shortName); if (k) byKey.set(k, a); const k2 = key(a.shortName); if (k2) byKey.set(k2, a); });
+  const cnt = new Map();
+  drives.forEach(d => (d.plays || []).forEach(p => {
+    const re = /FUMBLES\s*\(([^)]+)\)/gi; let m;
+    while ((m = re.exec(String(p.text || '')))) String(m[1]).split(/[,;]| and /).forEach(nm => { const a = byKey.get(key(nm)); if (a) cnt.set(a.id, (cnt.get(a.id) || 0) + 1); });
+  }));
+  if (!cnt.size) return '';
+  const rows = [...cnt.entries()].sort((x, y) => y[1] - x[1]).map(([id, n]) => { const a = ath.get(id); return { id, name: a.displayName || '', short: a.shortName || a.displayName || '', pos: (a.position && a.position.abbreviation) || '', jersey: a.jersey || '', ti: idx, vals: [String(n)] }; });
+  return nflTbl('Forced Fumbles', ['FF'], rows, rows.length > 1 ? [String(rows.reduce((m, r) => m + +r.vals[0], 0))] : null);
+}
 function statsHTML(g) {
   const teams = (g.sum.boxscore && g.sum.boxscore.players) || [];
   if (!teams.length) return msg('Statistiky zatím nejsou k dispozici.');
@@ -907,6 +923,7 @@ function statsHTML(g) {
   } else {
     const ORDN = ['passing', 'rushing', 'receiving', 'defensive', 'interceptions', 'fumbles', 'kickReturns', 'puntReturns', 'kicking', 'punting'];
     const oi = n => { const k = ORDN.indexOf(n); return k < 0 ? 99 : k; };
+    let ffDone = false;
     [...(t.statistics || [])].sort((a, b) => oi(a.name) - oi(b.name)).forEach(grp => {
       const labels = grp.labels || grp.names || [];
       const ath = (grp.athletes || []).filter(a => a.athlete && a.stats && a.stats.length);
@@ -914,7 +931,9 @@ function statsHTML(g) {
       const rows = ath.map(a => ({ id: a.athlete.id, name: a.athlete.displayName || '', short: a.athlete.shortName || a.athlete.displayName || '',
         pos: (a.athlete.position && a.athlete.position.abbreviation) || '', jersey: a.athlete.jersey || '', ti: idx, vals: a.stats }));
       out += nflTbl(NFL_GROUPS[grp.name] || grp.text || grp.name || '', labels, rows, rows.length > 1 && grp.totals && grp.totals.length ? grp.totals : null);
+      if (grp.name === 'fumbles' && !ffDone) { ffDone = true; out += ffTbl(g, t, idx); }
     });
+    if (!ffDone) out += ffTbl(g, t, idx);
   }
   return seg + (out || msg('Statistiky zatím nejsou k dispozici.'));
 }
