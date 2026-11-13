@@ -134,6 +134,14 @@ details[open] summary::after{content:'⌃'}
 .sch .rs{text-align:right;white-space:nowrap;padding-right:1px}
 .sch tr[data-game]{cursor:pointer}
 .stt{white-space:normal}
+.fx{table-layout:fixed}
+.fx th,.fx td{padding-left:1px;padding-right:1px;overflow:visible}
+.fx th{font-size:10.5px}
+.fx td{font-size:14.5px}
+.fx td.sm{font-size:12px}
+.fx th.n,.fx td.n{width:auto;padding-left:0;position:static}
+.fx .pn{max-width:100%}
+.fx td.n{overflow:hidden;text-overflow:ellipsis}
 .stt td.n{min-width:0}
 .mu{color:var(--mut)}
 .per{border-bottom:1px solid #3a3a3c;padding-bottom:6px}
@@ -549,10 +557,18 @@ function teamAbbr(league, id, slug) {
   const m = state.teams[league] || {};
   return (id && m['id' + id]) || (slug && (m[slug] || TEAM_EXTRA[slug])) || (slug ? String(slug).split('-')[0].slice(0, 3).toUpperCase() : '');
 }
-function simpleTable(title, labels, rows, totals) {
-  const trs = rows.map(r => `<tr><td class="n"><span class="pn">${esc(r.n)}</span><small>${esc(r.sub || '')}</small></td>${r.vals.map(v => `<td>${nv(v)}</td>`).join('')}</tr>`).join('');
-  const tot = totals ? `<tr><td class="n">Career</td>${totals.map(v => `<td><b>${esc(v)}</b></td>`).join('')}</tr>` : '';
-  return `<section class="blk"><div class="tw"><table><thead><tr><th class="n">${esc(title)}</th>${labels.map(l => `<th>${esc(l)}</th>`).join('')}</tr></thead><tbody>${trs}${tot}</tbody></table></div></section>`;
+function pickStatCols(labels, league, n) {
+  const pref = PREF[league];
+  let cols = pref ? [...new Set(pref.map(l => labels.indexOf(l)).filter(x => x >= 0))] : [];
+  if (cols.length < 3) cols = labels.map((_, k) => k);
+  return cols.slice(0, n || 7);
+}
+const cell = v => { const t = String(v == null ? '' : v); return `<td class="${t.length > 5 ? 'sm' : ''}">${nv(v)}</td>`; };
+function simpleTable(title, labels, rows, totals, league) {
+  const cols = pickStatCols(labels, league, 7);
+  const trs = rows.map(r => `<tr><td class="n"><span class="pn">${esc(r.n)}</span><small>${esc(r.sub || '')}</small></td>${cols.map(k => cell(r.vals[k])).join('')}</tr>`).join('');
+  const tot = totals ? `<tr><td class="n">Career</td>${cols.map(k => `<td${String(totals[k]).length > 5 ? ' class="sm"' : ''}><b>${esc(totals[k])}</b></td>`).join('')}</tr>` : '';
+  return `<section class="blk"><div class="tw"><table class="fx"><colgroup><col style="width:96px"></colgroup><thead><tr><th class="n">${esc(title)}</th>${cols.map(k => `<th>${esc(labels[k])}</th>`).join('')}</tr></thead><tbody>${trs}${tot}</tbody></table></div></section>`;
 }
 function gamelogHTML(p) {
   if (p.glErr) return msg('Gamelog se nepodařilo načíst (' + p.glErr + ').');
@@ -586,13 +602,13 @@ function seasonHTML(p) {
   if (p.stErr) return msg('Statistiky se nepodařilo načíst (' + p.stErr + ').');
   const cats = statCats(p.st, p.league);
   if (!cats.length) return msg('Statistiky sezóny nejsou k dispozici.');
-  return cats.map(c => simpleTable(c.title, c.labels, [c.rows[c.rows.length - 1]], null)).join('');
+  return cats.map(c => simpleTable(c.title, c.labels, [c.rows[c.rows.length - 1]], null, p.league)).join('');
 }
 function careerHTML(p) {
   if (p.stErr) return msg('Statistiky se nepodařilo načíst (' + p.stErr + ').');
   const cats = statCats(p.st, p.league);
   if (!cats.length) return msg('Statistiky kariéry nejsou k dispozici.');
-  return cats.map(c => simpleTable(c.title, c.labels, [...c.rows].reverse(), c.totals)).join('');
+  return cats.map(c => simpleTable(c.title, c.labels, [...c.rows].reverse(), c.totals, p.league)).join('');
 }
 
 /* ---------- tým ---------- */
@@ -682,7 +698,8 @@ async function loadTeamPlayers(t) {
         const j = await getJson(base + a.id + '/stats');
         statCats(j, t.league).forEach(c => {
           const r = c.rows[c.rows.length - 1]; if (!r) return;
-          rows.push({ a, cat: c.title, labels: c.labels, season: String(r.n), vals: r.vals });
+          const L = c.labels, nm = (L.includes('GAA') || L.includes('SV%')) ? 'Goalies' : (L.includes('PTS') && L.includes('PIM')) ? 'Skaters' : (CAT_NAME[String(c.title).toLowerCase()] || c.title);
+          rows.push({ a, cat: nm + '|' + L.join(','), name: nm, labels: L, season: String(r.n), vals: r.vals });
         });
       } catch (e) {}
     }
@@ -691,7 +708,7 @@ async function loadTeamPlayers(t) {
   const cnt = {}; rows.forEach(r => cnt[r.season] = (cnt[r.season] || 0) + 1);
   const cur = Object.keys(cnt).sort((x, y) => cnt[y] - cnt[x])[0];
   rows.filter(r => r.season === cur).forEach(r => {
-    if (!ps.cats.has(r.cat)) ps.cats.set(r.cat, { labels: r.labels, rows: [] });
+    if (!ps.cats.has(r.cat)) ps.cats.set(r.cat, { name: r.name, labels: r.labels, rows: [] });
     ps.cats.get(r.cat).rows.push(r);
   });
   ps.loading = false; ps.season = cur;
@@ -702,20 +719,17 @@ function teamStatsHTML(t) {
   if (t.ps.loading) return msg('Načítám statistiky hráčů…');
   if (!t.ps.cats.size) return msg('Statistiky hráčů nejsou k dispozici.');
   const tn = teamHead(t).name;
-  return [...t.ps.cats.entries()].map(([title, c]) => {
-    const pref = PREF[t.league];
-    let cols = pref ? pref.map(l => c.labels.indexOf(l)).filter(x => x >= 0) : [];
-    cols = [...new Set(cols)];
-    if (cols.length < 3) cols = c.labels.map((_, k) => k);
-    cols = cols.slice(0, 8);
-    const sk = cols.find(k => ['PTS', 'YDS'].includes(c.labels[k])) ?? cols[Math.min(1, cols.length - 1)];
+  return [...t.ps.cats.values()].map(c => {
+    const title = c.name;
+    const cols = pickStatCols(c.labels, t.league, 7);
+    const sk = cols.find(k => ['PTS', 'YDS', 'W'].includes(c.labels[k])) ?? cols[Math.min(1, cols.length - 1)];
     const num = v => { const n = parseFloat(String(v).replace(/,/g, '')); return isNaN(n) ? -1e9 : n; };
     const rows = [...c.rows].sort((x, y) => num(y.vals[sk]) - num(x.vals[sk]));
     const trs = rows.map(r => {
       const a = r.a, pos = (a.position && a.position.abbreviation) || '';
-      return `<tr data-player="${esc(a.id)}" data-pl="${t.league}" data-pn="${esc(a.displayName || '')}" data-pp="${esc(pos)}" data-pj="${esc(a.jersey || '')}" data-pt="${esc(tn)}"><td class="n"><span class="pn">${esc(shortNm(a.displayName || a.fullName))}</span></td>${cols.map(k => `<td>${nv(r.vals[k])}</td>`).join('')}</tr>`;
+      return `<tr data-player="${esc(a.id)}" data-pl="${t.league}" data-pn="${esc(a.displayName || '')}" data-pp="${esc(pos)}" data-pj="${esc(a.jersey || '')}" data-pt="${esc(tn)}"><td class="n"><span class="pn">${esc(shortNm(a.displayName || a.fullName))}</span></td>${cols.map(k => `${cell(r.vals[k])}`).join('')}</tr>`;
     }).join('');
-    return `<section class="blk"><div class="tw"><table><thead><tr><th class="n">${esc(CAT_NAME[String(title).toLowerCase()] || title)}</th>${cols.map(k => `<th>${esc(c.labels[k])}</th>`).join('')}</tr></thead><tbody>${trs}</tbody></table></div></section>`;
+    return `<section class="blk"><div class="tw"><table class="fx"><colgroup><col style="width:112px"></colgroup><thead><tr><th class="n">${esc(CAT_NAME[String(title).toLowerCase()] || title)}</th>${cols.map(k => `<th>${esc(c.labels[k])}</th>`).join('')}</tr></thead><tbody>${trs}</tbody></table></div></section>`;
   }).join('');
 }
 
@@ -731,6 +745,13 @@ async function searchPlayers(q, league) {
     H + 'search/v2?query=' + qq + '&limit=20&type=player',
     H + 'common/v3/search?query=' + qq + '&limit=20&type=player'
   ];
+  const toks = q.toLowerCase().split(/\s+/).filter(Boolean);
+  if (toks.length > 1) {
+    [toks[toks.length - 1], toks[0]].forEach(w => {
+      urls.push(H + 'common/v3/search?query=' + encodeURIComponent(w) + '&limit=50&type=player&sport=' + parts[0] + '&league=' + parts[1]);
+      urls.push(H + 'search/v2?query=' + encodeURIComponent(w) + '&limit=50&type=player');
+    });
+  }
   const settled = await Promise.allSettled(urls.map(getJson));
   const seen = new Set(), out = [];
   let ok = false, lastErr = null;
@@ -748,6 +769,8 @@ async function searchPlayers(q, league) {
       const id = (uid.match(/a:(\d+)/) || [])[1] || (/^\d+$/.test(String(i.id || '')) ? String(i.id) : '');
       const name = i.displayName || i.name || i.fullName;
       if (!id || !name || seen.has(id)) return;
+      const words = name.toLowerCase().split(/[\s.\-]+/);
+      if (!toks.every(k => words.some(w => w.startsWith(k)))) return;
       seen.add(id);
       out.push({ id, name, sub: (typeof i.subtitle === 'string' && i.subtitle) || (typeof i.description === 'string' ? i.description : '') || (i.isActive === false ? 'Retired' : '') });
     });
