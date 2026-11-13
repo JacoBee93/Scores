@@ -497,6 +497,19 @@ function normTeam(c) {
     logo: dk(t.logo || (t.logos && t.logos[0] && t.logos[0].href) || ''),
     score: score != null ? String(score) : '', winner: !!c.winner, record: rec };
 }
+const AFC = new Set(['BUF','MIA','NE','NYJ','BAL','CIN','CLE','PIT','HOU','IND','JAX','TEN','DEN','KC','LV','LAC','OAK','SD']);
+function roman(n) { const m = [[50,'L'],[40,'XL'],[10,'X'],[9,'IX'],[5,'V'],[4,'IV'],[1,'I']]; let r = ''; m.forEach(([v, c]) => { while (n >= v) { r += c; n -= v; } }); return r; }
+function poLabel(league, wk, year, e) {
+  if (league !== 'nfl') return 'Playoffs';
+  const a = AFC.has(String(e.away.abbr || '').toUpperCase()), h = AFC.has(String(e.home.abbr || '').toUpperCase());
+  const conf = a && h ? 'AFC' : !a && !h ? 'NFC' : '';
+  if ([e.away.abbr, e.home.abbr].some(x => /^(AFC|NFC)$/i.test(String(x || '')))) return 'Pro Bowl';
+  if (wk >= 4 && conf === '') { const n = year - 1965; return 'Super Bowl ' + (n === 50 ? '50' : roman(n)); }
+  if (wk === 1) return (conf ? conf + ' ' : '') + 'Wild Card Playoffs';
+  if (wk === 2) return (conf ? conf + ' ' : '') + 'Divisional Playoffs';
+  if (wk === 3) return (conf ? conf + ' ' : '') + 'Championship';
+  return 'Playoffs';
+}
 function normEvent(ev) {
   const c = (ev.competitions && ev.competitions[0]) || {};
   const comps = c.competitors || [];
@@ -697,7 +710,7 @@ function topView() { return state.player ? 'player' : state.game ? 'game' : stat
 function viewKey() { return topView() + (state.player ? state.player.id : state.game ? state.game.id : state.team ? state.team.id : state.lv ? state.lv.kind + state.lv.league + (state.lv.cat || '') : ''); }
 const GLOSS = {
   all: { GP: 'Games Played', G: 'Games / Goals', W: 'Wins', L: 'Losses', T: 'Ties', OTL: 'Overtime Losses', PCT: 'Winning Percentage', GB: 'Games Behind', HOME: 'Home Record', AWAY: 'Away Record', DIV: 'Division Record', CONF: 'Conference Record', DIFF: 'Differential', STRK: 'Current Streak', L10: 'Last 10 Games', TOT: 'Total', AVG: 'Average', YDS: 'Yards', TD: 'Touchdowns', INT: 'Interceptions', LNG: 'Longest', LONG: 'Longest', MIN: 'Minutes', RK: 'Rank' },
-  nfl: { PF: 'Points For', PA: 'Points Against', CMP: 'Completions', ATT: 'Attempts', 'CMP%': 'Completion Percentage', 'C/ATT': 'Completions / Attempts', SACK: 'Sacks', SACKS: 'Sacks', RTG: 'Passer Rating', QBR: 'Total QBR', CAR: 'Carries', REC: 'Receptions', TGTS: 'Targets', YAC: 'Yards After Catch', FD: 'First Downs', FUM: 'Fumbles', LST: 'Fumbles Lost', SOLO: 'Solo Tackles', AST: 'Assisted Tackles', TFL: 'Tackles For Loss', PD: 'Passes Defended', 'QB HTS': 'QB Hits', FF: 'Forced Fumbles', FR: 'Fumble Recoveries', BIG: 'Big Plays (20+ yds)', 'YDS/G': 'Yards Per Game', SYL: 'Sack Yards Lost', FG: 'Field Goals', XP: 'Extra Points', PTS: 'Points', NO: 'Number', YDSL: 'Yards Lost', G: 'Games', GS: 'Games Started', SFTY: 'Safeties', BLK: 'Blocked Kicks', KB: 'Kicks Blocked', FGM: 'Field Goals Made', FGA: 'Field Goals Attempted', 'FG%': 'Field Goal Percentage', XPM: 'Extra Points Made', XPA: 'Extra Points Attempted', 'XP%': 'Extra Point Percentage', PUNTS: 'Punts', P: 'Punts', NET: 'Net Punting Average', IN20: 'Punts Inside 20', 'IN 20': 'Punts Inside 20', TB: 'Touchbacks', FC: 'Fair Catches', RET: 'Returns', KR: 'Kick Returns', PR: 'Punt Returns', 'Y/R': 'Yards Per Reception', YPC: 'Yards Per Carry', 'Y/A': 'Yards Per Attempt', ADJQBR: 'Adjusted QBR', TCKL: 'Tackles', COMB: 'Combined Tackles', 'INT YDS': 'Interception Return Yards', 'INT TD': 'Interception Touchdowns', DEFTD: 'Defensive Touchdowns', FUML: 'Fumbles Lost', 'FG ATT': 'Field Goal Attempts', '1-19': 'FG Made 1-19 yds', '20-29': 'FG Made 20-29 yds', '30-39': 'FG Made 30-39 yds', '40-49': 'FG Made 40-49 yds', '50+': 'FG Made 50+ yds', FUMR: 'Fumble Recoveries', 'SCK YDS': 'Sack Yards', STF: 'Stuffs', 'STF YDS': 'Stuff Yards' },
+  nfl: { PF: 'Points For', PA: 'Points Against', CMP: 'Completions', ATT: 'Attempts', 'CMP%': 'Completion Percentage', 'C/ATT': 'Completions / Attempts', SACK: 'Sacks', SACKS: 'Sacks', RTG: 'Passer Rating', QBR: 'Total QBR', CAR: 'Carries', REC: 'Receptions', TGTS: 'Targets', YAC: 'Yards After Catch', FD: 'First Downs', FUM: 'Fumbles', LST: 'Fumbles Lost', SOLO: 'Solo Tackles', AST: 'Assisted Tackles', TFL: 'Tackles For Loss', PD: 'Passes Defended', 'QB HTS': 'QB Hits', FF: 'Forced Fumbles', FR: 'Fumble Recoveries', BIG: 'Big Plays (20+ yds)', 'YDS/G': 'Yards Per Game', SYL: 'Sack Yards Lost', FG: 'Field Goals', XP: 'Extra Points', PTS: 'Points', NO: 'Number', YDSL: 'Yards Lost', G: 'Games', GS: 'Games Started', SFTY: 'Safeties', BLK: 'Blocked Kicks', KB: 'Kicks Blocked', FGM: 'Field Goals Made', FGA: 'Field Goals Attempted', 'FG%': 'Field Goal Percentage', XPM: 'Extra Points Made', XPA: 'Extra Points Attempted', 'XP%': 'Extra Point Percentage', PUNTS: 'Punts', P: 'Punts', NET: 'Net Punting Average', IN20: 'Punts Inside 20', 'IN 20': 'Punts Inside 20', TB: 'Touchbacks', FC: 'Fair Catches', RET: 'Returns', KR: 'Kick Returns', PR: 'Punt Returns', 'Y/R': 'Yards Per Reception', YPC: 'Yards Per Carry', 'Y/A': 'Yards Per Attempt', ADJQBR: 'Adjusted QBR', TCKL: 'Tackles', COMB: 'Combined Tackles', 'INT YDS': 'Interception Return Yards', 'INT TD': 'Interception Touchdowns', DEFTD: 'Defensive Touchdowns', FUML: 'Fumbles Lost', 'FG ATT': 'Field Goal Attempts', '1-19': 'FG Made 1-19 yds', '20-29': 'FG Made 20-29 yds', '30-39': 'FG Made 30-39 yds', '40-49': 'FG Made 40-49 yds', '50+': 'FG Made 50+ yds', FUMR: 'Fumble Recoveries', 'SCK YDS': 'Sack Yards' },
   nba: { G: 'Games', PTS: 'Points', Pts: 'Points', REB: 'Rebounds', AST: 'Assists', STL: 'Steals', BLK: 'Blocks', TO: 'Turnovers', PF: 'Personal Fouls', FG: 'Field Goals Made-Attempted', 'FG%': 'Field Goal Percentage', '3PT': '3-Point FG Made-Attempted', '3P%': '3-Point Percentage', '3PT%': '3-Point Percentage', FT: 'Free Throws Made-Attempted', 'FT%': 'Free Throw Percentage', OFF: 'Offensive Rebounds', OR: 'Offensive Rebounds', DR: 'Defensive Rebounds', DD2: 'Double Doubles', TD3: 'Triple Doubles', FGM: 'Field Goals Made', FGA: 'Field Goals Attempted', '3PM': '3-Pointers Made', '3PA': '3-Pointers Attempted', FTM: 'Free Throws Made', FTA: 'Free Throws Attempted', PPG: 'Points Per Game', 'OPP PPG': 'Opponent Points Per Game', GS: 'Games Started' },
   nhl: { G: 'Goals', A: 'Assists', PTS: 'Points', '+/-': 'Plus/Minus Rating', PIM: 'Penalty Minutes', SOG: 'Shots On Goal', S: 'Shots', HIT: 'Hits', BKS: 'Blocked Shots', TOI: 'Time On Ice', 'TOI/G': 'Time On Ice Per Game', PPG: 'Power Play Goals', PPA: 'Power Play Assists', SHG: 'Short Handed Goals', SHA: 'Short Handed Assists', GWG: 'Game-Winning Goals', 'S%': 'Shooting Percentage', SPCT: 'Shooting Percentage', RW: 'Regulation Wins', ROW: 'Regulation + OT Wins', GF: 'Goals For', GA: 'Goals Against', GAA: 'Goals Against Average', 'SV%': 'Save Percentage', SV: 'Saves', SA: 'Shots Against', SO: 'Shutouts', GS: 'Games Started', FW: 'Faceoffs Won', FL: 'Faceoffs Lost', 'FO%': 'Faceoff Percentage' }
 };
@@ -812,7 +825,7 @@ function renderGame() {
               : esc(e.short).replace(' - ', '<br>');
     const hd = (g.sum && g.sum.header) || {}, hc = (hd.competitions && hd.competitions[0]) || {};
     const wk = e.week || hd.week, st = e.stype || (hd.season && hd.season.type), note = e.note || (hc.notes && hc.notes[0] && hc.notes[0].headline) || '';
-    const wlab = (st === 3 || (!wk && note)) ? note : g.league === 'nfl' && wk ? (st === 1 ? 'Preseason · Week ' + wk : 'Week ' + wk) : '';
+    const wlab = note || (st === 3 ? poLabel(g.league, wk, (hd.season && hd.season.year) || new Date(e.date).getFullYear() - (new Date(e.date).getMonth() < 6 ? 1 : 0), e) : g.league === 'nfl' && wk ? (st === 1 ? 'Preseason · Week ' + wk : 'Week ' + wk) : '');
     const pre = e.state === 'pre', ab = t => `<span class="s ab ${String(t.abbr || '').length > 3 ? 'ab4' : ''}" data-topen="${esc(t.id)}" data-tl="${g.league}" data-tn="${esc(t.name)}" data-tlogo="${esc(t.logo)}">${esc(t.abbr || '')}</span>`;
     hero = `<div class="hero${wlab ? ' hw' : ''}${pre ? ' hpre' : ''}">${wlab ? `<div class="wk">${esc(wlab)}</div>` : ''}${side(e.away, pre)}
       ${pre ? ab(e.away) : `<span class="s ${e.state === 'post' && !e.away.winner ? 'lose' : ''}">${esc(e.away.score)}</span>`}
@@ -1356,7 +1369,7 @@ function gamelogHTML(p, o) {
     let o = 0;
     groups = [];
     const isDef = /^(DE|DT|NT|DL|LB|OLB|ILB|MLB|CB|S|FS|SS|DB|EDGE)$/i.test(p.pos || '');
-    gc.forEach(c => { const ok = nflRelevant(p.pos, c.displayName || c.name), fum = /fumble/i.test(c.displayName || c.name || ''); const ks = []; for (let k = o; k < o + c.count; k++) if (ok && !(isDef && fum && !/^(FF|FR|REC|TD)$/i.test(labels[k]))) ks.push(k); o += c.count; if (ks.length) { groups.push([c.displayName || c.name, ks.length]); idx.push(...ks); } });
+    gc.forEach(c => { const ok = nflRelevant(p.pos, c.displayName || c.name), fum = /fumble/i.test(c.displayName || c.name || ''); const ks = []; for (let k = o; k < o + c.count; k++) if (ok && !/^STF/i.test(labels[k]) && !(isDef && fum && !/^(FF|FR|REC|TD)$/i.test(labels[k]))) ks.push(k); o += c.count; if (ks.length) { groups.push([c.displayName || c.name, ks.length]); idx.push(...ks); } });
     if (!idx.length) { labels.forEach((_, k) => idx.push(k)); groups = null; }
     cols = idx.map(k => [labels[k], k]);
   } else {
@@ -1599,7 +1612,7 @@ function careerHTML(p, cats) {
   const pv = (c, pm, k) => { const nm = c.names && c.names[k]; if (!nm || !pm) return null; if (pm[nm] != null) return pm[nm]; if (/-/.test(nm)) { const q = nm.split('-'); if (pm[q[0]] != null && pm[q[1]] != null) { const f = x => /\./.test(String(x)) ? (+x).toFixed(1) : x; return f(pm[q[0]]) + '-' + f(pm[q[1]]); } } return null; };
   const out = list.map(c => {
     const cols = p.league === 'nba' ? NBA_ALL.map(([l, d, w]) => [c.labels.indexOf(l === '3P%' && !c.labels.includes('3P%') ? '3PT%' : l), d, w]).filter(x => x[0] >= 0)
-      : c.labels.map((l, k) => [k, dl(l, p.league), p.league === 'nhl' ? (String(l).length > 3 ? 46 : 36) : 53]).filter(x => !(p.league === 'nhl' && ((c.labels[x[0]] === 'SOG' && c.labels.includes('S')) || c.labels[x[0]] === 'PROD')));
+      : c.labels.map((l, k) => [k, dl(l, p.league), p.league === 'nhl' ? (String(l).length > 3 ? 46 : 36) : 53]).filter(x => !(p.league === 'nhl' && ((c.labels[x[0]] === 'SOG' && c.labels.includes('S')) || c.labels[x[0]] === 'PROD')) && !(p.league === 'nfl' && /^STF/i.test(c.labels[x[0]])));
     const tw = 112 + cols.reduce((a, x) => a + x[2], 0);
     let rows, tot = null;
     if (mode !== 'post') {
@@ -1861,7 +1874,7 @@ function teamStatsHTML(t) {
   }
   return catList.map(c => {
     const title = c.name;
-    const cols = c.labels.map((_, k) => k).filter(k => !(t.league === 'nhl' && ((c.labels[k] === 'SOG' && c.labels.includes('S')) || c.labels[k] === 'PROD'))); const cw = k => t.league === 'nhl' ? (title === 'Goalies' && /^(GA|GAA|SA|SV|SV%|SO)$/.test(c.labels[k]) ? 52 : String(c.labels[k]).length > 3 ? 46 : 36) : 50; const fcw = t.league === 'nfl' ? 108 : 124;
+    const cols = c.labels.map((_, k) => k).filter(k => !(t.league === 'nhl' && ((c.labels[k] === 'SOG' && c.labels.includes('S')) || c.labels[k] === 'PROD')) && !(t.league === 'nfl' && /^STF/i.test(c.labels[k]))); const cw = k => t.league === 'nhl' ? (title === 'Goalies' && /^(GA|GAA|SA|SV|SV%|SO)$/.test(c.labels[k]) ? 52 : String(c.labels[k]).length > 3 ? 46 : 36) : 50; const fcw = t.league === 'nfl' ? 108 : 124;
     const gk = title + '|' + c.labels.join(',');
     const sel = (t.sort && t.sort[gk]) || {};
     const defK = cols.find(k => ['PTS', 'YDS', 'W'].includes(c.labels[k])) ?? cols[Math.min(1, cols.length - 1)];
