@@ -385,6 +385,9 @@ td.n .slg{width:20px;height:20px;object-fit:contain;vertical-align:-6px;margin-l
 .fx tbody td,.fx tbody tr:first-child td{padding-top:4.8px;padding-bottom:4.8px}
 .fx tbody tr:first-child td{padding-top:8px}
 .fx th[data-sort]{cursor:pointer;position:relative}
+.gst th.on{color:#8ab4ff;text-decoration:underline}
+.gst td.on{background:#26314a}
+.gst th[data-gsort],.nfx th[data-gsort]{cursor:pointer}
 .fx th.on,.nfx th.on{color:#8ab4ff;text-decoration:underline}
 .fx td.on,.nfx td.on{background:#26314a}
 .nfx th[data-sort]{cursor:pointer}
@@ -845,17 +848,27 @@ function teamNameOf(ti) {
   const g = state.game, ts = g && g.sum && g.sum.boxscore && g.sum.boxscore.players;
   return (ts && ts[ti] && ts[ti].team && ts[ti].team.displayName) || '';
 }
+function gSort(title, labels, rows) {
+  const g = state.game, gk = title + '|' + labels.join(','), sel = g && g.gsort && g.gsort[gk];
+  if (!sel || sel.k >= labels.length) return { gk, k: -1, rows };
+  const num = v => { const x = String(v == null ? '' : v).replace(/,/g, ''); let m; if ((m = x.match(/^(\d+):(\d+)$/))) return +m[1] * 60 + +m[2]; if ((m = x.match(/^(\d+)[-/](\d+)$/))) return +m[1] + +m[2] / 1000; const n = parseFloat(x); return isNaN(n) ? -1e9 : n; };
+  return { gk, k: sel.k, rows: [...rows].sort((a, b) => (sel.asc ? 1 : -1) * (num(a.vals[sel.k]) - num(b.vals[sel.k]))) };
+}
+const gTh = (S, labels) => labels.map((l, k) => `<th data-gsort="${k}" data-gsg="${esc(S.gk)}" class="${S.k === k ? 'on' : ''}">${esc(l)}</th>`).join('');
+const gTd = (S, vals) => vals.map((v, k) => `<td class="${S.k === k ? 'on' : ''}">${nv(v)}</td>`).join('');
 function tbl(title, labels, rows) {
+  const S = gSort(title, labels, rows); rows = S.rows;
   const trs = rows.map(r => `<tr data-player="${esc(r.id)}" data-pn="${esc(r.name)}" data-pp="${esc(r.pos)}" data-pj="${esc(r.jersey)}" data-pl="${esc(state.game ? state.game.league : '')}" data-pt="${esc(teamNameOf(r.ti))}">
-    <td class="n"><span class="pn">${esc(r.short)}</span><small>${esc(r.pos)}</small></td>${r.vals.map(v => `<td>${nv(v)}</td>`).join('')}</tr>`).join('');
-  return `<section class="blk"><div class="tw"><table><thead><tr><th class="n">${esc(title)}</th>${labels.map(l => `<th>${esc(l)}</th>`).join('')}</tr></thead><tbody>${trs}</tbody></table></div></section>`;
+    <td class="n"><span class="pn">${esc(r.short)}</span><small>${esc(r.pos)}</small></td>${gTd(S, r.vals)}</tr>`).join('');
+  return `<section class="blk"><div class="tw"><table class="gst"><thead><tr><th class="n">${esc(title)}</th>${gTh(S, labels)}</tr></thead><tbody>${trs}</tbody></table></div></section>`;
 }
 function nflTbl(title, labels, rows, totals) {
+  const S = gSort(title, labels, rows); rows = S.rows;
   const w = l => /\//.test(l) ? 62 : String(l).length > 4 ? 58 : 46;
   const tw = 128 + labels.reduce((a, l) => a + w(l), 0);
   const trs = rows.map(r => `<tr data-player="${esc(r.id)}" data-pn="${esc(r.name)}" data-pp="${esc(r.pos)}" data-pj="${esc(r.jersey)}" data-pl="nfl" data-pt="${esc(teamNameOf(r.ti))}">
-    <td class="n"><span class="pn">${esc(r.short)}</span><small>${esc(r.pos)}</small></td>${r.vals.map(v => `<td>${nv(v)}</td>`).join('')}</tr>`).join('') + (totals ? `<tr class="tot"><td class="n">Total</td>${labels.map((l, k) => `<td>${nv(totals[k] != null ? totals[k] : '')}</td>`).join('')}</tr>` : '');
-  return `<section class="blk"><div class="tw"><table class="nfx" style="width:max(100%, ${tw}px)"><colgroup><col>${labels.map(l => `<col style="width:${w(l)}px">`).join('')}</colgroup><thead><tr><th class="n">${esc(title)}</th>${labels.map(l => `<th>${esc(l)}</th>`).join('')}</tr></thead><tbody>${trs}</tbody></table></div></section>`;
+    <td class="n"><span class="pn">${esc(r.short)}</span><small>${esc(r.pos)}</small></td>${gTd(S, r.vals)}</tr>`).join('') + (totals ? `<tr class="tot"><td class="n">Total</td>${labels.map((l, k) => `<td>${nv(totals[k] != null ? totals[k] : '')}</td>`).join('')}</tr>` : '');
+  return `<section class="blk"><div class="tw"><table class="nfx" style="width:max(100%, ${tw}px)"><colgroup><col>${labels.map(l => `<col style="width:${w(l)}px">`).join('')}</colgroup><thead><tr><th class="n">${esc(title)}</th>${gTh(S, labels)}</tr></thead><tbody>${trs}</tbody></table></div></section>`;
 }
 function mergedAthletes(t) {
   const map = new Map();
@@ -2336,7 +2349,7 @@ window.addEventListener('hashchange', route);
 const $app = document.getElementById('app');
 $app.addEventListener('click', ev => {
   if (window._lpAt && Date.now() - window._lpAt < 900) { const lb = ev.target.closest('[data-league]'); if (lb) { ev.preventDefault(); return; } }
-  const b = ev.target.closest('[data-rclear],[data-go2],[data-home],[data-csort],[data-glm],[data-glyo],[data-glsrc],[data-ncy],[data-sstat],[data-gly],[data-league],[data-game],[data-date],[data-wk],[data-pst],[data-smode],[data-cl],[data-lsort],[data-drv],[data-pm],[data-tab],[data-ptab],[data-xp],[data-ttab],[data-pvt],[data-sort],[data-fav],[data-team],[data-player],[data-topen],[data-search],[data-month],[data-refresh],[data-back]');
+  const b = ev.target.closest('[data-rclear],[data-go2],[data-home],[data-csort],[data-glm],[data-glyo],[data-gsort],[data-glsrc],[data-ncy],[data-sstat],[data-gly],[data-league],[data-game],[data-date],[data-wk],[data-pst],[data-smode],[data-cl],[data-lsort],[data-drv],[data-pm],[data-tab],[data-ptab],[data-xp],[data-ttab],[data-pvt],[data-sort],[data-fav],[data-team],[data-player],[data-topen],[data-search],[data-month],[data-refresh],[data-back]');
   if (!b) return;
   const d = b.dataset;
   if (topView() === 'search' && !ev.target.closest('.fstar')) { if (d.topen) addRecent({ k: 't', l: d.tl, id: d.topen, name: d.tn || '', logo: d.tlogo || '' }); else if (d.player) addRecent({ k: 'p', l: d.pl, id: d.player, name: d.pn || '', sub: d.pt || '' }); }
@@ -2385,6 +2398,9 @@ $app.addEventListener('click', ev => {
     const e = state.player.exp = state.player.exp || new Set(); if (e.has(d.xp)) e.delete(d.xp); else e.add(d.xp); render();
   } else if (d.ptab) {
     state.player.tab = d.ptab; render();
+  } else if (d.gsort !== undefined) {
+    const g = state.game; g.gsort = g.gsort || {}; const cur = g.gsort[d.gsg], k = +d.gsort;
+    g.gsort[d.gsg] = { k, asc: cur && cur.k === k ? !cur.asc : false }; render();
   } else if (d.sort !== undefined) {
     const t = state.team; t.sort = t.sort || {}; const cur = t.sort[d.sg];
     t.sort[d.sg] = { k: +d.sort, asc: cur && cur.k === +d.sort ? !cur.asc : false }; render();
