@@ -97,8 +97,8 @@ header.d + main{padding-top:0}
 .dtabs.sm button{font-size:13px;letter-spacing:.6px}
 .pane{background:var(--card);margin:0 -16px 24px;padding:30px 16px 32px}
 .pane.t{padding-top:10px}
-.seg{display:flex;background:transparent;border-radius:15px;padding:3px;margin:0 auto;max-width:252px;border:1.5px solid #3a3a3c}
-.seg button{flex:1;padding:3px 4px;border-radius:12px;font-weight:600;font-size:14px;color:#fff}
+.seg{display:flex;background:transparent;border-radius:999px;padding:3px;margin:0 auto;max-width:252px;border:1.5px solid #3a3a3c}
+.seg button{flex:1;padding:3px 4px;border-radius:999px;font-weight:600;font-size:14px;color:#fff}
 .seg button.on{background:#fff;color:#000}
 .blk{margin-top:24px}
 .seg + .blk{margin-top:8px}
@@ -204,12 +204,14 @@ details[open] summary::after{content:'⌃'}
 .play.g .txt{font-weight:500}
 .play.g .sco{color:#fff;font-weight:700;font-size:12.5px;margin-top:4px}
 /* hráč */
-.ssum{background:#2c2c2e;border-radius:12px;overflow:hidden;margin:6px 0 18px}
+.ssum{background:#2c2c2e;border-radius:22px;overflow:hidden;margin:6px 0 18px}
 .ssh{padding:7px 10px;text-align:center;font-family:var(--wide);font-stretch:112%;font-weight:800;font-size:12px;letter-spacing:.5px;text-transform:uppercase;color:#fff}
 .ssg{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;padding:10px 4px 12px;text-align:center}
 .ssl{font-size:13px;color:var(--mut);font-weight:500}
 .ssv{font-family:var(--num);font-weight:700;font-size:30px;line-height:1.15;font-kerning:none}
 .ssr{font-size:12.5px;color:var(--mut)}
+.ssg > div[data-sstat]{cursor:pointer}
+.ssg > div[data-sstat]:active{opacity:.6}
 .glt tr.mb td{border-top:2px solid #48484a}
 .ysel{position:relative;margin:2px 0 6px}
 .ybtn{display:inline-flex;align-items:center;gap:8px;background:#2c2c2e;border-radius:12px;padding:7px 14px;font-weight:600;font-size:15px}
@@ -1393,11 +1395,16 @@ function gamelogFull(p) {
   if (g.err) return head + msg('Gamelog se nepodařilo načíst.');
   return gamelogHTML(p, { head, j: g.j });
 }
+function ssCat(p, x) {
+  let n = String(x.name || x.abbreviation || '').replace(/\W/g, '');
+  if (p.league === 'nfl' && /^interceptions$/i.test(n) && /^QB$/i.test(p.pos || '')) n = 'qbInterceptions';
+  return n;
+}
 function summaryHTML(p) {
   const a = p.bio || {}, ss = a.statsSummary, st = ((ss && ss.statistics) || []).filter(x => x && x.displayValue != null).slice(0, 4);
   if (!st.length) return '';
   const col = a.team && a.team.color ? '#' + String(a.team.color).replace('#', '') : 'var(--acc)';
-  return `<section class="ssum"><div class="ssh" style="background:${esc(col)}">${esc(ss.displayName || 'Season stats')}</div><div class="ssg">${st.map(x => `<div><div class="ssl">${esc(x.abbreviation || x.shortDisplayName || x.displayName || '')}</div><div class="ssv">${esc(x.displayValue)}</div><div class="ssr">${esc(x.rankDisplayValue || '')}</div></div>`).join('')}</div></section>`;
+  return `<section class="ssum"><div class="ssh" style="background:${esc(col)}">${esc(ss.displayName || 'Season stats')}</div><div class="ssg">${st.map(x => `<div data-sstat="${esc(ssCat(p, x))}" data-sstl="${esc(x.displayName || x.abbreviation || '')}"><div class="ssl">${esc(x.abbreviation || x.shortDisplayName || x.displayName || '')}</div><div class="ssv">${esc(x.displayValue)}</div><div class="ssr">${esc(x.rankDisplayValue || '')}</div></div>`).join('')}</div></section>`;
 }
 function overviewHTML(p) {
   const sum = summaryHTML(p);
@@ -2029,6 +2036,7 @@ function renderLV() {
 function byAthQuery(league, cat) {
   const c = String(cat || '');
   if (league === 'nfl') {
+    if (c === 'qbInterceptions') return ['offense:passing', 'passing.interceptions'];
     if (/^passing|^qb|completion/i.test(c)) return ['offense:passing', 'passing.' + c];
     if (/^rushing/i.test(c)) return ['offense:rushing', 'rushing.' + c];
     if (/^receiv/i.test(c)) return ['offense:receiving', 'receiving.' + c];
@@ -2040,7 +2048,7 @@ function byAthQuery(league, cat) {
   if (league === 'nhl' && /save|goalsAgainst|shutout|wins/i.test(c)) return ['goaltending', ''];
   return ['', ''];
 }
-function catKeys(cat) { const c = String(cat || ''); const b = c.replace(/PerGame$/i, ''); return [c, 'avg' + b.charAt(0).toUpperCase() + b.slice(1), b].map(x => x.toLowerCase()); }
+function catKeys(cat) { if (cat === 'qbInterceptions') return ['interceptions']; const c = String(cat || ''); const b = c.replace(/PerGame$/i, ''); return [c, 'avg' + b.charAt(0).toUpperCase() + b.slice(1), b].map(x => x.toLowerCase()); }
 async function loadLeaders() {
   const v = state.lv; if (!v || v.data || v.loading) return;
   v.loading = true;
@@ -2079,7 +2087,7 @@ async function loadLeaders() {
       let i = 0;
       const worker = async () => { while (i < rows.length) { const r = rows[i++]; const id = ((r.ref || '').match(/athletes\/(\d+)/) || [])[1]; try { r.a = state.athC[id] || (state.athC[id] = await getJson(String(r.ref).replace(/^http:/, 'https:'))); } catch (er) { r.a = { id }; } } };
       await Promise.all(Array.from({ length: 8 }, worker));
-      v.title = c && (c.displayName || c.name);
+      v.title = v.title || (c && (c.displayName || c.name));
       v.data = { cols: [{ label: (c && (c.shortDisplayName || c.abbreviation)) || 'VAL' }], rows };
       v.sk = 0;
     } catch (e2) { v.err = 'Nepodařilo se načíst žebříček.'; }
@@ -2214,7 +2222,7 @@ window.addEventListener('hashchange', route);
 const $app = document.getElementById('app');
 $app.addEventListener('click', ev => {
   if (window._lpAt && Date.now() - window._lpAt < 900) { const lb = ev.target.closest('[data-league]'); if (lb) { ev.preventDefault(); return; } }
-  const b = ev.target.closest('[data-rclear],[data-go2],[data-home],[data-csort],[data-glm],[data-glyo],[data-gly],[data-league],[data-game],[data-date],[data-wk],[data-pst],[data-smode],[data-cl],[data-lsort],[data-drv],[data-pm],[data-tab],[data-ptab],[data-xp],[data-ttab],[data-pvt],[data-sort],[data-fav],[data-team],[data-player],[data-topen],[data-search],[data-month],[data-refresh],[data-back]');
+  const b = ev.target.closest('[data-rclear],[data-go2],[data-home],[data-csort],[data-glm],[data-glyo],[data-sstat],[data-gly],[data-league],[data-game],[data-date],[data-wk],[data-pst],[data-smode],[data-cl],[data-lsort],[data-drv],[data-pm],[data-tab],[data-ptab],[data-xp],[data-ttab],[data-pvt],[data-sort],[data-fav],[data-team],[data-player],[data-topen],[data-search],[data-month],[data-refresh],[data-back]');
   if (!b) return;
   const d = b.dataset;
   if (topView() === 'search' && !ev.target.closest('.fstar')) { if (d.topen) addRecent({ k: 't', l: d.tl, id: d.topen, name: d.tn || '', logo: d.tlogo || '' }); else if (d.player) addRecent({ k: 'p', l: d.pl, id: d.player, name: d.pn || '', sub: d.pt || '' }); }
@@ -2237,6 +2245,9 @@ $app.addEventListener('click', ev => {
     state.team.month = d.month; render();
   } else if (d.game !== undefined) {
     window._fromList = true; location.hash = '#/game/' + (d.gl || state.league) + '/' + d.game;
+  } else if (d.sstat) {
+    state.lv = { kind: 'leaders', league: state.player.league, cat: d.sstat, sk: null, asc: false, title: d.sstl || '' };
+    window._fromList = true; location.hash = '#/leaders/' + state.player.league + '/' + d.sstat;
   } else if (d.cl !== undefined) {
     window._fromList = true; location.hash = '#/leaders/' + state.lv.league + '/' + (d.cl || 'x');
   } else if (d.lsort !== undefined) {
