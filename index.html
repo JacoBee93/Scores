@@ -38,9 +38,10 @@ header.d{padding:calc(env(safe-area-inset-top) + 30px) 12px 7px}
 .back{font-size:46px;line-height:1;height:50px;padding:0 18px 8px 8px}
 main{padding:6px 16px 0}
 header.d + main{padding-top:0}
-.strip{display:flex;gap:6px;overflow-x:auto;margin:10px -16px 0;padding:0 16px;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+.strip{display:flex;gap:6px;overflow-x:auto;margin:10px 0 0;padding:0;scrollbar-width:none;-webkit-overflow-scrolling:touch;scroll-snap-type:x mandatory}
+.strip .snap{scroll-snap-align:start;scroll-snap-stop:always}
 .strip::-webkit-scrollbar{display:none}
-.dy{flex:none;width:52px;background:var(--card);border-radius:12px;padding:5px 0;font-family:var(--num);font-weight:700;font-size:15px;display:flex;flex-direction:column;align-items:center;line-height:1.15;color:var(--mut)}
+.dy{flex:none;width:calc((100vw - 56px) / 5);background:var(--card);border-radius:12px;padding:5px 0;font-family:var(--num);font-weight:700;font-size:15px;display:flex;flex-direction:column;align-items:center;line-height:1.15;color:var(--mut)}
 .dy small{font-family:-apple-system,sans-serif;font-size:10.5px;font-weight:600}
 .dy.on{background:var(--acc);color:#fff}
 /* karty zápasů */
@@ -113,6 +114,11 @@ header.d + main{padding-top:0}
 .ir{cursor:pointer;display:flex;align-items:center;gap:12px;padding:10px 0;border-top:1px solid #2c2c2e}
 .ir .hs{width:44px;height:44px;border-radius:50%;background:#2c2c2e;object-fit:cover;flex:none}
 .is{text-align:right;flex:none}
+.tst td.n .pn{max-width:none}
+.tst th img{width:24px;height:24px;object-fit:contain;vertical-align:middle}
+.tst th:not(.n),.tst td:not(.n){min-width:58px;text-align:right}
+.tst td.rk{color:var(--mut);font-size:13px;min-width:44px}
+.ld .dash{font-family:var(--num);font-weight:700;font-size:21px;color:var(--mut);padding-top:16px}
 .tt{width:100%;border-collapse:collapse;white-space:normal}
 .tt th{padding:10px 6px;text-align:right;border-bottom:1px solid #3a3a3c}
 .tt th img{width:26px;height:26px;object-fit:contain}
@@ -346,8 +352,16 @@ async function loadList(silent) {
   const my = ++reqId;
   if (!silent) { state.loading = true; state.error = null; state.events = []; render(); }
   try {
-    const j = await getJson(API + L.path + '/scoreboard?dates=' + ymd(state.date));
+    let url = API + L.path + '/scoreboard?dates=' + ymd(state.date);
+    const W = state.nflw;
+    if (state.league === 'nfl') url = API + L.path + '/scoreboard' + (W && W.sel ? `?seasontype=${W.sel.t}&week=${W.sel.w}&dates=${W.year}` : '');
+    const j = await getJson(url);
     if (my !== reqId) return;
+    if (state.league === 'nfl' && !(W && W.cal)) {
+      const cal = [];
+      (((j.leagues || [])[0] || {}).calendar || []).forEach(sec => { const t = +sec.value; if (t !== 2 && t !== 3) return; (sec.entries || []).forEach(en => { if (/pro bowl/i.test(en.label || '')) return; cal.push({ t, w: +en.value, label: en.label || '', alt: en.alternateLabel || '' }); }); });
+      state.nflw = { cal, year: (j.season && j.season.year) || new Date().getFullYear(), sel: { t: (j.season && j.season.type) || 2, w: (j.week && j.week.number) || 1 } };
+    }
     state.events = (j.events || []).map(normEvent);
     state.error = null;
   } catch (e) {
@@ -496,18 +510,44 @@ function renderList() {
       return h + `<div class="fwrap"${mark}>${cardHTML(e)}</div>`;
     }).join('');
   }
-  else body = state.events.map(cardHTML).join('');
-  let strip = '';
-  for (let i = -30; !fav && i <= 30; i++) {
-    const d = addDays(state.date, i);
-    strip += `<button class="dy ${i === 0 ? 'on' : ''}" data-date="${ymd(d)}"><small>${DAYS[d.getDay()]}</small>${d.getDate()}.${d.getMonth()+1}.</button>`;
+  else if (state.league === 'nfl') {
+    let last = '';
+    body = state.events.slice().sort((a, b) => new Date(a.date) - new Date(b.date)).map(e => {
+      const d = new Date(e.date), day = DAYS[d.getDay()] + ' ' + d.getDate() + '.' + (d.getMonth() + 1) + '.';
+      let h = ''; if (day !== last) { h = `<div class="sec">${day}</div>`; last = day; }
+      return h + cardHTML(e);
+    }).join('');
   }
+  else body = state.events.map(cardHTML).join('');
+  const items = []; let onIdx = 0, skey = '';
+  if (!fav && state.league === 'nfl' && state.nflw && state.nflw.cal.length) {
+    const W = state.nflw; skey = 'nfl' + W.year;
+    W.cal.forEach((c, i) => {
+      const on = c.t === W.sel.t && c.w === W.sel.w; if (on) onIdx = i;
+      const m = /^week\s*(\d+)/i.exec(c.label);
+      items.push([on, `data-wk="${c.t}-${c.w}"`, m ? `<small>Week</small>${m[1]}` : `<small>Playoffs</small>${esc(c.alt || c.label)}`]);
+    });
+  } else if (!fav && state.league !== 'nfl') {
+    if (!state.stripBase || Math.abs((state.date - state.stripBase) / 864e5) > 50) state.stripBase = state.date;
+    skey = 'd' + ymd(state.stripBase);
+    for (let i = -60; i <= 60; i++) {
+      const d = addDays(state.stripBase, i), on = ymd(d) === ymd(state.date); if (on) onIdx = i + 60;
+      items.push([on, `data-date="${ymd(d)}"`, `<small>${DAYS[d.getDay()]}</small>${d.getDate()}.${d.getMonth()+1}.`]);
+    }
+  }
+  const strip = items.map((x, i) => `<button class="dy ${x[0] ? 'on' : ''} ${((i - onIdx + 2) % 5 + 5) % 5 === 0 ? 'snap' : ''}" ${x[1]}>${x[2]}</button>`).join('');
+  const os = document.getElementById('strip'), prev = os && state.stripKey === skey ? os.scrollLeft : null;
+  state.stripKey = skey;
   $app.innerHTML = `
     <header><div class="tabs">${tabs}<span class="grow"></span><button class="icon" data-search aria-label="Hledat">${SEARCH_SVG}</button></div>
-    ${fav ? '' : `<div class="strip" id="strip">${strip}</div>`}</header>
+    ${strip ? `<div class="strip" id="strip">${strip}</div>` : ''}</header>
     <main>${body}<div class="foot">Data: ESPN (neoficiální API)</div></main>`;
   const s = document.getElementById('strip'), on = s && s.querySelector('.on');
-  if (on) s.scrollLeft = on.offsetLeft - (s.clientWidth - on.offsetWidth) / 2;
+  if (on) {
+    const tgt = Math.max(0, on.offsetLeft - (s.clientWidth - on.offsetWidth) / 2);
+    if (prev != null && Math.abs(prev - tgt) > 1) { s.scrollLeft = prev; requestAnimationFrame(() => s.scrollTo({ left: tgt, behavior: 'smooth' })); }
+    else s.scrollLeft = tgt;
+  }
   if (fav && !state.favScrolled && state.events.length) { const f = document.querySelector('[data-first]'); if (f) { state.favScrolled = true; window.scrollTo(0, Math.max(0, f.getBoundingClientRect().top + window.scrollY - 190)); } }
 }
 function cardHTML(e) {
@@ -660,6 +700,7 @@ async function loadSeasonLeaders(g) {
       try {
         const a = await getJson(https(l.athlete.$ref));
         const dv = String(l.displayValue != null ? l.displayValue : l.value);
+        if (title === 'Plus/Minus' && !(parseFloat(dv) > 0)) return null;
         let sub = '';
         if (g.league === 'nfl' && l.statistics && l.statistics.$ref && /Yards/.test(title)) {
           try {
@@ -691,19 +732,22 @@ function pvLeaders(g) {
   const of = id => ((arr.find(x => String(x.team && x.team.id) === String(id)) || {}).leaders) || [];
   let la = of(e.away.id), lh = of(e.home.id);
   if (g.slLoading) return `<section class="pv"><div class="sec">Season leaders</div>${msg('Načítám…')}</section>`;
-  if (g.sl && g.sl[0] && g.sl[1] && (g.sl[0].length || g.sl[1].length)) { la = g.sl[0]; lh = g.sl[1]; }
+  let useSl = false;
+  if (g.sl && g.sl[0] && g.sl[1] && (g.sl[0].length || g.sl[1].length)) { la = g.sl[0]; lh = g.sl[1]; useSl = true; }
   else if (e.state !== 'pre') { la = []; lh = []; }
   const names = []; [...la, ...lh].forEach(c => { if (c && c.name && !names.includes(c.name)) names.push(c.name); });
+  const ord = (SL_CATS[g.league] || []).map(x => x[1]); names.sort((a, b) => (ord.indexOf(a) + 99) % 99 - (ord.indexOf(b) + 99) % 99);
+  if (useSl) { names.length = 0; ord.forEach(x => names.push(x)); }
   const side = (top, right, tm) => {
-    if (!top || !top.athlete) return '<div class="ld"></div>';
+    if (!top || !top.athlete) return `<div class="ld ${right ? 'r' : ''}"><div class="lt"><div class="dash">–</div></div></div>`;
     const a = top.athlete, ms = top.mainStat, val = ms ? `${ms.value} ${ms.label || ''}` : (top.displayValue || ''), sub = ms ? (top.summary || '') : '';
     const pos = (a.position && a.position.abbreviation) || '';
     return `<div class="ld ${right ? 'r' : ''}" data-player="${esc(a.id)}" data-pl="${g.league}" data-pn="${esc(a.displayName || a.shortName || '')}" data-pp="${esc(pos)}" data-pj="${esc(a.jersey || '')}" data-pt="${esc((tm && tm.name) || '')}"><img class="hs" src="${esc(hsOf(a, g.league))}" alt="" onerror="this.style.visibility='hidden'">
       <div class="lt"><div class="ln">${right ? `<small class="pl">${esc(pos)}</small>` : ''}${esc(a.shortName || a.displayName || '')}${right ? '' : `<small>${esc(pos)}</small>`}</div><div class="lv">${esc(String(val).trim())}</div>${sub ? `<div class="ls">${esc(sub)}</div>` : ''}</div></div>`;
   };
-  const rows = names.filter(n => la.some(c => c.name === n) && lh.some(c => c.name === n)).slice(0, 4).map(n => {
+  const rows = names.slice(0, 4).map(n => {
     const ca = la.find(c => c.name === n), ch = lh.find(c => c.name === n), t = ca || ch;
-    return `<div class="lc"><div class="lh">${esc((t.displayName || n).replace(/ Leader$/i, ''))}</div><div class="lg">${side(ca && ca.leaders && ca.leaders[0], false, e.away)}${side(ch && ch.leaders && ch.leaders[0], true, e.home)}</div></div>`;
+    return `<div class="lc"><div class="lh">${esc(((t && t.displayName) || n).replace(/ Leader$/i, ''))}</div><div class="lg">${side(ca && ca.leaders && ca.leaders[0], false, e.away)}${side(ch && ch.leaders && ch.leaders[0], true, e.home)}</div></div>`;
   }).join('');
   if (!rows) return '';
   return `<section class="pv"><div class="sec">Season leaders</div><div class="lhd">${logoImg(e.away.logo)}<b>${esc(e.away.abbr)}</b><span class="grow"></span><b>${esc(e.home.abbr)}</b>${logoImg(e.home.logo)}</div>${rows}</section>`;
@@ -773,11 +817,14 @@ function ensureLeagueStats(league, cb) {
     } catch (e) { delete state.lgs[league]; }
   })();
 }
+function tstTable(title, heads, rows) {
+  return `<section class="blk"><div class="tw"><table class="ros sep tst"><thead><tr><th class="n">${esc(title)}</th>${heads.map(h => `<th>${h}</th>`).join('')}</tr></thead><tbody>${rows.map(r => `<tr><td class="n"><span class="pn">${esc(r[0])}</span></td>${r.slice(1).map((v, i) => `<td class="${r.rk && i === r.length - 2 ? 'rk' : ''}">${esc(v != null && v !== '' ? v : '-')}</td>`).join('')}</tr>`).join('')}</tbody></table></div></section>`;
+}
 function pvTeamTable(g) {
   const e = g.ev, A = nhlRows(flatStats(g.ts[0])), H = nhlRows(flatStats(g.ts[1]));
   const rows = A.map((r, i) => [r[0], r[1], H[i][1]]).filter(r => r[1] != null || r[2] != null);
   if (!rows.length) return '';
-  return `<section class="pv"><table class="tt"><thead><tr><th class="hd"><div class="sec">Team stats</div></th><th>${logoImg(e.away.logo)}</th><th>${logoImg(e.home.logo)}</th></tr></thead><tbody>${rows.map(r => `<tr><td>${esc(r[0])}</td><td>${esc(r[1] != null ? r[1] : '-')}</td><td>${esc(r[2] != null ? r[2] : '-')}</td></tr>`).join('')}</tbody></table></section>`;
+  return tstTable('Team stats', [logoImg(e.away.logo), logoImg(e.home.logo)], rows);
 }
 function pvStats(g) {
   const e = g.ev;
@@ -1171,7 +1218,8 @@ function teamTabStatsHTML(t) {
     }).filter(Boolean);
   }
   if (!rows.length) return msg('Statistiky týmu nejsou k dispozici.');
-  return `<table class="tt"><tbody>${rows.map(r => `<tr><td>${esc(r[0])}</td><td>${esc(r[1].displayValue != null ? r[1].displayValue : r[1].value)}</td>${t.league === 'nhl' ? '' : `<td class="mut">${esc(r[2] || '')}</td>`}</tr>`).join('')}</tbody></table>`;
+  const nhl = t.league === 'nhl';
+  return tstTable('Team stats', nhl ? ['Value'] : ['Value', 'Rank'], rows.map(r => { const o = [r[0], r[1].displayValue != null ? r[1].displayValue : r[1].value]; if (!nhl) { o.push(r[2] || ''); o.rk = true; } return o; }));
 }
 function teamStatsHTML(t) {
   if (!t.ps) return msg('Načítám…');
@@ -1347,7 +1395,7 @@ window.addEventListener('hashchange', route);
 
 const $app = document.getElementById('app');
 $app.addEventListener('click', ev => {
-  const b = ev.target.closest('[data-league],[data-game],[data-date],[data-tab],[data-ptab],[data-xp],[data-ttab],[data-pvt],[data-sort],[data-fav],[data-team],[data-player],[data-topen],[data-search],[data-month],[data-refresh],[data-back]');
+  const b = ev.target.closest('[data-league],[data-game],[data-date],[data-wk],[data-tab],[data-ptab],[data-xp],[data-ttab],[data-pvt],[data-sort],[data-fav],[data-team],[data-player],[data-topen],[data-search],[data-month],[data-refresh],[data-back]');
   if (!b) return;
   const d = b.dataset;
   if (d.fav !== undefined) {
@@ -1368,6 +1416,8 @@ $app.addEventListener('click', ev => {
     state.team.month = d.month; render();
   } else if (d.game !== undefined) {
     window._fromList = true; location.hash = '#/game/' + (d.gl || state.league) + '/' + d.game;
+  } else if (d.wk) {
+    const [t, w] = d.wk.split('-').map(Number); state.nflw.sel = { t, w }; loadList();
   } else if (d.date) {
     setDate(new Date(+d.date.slice(0, 4), +d.date.slice(4, 6) - 1, +d.date.slice(6, 8), 12));
     loadList();
