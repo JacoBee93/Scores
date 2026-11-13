@@ -65,7 +65,7 @@ header.d + main{padding-top:0}
 .dy small{font-family:-apple-system,sans-serif;font-size:10.5px;font-weight:600}
 .dy.on{background:var(--acc);color:#fff}
 /* karty zápasů */
-.card{background:var(--card);border-radius:20px;padding:13px 16px 8px;margin-bottom:10px;cursor:pointer}
+.card{background:var(--card);border-radius:22px;padding:13px 16px 8px;margin-bottom:10px;cursor:pointer}
 .card .top{color:var(--mut);font-size:13.5px;margin-bottom:2px}
 .card .top .live{color:var(--live);font-weight:600}
 .row{display:flex;align-items:center;gap:11px;padding:6px 0}
@@ -79,7 +79,7 @@ header.d + main{padding-top:0}
 .msg button{margin-top:12px;background:var(--card);padding:9px 16px;border-radius:12px;color:#fff}
 .foot{color:var(--mut);font-size:12px;text-align:center;margin-top:20px;padding-bottom:30px}
 /* detail zápasu */
-.hero{background:var(--card);border-radius:22px;padding:16px 0;display:grid;grid-template-columns:repeat(5,1fr);align-items:center;justify-items:center;margin:0 4px}
+.hero{background:var(--card);border-radius:22px;padding:16px 0;display:grid;grid-template-columns:repeat(5,1fr);align-items:center;justify-items:center;margin:0 -8px}
 .hero .t{display:flex;flex-direction:column;align-items:center;gap:5px;font-weight:600;font-size:14.5px}
 .hero .t img,.hero .t .ph{width:42px;height:42px;object-fit:contain}
 .hero .s{font-family:var(--num);font-weight:700;font-size:50px;line-height:1}
@@ -97,8 +97,8 @@ header.d + main{padding-top:0}
 .dtabs.sm button{font-size:13px;letter-spacing:.6px}
 .pane{background:var(--card);margin:10px -8px 16px;border-radius:22px;padding:30px 14px 40px;min-height:70vh}
 .pane.t{padding-top:10px}
-.seg{display:flex;background:transparent;border-radius:999px;padding:3px;margin:0 auto;max-width:252px;border:1.5px solid #3a3a3c}
-.seg button{flex:1;padding:3px 4px;border-radius:999px;font-weight:600;font-size:14px;color:#fff}
+.seg{display:flex;background:transparent;border-radius:15px;padding:3px;margin:0 auto;max-width:252px;border:1.5px solid #3a3a3c}
+.seg button{flex:1;padding:3px 4px;border-radius:12px;font-weight:600;font-size:14px;color:#fff}
 .seg button.on{background:#fff;color:#000}
 .blk{margin-top:24px}
 .seg + .blk{margin-top:8px}
@@ -162,7 +162,8 @@ header.d + main{padding-top:0}
 .l5r:last-child{border-bottom:0}
 .l5r:active{opacity:.6}
 .l5r .rw{width:16px;font-weight:800;font-family:var(--num);font-size:18px}
-.l5r .ro{width:56px;font-family:var(--num);font-weight:700;font-size:16px;white-space:nowrap}
+.l5r .ro i{font-style:normal;width:15px;text-align:center}
+.l5r .ro{width:44px;display:flex;align-items:center;gap:3px;font-family:var(--num);font-weight:700;font-size:16px;color:var(--mut);white-space:nowrap;flex:none}
 .l5r img,.l5r .ph{width:24px;height:24px;object-fit:contain;flex:none}
 .l5r .rs2{margin-left:auto;font-family:var(--num);font-size:17px;white-space:nowrap}
 .l5r .rs2 u{text-decoration:none;margin:0 4px}
@@ -311,14 +312,14 @@ td.n .slg{width:20px;height:20px;object-fit:contain;vertical-align:-6px;margin-l
 .dsc small{font-size:10.5px;color:var(--mut);font-weight:600}
 .drv .chev{margin:0 4px 0 2px}
 .dpl{padding:2px 0 8px;border-bottom:1px solid #2c2c2e}
-.pc{border:1px solid #3a3a3c;border-radius:14px;padding:12px 14px;margin:10px 0}
+.pc{border:1px solid #3a3a3c;border-radius:12px;padding:12px 14px;margin:10px 0}
 .pc .ph{display:flex;align-items:center;gap:12px}
 .pc .ph .dt{flex:1;min-width:0}
 .pc .px{font-size:14px;line-height:1.35;margin-top:6px}
 .pc .pd{color:var(--mut);font-size:12.5px;margin-top:6px}
 .pc.scr{border-color:#5a5a5e}
 .lpo{position:fixed;inset:0;z-index:60;background:rgba(0,0,0,.35)}
-.lpm{position:fixed;z-index:61;background:#2c2c2e;border-radius:14px;min-width:200px;overflow:hidden;box-shadow:0 10px 30px rgba(0,0,0,.5)}
+.lpm{position:fixed;z-index:61;background:#2c2c2e;border-radius:12px;min-width:200px;overflow:hidden;box-shadow:0 10px 30px rgba(0,0,0,.5)}
 .lpm button{display:block;width:100%;text-align:left;padding:14px 16px;font-size:16px;font-weight:600;color:#fff;background:none;border:0;border-bottom:1px solid #3a3a3c;font-family:inherit}
 .lpm button:last-child{border-bottom:0}
 .lvt{font-family:var(--num);font-weight:700;font-size:26px;margin:4px 4px 12px}
@@ -1147,7 +1148,7 @@ function pvLast5(g) {
       const res = ev.gameResult || '', opp = ev.opponent || {}, own = String(ev.score || '');
       const sc = own.match(/(\d+)\D+(\d+)/); let a = '', b = '';
       if (sc) { const hi = Math.max(+sc[1], +sc[2]), lo = Math.min(+sc[1], +sc[2]); if (res === 'L') { a = lo; b = hi; } else { a = hi; b = lo; } }
-      return `<div class="l5r" data-game="${esc(ev.id)}" data-gl="${g.league}"><span class="${res === 'W' ? 'W' : res === 'L' ? 'L' : ''} rw">${esc(res)}</span><span class="ro">${esc((ev.atVs === '@' ? '@' : '') + (opp.abbreviation || ''))}</span>${logoImg(opp.logo)}<span class="rs2">${res === 'L' ? `<i>${a}</i><u>-</u><b>${b}</b>` : `<b>${a}</b><u>-</u><i>${b}</i>`}</span></div>`;
+      return `<div class="l5r" data-game="${esc(ev.id)}" data-gl="${g.league}"><span class="${res === 'W' ? 'W' : res === 'L' ? 'L' : ''} rw">${esc(res)}</span><span class="ro"><i>${ev.atVs === '@' ? '@' : ''}</i>${logoImg(opp.logo)}</span><span class="rs2">${res === 'L' ? `<i>${a}</i><u>-</u><b>${b}</b>` : `<b>${a}</b><u>-</u><i>${b}</i>`}</span></div>`;
     }).join('')}</div>`;
   };
   return `<section class="pv"><div class="sec">Recent games</div><div class="lhd">${logoImg(e.away.logo)}<b>${esc(e.away.abbr)}</b><span class="grow"></span><b>${esc(e.home.abbr)}</b>${logoImg(e.home.logo)}</div><div class="l5">${col(e.away)}${col(e.home)}</div></section>`;
@@ -1501,6 +1502,7 @@ function careerHTML(p, cats) {
     const title = p.league === 'nba' ? (mode === 'reg' ? 'Season' : 'Playoffs') : catName(c.title, c.labels, p.league);
     const sk = mode + '|' + c.title, so = (p.csort || {})[sk];
     if (so) { const num = x => { const n = parseFloat(String(x == null ? '' : x).replace(/,/g, '')); return isNaN(n) ? -1e12 : n; }; rows = [...rows].sort((a, b) => (so.asc ? 1 : -1) * (num(a.v[so.i]) - num(b.v[so.i]))); }
+    cols.forEach((x, i) => { const L = Math.max(0, ...rows.map(r => String(r.v[i] == null ? '' : r.v[i]).length)), T = tot ? String(tot[i] == null ? '' : tot[i]).length : 0; x[2] = Math.max(x[2], Math.ceil(Math.max(L * 9, T * 10) + 10)); });
     const fc = p.league === 'nba' ? 112 : 80, tw2 = fc + cols.reduce((a, x) => a + x[2], 0);
     return `<section class="blk"><div class="tw"><table class="nfx sep" style="width:max(100%, ${tw2}px)"><colgroup><col style="width:${fc}px">${cols.map(x => `<col style="width:${x[2]}px">`).join('')}</colgroup><thead><tr><th class="n">${esc(title)}</th>${cols.map((x, i) => `<th data-csort="${i}" data-cs="${esc(sk)}" class="${so && so.i === i ? 'on' : ''}">${esc(x[1])}</th>`).join('')}</tr></thead><tbody>${rows.map(r => `<tr><td class="n"><span class="pn">${esc(r.n)}</span>${mode === 'ncaa' ? (r.tid ? `<img class="slg" src="https://a.espncdn.com/i/teamlogos/ncaa/500-dark/${esc(r.tid)}.png" alt="" onerror="if(!this.dataset.f){this.dataset.f=1;this.src=this.src.replace('500-dark','500')}else this.remove()">` : '') : seasonLogo(p.league, r)}</td>${r.v.map((v, i) => `<td class="${so && so.i === i ? 'on' : ''}">${nv(clean(v))}</td>`).join('')}</tr>`).join('')}${tot ? `<tr class="tot"><td class="n">Career</td>${tot.map(v => `<td>${nv(clean(v))}</td>`).join('')}</tr>` : ''}</tbody></table></div></section>`;
   }).join('');
