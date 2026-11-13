@@ -58,14 +58,14 @@ header.d + main{padding-top:0}
 .msg button{margin-top:12px;background:var(--card);padding:9px 16px;border-radius:12px;color:#fff}
 .foot{color:var(--mut);font-size:12px;text-align:center;margin-top:20px;padding-bottom:30px}
 /* detail zápasu */
-.hero{background:var(--card);border-radius:22px;padding:16px 0;display:grid;grid-template-columns:repeat(5,1fr);align-items:center;justify-items:center;margin:0 4px}
-.hero .t{display:flex;flex-direction:column;align-items:center;gap:5px;font-weight:600;font-size:14.5px}
-.hero .t img,.hero .t .ph{width:42px;height:42px;object-fit:contain}
+.hero{background:var(--card);border-radius:22px;padding:26px 0 24px;display:grid;grid-template-columns:repeat(5,1fr);align-items:center;justify-items:center;margin:0 4px}
+.hero .t{display:flex;flex-direction:column;align-items:center;gap:7px;font-weight:600;font-size:16px}
+.hero .t img,.hero .t .ph{width:54px;height:54px;object-fit:contain}
 .hero .s{font-family:var(--num);font-weight:700;font-size:50px;line-height:1}
 .hero .s.lose{color:var(--mut)}
-.hero .m{text-align:center;font-size:14.5px;font-weight:500;line-height:1.35}
+.hero .m{text-align:center;font-size:20px;font-weight:600;line-height:1.5}
 .hero .m.live{color:var(--live)}
-.hero .m span{color:#fff}
+.hero .m span{color:var(--mut);font-size:14px;font-weight:500}
 .dtabs{display:flex;gap:21px;border-bottom:1px solid #3a3a3c;margin:4px -16px 0;padding:0 20px;overflow-x:auto;scrollbar-width:none}
 .dtabs::-webkit-scrollbar{display:none}
 .dtabs button{flex:none;padding:12px 0 13px;font-weight:600;font-size:16px;letter-spacing:1px;color:var(--mut);border-bottom:3px solid transparent;margin-bottom:-1px;white-space:nowrap}
@@ -98,7 +98,7 @@ header.d + main{padding-top:0}
 .ls{color:var(--mut);font-size:11.5px;line-height:1.25}
 .ld .ls{white-space:nowrap;font-size:10.5px;letter-spacing:-.1px}
 .ld[data-player]{cursor:pointer}
-.hero .t .rc{font-size:12px;font-weight:500;color:var(--mut)}
+.hero .t .rc{font-size:14px;font-weight:500;color:var(--mut)}
 .lhd .rc{font-family:-apple-system,sans-serif;font-size:12px;font-weight:500;color:var(--mut);letter-spacing:0}
 .tt th.hd{text-align:left;vertical-align:middle}
 .tt th.hd .sec{margin:0}
@@ -636,7 +636,7 @@ function teamColor(c, fb) {
 const SL_CATS = {
   nfl: [[/^passingYards$/i, 'Passing Yards', 'YDS'], [/^rushingYards$/i, 'Rushing Yards', 'YDS'], [/^receivingYards$/i, 'Receiving Yards', 'YDS'], [/^sacks$/i, 'Sacks', 'SACKS']],
   nba: [[/^pointsPerGame$|^avgPoints$/i, 'Points', 'PPG'], [/^reboundsPerGame$|^avgRebounds$/i, 'Rebounds', 'RPG'], [/^assistsPerGame$|^avgAssists$/i, 'Assists', 'APG'], [/^stealsPerGame$|^avgSteals$/i, 'Steals', 'SPG']],
-  nhl: [[/^goals$/i, 'Goals', 'G'], [/^assists$/i, 'Assists', 'A'], [/^points$/i, 'Points', 'PTS'], [/^plusMinus$/i, 'Plus/Minus', '']]
+  nhl: [[/^goals$/i, 'Goals', 'G'], [/^assists$/i, 'Assists', 'A'], [/^points$/i, 'Points', 'PTS'], [/^plusMinus$|^plusminus$|^plusMinusRating$/i, 'Plus/Minus', '']]
 };
 async function loadSeasonLeaders(g) {
   const e = g.ev, parts = LEAGUES[g.league].path.split('/'), hs = g.sum && g.sum.header && g.sum.header.season;
@@ -649,12 +649,25 @@ async function loadSeasonLeaders(g) {
     }
     if (!cats) return null;
     const out = await Promise.all(SL_CATS[g.league].map(async ([re, title, lab]) => {
-      const c = cats.find(x => re.test(String(x.name || ''))), l = c && c.leaders && c.leaders[0];
+      const c = cats.find(x => re.test(String(x.name || '')) || re.test(String(x.displayName || '').replace(/[^a-z]/gi, ''))), l = c && c.leaders && c.leaders[0];
       if (!l || !l.athlete || !l.athlete.$ref) return null;
       try {
         const a = await getJson(https(l.athlete.$ref));
         const dv = String(l.displayValue != null ? l.displayValue : l.value);
-        return { name: title, displayName: title, leaders: [{ athlete: { id: a.id, displayName: a.displayName, shortName: a.shortName || a.displayName, position: a.position, jersey: a.jersey, headshot: a.headshot }, mainStat: { value: /[a-z]/i.test(dv) ? dv : dv, label: /[a-z]/i.test(dv) ? '' : lab } }] };
+        let sub = '';
+        if (g.league === 'nfl' && l.statistics && l.statistics.$ref && /Yards/.test(title)) {
+          try {
+            const sj = await getJson(https(l.statistics.$ref)), cs = (sj.splits && sj.splits.categories) || [];
+            const gs = (cat, n) => { const c2 = cs.find(x => x.name === cat); const st = c2 && (c2.stats || []).find(x => x.name === n); return st ? (st.displayValue != null ? st.displayValue : st.value) : null; };
+            const nz = v => v != null && String(v) !== '0' && String(v) !== '';
+            const p = [];
+            if (title === 'Passing Yards') { const c1 = gs('passing', 'completions'), at = gs('passing', 'passingAttempts'); if (c1 != null && at != null) p.push(c1 + '/' + at); const td = gs('passing', 'passingTouchdowns'), it = gs('passing', 'interceptions'); if (nz(td)) p.push(td + ' TD'); if (nz(it)) p.push(it + ' INT'); }
+            else if (title === 'Rushing Yards') { const ca = gs('rushing', 'rushingAttempts'), td = gs('rushing', 'rushingTouchdowns'); if (nz(ca)) p.push(ca + ' CAR'); if (nz(td)) p.push(td + ' TD'); }
+            else { const rc = gs('receiving', 'receptions'), td = gs('receiving', 'receivingTouchdowns'); if (nz(rc)) p.push(rc + ' REC'); if (nz(td)) p.push(td + ' TD'); }
+            sub = p.join(', ');
+          } catch (err) {}
+        }
+        return { name: title, displayName: title, leaders: [{ athlete: { id: a.id, displayName: a.displayName, shortName: a.shortName || a.displayName, position: a.position, jersey: a.jersey, headshot: a.headshot }, mainStat: { value: dv, label: /[a-z]/i.test(dv) ? '' : lab }, summary: sub }] };
       } catch (err) { return null; }
     }));
     return out.filter(Boolean);
@@ -687,7 +700,7 @@ function pvLeaders(g) {
     return `<div class="lc"><div class="lh">${esc((t.displayName || n).replace(/ Leader$/i, ''))}</div><div class="lg">${side(ca && ca.leaders && ca.leaders[0], false, e.away)}${side(ch && ch.leaders && ch.leaders[0], true, e.home)}</div></div>`;
   }).join('');
   if (!rows) return '';
-  return `<section class="pv"><div class="sec">Season leaders</div><div class="lhd">${logoImg(e.away.logo)}<b>${esc(e.away.abbr)}</b>${e.away.record ? `<span class="rc">${esc(e.away.record)}</span>` : ''}<span class="grow"></span>${e.home.record ? `<span class="rc">${esc(e.home.record)}</span>` : ''}<b>${esc(e.home.abbr)}</b>${logoImg(e.home.logo)}</div>${rows}</section>`;
+  return `<section class="pv"><div class="sec">Season leaders</div><div class="lhd">${logoImg(e.away.logo)}<b>${esc(e.away.abbr)}</b><span class="grow"></span><b>${esc(e.home.abbr)}</b>${logoImg(e.home.logo)}</div>${rows}</section>`;
 }
 const PV_STATS = {
   nfl: [['Pts Scored per Game', /^(avg)?(total)?points ?per ?game|^points ?per ?game|avgpoints$/i], ['Pts Allowed per Game', /(opp|against|allowed).*points ?per ?game|pointsAgainstPerGame|pointsAllowed/i, true], ['Yds per Game', /total ?yards ?per ?game|^yards ?per ?game|avg.*total ?yards/i], ['Pass Yds per Game', /passing ?yards ?per ?game|net passing yards per game/i], ['Rush Yds per Game', /rushing ?yards ?per ?game/i], ['3rd Down Efficiency Percentage', /third ?down.*(pct|percent|conv)|3rd down/i], ['Sacks', /^sacks$/i], ['Interceptions', /^(passing)?interceptions$/i]],
@@ -705,7 +718,8 @@ const NHL_TABLE = [
   ['Penalty Kill Percentage', /penaltyKillPct|penalty kill percentage/i],
   ['Short Handed Goals', /^shortHandedGoals$|^short handed goals$/i],
   ['Short Handed Goals Against', /shortHandedGoalsAgainst|short handed goals against/i]];
-const findNhl = (list, re) => list.find(x => re.test(String(x.name || ''))) || list.find(x => re.test(String(x.displayName || '')));
+const nrm = x => String(x || '').replace(/[^a-z0-9]/gi, '').toLowerCase();
+const findNhl = (list, re) => list.find(x => re.test(String(x.name || ''))) || list.find(x => re.test(String(x.displayName || ''))) || list.find(x => re.test(nrm(x.displayName))) || list.find(x => re.test(nrm(x.shortDisplayName)));
 function flatStats(j) {
   if (!j) return [];
   const cats = (j.results && j.results.stats && j.results.stats.categories) || (j.stats && j.stats.categories) || (j.splits && j.splits.categories) || j.categories || [];
@@ -740,7 +754,10 @@ function ensureLeagueStats(league, cb) {
 function pvTeamTable(g) {
   const e = g.ev, A = flatStats(g.ts[0]), H = flatStats(g.ts[1]);
   let rows = NHL_TABLE.map(([t, re]) => { const a = findNhl(A, re), h = findNhl(H, re); return a && h ? [t, a, h] : null; }).filter(Boolean);
-  if (rows.length < 4) rows = A.slice(0, 12).map(a => [a.displayName || a.name, a, H.find(x => x.name === a.name)]).filter(r => r[2]);
+  if (rows.length < 9) {
+    const used = new Set(rows.map(r => r[1].name));
+    A.filter(a => !used.has(a.name) && a.displayName).forEach(a => { const h = H.find(x => x.name === a.name); if (h && rows.length < 14) { rows.push([a.displayName, a, h]); used.add(a.name); } });
+  }
   if (!rows.length) return '';
   return `<section class="pv"><table class="tt"><thead><tr><th class="hd"><div class="sec">Team stats</div></th><th>${logoImg(e.away.logo)}</th><th>${logoImg(e.home.logo)}</th></tr></thead><tbody>${rows.map(r => `<tr><td>${esc(r[0])}</td><td>${esc(r[1].displayValue)}</td><td>${esc(r[2].displayValue)}</td></tr>`).join('')}</tbody></table></section>`;
 }
@@ -874,7 +891,7 @@ function renderPlayer() {
     <header class="d"><div class="tabs"><button class="back" data-back aria-label="Zpět">‹</button></div></header>
     <main><div class="phero"><img class="hs" src="https://a.espncdn.com/i/headshots/${p.league}/players/full/${esc(p.id)}.png" alt="" onerror="this.style.visibility='hidden'">
       <div><div class="pname">${esc(p.name || 'Hráč')}</div><div class="psub">${esc(sub)}</div></div></div>
-      <div class="dtabs sm">${tab('gl', 'Gamelog')}${tab('stats', 'Player stats')}${tab('tstats', 'Team stats')}</div>
+      <div class="dtabs sm">${tab('gl', 'Gamelog')}${tab('stats', 'Stats')}</div>
       <div class="pane t">${body}</div></main>`;
 }
 const TEAM_EXTRA = {'arizona-coyotes':'ARI','phoenix-coyotes':'PHX','atlanta-thrashers':'ATL','utah-hockey-club':'UTA','seattle-supersonics':'SEA','new-orleans-hornets':'NOH','new-jersey-nets':'NJN','charlotte-bobcats':'CHA','oakland-raiders':'OAK','san-diego-chargers':'SD','st-louis-rams':'STL','washington-redskins':'WSH','washington-football-team':'WSH'};
@@ -1036,7 +1053,7 @@ function renderTeam() {
     <main><div class="phero">${h.logo ? `<img class="tl" src="${esc(h.logo)}" alt="" onerror="this.style.visibility='hidden'">` : ''}
       <div class="grow"><div class="pname up">${esc(h.name)}</div><div class="psub">${esc(h.sub)}</div></div>
       <button class="fstar ${isFav(t.league, t.id) ? 'on' : ''}" data-fav="${esc(t.id)}" data-fl="${t.league}" data-fn="${esc(h.name)}" data-flogo="${esc(h.logo)}" aria-label="Oblíbený tým">${STAR_SVG}</button></div>
-      <div class="dtabs sm">${tab('roster', 'Roster')}${tab('sched', 'Schedule')}${tab('stats', 'Stats')}</div>
+      <div class="dtabs sm">${tab('roster', 'Roster')}${tab('sched', 'Schedule')}${tab('stats', 'Player stats')}${tab('tstats', 'Team stats')}</div>
       <div class="pane t">${body}</div></main>`;
   const ms = document.getElementById('mstrip'), on = ms && ms.querySelector('.on');
   if (on) ms.scrollLeft = on.offsetLeft - (ms.clientWidth - on.offsetWidth) / 2;
