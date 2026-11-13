@@ -99,6 +99,8 @@ header.d + main{padding-top:0}
 .ld.r{flex-direction:row-reverse;text-align:right}
 .ld .hs{width:52px;height:52px;border-radius:50%;background:#2c2c2e;object-fit:cover;flex:none}
 .ld .lt{min-width:0}
+.ld .ln{white-space:nowrap}
+.ld .ln.lg2{font-size:14px}
 .ln{font-family:var(--num);font-weight:700;font-size:17px;line-height:1.1}
 .ln small{color:var(--mut);font-family:-apple-system,sans-serif;font-size:10px;font-weight:600;margin-left:4px}
 .lv{font-family:var(--num);font-weight:700;font-size:21px;line-height:1.15}
@@ -186,7 +188,7 @@ details[open] summary::after{content:'⌃'}
 .phero .hs{width:68px;height:68px;border-radius:50%;background:var(--card);object-fit:cover;flex:none}
 .phero.pp{flex-direction:row-reverse;justify-content:space-between;margin-left:0}
 .phero.pp > div{flex:1;min-width:0;padding-left:10px}
-.phero.pp .hs{width:104px;height:104px}
+.phero.pp .hs{width:104px;height:104px;margin-right:28px}
 .pname{font-family:var(--num);font-weight:700;font-size:28px;line-height:1.05}
 .psub{color:var(--mut);font-size:13px;margin-top:3px}
 .grow{flex:1}
@@ -246,7 +248,7 @@ details[open] summary::after{content:'⌃'}
 .glt tbody tr:active td{background:#2a2a2e}
 .glt td.rs2 b{font-family:inherit;font-weight:400;font-size:15px}
 .glt td.rs2 .W,.glt td.rs2 .L{font-family:inherit;font-weight:700;font-size:15px;width:14px}
-.glt td.rs2 small{font-size:10px;font-weight:700}
+.glt td.rs2 small{font-size:11px;font-weight:400;font-family:inherit;color:inherit}
 td.n .slg{width:20px;height:20px;object-fit:contain;vertical-align:-4px;margin-left:6px}
 .nfx tr.tot td.n{font-family:var(--num)}
 .nfx th.n,.nfx td.n{overflow:hidden;text-overflow:ellipsis}
@@ -335,14 +337,14 @@ td.n .slg{width:20px;height:20px;object-fit:contain;vertical-align:-4px;margin-l
 .sch .rs .mu{color:var(--mut)}
 .sch .rs .sf{display:inline-block;width:24px;text-align:left;color:var(--mut);font-size:10px;margin-left:3px;font-weight:600}
 .sch .rs .live{color:var(--live);font-weight:600}
-.sch .rg{display:inline-grid;grid-template-columns:22px 72px 20px;align-items:center;vertical-align:middle}
+.sch .rg{display:inline-grid;grid-template-columns:96px 20px;align-items:center;vertical-align:middle}
 .sch .rg .W,.sch .rg .L{text-align:center !important}
 .sch td.n .pn{font-size:16.5px}
 .sch th.n,.sch td.n{min-width:78px}
 .sch .opp b{font-size:16.5px}
 .sch .opp img{width:24px;height:24px;margin:0 6px 0 0}
 .sch td{padding-top:7px;padding-bottom:7px}
-.sch .rs .sf{text-align:right;font-size:10px;margin:0 4px 0 0;width:auto}
+.sch .rs .sf{font-size:10px;margin:0 4px 0 0;width:auto;color:var(--mut);font-family:-apple-system,sans-serif;font-weight:600;vertical-align:2px}
 .sch .opp small{width:16px}
 .sch .rg .W,.sch .rg .L{width:auto;margin:0}
 .sch .sc2{display:grid;grid-template-columns:1fr 12px 1fr;align-items:center}
@@ -589,10 +591,12 @@ async function loadTeam() {
 function topView() { return state.player ? 'player' : state.game ? 'game' : state.team ? 'team' : state.lv ? 'lv' : state.search ? 'search' : 'list'; }
 function viewKey() { return topView() + (state.player ? state.player.id : state.game ? state.game.id : state.team ? state.team.id : state.lv ? state.lv.kind + state.lv.league + (state.lv.cat || '') : ''); }
 function render() {
-  const key = viewKey(), y = key === state.lastView ? window.scrollY : 0, v = topView();
+  const key = viewKey(), same = key === state.lastView, y = same ? window.scrollY : 0, v = topView();
+  const tws = same ? [...document.querySelectorAll('.tw')].map(x => x.scrollLeft) : null;
   if (v === 'player') renderPlayer(); else if (v === 'game') renderGame(); else if (v === 'team') renderTeam();
   else if (v === 'lv') renderLV(); else if (v === 'search') renderSearch(); else renderList();
   state.lastView = key;
+  if (tws) document.querySelectorAll('.tw').forEach((x, i) => { if (tws[i]) x.scrollLeft = tws[i]; });
   window.scrollTo(0, y);
 }
 const logoImg = src => src ? `<img src="${esc(src)}" alt="" onerror="this.style.visibility='hidden'">` : '<span class="ph"></span>';
@@ -860,7 +864,7 @@ function pvLeaders(g) {
     const a = top.athlete, ms = top.mainStat, val = ms ? `${ms.value} ${ms.label || ''}` : (top.displayValue || ''), sub = ms ? (top.summary || '') : '';
     const pos = (a.position && a.position.abbreviation) || '';
     return `<div class="ld ${right ? 'r' : ''}" data-player="${esc(a.id)}" data-pl="${g.league}" data-pn="${esc(a.displayName || a.shortName || '')}" data-pp="${esc(pos)}" data-pj="${esc(a.jersey || '')}" data-pt="${esc((tm && tm.name) || '')}"><img class="hs" src="${esc(hsOf(a, g.league))}" alt="" onerror="this.style.visibility='hidden'">
-      <div class="lt"><div class="ln">${right ? `<small class="pl">${esc(pos)}</small>` : ''}${esc(a.shortName || a.displayName || '')}${right ? '' : `<small>${esc(pos)}</small>`}</div><div class="lv">${esc(String(val).trim())}</div>${sub ? `<div class="ls">${esc(sub)}</div>` : ''}</div></div>`;
+      <div class="lt"><div class="ln ${String(a.shortName || a.displayName || '').length > 13 ? 'lg2' : ''}">${right ? `<small class="pl">${esc(pos)}</small>` : ''}${esc(a.shortName || a.displayName || '')}${right ? '' : `<small>${esc(pos)}</small>`}</div><div class="lv">${esc(String(val).trim())}</div>${sub ? `<div class="ls">${esc(sub)}</div>` : ''}</div></div>`;
   };
   const rows = names.slice(0, 4).map(n => {
     const ca = la.find(c => c.name === n), ch = lh.find(c => c.name === n), t = ca || ch;
@@ -1222,7 +1226,7 @@ function gamelogHTML(p) {
     return `<tr data-game="${esc(r.id)}" data-gl="${p.league}"><td class="n"><span class="pn">${m.gameDate ? esc(fmtShort(m.gameDate)) : ''}</span><small>${esc((m.atVs || '') + ' ' + opp)}</small></td><td class="rs2"><span class="${wl === 'W' || wl === 'L' ? wl : ''}">${esc(wl)}</span> <b>${esc(sm[1] || '')}</b>${sm[2] ? ` <small class="mut">${esc(sm[2])}</small>` : ''}</td>${cols.map(c => `<td>${nv(String(r.s[c[1]] == null ? '' : r.s[c[1]]).replace(/,/g, ''))}</td>`).join('')}</tr>`;
   }).join('');
   let totRow = '';
-  if (p.league !== 'nfl' && shown.length > 1) {
+  if (false) {
     const vals = i => shown.map(r => String(r.s[i] == null ? '' : r.s[i]).replace(/,/g, ''));
     const sumN = a => a.reduce((m, x) => m + (parseFloat(x) || 0), 0);
     const base = l => ({ 'FG%': 'FG', '3P%': '3PT', 'FT%': 'FT' })[l];
@@ -1458,11 +1462,11 @@ function scheduleHTML(t) {
     const mine = e.home.id === t.id ? e.home : e.away, opp = mine === e.home ? e.away : e.home;
     const d = new Date(e.date), when = DAYS[d.getDay()] + ' ' + d.getDate() + '.' + (d.getMonth() + 1) + '.';
     let res;
-    if (e.state === 'pre') res = `<span class="rg"><i></i><span class="tm">${esc(fmtTime(e.date))}</span><i></i></span>`;
+    if (e.state === 'pre') res = `<span class="rg"><span class="tm">${esc(fmtTime(e.date))}</span><i></i></span>`;
     else if (e.state === 'in') res = `<span class="live">${esc(e.short)}</span>`;
     else {
       const w = mine.winner, sfx = e.short.replace(/^Final\/?/, '');
-      res = `<span class="rg"><small class="sf">${esc(sfx)}</small><span class="sc2"><b class="${w ? '' : 'mu'}">${esc(mine.score)}</b><i>:</i><b class="${w ? 'mu' : ''}">${esc(opp.score)}</b></span><span class="${w ? 'W' : 'L'}">${w ? 'W' : 'L'}</span></span>`;
+      res = `<span class="rg"><span class="sc2"><b class="${w ? '' : 'mu'}">${sfx ? `<small class="sf">${esc(sfx)}</small>` : ''}${esc(mine.score)}</b><i>:</i><b class="${w ? 'mu' : ''}">${esc(opp.score)}</b></span><span class="${w ? 'W' : 'L'}">${w ? 'W' : 'L'}</span></span>`;
     }
     return `<tr data-game="${esc(e.id)}" data-gl="${t.league}"><td class="n"><span class="pn">${when}</span></td>
       <td class="opp"><small>${mine === e.home ? 'vs' : '@'}</small>${logoImg(opp.logo || teamLogoOf(t.league, opp))}<b>${esc(teamShortOf(t.league, opp))}</b></td><td class="rs">${res}</td></tr>`;
