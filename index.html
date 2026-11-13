@@ -1886,13 +1886,13 @@ function nbaPlayersHTML(t, tn) {
   const c = cats.find(x => /averag/i.test(x.name) && x.labels.includes('PTS')) || cats.find(x => x.labels.includes('PTS') && x.labels.includes('MIN')) || cats[0];
   const cols = NBA_ALL.map(([l, d, w]) => [c.labels.indexOf(l === '3P%' && !c.labels.includes('3P%') ? '3PT%' : l), d, w]).filter(x => x[0] >= 0);
   const gk = 'nba-all', sel = (t.sort && t.sort[gk]) || {};
-  const defK = (cols.find(x => x[1] === 'Pts') || cols[0])[0], sk = sel.k != null && cols.some(x => x[0] === sel.k) ? sel.k : defK, asc = !!sel.asc;
+  const defK = (cols.find(x => x[1] === 'Pts') || cols[0])[0], sk = sel.k != null && cols.some(x => x[0] === sel.k) ? sel.k : defK, asc = !!sel.asc, man = sel.k != null;
   const num = v => { const n = parseFloat(String(v).replace(/,/g, '')); return isNaN(n) ? -1e9 : n; };
   const rows = [...c.rows].sort((x, y) => (asc ? 1 : -1) * (num(x.vals[sk]) - num(y.vals[sk])));
   const tw = 132 + cols.reduce((a, x) => a + x[2], 0);
   const short = teamHead(t).name.split(' ').pop();
-  const trs = rows.map(r => { const a = r.a, pos = (a.position && a.position.abbreviation) || ''; return `<tr data-player="${esc(a.id)}" data-pl="nba" data-pn="${esc(a.displayName || '')}" data-pp="${esc(pos)}" data-pj="${esc(a.jersey || '')}" data-pt="${esc(tn)}"><td class="n"><span class="pn">${esc(shortNm(a.displayName || a.fullName))}</span><small>${esc(pos)}</small></td>${cols.map(x => `<td class="${x[0] === sk ? 'on' : ''}">${nv(String(r.vals[x[0]] == null ? '' : r.vals[x[0]]).replace(/,/g, ''))}</td>`).join('')}</tr>`; }).join('');
-  return `<section class="blk"><div class="tw"><table class="nfx sep" style="width:max(100%, ${tw}px)"><colgroup><col>${cols.map(x => `<col style="width:${x[2]}px">`).join('')}</colgroup><thead><tr><th class="n">${esc(short)}</th>${cols.map(x => `<th data-sort="${x[0]}" data-sg="${gk}" class="${x[0] === sk ? 'on' + (asc ? ' asc' : '') : ''}">${esc(x[1])}</th>`).join('')}</tr></thead><tbody>${trs}</tbody></table></div></section>`;
+  const trs = rows.map(r => { const a = r.a, pos = (a.position && a.position.abbreviation) || ''; return `<tr data-player="${esc(a.id)}" data-pl="nba" data-pn="${esc(a.displayName || '')}" data-pp="${esc(pos)}" data-pj="${esc(a.jersey || '')}" data-pt="${esc(tn)}"><td class="n"><span class="pn">${esc(shortNm(a.displayName || a.fullName))}</span><small>${esc(pos)}</small></td>${cols.map(x => `<td class="${man && x[0] === sk ? 'on' : ''}">${nv(String(r.vals[x[0]] == null ? '' : r.vals[x[0]]).replace(/,/g, ''))}</td>`).join('')}</tr>`; }).join('');
+  return `<section class="blk"><div class="tw"><table class="nfx sep" style="width:max(100%, ${tw}px)"><colgroup><col>${cols.map(x => `<col style="width:${x[2]}px">`).join('')}</colgroup><thead><tr><th class="n">${esc(short)}</th>${cols.map(x => `<th data-sort="${x[0]}" data-sg="${gk}" class="${man && x[0] === sk ? 'on' + (asc ? ' asc' : '') : ''}">${esc(x[1])}</th>`).join('')}</tr></thead><tbody>${trs}</tbody></table></div></section>`;
 }
 function teamStatsHTML(t) {
   if (!t.ps) return msg('Načítám…');
@@ -2378,7 +2378,8 @@ $app.addEventListener('click', ev => {
   } else if (d.cl !== undefined) {
     window._fromList = true; location.hash = '#/leaders/' + state.lv.league + '/' + (d.cl || 'x');
   } else if (d.lsort !== undefined) {
-    const v = state.lv, k = +d.lsort; v.asc = v.sk === k ? !v.asc : false; v.sk = k; render();
+    const v = state.lv, k = +d.lsort; if (v.sk0 == null) v.sk0 = v.sk;
+    if (v.sk === k && v.manual && v.asc) { v.sk = v.sk0; v.asc = false; v.manual = false; } else if (v.sk === k && v.manual) v.asc = true; else { v.sk = k; v.asc = false; v.manual = true; } render();
   } else if (d.pst) {
     state.player.pst = d.pst; if (d.pst === 'ncaa') loadNcaa(state.player); render();
   } else if (d.smode) {
@@ -2400,10 +2401,10 @@ $app.addEventListener('click', ev => {
     state.player.tab = d.ptab; render();
   } else if (d.gsort !== undefined) {
     const g = state.game; g.gsort = g.gsort || {}; const cur = g.gsort[d.gsg], k = +d.gsort;
-    g.gsort[d.gsg] = { k, asc: cur && cur.k === k ? !cur.asc : false }; render();
+    if (cur && cur.k === k && cur.asc) delete g.gsort[d.gsg]; else g.gsort[d.gsg] = { k, asc: !!(cur && cur.k === k) }; render();
   } else if (d.sort !== undefined) {
     const t = state.team; t.sort = t.sort || {}; const cur = t.sort[d.sg];
-    t.sort[d.sg] = { k: +d.sort, asc: cur && cur.k === +d.sort ? !cur.asc : false }; render();
+    const k = +d.sort; if (cur && cur.k === k && cur.asc) delete t.sort[d.sg]; else t.sort[d.sg] = { k, asc: !!(cur && cur.k === k) }; render();
   } else if (d.pvt !== undefined) {
     state.game.pvTeam = +d.pvt; render();
   } else if (d.ttab) {
