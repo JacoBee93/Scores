@@ -184,6 +184,9 @@ details[open] summary::after{content:'⌃'}
 /* hráč */
 .phero{display:flex;align-items:center;gap:14px;margin:4px 4px 14px}
 .phero .hs{width:68px;height:68px;border-radius:50%;background:var(--card);object-fit:cover;flex:none}
+.phero.pp{flex-direction:row-reverse;justify-content:space-between;margin-left:0}
+.phero.pp > div{flex:1;min-width:0}
+.phero.pp .hs{width:104px;height:104px}
 .pname{font-family:var(--num);font-weight:700;font-size:28px;line-height:1.05}
 .psub{color:var(--mut);font-size:13px;margin-top:3px}
 .grow{flex:1}
@@ -1151,7 +1154,7 @@ function renderPlayer() {
   const tab = (k, l) => `<button data-ptab="${k}" class="${p.tab === k ? 'on' : ''}">${l}</button>`;
   $app.innerHTML = `
     <header class="d"><div class="tabs"><button class="back" data-back aria-label="Zpět">‹</button><button class="home" data-home aria-label="Domů"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"><path d="M3 10.5 12 3l9 7.5"/><path d="M5.5 9v11h13V9"/><path d="M10 20v-6h4v6"/></svg></button></div></header>
-    <main><div class="phero"><img class="hs" src="https://a.espncdn.com/i/headshots/${p.league}/players/full/${esc(p.id)}.png" alt="" onerror="this.style.visibility='hidden'">
+    <main><div class="phero pp"><img class="hs" src="https://a.espncdn.com/i/headshots/${p.league}/players/full/${esc(p.id)}.png" alt="" onerror="this.style.visibility='hidden'">
       <div><div class="pname">${esc(p.name || 'Hráč')}</div><div class="psub">${esc(sub)}</div></div></div>
       <div class="dtabs sm">${tab('gl', 'Gamelog')}${tab('stats', 'Stats')}</div>
       <div class="pane t">${body}</div></main>`;
@@ -1750,7 +1753,7 @@ function standingsHTML(v, c) {
     const w = l => l === 'OPP PPG' ? 64 : ['HOME', 'AWAY', 'DIV', 'CONF', 'L10'].includes(l) ? 54 : ['PCT', 'DIFF', 'STRK', 'PPG'].includes(l) ? 50 : 40;
     const tw = 150 + use.reduce((a, x) => a + w(x[0]), 0);
     const clv = (l, x) => l === 'L10' ? String(x).replace(/,\s*\d+\s*PTS?/i, '') : x;
-    const trs = ents.map((en, i) => { const tm = en.team || {}, lg = (tm.logos && tm.logos[0] && tm.logos[0].href) || teamLogoOf(v.league, { id: tm.id, abbr: tm.abbreviation }); return `<tr class="${g.cut && i === g.cut - 1 && ents.length > g.cut ? 'cut' : ''}" data-topen="${esc(tm.id)}" data-tl="${v.league}" data-tn="${esc(tm.displayName || '')}" data-tlogo="${esc(lg)}"><td class="n"><div class="tc"><span class="rk">${g.norank ? '' : i + 1}</span>${logoImg(lg)}<span class="pn">${esc(tm.shortDisplayName || tm.name || tm.abbreviation || '')}</span></div></td>${use.map(([l, cands]) => `<td>${nv(String(clv(l, sv(en, cands) ?? '-')))}</td>`).join('')}</tr>`; }).join('');
+    const trs = ents.map((en, i) => { const tm = en.team || {}, lg = (tm.logos && tm.logos[0] && tm.logos[0].href) || teamLogoOf(v.league, { id: tm.id, abbr: tm.abbreviation }); return `<tr class="${g.cut && i === g.cut - 1 && ents.length > g.cut ? 'cut' : ''}" data-topen="${esc(tm.id)}" data-tl="${v.league}" data-tn="${esc(tm.displayName || '')}" data-tlogo="${esc(lg)}"><td class="n"><div class="tc"><span class="rk">${i + 1}</span>${logoImg(lg)}<span class="pn">${esc(tm.shortDisplayName || tm.name || tm.abbreviation || '')}</span></div></td>${use.map(([l, cands]) => `<td>${nv(String(clv(l, sv(en, cands) ?? '-')))}</td>`).join('')}</tr>`; }).join('');
     return `<section class="blk"><div class="tw"><table class="nfx sep stn" style="width:max(100%, ${tw}px)"><colgroup><col>${use.map(x => `<col style="width:${w(x[0])}px">`).join('')}</colgroup><thead><tr><th class="n">${esc(g.name)}</th>${use.map(x => `<th>${esc(x[0])}</th>`).join('')}</tr></thead><tbody>${trs}</tbody></table></div></section>`;
   }).join('');
 }
