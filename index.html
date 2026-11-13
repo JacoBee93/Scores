@@ -256,10 +256,11 @@ details[open] summary::after{content:'⌃'}
 .glt thead tr:first-child th{border-bottom:0;padding-bottom:0}
 .glt th.grp{text-align:left;padding-left:8px;color:var(--mut);font-size:10px;letter-spacing:.5px;border-bottom:0;padding-bottom:2px}
 .glt td.n small{margin-left:3px}
+.glt td.n .glo{width:20px;height:20px;object-fit:contain;vertical-align:-4px;margin-left:3px}
 .glt td.n .pn{font-size:15px}
 .glt td.rs2 b{letter-spacing:-.2px}
 .glt td.n .pn{font-size:15.5px}
-.glt tbody td:nth-child(2),.glt thead tr:last-child th:nth-child(2){position:sticky;left:80px;padding-left:0;background:var(--card);z-index:1}
+.glt tbody td:nth-child(2),.glt thead tr:last-child th:nth-child(2){position:sticky;left:74px;padding-left:0;background:var(--card);z-index:1}
 .glt td.n,.glt th.n{z-index:2}
 .glt tbody tr{cursor:pointer}
 .glt tbody tr:active td{background:#2a2a2e}
@@ -355,6 +356,7 @@ td.n .slg{width:20px;height:20px;object-fit:contain;vertical-align:-4px;margin-l
 .sch .rs .mu{color:var(--mut)}
 .sch .rs .sf{display:inline-block;width:24px;text-align:left;color:var(--mut);font-size:10px;margin-left:3px;font-weight:600}
 .sch .rs .live{color:var(--live);font-weight:600}
+.sch .rs .T{font-family:var(--num);font-size:19px;color:var(--mut);text-align:center}
 .sch .rg{display:inline-grid;grid-template-columns:96px 20px;align-items:center;vertical-align:middle}
 .sch .rg .W,.sch .rg .L{text-align:center !important}
 .sch td.n .pn{font-size:16.5px}
@@ -1266,12 +1268,12 @@ function gamelogHTML(p) {
     if (cols.length < 3) cols = labels.map((l, i) => [l, i]);
   }
   const w = l => /\//.test(l) ? 56 : String(l).length > 3 ? 50 : /^(FG|3PT|FT|TOI)$/.test(l) ? 50 : 43;
-  const tw = 80 + 82 + cols.reduce((a, c) => a + w(c[0]), 0);
+  const tw = 74 + 82 + cols.reduce((a, c) => a + w(c[0]), 0);
   const trs = shown.map(r => {
-    const m = r.m, opp = (m.opponent && (m.opponent.abbreviation || m.opponent.displayName)) || '';
+    const m = r.m, opp = (m.opponent && (m.opponent.abbreviation || m.opponent.displayName)) || '', ol = m.opponent ? dk((m.opponent.logo) || teamLogoOf(p.league, { id: m.opponent.id, abbr: m.opponent.abbreviation })) : '';
     const sm = String(m.score || '').match(/^(\S+)\s*(.*)$/) || [];
     const wl = m.gameResult || '';
-    return `<tr data-game="${esc(r.id)}" data-gl="${p.league}"><td class="n"><span class="pn">${m.gameDate ? esc(fmtShort(m.gameDate)) : ''}</span><small>${esc((m.atVs || '') + ' ' + opp)}</small></td><td class="rs2"><span class="${wl === 'W' || wl === 'L' ? wl : 'T'}">${esc(wl)}</span> <b>${esc(sm[1] || '')}</b>${sm[2] ? ` <small class="mut">${esc(sm[2])}</small>` : ''}</td>${cols.map(c => `<td>${nv(String(r.s[c[1]] == null ? '' : r.s[c[1]]).replace(/,/g, ''))}</td>`).join('')}</tr>`;
+    return `<tr data-game="${esc(r.id)}" data-gl="${p.league}"><td class="n"><span class="pn">${m.gameDate ? esc(fmtShort(m.gameDate)) : ''}</span><small>${esc(m.atVs === '@' ? '@' : 'vs')}</small>${ol ? `<img class="glo" src="${esc(ol)}" alt="${esc(opp)}" onerror="this.replaceWith(Object.assign(document.createElement('small'),{textContent:'${esc(opp)}'}))">` : `<small>${esc(opp)}</small>`}</td><td class="rs2"><span class="${wl === 'W' || wl === 'L' ? wl : 'T'}">${esc(wl)}</span> <b>${esc(sm[1] || '')}</b>${sm[2] ? ` <small class="mut">${esc(sm[2])}</small>` : ''}</td>${cols.map(c => `<td>${nv(String(r.s[c[1]] == null ? '' : r.s[c[1]]).replace(/,/g, ''))}</td>`).join('')}</tr>`;
   }).join('');
   let totRow = '';
   if (false) {
@@ -1290,7 +1292,7 @@ function gamelogHTML(p) {
     totRow = `<tr class="tot"><td class="n">Total</td><td class="rs2"></td>${tv.map(x => `<td>${nv(x)}</td>`).join('')}</tr>`;
   }
   const ghead = groups && groups.length > 1 ? `<tr><th class="n"></th><th></th>${groups.map(g => `<th class="grp" colspan="${g[1]}">${esc(g[0])}</th>`).join('')}</tr>` : '';
-  return strip + `<section class="blk" style="margin-top:6px"><div class="tw"><table class="nfx sep glt" style="width:max(100%, ${tw}px)"><colgroup><col style="width:80px"><col style="width:82px">${cols.map(c => `<col style="width:${w(c[0])}px">`).join('')}</colgroup><thead>${ghead}<tr><th class="n">Gamelog</th><th></th>${cols.map(c => `<th>${esc(c[0])}</th>`).join('')}</tr></thead><tbody>${trs}${totRow}</tbody></table></div></section>`;
+  return strip + `<section class="blk" style="margin-top:6px"><div class="tw"><table class="nfx sep glt" style="width:max(100%, ${tw}px)"><colgroup><col style="width:74px"><col style="width:82px">${cols.map(c => `<col style="width:${w(c[0])}px">`).join('')}</colgroup><thead>${ghead}<tr><th class="n">Gamelog</th><th></th>${cols.map(c => `<th>${esc(c[0])}</th>`).join('')}</tr></thead><tbody>${trs}${totRow}</tbody></table></div></section>`;
 }
 function statCats(j, league) {
   return ((j && j.categories) || []).filter(c => c.statistics && c.statistics.length).map(c => ({
@@ -1514,8 +1516,8 @@ function scheduleHTML(t) {
     if (e.state === 'pre') res = `<span class="rg"><span class="tm">${esc(fmtTime(e.date))}</span><i></i></span>`;
     else if (e.state === 'in') res = `<span class="live">${esc(e.short)}</span>`;
     else {
-      const w = mine.winner, sfx = e.short.replace(/^Final\/?/, '');
-      res = `<span class="rg"><span class="sc2"><b class="${w ? '' : 'mu'}">${sfx ? `<small class="sf">${esc(sfx)}</small>` : ''}${esc(mine.score)}</b><i>:</i><b class="${w ? 'mu' : ''}">${esc(opp.score)}</b></span><span class="${w ? 'W' : 'L'}">${w ? 'W' : 'L'}</span></span>`;
+      const tie = String(mine.score) !== '' && String(mine.score) === String(opp.score), w = mine.winner, sfx = e.short.replace(/^Final\/?/, '');
+      res = `<span class="rg"><span class="sc2"><b class="${w ? '' : 'mu'}">${sfx ? `<small class="sf">${esc(sfx)}</small>` : ''}${esc(mine.score)}</b><i>:</i><b class="${w ? 'mu' : ''}">${esc(opp.score)}</b></span><span class="${tie ? 'T' : w ? 'W' : 'L'}">${tie ? 'T' : w ? 'W' : 'L'}</span></span>`;
     }
     return `<tr data-game="${esc(e.id)}" data-gl="${t.league}"><td class="n"><span class="pn">${when}</span></td>
       <td class="opp"><small>${mine === e.home ? 'vs' : '@'}</small>${logoImg(opp.logo || teamLogoOf(t.league, opp))}<b>${esc(teamShortOf(t.league, opp))}</b></td><td class="rs">${res}</td></tr>`;
