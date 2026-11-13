@@ -19,6 +19,9 @@
   --wide:'Archivo',-apple-system,sans-serif}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
+html,body{overflow-x:clip;max-width:100%}
+.pane{overflow-x:clip}
+main,header{max-width:100vw}
 html,body{touch-action:manipulation;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;-webkit-tap-highlight-color:transparent}
 input,textarea{-webkit-user-select:text;user-select:text;font-size:16px !important}
 html,body{margin:0;background:var(--bg);color:#fff;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;font-size:16px}
@@ -155,7 +158,8 @@ td.n{text-align:left;padding-left:0;position:sticky;left:0;background:var(--card
 td.n small{color:var(--mut);font-family:-apple-system,sans-serif;font-size:10px;font-weight:600;margin-left:4px}
 .neg{position:absolute;margin-left:-.45em}
 tr[data-player]{cursor:pointer}
-tr[data-player]:active td{opacity:.6}
+tr[data-player]:active td:not(.n),tr[data-topen]:active td:not(.n){opacity:.6}
+tr[data-player]:active td.n .pn,tr[data-topen]:active td.n .pn{opacity:.6}
 .res{text-align:left;white-space:nowrap;padding:4.8px 10px 4.8px 4px}
 .wl{display:inline-block;width:21px;font-weight:700}
 .scr{display:inline-block;min-width:34px;font-variant-numeric:normal}
@@ -1620,7 +1624,7 @@ function paintSearch() {
 /* ----- standings & league stats ----- */
 const STD_COLS = {
   nfl: [['W', ['wins']], ['L', ['losses']], ['T', ['ties']], ['PCT', ['winpercent']], ['HOME', ['home']], ['AWAY', ['road', 'away']], ['DIV', ['vsdiv', 'vs. div.', 'division']], ['CONF', ['vsconf', 'vs. conf.', 'conference']], ['PF', ['pointsfor']], ['PA', ['pointsagainst']], ['DIFF', ['differential', 'pointdifferential']], ['STRK', ['streak']]],
-  nba: [['W', ['wins']], ['L', ['losses']], ['PCT', ['winpercent']], ['GB', ['gamesbehind']], ['HOME', ['home']], ['AWAY', ['road', 'away']], ['DIV', ['vsdiv', 'vs. div.', 'division']], ['CONF', ['vsconf', 'vs. conf.', 'conference']], ['PPG', ['avgpointsfor']], ['OPP PPG', ['avgpointsagainst']], ['DIFF', ['differential', 'pointdifferential']], ['STRK', ['streak']], ['L10', ['lasttengames', 'last ten games', 'l10']]],
+  nba: [['W', ['wins']], ['L', ['losses']], ['PCT', ['winpercent']], ['HOME', ['home']], ['AWAY', ['road', 'away']], ['DIV', ['vsdiv', 'vs. div.', 'division']], ['CONF', ['vsconf', 'vs. conf.', 'conference']], ['PPG', ['avgpointsfor']], ['OPP PPG', ['avgpointsagainst']], ['DIFF', ['differential', 'pointdifferential']], ['STRK', ['streak']], ['L10', ['lasttengames', 'last ten games', 'l10']]],
   nhl: [['PTS', ['points']], ['GP', ['gamesplayed']], ['W', ['wins']], ['L', ['losses']], ['OTL', ['otlosses', 'overtimelosses']], ['RW', ['regulationwins']], ['ROW', ['regulationandovertimewins', 'row']], ['GF', ['pointsfor']], ['GA', ['pointsagainst']], ['DIFF', ['differential', 'pointdifferential']], ['HOME', ['home']], ['AWAY', ['road', 'away']], ['L10', ['lasttengames', 'last ten games', 'l10']], ['STRK', ['streak']]]
 };
 state.lvC = {}; state.athC = {};
@@ -1635,7 +1639,7 @@ async function loadLV() {
       await ensureTeams(v.league).catch(() => {});
       const j = await getJson('https://site.api.espn.com/apis/v2/sports/' + L.path + '/standings?level=' + (v.mode === 'div' ? 3 : 2));
       const groups = [];
-      const walk = n => { if (n.standings && n.standings.entries && n.standings.entries.length) groups.push({ name: n.name || n.abbreviation || '', entries: n.standings.entries }); (n.children || []).forEach(walk); };
+      const walk = n => { if (n.standings && n.standings.entries && n.standings.entries.length) groups.push({ name: (v.mode === 'conf' && v.league === 'nfl' && n.abbreviation) ? n.abbreviation : (n.name || n.abbreviation || ''), entries: n.standings.entries }); (n.children || []).forEach(walk); };
       walk(j);
       state.lvC[key] = { groups };
     } else {
@@ -1645,6 +1649,11 @@ async function loadLV() {
         try { j = await getJson(u); if (j && j.categories && j.categories.length) break; } catch (e) {}
       }
       const cats = ((j && j.categories) || []).filter(c => c.leaders && c.leaders.length).map(c => ({ name: c.name, title: c.displayName || c.name, rows: c.leaders.slice(0, 5).map(l => ({ val: l.displayValue != null ? l.displayValue : l.value, ref: l.athlete && l.athlete.$ref, tid: ((l.team && l.team.$ref) || '').match(/teams\/(\d+)/), a: null })) }));
+      if (v.league === 'nfl') {
+        const ORD = [/^passingYards$/i, /^passingTouchdowns$/i, /^rushingYards$/i, /^rushingTouchdowns$/i, /^receivingYards$/i, /^receivingTouchdowns$/i, /^totalTackles$/i, /^sacks$/i, /^interceptions$/i, /^passesDefended$/i, /^fieldGoals?Made$/i, /long.*fieldGoal|fieldGoal.*long/i];
+        const picked = ORD.map(re => cats.find(c => re.test(String(c.name)))).filter(Boolean);
+        if (picked.length >= 4) { cats.length = 0; picked.forEach(c => cats.push(c)); }
+      }
       const all = cats.flatMap(c => c.rows).filter(r => r.ref);
       state.lvC[key] = { cats, loading: true };
       let i = 0;
@@ -1702,7 +1711,7 @@ function byAthQuery(league, cat) {
     if (/^rushing/i.test(c)) return ['offense:rushing', 'rushing.' + c];
     if (/^receiv/i.test(c)) return ['offense:receiving', 'receiving.' + c];
     if (/interception/i.test(c)) return ['defense', 'defensiveInterceptions.interceptions'];
-    if (/sack|tackle|fumble|defens/i.test(c)) return ['defense', 'defensive.' + c];
+    if (/sack|tackle|fumble|defens|passesDefended/i.test(c)) return ['defense', 'defensive.' + c];
     if (/kick|field ?goal|punt/i.test(c)) return ['specialTeams', ''];
     return ['offense:passing', 'passing.passingYards'];
   }
@@ -1788,7 +1797,7 @@ function renderLeaders() {
   };
   const open = el => {
     const lg = el.dataset.league; if (!LEAGUES[lg]) return;
-    window._lpAt = Date.now(); close(); haptic();
+    window._lpAt = Date.now(); close();
     const r = el.getBoundingClientRect();
     const o = document.createElement('div'); o.className = 'lpo';
     const m = document.createElement('div'); m.className = 'lpm';
