@@ -352,7 +352,8 @@ td.n .slg{width:20px;height:20px;object-fit:contain;vertical-align:-4px;margin-l
 .fx td.n{overflow:hidden;text-overflow:ellipsis}
 .stt td.n{min-width:0}
 .mu{color:var(--mut)}
-.per{border-bottom:1px solid #3a3a3c;padding-bottom:6px}
+.per{border-bottom:2px solid #3a3a3c;padding-bottom:0}
+.per > .drv:last-child,.per > .dpl:last-child{border-bottom:0}
 .per:last-child{border-bottom:0}
 .phd{font-family:var(--wide);font-stretch:112%;font-weight:800;font-size:12px;letter-spacing:.5px;padding:16px 0 4px}
 .pname.up{text-transform:uppercase}
@@ -1288,12 +1289,12 @@ function gamelogHTML(p) {
     if (cols.length < 3) cols = labels.map((l, i) => [l, i]);
   }
   const w = l => /\//.test(l) ? 56 : String(l).length > 3 ? 50 : /^(FG|3PT|FT|TOI)$/.test(l) ? 50 : 43;
-  const tw = 84 + 80 + cols.reduce((a, c) => a + w(c[0]), 0);
+  const tw = 84 + 92 + cols.reduce((a, c) => a + w(c[0]), 0);
   const trs = shown.map(r => {
     const m = r.m, opp = (m.opponent && (m.opponent.abbreviation || m.opponent.displayName)) || '', ol = m.opponent ? dk((m.opponent.logo) || teamLogoOf(p.league, { id: m.opponent.id, abbr: m.opponent.abbreviation })) : '';
     const sm = String(m.score || '').match(/^(\S+)\s*(.*)$/) || [];
     const wl = m.gameResult || '';
-    return `<tr data-game="${esc(r.id)}" data-gl="${p.league}"><td class="n"><span class="pn">${m.gameDate ? esc(fmtShort(m.gameDate)) : ''}</span><small>${esc(m.atVs === '@' ? '@' : 'vs')}</small>${ol ? `<img class="glo" src="${esc(ol)}" alt="${esc(opp)}" onerror="this.replaceWith(Object.assign(document.createElement('small'),{textContent:'${esc(opp)}'}))">` : `<small>${esc(opp)}</small>`}</td><td class="rs2"><span class="${wl === 'W' || wl === 'L' ? wl : 'T'}">${esc(wl)}</span> <b class="gsc">${esc(sm[1] || '')}${sm[2] ? `<sup>${esc(sm[2])}</sup>` : ''}</b></td>${cols.map(c => `<td>${nv(String(r.s[c[1]] == null ? '' : r.s[c[1]]).replace(/,/g, ''))}</td>`).join('')}</tr>`;
+    return `<tr data-game="${esc(r.id)}" data-gl="${p.league}"><td class="n"><span class="pn">${m.gameDate ? esc(fmtShort(m.gameDate)) : ''}</span><small>${esc(m.atVs === '@' ? '@' : 'vs')}</small>${ol ? `<img class="glo" src="${esc(ol)}" alt="${esc(opp)}" onerror="this.replaceWith(Object.assign(document.createElement('small'),{textContent:'${esc(opp)}'}))">` : `<small>${esc(opp)}</small>`}</td><td class="rs2"><span class="${wl === 'W' || wl === 'L' ? wl : 'T'}">${esc(wl)}</span> <b>${esc(sm[1] || '')}</b>${sm[2] ? ` <small class="mut">${esc(sm[2])}</small>` : ''}</td>${cols.map(c => `<td>${nv(String(r.s[c[1]] == null ? '' : r.s[c[1]]).replace(/,/g, ''))}</td>`).join('')}</tr>`;
   }).join('');
   let totRow = '';
   if (false) {
@@ -1312,7 +1313,7 @@ function gamelogHTML(p) {
     totRow = `<tr class="tot"><td class="n">Total</td><td class="rs2"></td>${tv.map(x => `<td>${nv(x)}</td>`).join('')}</tr>`;
   }
   const ghead = groups && groups.length > 1 ? `<tr><th class="n gh" colspan="2"></th>${groups.map(g => `<th class="grp" colspan="${g[1]}">${esc(g[0])}</th>`).join('')}</tr>` : '';
-  return strip + `<section class="blk" style="margin-top:6px"><div class="tw"><table class="nfx sep glt" style="width:max(100%, ${tw}px)"><colgroup><col style="width:84px"><col style="width:80px">${cols.map(c => `<col style="width:${w(c[0])}px">`).join('')}</colgroup><thead>${ghead}<tr><th class="n">Gamelog</th><th></th>${cols.map(c => `<th>${esc(c[0])}</th>`).join('')}</tr></thead><tbody>${trs}${totRow}</tbody></table></div></section>`;
+  return strip + `<section class="blk" style="margin-top:6px"><div class="tw"><table class="nfx sep glt" style="width:max(100%, ${tw}px)"><colgroup><col style="width:84px"><col style="width:92px">${cols.map(c => `<col style="width:${w(c[0])}px">`).join('')}</colgroup><thead>${ghead}<tr><th class="n">Gamelog</th><th></th>${cols.map(c => `<th>${esc(c[0])}</th>`).join('')}</tr></thead><tbody>${trs}${totRow}</tbody></table></div></section>`;
 }
 function statCats(j, league) {
   return ((j && j.categories) || []).filter(c => c.statistics && c.statistics.length).map(c => ({
@@ -1433,7 +1434,7 @@ function careerHTML(p, cats) {
   const pv = (c, pm, k) => { const nm = c.names && c.names[k]; if (!nm || !pm) return null; if (pm[nm] != null) return pm[nm]; if (/-/.test(nm)) { const q = nm.split('-'); if (pm[q[0]] != null && pm[q[1]] != null) { const f = x => /\./.test(String(x)) ? (+x).toFixed(1) : x; return f(pm[q[0]]) + '-' + f(pm[q[1]]); } } return null; };
   const out = list.map(c => {
     const cols = p.league === 'nba' ? NBA_ALL.map(([l, d, w]) => [c.labels.indexOf(l === '3P%' && !c.labels.includes('3P%') ? '3PT%' : l), d, w]).filter(x => x[0] >= 0)
-      : c.labels.map((l, k) => [k, dl(l, p.league), String(l).length > 4 ? 66 : 58]);
+      : c.labels.map((l, k) => [k, dl(l, p.league), 56]);
     const tw = 112 + cols.reduce((a, x) => a + x[2], 0);
     let rows, tot = null;
     if (mode !== 'post') {
@@ -1454,8 +1455,8 @@ function careerHTML(p, cats) {
     const title = p.league === 'nba' ? (mode === 'reg' ? 'Season' : 'Playoffs') : catName(c.title, c.labels, p.league);
     const sk = mode + '|' + c.title, so = (p.csort || {})[sk];
     if (so) { const num = x => { const n = parseFloat(String(x == null ? '' : x).replace(/,/g, '')); return isNaN(n) ? -1e12 : n; }; rows = [...rows].sort((a, b) => (so.asc ? 1 : -1) * (num(a.v[so.i]) - num(b.v[so.i]))); }
-    const tw2 = 92 + cols.reduce((a, x) => a + x[2], 0);
-    return `<section class="blk"><div class="tw"><table class="nfx sep" style="width:max(100%, ${tw2}px)"><colgroup><col style="width:92px">${cols.map(x => `<col style="width:${x[2]}px">`).join('')}</colgroup><thead><tr><th class="n">${esc(title)}</th>${cols.map((x, i) => `<th data-csort="${i}" data-cs="${esc(sk)}" class="${so && so.i === i ? 'on' : ''}">${esc(x[1])}</th>`).join('')}</tr></thead><tbody>${rows.map(r => `<tr><td class="n"><span class="pn">${esc(r.n)}</span>${mode === 'ncaa' ? (r.tid ? `<img class="slg" src="https://a.espncdn.com/i/teamlogos/ncaa/500-dark/${esc(r.tid)}.png" alt="" onerror="if(!this.dataset.f){this.dataset.f=1;this.src=this.src.replace('500-dark','500')}else this.remove()">` : '') : seasonLogo(p.league, r)}</td>${r.v.map((v, i) => `<td class="${so && so.i === i ? 'on' : ''}">${nv(clean(v))}</td>`).join('')}</tr>`).join('')}${tot ? `<tr class="tot"><td class="n">Career</td>${tot.map(v => `<td>${nv(clean(v))}</td>`).join('')}</tr>` : ''}</tbody></table></div></section>`;
+    const tw2 = 80 + cols.reduce((a, x) => a + x[2], 0);
+    return `<section class="blk"><div class="tw"><table class="nfx sep" style="width:max(100%, ${tw2}px)"><colgroup><col style="width:80px">${cols.map(x => `<col style="width:${x[2]}px">`).join('')}</colgroup><thead><tr><th class="n">${esc(title)}</th>${cols.map((x, i) => `<th data-csort="${i}" data-cs="${esc(sk)}" class="${so && so.i === i ? 'on' : ''}">${esc(x[1])}</th>`).join('')}</tr></thead><tbody>${rows.map(r => `<tr><td class="n"><span class="pn">${esc(r.n)}</span>${mode === 'ncaa' ? (r.tid ? `<img class="slg" src="https://a.espncdn.com/i/teamlogos/ncaa/500-dark/${esc(r.tid)}.png" alt="" onerror="if(!this.dataset.f){this.dataset.f=1;this.src=this.src.replace('500-dark','500')}else this.remove()">` : '') : seasonLogo(p.league, r)}</td>${r.v.map((v, i) => `<td class="${so && so.i === i ? 'on' : ''}">${nv(clean(v))}</td>`).join('')}</tr>`).join('')}${tot ? `<tr class="tot"><td class="n">Career</td>${tot.map(v => `<td>${nv(clean(v))}</td>`).join('')}</tr>` : ''}</tbody></table></div></section>`;
   }).join('');
   if (!out) return seg + msg(mode === 'ncaa' ? 'Statistiky z NCAA nejsou k dispozici.' : mode === 'post' ? (p.postDone ? 'Žádné zápasy v play-off.' : 'Načítám play-off…') : 'Statistiky nejsou k dispozici.');
   return seg + out;
