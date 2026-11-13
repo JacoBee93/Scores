@@ -148,7 +148,7 @@ header.d + main{padding-top:0}
 .l5r img,.l5r .ph{width:24px;height:24px;object-fit:contain;flex:none}
 .l5r .rs2{margin-left:auto;font-family:var(--num);font-size:17px;white-space:nowrap}
 .l5r .rs2 b{font-weight:700}.l5r .rs2 i{font-style:normal;color:var(--mut)}
-.tw{overflow-x:auto;-webkit-overflow-scrolling:touch;overscroll-behavior-x:contain;touch-action:pan-x pan-y}
+.tw{overflow-x:auto;-webkit-overflow-scrolling:touch;overscroll-behavior-x:none;touch-action:pan-x pan-y}
 #app{overflow-x:hidden;overflow-x:clip}
 table{border-collapse:separate;border-spacing:0;width:100%;white-space:nowrap}
 th{color:#fff;font-weight:700;font-size:11px;text-align:center;padding:12px 5.6px 14px;border-bottom:1px solid #3a3a3c}
@@ -412,7 +412,7 @@ function normTeam(c) {
   const rec = (c.records && c.records[0] && c.records[0].summary) ||
               (Array.isArray(c.record) && c.record[0] && c.record[0].displayValue) || '';
   return { id: t.id, abbr: t.abbreviation || '', name: t.shortDisplayName || t.displayName || t.name || '',
-    logo: t.logo || (t.logos && t.logos[0] && t.logos[0].href) || '',
+    logo: dk(t.logo || (t.logos && t.logos[0] && t.logos[0].href) || ''),
     score: score != null ? String(score) : '', winner: !!c.winner, record: rec };
 }
 function normEvent(ev) {
@@ -501,7 +501,7 @@ function parseTeams(j) {
   const add = tm => {
     if (tm && tm.id && !out.some(x => x.id === String(tm.id)))
       out.push({ id: String(tm.id), name: tm.displayName || '', abbr: tm.abbreviation || '', loc: tm.location || '', short: tm.shortDisplayName || tm.name || '', slug: tm.slug || '',
-        logo: tm.logo || (tm.logos && tm.logos[0] && tm.logos[0].href) || '' });
+        logo: dk(tm.logo || (tm.logos && tm.logos[0] && tm.logos[0].href) || '') });
   };
   (((j.sports || [])[0] || {}).leagues || []).forEach(l => (l.teams || []).forEach(t => add(t.team || t)));
   if (!out.length) (j.teams || []).forEach(t => add(t.team || t));
@@ -596,9 +596,11 @@ function render() {
   if (v === 'player') renderPlayer(); else if (v === 'game') renderGame(); else if (v === 'team') renderTeam();
   else if (v === 'lv') renderLV(); else if (v === 'search') renderSearch(); else renderList();
   state.lastView = key;
+  $app.querySelectorAll('img[src*="/teamlogos/"]').forEach(im => { const d = dk(im.getAttribute('src')); if (d !== im.getAttribute('src')) im.setAttribute('src', d); });
   if (tws) document.querySelectorAll('.tw').forEach((x, i) => { if (tws[i]) x.scrollLeft = tws[i]; });
   window.scrollTo(0, y);
 }
+const dk = u => String(u || '').replace(/(\/teamlogos\/\w+\/)500\/([\w-]+\.png)/, '$1500-dark/$2');
 const logoImg = src => src ? `<img src="${esc(src)}" alt="" onerror="this.style.visibility='hidden'">` : '<span class="ph"></span>';
 
 function renderList() {
@@ -821,7 +823,6 @@ async function loadSeasonLeaders(g) {
       try {
         const a = await getJson(https(l.athlete.$ref));
         const dv = String(l.displayValue != null ? l.displayValue : l.value);
-        if (title === 'Plus/Minus' && !(parseFloat(dv) > 0)) return null;
         let sub = '';
         if (g.league === 'nfl' && l.statistics && l.statistics.$ref && /Yards/.test(title)) {
           try {
@@ -1315,6 +1316,7 @@ function nflRelevant(pos, title) {
 function seasonLogo(league, r) {
   const ab = /^[A-Z]{2,4}$/.test(String(r.sub || '')) ? r.sub : '';
   const u = teamLogoOf(league, { id: r.tid, abbr: ab });
+  if (!r.tid && !ab) return `<small class="tot2">TOT</small>`;
   return u ? `<img class="slg" src="${esc(u)}" alt="" onerror="this.replaceWith(Object.assign(document.createElement('small'),{textContent:'${esc(ab)}'}))">` : (ab ? `<small>${esc(ab)}</small>` : '');
 }
 function careerHTML(p, cats) {
@@ -1447,7 +1449,7 @@ function teamShortOf(league, tm) {
 }
 function teamLogoOf(league, tm) {
   const x = (state.teamList[league] || []).find(y => y.id === String(tm.id));
-  return (x && x.logo) || (tm.abbr ? `https://a.espncdn.com/i/teamlogos/${league}/500/${String(tm.abbr).toLowerCase()}.png` : '');
+  return dk((x && x.logo) || (tm.abbr ? `https://a.espncdn.com/i/teamlogos/${league}/500/${String(tm.abbr).toLowerCase()}.png` : ''));
 }
 function scheduleHTML(t) {
   const evs = t.events || [];
@@ -2068,6 +2070,8 @@ if (/^#\/(game|team|search|player)/.test(location.hash)) route(); else loadList(
 document.addEventListener('touchmove', e => { if (e.touches.length > 1) e.preventDefault(); }, { passive: false });
 
 document.addEventListener('scroll', e => { const t = e.target; if (t && t.nodeType === 1 && (t.id === 'app' || t.classList.contains('pane') || t.tagName === 'MAIN') && t.scrollLeft) t.scrollLeft = 0; }, { capture: true, passive: true });
+
+document.addEventListener('error', e => { const im = e.target; if (im && im.tagName === 'IMG' && /\/500-dark\//.test(im.src) && !im.dataset.fb) { im.dataset.fb = 1; e.stopImmediatePropagation(); im.src = im.src.replace('/500-dark/', '/500/'); } }, true);
 </script>
 </body>
 </html>
