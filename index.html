@@ -422,7 +422,7 @@ body{min-height:100vh}
 .gl2 .glr b:first-of-type{text-align:right}
 .gl2 .glr b:last-of-type{text-align:left}
 .gl2 .glr i{font-style:normal;text-align:center}
-.gl2 td.gr .glr .W,.gl2 td.gr .glr .L,.gl2 td.gr .glr .T{width:auto;margin:0;text-align:right}
+.gl2 td.gr .glr .W,.gl2 td.gr .glr .L,.gl2 td.gr .glr .T{width:auto;margin:0;text-align:center}
 .nfx tr.hid{display:none}
 .nfx tr.ctot{cursor:pointer}
 .nfx tr.csub td{background:#232326}
@@ -698,7 +698,7 @@ td.n .slg{width:20px;height:20px;object-fit:contain;vertical-align:-6px;margin-l
 .sch .rg.rgw:not(.w3) .sc2{grid-template-columns:24px 8px 24px}
 .sch .rg.rgw:not(.w3) .sf{margin-right:-2px !important}
 .sch .rg.rgw .sf{margin:0 !important;width:auto !important;text-align:right;vertical-align:0}
-.sch .rg.rgw .W,.sch .rg.rgw .L,.sch .rg.rgw .T{text-align:right !important}
+.sch .rg.rgw .W,.sch .rg.rgw .L,.sch .rg.rgw .T{text-align:center !important}
 .sch td.rs{overflow:visible}
 .sch .rg .W,.sch .rg .L{width:auto;margin:0}
 .sch .sc2{display:grid;grid-template-columns:1fr 12px 1fr;align-items:center}
@@ -2674,8 +2674,9 @@ async function teamPsFast(t, all0, base, catNm) {
   const out = [], hit = new Set();
   all.forEach(a => { const m = M[a.id]; if (!m) return;
     tcats.forEach(c => { const vals = c.names.map(n => val(m, n)), spec = c.names.map((n, k) => [n, vals[k]]).filter(x => !GEN.test(x[0])), ok = spec.filter(x => x[1] != null).length;
-      if (!spec.length || ok / spec.length < .7) return;
-      if (!spec.some(x => x[1] != null && parseFloat(String(x[1]).replace(/,/g, '')) !== 0)) return;
+      const num = v => { const n = parseFloat(String(v == null ? '' : v).replace(/,/g, '')); return isNaN(n) ? null : n; };
+      if (!spec.length || spec.filter(x => num(x[1]) != null).length / spec.length < .5) return;
+      if (!spec.some(x => { const n = num(x[1]); return n != null && n !== 0; })) return;
       hit.add(c.title); const nm = catNm(c);
       out.push({ a, cat: nm + '|' + c.labels.join(','), name: nm, labels: c.labels, names: c.names, season: seasonN, vals: vals.map(v => v == null ? '' : String(v)) }); }); });
   if (!out.length) return null;
