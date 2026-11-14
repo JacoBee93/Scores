@@ -6,7 +6,7 @@
 <meta name="theme-color" content="#000000">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Score">
 <link rel="apple-touch-icon" href="icon.png">
 <link rel="manifest" href="manifest.webmanifest">
@@ -110,6 +110,7 @@ header.d + main{padding-top:0}
 .dtabs.sm button{font-size:13px;letter-spacing:.3px}
 .dtabs button{font-family:var(--wide);font-weight:800;font-stretch:105%}
 .dtabs.five{gap:0;justify-content:space-between;padding:0 12px}
+.dtabs.even{gap:0;justify-content:space-between;padding:0 20px}
 .dtabs.five button{font-size:11.5px;letter-spacing:0;font-stretch:100%}
 .pane{background:var(--card);margin:0 -16px 24px;padding:30px 16px 32px}
 .pane.t{padding-top:10px}
@@ -331,7 +332,10 @@ header [data-refresh]{display:none !important}
 #fhome{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(env(safe-area-inset-bottom) + 12px);z-index:120;width:96px;height:36px;border-radius:18px;background:rgba(58,58,60,.82);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);color:#fff;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 16px rgba(0,0,0,.45)}
 #fhome[hidden]{display:none}
 #fhome:active{transform:translateX(-50%) scale(.94)}
-main{padding-bottom:64px}
+main{padding-bottom:0}
+.pane{padding-bottom:110px !important;min-height:calc(100vh - 200px)}
+html{background:var(--card)}
+body{min-height:100vh}
 #ptr{position:fixed;left:50%;top:calc(env(safe-area-inset-top) + 6px);z-index:130;width:38px;height:38px;border-radius:50%;background:#2c2c2e;color:var(--mut);display:flex;align-items:center;justify-content:center;opacity:0;transform:translate(-50%,0);pointer-events:none;box-shadow:0 4px 12px rgba(0,0,0,.4);transition:opacity .15s}
 #ptr.ready{color:#fff}
 #ptr.spin{opacity:1 !important;color:#fff;animation:ptrs .7s linear infinite}
@@ -356,7 +360,7 @@ main{padding-bottom:64px}
 .gl2 th,.gl2 td{white-space:nowrap;overflow:hidden;text-overflow:clip;text-align:center;padding:0 3px}
 .gl2 .gh1 th{font-size:11.5px;font-weight:800;text-transform:uppercase;letter-spacing:.4px;padding:4px 3px 4px;border-bottom:1px solid #3a3a3c;color:#fff;height:auto}
 .gl2 .gh1 th.gtt{text-align:left;padding-left:0;font-family:var(--wide);font-stretch:105%}
-.gl2 .gh1 th.grp{text-align:center;color:#fff}
+.gl2 .gh1 th.grp{text-align:left;padding-left:6px;color:#fff}
 .gl2 .gh2 th{font-size:11px;font-weight:700;text-transform:uppercase;padding:7px 3px;border-bottom:1px solid #3a3a3c;height:auto;color:#fff}
 .gl2 .gh2 th.l{text-align:left;padding-left:0}
 .gl2 .gh2 th[data-glsort]{cursor:pointer}
@@ -635,7 +639,8 @@ td.n .slg{width:20px;height:20px;object-fit:contain;vertical-align:-6px;margin-l
 .sch .rs .sf.sfb{margin:0 4px 0 0}
 .sch .rs .sf{font-size:10px;margin:0 0 0 4px;width:auto;color:var(--mut);font-family:-apple-system,sans-serif;font-weight:600;vertical-align:2px}
 .sch .opp small{width:18px;margin-right:12px}
-.sch .rg.rgw{grid-template-columns:20px 96px}
+.sch .rg.rgw{grid-template-columns:20px 72px;column-gap:6px}
+.sch .rg.rgw .sc2{grid-template-columns:30px 10px 32px}
 .sch .rg .W,.sch .rg .L{width:auto;margin:0}
 .sch .sc2{display:grid;grid-template-columns:1fr 12px 1fr;align-items:center}
 .sch .sc2 b{font-size:18px;font-variant-numeric:tabular-nums}
@@ -707,36 +712,49 @@ function tabHTML(k) {
   return '';
 }
 (() => {
-  let sx = null, sy = 0, hz = false, pane = null, tw = null, gh = [], W = 0, bs = [], cur = -1, st0 = 0, lsx = null, lsy = 0;
-  document.addEventListener('touchend', e => { if (lsx == null) return; const t = e.changedTouches[0], dx = t.clientX - lsx, dy = t.clientY - lsy; lsx = null;
-    if (Math.abs(dx) < 60 || Math.abs(dy) > Math.abs(dx) * .6) return;
-    const items = [...$app.querySelectorAll('.dy')], i = items.findIndex(b => b.classList.contains('on')), j = i + (dx < 0 ? 1 : -1);
-    if (i < 0 || j < 0 || j >= items.length) return; window._slide = dx < 0 ? 1 : -1; window._slideSel = 'main'; items[j].click(); }, { passive: true });
+  let S = null, raf = 0;
+  const pop = () => document.getElementById('wpov') || document.getElementById('brpop') || document.getElementById('artpop');
   const keyOf = b => b && (b.dataset.tab || b.dataset.ptab || b.dataset.ttab);
-  const clear = () => { gh.forEach(x => x.remove()); gh = []; };
-  const setX = (x, anim) => { [pane, ...gh].forEach(el => { if (!el) return; el.style.transition = anim ? 'transform .22s cubic-bezier(.2,.7,.3,1)' : ''; }); if (pane) pane.style.transform = x ? `translateX(${x}px)` : ''; gh.forEach(el => el.style.transform = `translateX(${x + (+el.dataset.off) * W}px)`); };
-  document.addEventListener('touchstart', e => { const t = e.target; sx = null; hz = false; if (e.touches.length !== 1 || document.getElementById('wpov') || document.getElementById('brpop') || document.getElementById('artpop')) return;
-    if (topView() === 'list' && state.league !== 'fav' && t.closest && t.closest('main') && !t.closest('.dstrip, .tabs, header')) { lsx = e.touches[0].clientX; lsy = e.touches[0].clientY; return; }
-    if (!t.closest || !t.closest('.pane') || t.closest('.brsw, .mstrip, .wpw, .rkw, .ysel, .ylist, .scf, .cmpr, input, .ghost')) return;
-    bs = [...$app.querySelectorAll('.dtabs button')]; if (bs.length < 2) return; cur = bs.findIndex(b => b.classList.contains('on')); if (cur < 0) return;
-    sx = e.touches[0].clientX; sy = e.touches[0].clientY; pane = t.closest('.pane'); tw = t.closest('.tw'); st0 = tw ? tw.scrollLeft : 0; }, { passive: true });
-  document.addEventListener('touchmove', e => { if (sx == null) return; const t = e.touches[0], dx = t.clientX - sx, dy = t.clientY - sy;
-    if (!hz) {
-      if (Math.abs(dy) > 10 && Math.abs(dy) > Math.abs(dx)) { sx = null; return; }
+  const apply = () => { raf = 0; if (!S || !S.hz) return; const x = S.x;
+    S.el.style.transform = `translate3d(${x}px,0,0)`; S.gh.forEach(g => g.style.transform = `translate3d(${x + g._off * S.W}px,0,0)`);
+    if (S.strip) S.strip.scrollLeft = S.sb - (x / S.W) * S.iw; };
+  const anim = (st, to, ms, done) => { const els = [st.el, ...st.gh];
+    els.forEach(e => { e.style.transition = `transform ${ms}ms cubic-bezier(.2,.8,.2,1)`; });
+    st.el.style.transform = `translate3d(${to}px,0,0)`; st.gh.forEach(g => g.style.transform = `translate3d(${to + g._off * st.W}px,0,0)`);
+    if (st.strip) { const tgt = st.sb - (to / st.W) * st.iw; st.strip.scrollTo({ left: tgt, behavior: 'smooth' }); }
+    setTimeout(() => { done && done(); }, ms + 10); };
+  const cleanup = st => { st.gh.forEach(g => g.remove()); if (st.el) { st.el.style.transition = ''; st.el.style.transform = ''; st.el.style.willChange = ''; } };
+  const ghost = (st, html, off) => { const g = document.createElement('div'); g.className = st.cls + ' ghost'; g._off = off;
+    g.style.cssText = `position:absolute;top:${st.el.offsetTop}px;left:${st.el.offsetLeft}px;width:${st.W}px;min-height:${Math.max(st.el.offsetHeight, window.innerHeight)}px;margin:0;pointer-events:none;will-change:transform;transform:translate3d(${off * st.W}px,0,0)`;
+    g.innerHTML = html; st.el.parentNode.appendChild(g); st.gh.push(g); };
+  document.addEventListener('touchstart', e => { S = null; if (e.touches.length !== 1 || pop()) return; const t = e.target; if (!t.closest) return;
+    const v = topView(), x = e.touches[0].clientX, y = e.touches[0].clientY, base = { x0: x, y0: y, t0: Date.now(), x: 0, hz: false, gh: [] };
+    if (v === 'list') { if (state.league === 'fav' || t.closest('header, #fhome, #ptr')) return; const items = [...$app.querySelectorAll('.dy')], cur = items.findIndex(b => b.classList.contains('on')); if (cur < 0) return;
+      S = Object.assign(base, { mode: 'day', el: $app.querySelector('main'), cls: '', items, cur }); return; }
+    if (!t.closest('.pane') || t.closest('.brsw, .mstrip, .wpw, .rkw, .ysel, .ylist, .scf, .cmpr, input, .ghost')) return;
+    const bs = [...$app.querySelectorAll('.dtabs button')]; if (bs.length < 2) return; const cur = bs.findIndex(b => b.classList.contains('on')); if (cur < 0) return;
+    const tw = t.closest('.tw'); S = Object.assign(base, { mode: 'tab', el: t.closest('.pane'), cls: 'pane t', items: bs, cur, tw, st0: tw ? tw.scrollLeft : 0 }); }, { passive: true });
+  document.addEventListener('touchmove', e => { if (!S) return; const t = e.touches[0], dx = t.clientX - S.x0, dy = t.clientY - S.y0;
+    if (!S.hz) {
+      if (Math.abs(dy) > 10 && Math.abs(dy) > Math.abs(dx)) { S = null; return; }
       if (Math.abs(dx) < 8) return;
-      if (tw && tw.scrollWidth > tw.clientWidth + 2) { const atL = st0 <= 1, atR = st0 >= tw.scrollWidth - tw.clientWidth - 1; if (!((dx > 0 && atL) || (dx < 0 && atR))) { sx = null; return; } }
-      hz = true; W = pane.offsetWidth; pane.parentNode.style.position = 'relative';
-      [[cur - 1, -1], [cur + 1, 1]].forEach(([k, off]) => { if (k < 0 || k >= bs.length) return; const g = document.createElement('div'); g.className = 'pane t ghost'; g.dataset.off = off;
-        g.style.cssText = `position:absolute;top:${pane.offsetTop}px;left:${pane.offsetLeft}px;width:${W}px;min-height:${pane.offsetHeight}px;margin:0;pointer-events:none`; g.innerHTML = tabHTML(keyOf(bs[k])); pane.parentNode.appendChild(g); gh.push(g); });
+      if (S.tw && S.tw.scrollWidth > S.tw.clientWidth + 2) { const atL = S.st0 <= 1, atR = S.st0 >= S.tw.scrollWidth - S.tw.clientWidth - 1; if (!((dx > 0 && atL) || (dx < 0 && atR))) { S = null; return; } }
+      S.hz = true; S.W = S.el.offsetWidth; S.el.parentNode.style.position = 'relative'; S.el.style.willChange = 'transform'; S.x0 = t.clientX;
+      [[S.cur - 1, -1], [S.cur + 1, 1]].forEach(([k, off]) => { if (k < 0 || k >= S.items.length) return;
+        let html = '';
+        if (S.mode === 'tab') html = tabHTML(keyOf(S.items[k]));
+        else { const n = neighborKeys()[off < 0 ? 0 : 1], ev = n && state.dayC[n.key]; html = Array.isArray(ev) ? (ev.length ? ev.map(cardHTML).join('') : msg('No games on this day.')) : msg('Loading…'); }
+        ghost(S, html, off); });
+      if (S.mode === 'day') { S.strip = document.getElementById('strip'); if (S.strip) { S.sb = S.strip.scrollLeft; S.iw = (S.items[1] ? S.items[1].offsetLeft - S.items[0].offsetLeft : 70); S.strip.style.scrollBehavior = 'auto'; } }
+      return;
     }
-    let x = dx; if ((dx > 0 && cur === 0) || (dx < 0 && cur === bs.length - 1)) x = dx * .25;
-    setX(x, false); }, { passive: true });
-  document.addEventListener('touchend', e => { if (sx == null) return; const t = e.changedTouches[0], dx = t.clientX - sx; sx = null;
-    if (!hz) return;
-    const j = cur + (dx < 0 ? 1 : -1), go = Math.abs(dx) > Math.min(90, W * .22) && j >= 0 && j < bs.length;
-    if (!go) { setX(0, true); setTimeout(() => { clear(); if (pane) pane.style.transform = ''; }, 230); return; }
-    setX(dx < 0 ? -W : W, true);
-    setTimeout(() => { clear(); window._noSlide = 1; bs[j].click(); window.scrollTo(0, Math.min(window.scrollY, 0) || window.scrollY); }, 210);
+    let x = t.clientX - S.x0; if ((x > 0 && S.cur === 0) || (x < 0 && S.cur === S.items.length - 1)) x *= .3;
+    S.lx = S.x; S.lt = S.tt || S.t0; S.tt = Date.now(); S.x = x; if (!raf) raf = requestAnimationFrame(apply); }, { passive: true });
+  document.addEventListener('touchend', () => { const st = S; S = null; if (!st || !st.hz) return; if (raf) { cancelAnimationFrame(raf); raf = 0; }
+    const vel = (st.x - (st.lx || 0)) / Math.max(1, (st.tt || 0) - (st.lt || 0)), dir = st.x < 0 ? 1 : -1, j = st.cur + dir;
+    const go = j >= 0 && j < st.items.length && (Math.abs(st.x) > st.W * .22 || (Math.abs(vel) > .45 && Math.sign(vel) === Math.sign(st.x)));
+    if (!go) { anim(st, 0, 220, () => cleanup(st)); return; }
+    anim(st, -dir * st.W, 240, () => { st.gh.forEach(g => g._keep = 1); window._noSlide = 1; st.items[j].click(); cleanup(st); });
   }, { passive: true });
 })();
 window.SIL = 'data:image/svg+xml,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" fill="#2c2c2e"/><circle cx="50" cy="38" r="18" fill="#0d0d0f"/><path d="M14 100c2-22 17-34 36-34s34 12 36 34z" fill="#0d0d0f"/></svg>');
@@ -820,38 +838,50 @@ async function loadFavs(silent) {
 }
 let _prefetched = {};
 function prefetchLeague(l) { if (_prefetched[l] || (l !== 'nfl' && l !== 'nba')) return; _prefetched[l] = 1; setTimeout(() => ensureLeagueStats(l), 1500); }
+state.dayC = {};
+const dayKey = (lg, d, w) => lg === 'nfl' ? 'nfl|' + (w ? w.t + '-' + w.w : '') : lg + '|' + ymd(d);
+const sortEv = a => a.sort((x, y) => ((y.state === 'in') - (x.state === 'in')) || (new Date(x.date) - new Date(y.date)));
+async function fetchDay(lg, d, w, yr) {
+  const L = LEAGUES[lg];
+  if (lg === 'nfl') { const j = await getJson(API + L.path + '/scoreboard' + (w ? `?seasontype=${w.t}&week=${w.w}&dates=${yr}` : ''), true); return { j, evs: sortEv((j.events || []).map(normEvent)) }; }
+  const prev = new Date(d); prev.setDate(prev.getDate() - 1);
+  const rs = await Promise.allSettled([getJson(API + L.path + '/scoreboard?dates=' + ymd(prev), true), getJson(API + L.path + '/scoreboard?dates=' + ymd(d), true)]);
+  if (rs.every(r => r.status !== 'fulfilled')) throw rs[1].reason;
+  const seen = new Set(), evs = [], key = ymd(d); rs.forEach(r => { if (r.status === 'fulfilled') (r.value.events || []).forEach(ev => { if (!seen.has(ev.id)) { seen.add(ev.id); evs.push(ev); } }); });
+  return { j: rs[1].status === 'fulfilled' ? rs[1].value : rs[0].value, evs: sortEv(evs.filter(ev => ymd(new Date(ev.date)) === key).map(normEvent)) };
+}
+function neighborKeys() {
+  const lg = state.league; if (!LEAGUES[lg]) return [];
+  if (lg === 'nfl') { const W = state.nflw; if (!W || !W.cal || !W.sel) return []; const i = W.cal.findIndex(c => c.t === W.sel.t && c.w === W.sel.w); return [W.cal[i - 1], W.cal[i + 1]].map(c => c ? { w: { t: c.t, w: c.w }, key: dayKey('nfl', null, c) } : null); }
+  return [-1, 1].map(o => { const d = new Date(state.date); d.setDate(d.getDate() + o); return { d, key: dayKey(lg, d) }; });
+}
+function prefetchNeighbors() {
+  const lg = state.league; neighborKeys().forEach(n => { if (!n || state.dayC[n.key]) return; state.dayC[n.key] = 'loading';
+    fetchDay(lg, n.d, n.w, state.nflw && state.nflw.year).then(r => { state.dayC[n.key] = r.evs; }).catch(() => { delete state.dayC[n.key]; }); });
+}
 async function loadList(silent) {
   prefetchLeague(state.league);
   if (state.league === 'fav') return loadFavs(silent);
-  const L = LEAGUES[state.league];
-  const my = ++reqId;
-  if (!silent) { state.loading = true; state.error = null; state.events = []; render(); }
+  const lg = state.league, my = ++reqId, W = state.nflw, key = dayKey(lg, state.date, W && W.sel);
+  const cached = Array.isArray(state.dayC[key]) ? state.dayC[key] : null;
+  if (!silent) { if (cached) { state.loading = false; state.error = null; state.events = cached; render(); } else { state.loading = true; state.error = null; state.events = []; render(); } }
   try {
-    let url = API + L.path + '/scoreboard?dates=' + ymd(state.date);
-    const W = state.nflw;
-    if (state.league === 'nfl') url = API + L.path + '/scoreboard' + (W && W.sel ? `?seasontype=${W.sel.t}&week=${W.sel.w}&dates=${W.year}` : '');
-    let j;
-    if (state.league === 'nfl') j = await getJson(url, true);
-    else { const prev = new Date(state.date); prev.setDate(prev.getDate() - 1);
-      const rs = await Promise.allSettled([getJson(API + L.path + '/scoreboard?dates=' + ymd(prev), true), getJson(url, true)]);
-      if (rs.every(r => r.status !== 'fulfilled')) throw rs[1].reason;
-      const seen = new Set(), evs = []; rs.forEach(r => { if (r.status === 'fulfilled') (r.value.events || []).forEach(ev => { if (!seen.has(ev.id)) { seen.add(ev.id); evs.push(ev); } }); });
-      const key = ymd(state.date);
-      j = Object.assign({}, rs[1].status === 'fulfilled' ? rs[1].value : rs[0].value, { events: evs.filter(ev => ymd(new Date(ev.date)) === key) }); }
+    const r = await fetchDay(lg, state.date, W && W.sel, W && W.year), j = r.j;
     if (my !== reqId) return;
-    if (state.league === 'nfl' && !(W && W.cal)) {
+    if (lg === 'nfl' && !(W && W.cal)) {
       const cal = [];
       (((j.leagues || [])[0] || {}).calendar || []).forEach(sec => { const t = +sec.value; if (t !== 2 && t !== 3) return; (sec.entries || []).forEach(en => { if (/pro bowl/i.test(en.label || '')) return; cal.push({ t, w: +en.value, label: en.label || '', alt: en.alternateLabel || '' }); }); });
       state.nflw = { cal, year: (j.season && j.season.year) || new Date().getFullYear(), sel: { t: (j.season && j.season.type) || 2, w: (j.week && j.week.number) || 1 } };
     }
-    state.events = (j.events || []).map(normEvent).sort((a, b) => ((b.state === 'in') - (a.state === 'in')) || (new Date(a.date) - new Date(b.date)));
+    state.events = r.evs; state.dayC[dayKey(lg, state.date, state.nflw && state.nflw.sel)] = r.evs;
     state.error = null;
   } catch (e) {
     if (my !== reqId) return;
-    state.error = 'Failed to load data (' + (e.message || e) + ').';
+    if (!state.events.length) state.error = 'Failed to load data (' + (e.message || e) + ').';
   }
   state.loading = false;
   if (topView() === 'list') render();
+  prefetchNeighbors();
 }
 async function loadGame() {
   const g = state.game; if (!g) return;
@@ -1134,7 +1164,7 @@ function renderGame() {
   $app.innerHTML = `
     <header class="d"><div class="tabs"><button class="back" data-back aria-label="Back">‹</button><button class="home" data-home aria-label="Home"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"><path d="M3 10.5 12 3l9 7.5"/><path d="M5.5 9v11h13V9"/><path d="M10 20v-6h4v6"/></svg></button><button class="home" data-refresh aria-label="Refresh"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12a8 8 0 1 1-2.34-5.66"/><path d="M20 4v5h-5"/></svg></button></div></header>
     <main>${hero}
-      ${g.tabInit ? `<div class="dtabs sm ${gTabs(g).length > 4 ? 'five' : ''}">${gTabs(g).map(([k, l]) => `<button data-tab="${k}" class="${g.tab === k ? 'on' : ''}">${l}</button>`).join('')}</div>` : '<div class="dtabs sm"></div>'}
+      ${g.tabInit ? `<div class="dtabs sm ${gTabs(g).length > 4 ? 'five' : 'even'}">${gTabs(g).map(([k, l]) => `<button data-tab="${k}" class="${g.tab === k ? 'on' : ''}">${l}</button>`).join('')}</div>` : '<div class="dtabs sm"></div>'}
       <div class="pane t">${body}</div></main>`;
 }
 
@@ -2256,7 +2286,7 @@ function careerHTML(p, cats) {
         const blk = rows.slice(q, z + 1), r = blk.find(isTot), sub = blk.filter(x => !isTot(x)); q = z;
         if (!r || !sub.length) { blk.forEach(x => out.push(RT(x, '', '', null))); continue; }
         const key = mode + r.n, open = !!(p.cexp && p.cexp[key]);
-        const lg2 = `<span class="tot2l">${sub.slice(0, 3).map(x => seasonLogo(p.league, x)).join('')}<i class="chev ${open ? 'up' : ''}"></i></span>`;
+        const lg2 = `<span class="tot2l"><small class="tot2">TOT</small><i class="chev ${open ? 'up' : ''}"></i></span>`;
         out.push(RT(r, 'ctot', `data-cexp="${esc(key)}"`, lg2)); sub.forEach(x => out.push(RT(x, 'csub' + (open ? '' : ' hid'), '', null))); }
       return out.join(''); })()}${tot ? `<tr class="tot"><td class="n">Career</td>${tot.map(v => `<td>${nv(clean(v))}</td>`).join('')}</tr>` : ''}</tbody></table></div></section>`;
   }).join('');
