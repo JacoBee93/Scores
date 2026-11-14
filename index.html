@@ -89,6 +89,10 @@ header.d + main{padding-top:0}
 .row.lose .nm,.row.lose .sc{color:var(--mut)}
 .row .arr{width:10px;font-size:10px}
 .msg{color:var(--mut);text-align:center;padding:36px 0;font-size:15px}
+.msg.ld{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;font-size:12px;letter-spacing:1.6px;text-transform:uppercase;font-weight:700;color:rgba(255,255,255,.5);padding:44px 0}
+.msg.ld::before{content:'';width:36px;height:36px;border-radius:50%;border:3px solid rgba(255,255,255,.1);border-top-color:#fff;border-right-color:rgba(255,255,255,.45);animation:spn .75s linear infinite}
+.msg.ld{animation:ldin .25s ease}
+@keyframes ldin{from{opacity:0}to{opacity:1}}
 .msg button{margin-top:12px;background:var(--card);padding:9px 16px;border-radius:12px;color:#fff}
 .foot{color:var(--mut);font-size:12px;text-align:center;margin-top:20px;padding-bottom:30px}
 /* detail zápasu */
@@ -855,6 +859,7 @@ document.addEventListener('touchstart', e => { const t = e.target && e.target.cl
   } catch (x) {} }, { passive: true, capture: true });
 const stOf = e => (e && e.status && e.status.type && e.status.type.state) || (e && e.competitions && e.competitions[0] && e.competitions[0].status && e.competitions[0].status.type && e.competitions[0].status.type.state) || '';
 function ttlFor(u, j) {
+  const sm = u.match(/[?&]season=(\d{4})/) || u.match(/\/seasons\/(\d{4})\//); if (sm && +sm[1] < new Date().getFullYear() - 1) return 30 * 24 * HR;
   if (/\/summary\?event=/.test(u)) { const c = j && j.header && j.header.competitions && j.header.competitions[0], t = c && c.status && c.status.type; return t && t.completed ? 7 * 24 * HR : t && t.state === 'pre' ? 2 * MIN : 15e3; }
   if (/\/scoreboard/.test(u)) { const ev = (j && j.events) || [], st = ev.map(stOf); if (st.includes('in')) return 15e3; if (st.includes('pre')) return 2 * MIN; return ev.length ? 12 * HR : 30 * MIN; }
   if (/\/plays\?|\/competitions\/\d+\?/.test(u)) return 30e3;
@@ -2948,6 +2953,11 @@ async function loadLV() {
       const worker = async () => { while (i < all.length) { const r = all[i++]; const id = (r.ref.match(/athletes\/(\d+)/) || [])[1]; try { r.a = state.athC[id] || (state.athC[id] = await getJson(String(r.ref).replace(/^http:/, 'https:'))); } catch (e) { r.a = { id, displayName: '' }; } } };
       await Promise.all(Array.from({ length: 8 }, worker));
       saveAth();
+      if (v.sy) (async () => { const cgs = [...new Set(cats.map(c => byAthQuery(v.league, c.name)[0]))], tmap = {};
+        await Promise.all(cgs.map(async cg => { try { const j = await getJson('https://site.web.api.espn.com/apis/common/v3/sports/' + L.path + '/statistics/byathlete?region=us&lang=en&contentorigin=espn&isqualified=false&limit=1000&page=1&seasontype=2&season=' + v.sy + (cg ? '&category=' + cg : ''));
+          (j.athletes || []).forEach(x => { const a = x.athlete || {}, t = a.teamId || (a.team && a.team.id); if (!a.id) return; if (t) tmap[a.id] = String(t); else if (a.teamShortName) { const tm = (state.teamList[v.league] || []).find(z => z.abbr === a.teamShortName); if (tm) tmap[a.id] = tm.id; } }); } catch (e) {} }));
+        let ch = 0; cats.forEach(c => c.rows.forEach(r => { const id = ((r.ref || '').match(/athletes\/(\d+)/) || [])[1]; if (id && tmap[id]) { r.tid = [0, tmap[id]]; ch++; } }));
+        if (ch && state.lv === v && topView() === 'lv') render(); })();
       state.lvC[key].loading = false;
       if (!cats.length) state.lvC[key].err = 'League stats not available.';
     }
