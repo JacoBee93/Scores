@@ -1125,7 +1125,7 @@ async function loadTeam() {
     });
   });
   const rcount = (() => { let n = 0; ((t.roster && t.roster.athletes) || []).forEach(a => { n += Array.isArray(a && a.items) ? a.items.length : a ? 1 : 0; }); return n; })(), ry = t.roster && t.roster.season && +t.roster.season.year;
-  const pastRoster = !!t.sy;
+  const pastRoster = false;
   if (pastRoster) { t.roster = null; t.rosterLoading = true; }
   t.done = true;
   if (state.team === t && topView() === 'team') render();
@@ -2186,7 +2186,15 @@ function gamelogHTML(p, o) {
       <thead><tr class="gh1"><th class="gtt" colspan="3">${esc(title)}</th>${gh}</tr><tr class="gh2"><th class="l">Date</th><th class="l">Opp</th><th class="l">Result</th>${cols.map((c, ci) => `<th data-glsort="${esc(key)}|${ci}" class="${so && so.i === ci ? 'on' : ''}">${esc(c[0])}</th>`).join('')}</tr></thead><tbody>${trs}</tbody></table></div></section>`;
   };
   if (o.limit) { const all = secs.flatMap(x => x.rows).sort((a, b) => new Date(b.m.gameDate || 0) - new Date(a.m.gameDate || 0)).slice(0, o.limit); return H + table(o.title || 'Recent games', all, 'recent'); }
-  return H + secs.map(x => table((x.name || 'Games') + (tAbbr && !o.j ? ' (' + tAbbr + ')' : ''), x.rows, x.name)).join('');
+  const secTeams = x => {
+    const L = []; [...x.rows].reverse().forEach(r => { const tm = r.m.team || {}, a = tm.abbreviation || (tm.id ? teamAbbr(p.league, tm.id) : ''); if (a && !L.includes(a)) L.push(a); });
+    if (L.length) return L;
+    const ym = String(x.name).match(/(\d{4})(?:-(\d{2}))?/); if (ym) { const y = ym[2] ? +ym[1] + 1 : +ym[1];
+      const rs = []; try { statCats(p.st, p.league).forEach(c => c.rows.forEach(r => { if (+r.year === y && r.sub && !/^(TOT|TOTAL)$/i.test(r.sub) && !rs.includes(r.sub)) rs.push(r.sub); })); } catch (e) {}
+      if (rs.length) return rs; }
+    return !o.j && tAbbr ? [tAbbr] : [];
+  };
+  return H + secs.map(x => { const tl = o.limit ? [] : secTeams(x); return table((x.name || 'Games') + (tl.length ? ' (' + tl.join(', ') + ')' : ''), x.rows, x.name); }).join('');
 }
 function seasonLbl(p, y) { y = +y; return p.league === 'nfl' ? String(y) : (y - 1) + '-' + String(y).slice(2); }
 function glSeasons(p, J) {
@@ -2541,6 +2549,7 @@ async function coreRoster(t) {
   return out.length ? { athletes: out } : null;
 }
 function rosterHTML(t) {
+  if (t.sy) return msg('Data not available for this season.');
   if (t.rosterLoading) return msg('Loading…');
   if (t.rosterErr || !t.roster) return msg(t.sy ? 'Data not available for this season.' : 'Failed to load roster' + (t.rosterErr ? ' (' + t.rosterErr + ')' : '.'));
   const all = [];
@@ -2651,7 +2660,7 @@ async function teamPsFast(t, all, base, catNm) {
   return out;
 }
 async function loadTeamPlayers(t) {
-  if (t.ps || t.rosterLoading) return;
+  if (t.ps || t.rosterLoading || t.sy) return;
   const ck = 'tps_' + t.league + '_' + t.id + (t.sy ? '_' + t.sy : ''), cached = lsGet(ck, t.sy ? 30 * 864e5 : 6 * 3600e3);
   const lastEnd = Math.max(0, ...(t.events || []).filter(e => e.state === 'post' || e.state === 'in').map(e => new Date(e.date).getTime() + 3.5 * 36e5).filter(x => x < Date.now()));
   if (cached && cached.ts && lastEnd > cached.ts) { /* od ulozeni se dohral zapas -> stahnout znovu */ }
@@ -2729,6 +2738,7 @@ function nbaPlayersHTML(t, tn) {
   return `<section class="blk"><div class="tw"><table class="nfx sep" style="width:max(100%, ${tw}px)"><colgroup><col>${cols.map(x => `<col style="width:${x[2]}px">`).join('')}</colgroup><thead><tr><th class="n">${esc(short)}</th>${cols.map(x => `<th data-sort="${x[0]}" data-sg="${gk}" class="${man && x[0] === sk ? 'on' + (asc ? ' asc' : '') : ''}">${esc(x[1])}</th>`).join('')}</tr></thead><tbody>${trs}</tbody></table></div></section>`;
 }
 function teamStatsHTML(t) {
+  if (t.sy) return msg('Data not available for this season.');
   if (!t.ps) return msg('Loading…');
   if (t.ps.loading) return msg('Loading player stats…');
   if (!t.ps.cats.size) return msg('Player stats not available.');
