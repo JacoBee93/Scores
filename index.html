@@ -925,13 +925,14 @@ function normEvent(ev) {
   const e = { id: ev.id, date: ev.date || c.date, state: t.state, short: t.shortDetail || t.detail || '',
               home: normTeam(homeC), away: normTeam(awayC),
               week: ev.week && ev.week.number, stype: (ev.season && ev.season.type) || (ev.seasonType && (ev.seasonType.type || +ev.seasonType.id)), note: (c.notes && c.notes[0] && c.notes[0].headline) || '' };
+  e.tbd = t.state === 'pre' && (c.timeValid === false || ev.timeValid === false || /\bTBD\b/i.test(String(t.shortDetail || t.detail || '')));
   if (e.state === 'post' && !e.home.winner && !e.away.winner) {
     const h = parseInt(e.home.score), a = parseInt(e.away.score);
     if (!isNaN(h) && !isNaN(a) && h !== a) (h > a ? e.home : e.away).winner = true;
   }
   return e;
 }
-function statusText(e) { return e.state === 'pre' ? fmtTime(e.date) : e.short; }
+function statusText(e) { return e.state === 'pre' ? (e.tbd ? 'TBD' : fmtTime(e.date)) : e.short; }
 
 /* ---------- načítání ---------- */
 async function loadFavs(silent) {
@@ -1286,7 +1287,7 @@ function renderGame() {
   if (e) {
     const dd = new Date(e.date), preDay = ymd(dd) === ymd(new Date()) ? 'Today' : DAYS[dd.getDay()];
     const mid = e.state === 'post' ? `<span class="fin">${esc(e.short || 'Final')}</span>`
-              : e.state === 'pre' ? `<span class="pd">${esc(preDay)}<br>${fmtTime(e.date)}</span>`
+              : e.state === 'pre' ? `<span class="pd">${esc(preDay)}<br>${e.tbd ? 'TBD' : fmtTime(e.date)}</span>`
               : esc(e.short).replace(' - ', '<br>');
     const hd = (g.sum && g.sum.header) || {}, hc = (hd.competitions && hd.competitions[0]) || {};
     const wk = e.week || hd.week, st = e.stype || (hd.season && hd.season.type), note = e.note || (hc.notes && hc.notes[0] && hc.notes[0].headline) || '';
@@ -2526,7 +2527,7 @@ function renderTeam() {
   const body0 = !t.done ? msg('Loading…') : t.tab === 'roster' ? rosterHTML(t) : t.tab === 'sched' ? scheduleHTML(t) : t.tab === 'tstats' ? teamTabStatsHTML(t) : t.tab === 'inj' ? teamInjHTML(t) : teamStatsHTML(t);
   const body = t.done && (t.tab === 'stats' || t.tab === 'tstats') ? sseg + body0 : body0;
   $app.innerHTML = `
-    <header class="d"><div class="tabs"><button class="back" data-back aria-label="Back"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></button><button class="home" data-home aria-label="Home"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"><path d="M3 10.5 12 3l9 7.5"/><path d="M5.5 9v11h13V9"/><path d="M10 20v-6h4v6"/></svg></button><button class="home" data-refresh aria-label="Refresh"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12a8 8 0 1 1-2.34-5.66"/><path d="M20 4v5h-5"/></svg></button><span class="grow"></span>${(() => { const Y = brYears(t.league), y = t.sy || Y[0], ty = t.stype || 2, yl = yy => t.league === 'nfl' ? String(yy) : (yy - 1) + '-' + String(yy).slice(2), lab = (yy, tt) => yl(yy) + (tt === 3 ? ' Postseason' : ' Regular Season');
+    <header class="d"><div class="tabs"><button class="back" data-back aria-label="Back"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></button><button class="home" data-home aria-label="Home"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"><path d="M3 10.5 12 3l9 7.5"/><path d="M5.5 9v11h13V9"/><path d="M10 20v-6h4v6"/></svg></button><button class="home" data-refresh aria-label="Refresh"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12a8 8 0 1 1-2.34-5.66"/><path d="M20 4v5h-5"/></svg></button><span class="grow"></span>${(() => { const Y = brYears(t.league), y = t.sy || Y[0], ty = t.stype || 2, yl = yy => t.league === 'nfl' ? String(yy) : (yy - 1) + '-' + String(yy).slice(2), lab = (yy, tt) => yl(yy) + (tt === 3 ? ' Postseason' : ' Reg. Season');
       const opts = []; Y.forEach((x, i) => { if (i > 0) opts.push([x, 3]); opts.push([x, 2]); });
       return `<div class="ysel tys"><button class="ybtn" data-tyo="1">${esc(lab(y, ty))}<i class="chev ${t.yOpen ? 'up' : ''}"></i></button>${t.yOpen ? `<div class="ylist">${opts.map(([x, tt]) => `<button data-ty="${x}|${tt}" class="${x === y && tt === ty ? 'on' : ''}">${esc(lab(x, tt))}</button>`).join('')}</div>` : ''}</div>`; })()}</div></header>
     <main><div class="phero">${h.logo ? `<img class="tl" src="${esc(h.logo)}" alt="" onerror="this.style.visibility='hidden'">` : ''}
@@ -2598,7 +2599,7 @@ function scheduleHTML(t) {
     const mine = e.home.id === t.id ? e.home : e.away, opp = mine === e.home ? e.away : e.home;
     const d = new Date(e.date), when = DAYS[d.getDay()] + ' ' + d.getDate() + '.' + (d.getMonth() + 1) + '.';
     let res;
-    if (e.state === 'pre') res = `<span class="rg rgw"><i></i><span class="tm">${esc(fmtTime(e.date))}</span><i></i></span>`;
+    if (e.state === 'pre') res = `<span class="rg rgw"><i></i><span class="tm">${esc(e.tbd ? 'TBD' : fmtTime(e.date))}</span><i></i></span>`;
     else if (e.state === 'in') res = `<span class="live">${esc(e.short)}</span>`;
     else {
       const tie = String(mine.score) !== '' && String(mine.score) === String(opp.score), w = mine.winner, sfx = e.short.replace(/^Final\/?/, '');
@@ -2609,6 +2610,12 @@ function scheduleHTML(t) {
   };
   let html = '', cur = null, rows = '';
   const flush = () => { if (cur !== null && rows) html += `<section class="blk"><div class="schw"><table class="sch"><colgroup><col style="width:74px"><col><col style="width:134px"></colgroup><thead><tr><th class="n">${esc(cur || 'Games')}</th><th></th><th></th></tr></thead><tbody>${rows}</tbody></table></div></section>`; rows = ''; };
+  if (t.league === 'nfl') {
+    const rk = n => /pre/i.test(n) ? 0 : /post|playoff/i.test(n) ? 2 : 1;
+    [...sorted].sort((a, b) => rk(a.stype || '') - rk(b.stype || '') || new Date(a.date) - new Date(b.date)).forEach(e => { const st = e.stype || ''; if (st !== cur) { flush(); cur = st; } rows += row(e); });
+    flush();
+    return html;
+  }
   sorted.filter(e => key(e) === t.month).forEach(e => { const st = e.stype || ''; if (st !== cur) { flush(); cur = st; } rows += row(e); });
   flush();
   return `<div class="mstrip" id="mstrip">${strip}</div>${html}`;
@@ -3463,7 +3470,7 @@ $app.addEventListener('click', ev => {
     state.team.yOpen = !state.team.yOpen; render();
   } else if (d.ty) {
     const t = state.team, [ys, ts] = String(d.ty).split('|'), y = +ys, tt = +ts || 2, ny = y === seasonYear(t.league) ? null : y; t.yOpen = false;
-    if (ny !== (t.sy || null) || tt !== (t.stype || 2)) { t.sy = ny; t.stype = tt; t.done = false; t.ps = null; t.month = null; t.roster = null; t.events = []; render(); loadTeam(); } else render();
+    if (ny !== (t.sy || null) || tt !== (t.stype || 2)) { t.sy = ny; t.stype = tt; t.tab = 'stats'; t.done = false; t.ps = null; t.month = null; t.roster = null; t.events = []; render(); loadTeam(); } else render();
   } else if (d.lsyo) {
     state.lv.syOpen = !state.lv.syOpen; render();
   } else if (d.lsy) {
