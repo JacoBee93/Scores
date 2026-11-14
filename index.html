@@ -125,7 +125,7 @@ header.d + main{padding-top:0}
 .dtabs.sm button{font-size:13px;letter-spacing:.3px}
 .dtabs button{font-family:var(--wide);font-weight:800;font-stretch:105%}
 .dtabs.five{gap:0;justify-content:space-between;padding:0 12px}
-.dtabs.even{gap:0;justify-content:space-between;padding:0 20px}
+.dtabs.even{gap:0;justify-content:space-between;padding:0 30px}
 .dtabs.five button{font-size:11.5px;letter-spacing:0;font-stretch:100%}
 .pane{background:var(--card);margin:0 -16px 24px;padding:30px 16px 32px}
 .pane.t{padding-top:10px}
@@ -479,13 +479,13 @@ body{min-height:100vh}
 .ylist button{display:block;width:100%;text-align:left;padding:10px 16px;font-size:15px;border-bottom:1px solid #3a3a3c}
 .ylist button.on{color:var(--acc);font-weight:700}
 .phero{display:flex;align-items:center;gap:14px;margin:4px 4px 14px}
-.phero .hs.heart{border-radius:0;background:#c8102e;-webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath d='M50 92C18 69 3 52 3 31 3 15 15 4 29 4c9 0 17 5 21 13 4-8 12-13 21-13 14 0 26 11 26 27 0 21-15 38-47 61z'/%3E%3C/svg%3E") center/100% 100% no-repeat;mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath d='M50 92C18 69 3 52 3 31 3 15 15 4 29 4c9 0 17 5 21 13 4-8 12-13 21-13 14 0 26 11 26 27 0 21-15 38-47 61z'/%3E%3C/svg%3E") center/100% 100% no-repeat;width:84px !important;height:84px !important}
+.phero .hs.heart{border-radius:0;background:#c8102e;-webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath d='M50 92C18 69 3 52 3 31 3 15 15 4 29 4c9 0 17 5 21 13 4-8 12-13 21-13 14 0 26 11 26 27 0 21-15 38-47 61z'/%3E%3C/svg%3E") center/100% 100% no-repeat;mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath d='M50 92C18 69 3 52 3 31 3 15 15 4 29 4c9 0 17 5 21 13 4-8 12-13 21-13 14 0 26 11 26 27 0 21-15 38-47 61z'/%3E%3C/svg%3E") center/100% 100% no-repeat;width:112px !important;height:104px !important;padding-top:16px;box-sizing:border-box;object-fit:cover;object-position:50% 0}
 .phero .hs{width:68px;height:68px;border-radius:50%;background:var(--card);object-fit:cover;flex:none}
 .phero.pp{flex-direction:row-reverse;justify-content:space-between;margin-left:0}
 .phero.pp > div{flex:1;min-width:0;padding-left:10px}
 .phero.pp .hs{width:104px;height:104px;margin-right:28px}
 .pname{font-family:var(--num);font-weight:700;font-size:28px;line-height:1.05}
-.psub{color:var(--mut);font-size:13px;margin-top:3px}
+.psub{color:rgba(255,255,255,.6);font-size:13px;margin-top:3px}
 .grow{flex:1}
 .icon{width:38px;height:38px;border-radius:12px;background:var(--card);display:flex;align-items:center;justify-content:center}
 .icon svg{width:19px;height:19px;stroke:#fff;fill:none;stroke-width:2.2;stroke-linecap:round}
@@ -1115,8 +1115,12 @@ async function loadTeam() {
       t.events.push(e);
     });
   });
+  const rcount = (() => { let n = 0; ((t.roster && t.roster.athletes) || []).forEach(a => { n += Array.isArray(a && a.items) ? a.items.length : a ? 1 : 0; }); return n; })(), ry = t.roster && t.roster.season && +t.roster.season.year;
+  const pastRoster = t.sy && (!rcount || (ry && ry !== t.sy));
+  if (pastRoster) { t.roster = null; t.rosterLoading = true; }
   t.done = true;
   if (state.team === t && topView() === 'team') render();
+  if (pastRoster) { const r = await coreRoster(t).catch(() => null); if (t.req !== rq || state.team !== t) return; t.rosterLoading = false; t.roster = r; t.rosterErr = r ? null : 'no data'; if (topView() === 'team') render(); }
   setTimeout(() => { if (state.team === t) loadTeamPlayers(t); }, t.tab === 'stats' ? 0 : 400);
 }
 
@@ -1994,9 +1998,16 @@ function strBadge(p) {
   const b = /power ?-?play|\bPPG?\b/i.test(s) ? 'PPG' : /short ?-?handed|\bSHG?\b/i.test(s) ? 'SHG' : /empty ?-?net|\bENG\b/i.test(s) ? 'EN' : '';
   return b ? ` <span class="sbg">${b}</span>` : '';
 }
+function nflScoreText(t) {
+  t = t.replace(/,?\s*(Center|Holder|Snapper)\s*[-:]\s*(?:[A-Z]\.\s?)?[A-Za-z'-]+(?:\s[A-Z][A-Za-z'-]+)?/g, '').replace(/\s+,/g, ',').replace(/,\s*\./g, '.').replace(/\s{2,}/g, ' ').trim();
+  let k = t.search(/\s\(/);
+  if (k < 0) { const m = t.match(/TOUCHDOWN[.,]?/i); if (m) k = m.index + m[0].length; }
+  if (k < 0 || k >= t.length - 1) return esc(t);
+  return esc(t.slice(0, k)) + `<span class="ast">${esc(t.slice(k))}</span>`;
+}
 function scoringHTML(g) {
   const sum = g.sum, ev = g.ev;
-  let plays = getPlays(sum).filter(p => p.scoringPlay);
+  let plays = g.league === 'nfl' && sum.scoringPlays && sum.scoringPlays.length ? sum.scoringPlays : getPlays(sum).filter(p => p.scoringPlay);
   if (!plays.length && sum.scoringPlays && sum.scoringPlays.length) plays = sum.scoringPlays;
   if (!plays.length) return msg(ev && ev.state === 'pre' ? 'Game has not started yet.' : 'No goals yet.');
   const logos = {};
@@ -2009,7 +2020,7 @@ function scoringHTML(g) {
       const lg = p.team && logos[p.team.id];
       const sc = p.awayScore != null && ev ? `<span class="sco">${esc(ev.away.abbr)} ${esc(p.awayScore)} – ${esc(ev.home.abbr)} ${esc(p.homeScore)}</span>` : '';
       return `<div class="play g"><span class="pl">${lg ? `<img src="${esc(lg)}" alt="" onerror="this.style.visibility='hidden'">` : ''}</span>
-        <span class="clk">${esc((p.clock && p.clock.displayValue) || '')}</span><span class="txt">${sc && g.league === 'nhl' ? sc.replace('</span>', strBadge(p) + '</span>') : sc}${g.league === 'nhl' ? (t => { const k = t.search(/,\s*(assists|unassisted)/i); return k < 0 ? esc(t) : esc(t.slice(0, k)) + `<span class="ast">${esc(t.slice(k))}</span>`; })(nhlGoalText(p)) : (t => { const k = t.search(/\s\(/); return k < 0 || g.league !== 'nfl' ? esc(t) : esc(t.slice(0, k)) + `<span class="ast">${esc(t.slice(k))}</span>`; })(String(p.text || p.shortText || ''))}${!sc && g.league === 'nhl' ? strBadge(p) : ''}</span></div>`;
+        <span class="clk">${esc((p.clock && p.clock.displayValue) || '')}</span><span class="txt">${sc && g.league === 'nhl' ? sc.replace('</span>', strBadge(p) + '</span>') : sc}${g.league === 'nhl' ? (t => { const k = t.search(/,\s*(assists|unassisted)/i); return k < 0 ? esc(t) : esc(t.slice(0, k)) + `<span class="ast">${esc(t.slice(k))}</span>`; })(nhlGoalText(p)) : g.league === 'nfl' ? nflScoreText(String(p.text || p.shortText || '')) : esc(p.text || p.shortText || '')}${!sc && g.league === 'nhl' ? strBadge(p) : ''}</span></div>`;
     }).join('');
     return `<section class="per"><div class="phd">${periodLabel(g.league, k)}</div>${rows}</section>`;
   }).join('');
@@ -2474,6 +2485,7 @@ function teamHead(t) {
   return { name, logo, sub: [rec, stand].filter(Boolean).join(' • ') };
 }
 function teamInjHTML(t) {
+  if (t.sy) return msg('Data not available for this season.');
   const r = t.roster; if (!r) return msg('Failed to load roster.');
   const list = []; (r.athletes || []).forEach(x => x && Array.isArray(x.items) ? list.push(...x.items) : list.push(x));
   const inj = list.filter(a => a && Array.isArray(a.injuries) && a.injuries.some(i => i && (i.status || i.type)));
@@ -2497,15 +2509,28 @@ function renderTeam() {
     <main><div class="phero">${h.logo ? `<img class="tl" src="${esc(h.logo)}" alt="" onerror="this.style.visibility='hidden'">` : ''}
       <div class="grow"><div class="pname up">${esc(h.name)}</div><div class="psub">${esc(h.sub)}</div></div>
       <button class="fstar ${isFav(t.league, t.id) ? 'on' : ''}" data-fav="${esc(t.id)}" data-fl="${t.league}" data-fn="${esc(h.name)}" data-flogo="${esc(h.logo)}" aria-label="Favorite team">${STAR_SVG}</button></div>
-      <div class="dtabs sm even">${tab('roster', 'Roster')}${tab('sched', 'Schedule')}${tab('stats', 'Stats', t.tab === 'tstats')}${t.sy ? '' : tab('inj', 'Injuries')}</div>
+      <div class="dtabs sm even">${tab('roster', 'Roster')}${tab('sched', 'Schedule')}${tab('stats', 'Stats', t.tab === 'tstats')}${tab('inj', 'Injuries')}</div>
       <div class="pane t">${body}</div></main>`;
   const ms = document.getElementById('mstrip'), on = ms && ms.querySelector('.on');
   if (on) ms.scrollLeft = on.offsetLeft - (ms.clientWidth - on.offsetWidth) / 2;
 }
 const ROS_ORD = { nfl: ['QB','RB','FB','WR','TE','OT','T','OL','G','OG','C','DE','DT','NT','DL','EDGE','LB','OLB','ILB','MLB','CB','S','FS','SS','DB','PK','K','P','LS'], nba: ['PG','SG','G','SF','F','PF','C'], nhl: ['C','LW','RW','F','W','D','G'] };
 const ROS_GRP = { nfl: [['Offense', /^(QB|RB|FB|WR|TE|OT|T|OL|G|OG|C)$/], ['Defense', /^(DE|DT|NT|DL|EDGE|LB|OLB|ILB|MLB|CB|S|FS|SS|DB)$/], ['Special Teams', /^(PK|K|P|LS)$/]], nhl: [['Forwards', /^(C|LW|RW|F|W)$/], ['Defense', /^D$/], ['Goalies', /^G$/]] };
+async function coreRoster(t) {
+  const parts = LEAGUES[t.league].path.split('/'), cur = seasonYear(t.league);
+  const j = await getJson('https://sports.core.api.espn.com/v2/sports/' + parts[0] + '/leagues/' + parts[1] + '/seasons/' + t.sy + '/teams/' + t.id + '/athletes?limit=200&lang=en&region=us');
+  const refs = ((j && j.items) || []).map(x => x && x.$ref).filter(Boolean), out = [];
+  let i = 0;
+  const w = async () => { while (i < refs.length) { const r = refs[i++]; try { const a = await getJson(String(r).replace(/^http:/, 'https:'));
+    const by = a.dateOfBirth ? new Date(a.dateOfBirth).getFullYear() : null, ex = a.experience && a.experience.years != null ? Math.max(0, a.experience.years - (cur - t.sy)) : null;
+    out.push({ id: String(a.id), displayName: a.displayName || a.fullName, fullName: a.fullName, lastName: a.lastName, jersey: a.jersey, position: { abbreviation: (a.position && a.position.abbreviation) || '' },
+      experience: ex != null ? { years: ex } : null, age: by ? t.sy - by - (t.league === 'nfl' ? 0 : 1) : '', displayHeight: a.displayHeight, displayWeight: a.displayWeight }); } catch (e) {} } };
+  await Promise.all(Array.from({ length: 8 }, w));
+  return out.length ? { athletes: out } : null;
+}
 function rosterHTML(t) {
-  if (t.rosterErr || !t.roster) return msg('Failed to load roster' + (t.rosterErr ? ' (' + t.rosterErr + ')' : '.'));
+  if (t.rosterLoading) return msg('Loading…');
+  if (t.rosterErr || !t.roster) return msg(t.sy ? 'Data not available for this season.' : 'Failed to load roster' + (t.rosterErr ? ' (' + t.rosterErr + ')' : '.'));
   const all = [];
   const gp = g => { const x = String(g || ''); return /left/i.test(x) ? 'LW' : /right/i.test(x) ? 'RW' : /cent/i.test(x) ? 'C' : /defen/i.test(x) && t.league === 'nhl' ? 'D' : /goal/i.test(x) ? 'G' : ''; };
   (t.roster.athletes || []).forEach(a => { if (!a) return; if (Array.isArray(a.items)) { const g = t.league === 'nhl' ? gp(a.position) : ''; a.items.forEach(x => { if (g) x._gpos = g; all.push(x); }); } else all.push(a); });
@@ -2515,7 +2540,7 @@ function rosterHTML(t) {
   all.sort((a, b) => oi(a) - oi(b) || String(a.lastName || a.displayName || '').localeCompare(String(b.lastName || b.displayName || '')));
   const tr = a => {
     const pos = a._gpos || (a.position && a.position.abbreviation) || '', nm = a.displayName || a.fullName || '';
-    const ey = a.experience && a.experience.years != null ? a.experience.years : '', exp = ey === 0 || ey === '0' ? 'R' : ey;
+    const ey = a.experience && a.experience.years != null ? a.experience.years : '', exp = ey === 0 || ey === '0' ? 'R' : ey === '' ? '–' : ey;
     const ht = String(a.displayHeight || '').replace(/\s/g, ''), wt = String(a.displayWeight || '').replace(/\s*lbs?\.?/i, '');
     return `<tr data-player="${esc(a.id)}" data-pl="${t.league}" data-pn="${esc(nm)}" data-pp="${esc(pos)}" data-pj="${esc(a.jersey || '')}" data-pt="${esc(tn)}">
       <td class="n"><span class="pn">${esc(nm)}</span></td><td>${esc(pos)}</td><td>${esc(a.jersey || '–')}</td><td>${esc(exp)}</td><td>${esc(ht)}</td><td>${esc(wt)}</td><td>${esc(a.age)}</td></tr>`;
@@ -2614,7 +2639,7 @@ async function teamPsFast(t, all, base, catNm) {
   return out;
 }
 async function loadTeamPlayers(t) {
-  if (t.ps) return;
+  if (t.ps || t.rosterLoading) return;
   const ck = 'tps_' + t.league + '_' + t.id + (t.sy ? '_' + t.sy : ''), cached = lsGet(ck, t.sy ? 30 * 864e5 : 6 * 3600e3);
   const lastEnd = Math.max(0, ...(t.events || []).filter(e => e.state === 'post' || e.state === 'in').map(e => new Date(e.date).getTime() + 3.5 * 36e5).filter(x => x < Date.now()));
   if (cached && cached.ts && lastEnd > cached.ts) { /* od ulozeni se dohral zapas -> stahnout znovu */ }
@@ -2865,7 +2890,7 @@ async function loadLV() {
       for (const u of ['https://sports.core.api.espn.com/v2/sports/' + parts[0] + '/leagues/' + parts[1] + '/seasons/' + (v.sy || seasonYear(v.league)) + '/types/2/leaders?limit=5&lang=en&region=us'].concat(v.sy ? [] : ['https://sports.core.api.espn.com/v2/sports/' + parts[0] + '/leagues/' + parts[1] + '/leaders?limit=5&lang=en&region=us'])) {
         try { j = await getJson(u); if (j && j.categories && j.categories.length) break; } catch (e) {}
       }
-      const cats = ((j && j.categories) || []).filter(c => c.leaders && c.leaders.length).map(c => ({ name: c.name, abbr: c.abbreviation || c.shortDisplayName || '', title: c.displayName || c.name, rows: c.leaders.slice(0, 5).map(l => ({ val: l.displayValue != null ? l.displayValue : l.value, ref: l.athlete && l.athlete.$ref, tid: ((l.team && l.team.$ref) || '').match(/teams\/(\d+)/), a: null })) }));
+      const cats = ((j && j.categories) || []).filter(c => c.leaders && c.leaders.length).map(c => ({ name: c.name, abbr: c.abbreviation || c.shortDisplayName || '', title: c.displayName || c.name, rows: c.leaders.slice(0, 5).map(l => ({ val: /pct|percent/i.test(String(c.name) + ' ' + String(c.displayName)) && typeof l.value === 'number' && l.value <= 1 ? (l.value * 100).toFixed(1) : l.displayValue != null ? l.displayValue : l.value, ref: l.athlete && l.athlete.$ref, tid: ((l.team && l.team.$ref) || '').match(/teams\/(\d+)/), a: null })) }));
       if (v.league === 'nfl') {
         const ORD = [/^passingYards$/i, /^passingTouchdowns$/i, /^rushingYards$/i, /^rushingTouchdowns$/i, /^receivingYards$/i, /^receivingTouchdowns$/i, /^totalTackles$/i, /^sacks$/i, /^interceptions$/i, /^passesDefended$/i, /^fieldGoals?Made$/i, /long.*fieldGoal|fieldGoal.*long/i];
         const picked = ORD.map(re => cats.find(c => re.test(String(c.name)))).filter(Boolean);
@@ -3205,6 +3230,11 @@ async function loadLeaders() {
       return { a: at, vals };
     });
     if (!rows.length || !cols.length) throw new Error('empty');
+    try { const lc = state.lvC['lstats' + v.league + (v.sy || '')], cc = lc && lc.cats && lc.cats.find(c => c.name === v.cat), top = cc ? cc.rows.map(r => r.a && String(r.a.id)).filter(Boolean) : [];
+      const have = new Set(rows.map(r => String(r.a.id))), miss = top.filter(id => !have.has(id));
+      if (miss.length) { const j2 = await getJson(u.replace('isqualified=true', 'isqualified=false').replace('limit=100', 'limit=1000'));
+        (j2.athletes || []).forEach(a => { const id = String((a.athlete || {}).id); if (!miss.includes(id)) return; const ac = a.categories || [];
+          rows.push({ a: a.athlete || {}, vals: cols.map(col => { const x = ac.find(q => q.name === col.ci); if (!x) return ''; const arr = x.totals || x.values || []; return arr[col.k] != null ? arr[col.k] : ''; }) }); }); } } catch (e) {}
     v.data = { cols, rows };
     const keys = catKeys(v.cat);
     const li = leaderCol(cols, v, keys);
@@ -3396,7 +3426,7 @@ $app.addEventListener('click', ev => {
     state.team.yOpen = !state.team.yOpen; render();
   } else if (d.ty) {
     const t = state.team, y = +d.ty, ny = y === seasonYear(t.league) ? null : y; t.yOpen = false;
-    if (ny !== (t.sy || null)) { t.sy = ny; t.done = false; t.ps = null; t.month = null; t.roster = null; t.events = []; if (t.tab === 'inj' && ny) t.tab = 'roster'; render(); loadTeam(); } else render();
+    if (ny !== (t.sy || null)) { t.sy = ny; t.done = false; t.ps = null; t.month = null; t.roster = null; t.events = []; render(); loadTeam(); } else render();
   } else if (d.lsyo) {
     state.lv.syOpen = !state.lv.syOpen; render();
   } else if (d.lsy) {
