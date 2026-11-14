@@ -1404,7 +1404,7 @@ function teamNameOf(ti) {
 }
 function gSort(title, labels, rows) {
   const g = state.game, gk = title + '|' + labels.join(','); let sel = g && g.gsort && g.gsort[gk], def = false;
-  if ((!sel || sel.k >= labels.length) && g && g.ev && g.ev.state === 'post') { const dk = labels.indexOf(g.league === 'nba' ? 'PTS' : g.league === 'nhl' ? (labels.includes('PTS') ? 'PTS' : 'G') : '__'); if (dk >= 0) { sel = { k: dk, asc: false }; def = true; } }
+  if ((!sel || sel.k >= labels.length) && g && g.ev && (g.ev.state === 'post' || g.ev.state === 'in')) { const dk = labels.indexOf(g.league === 'nba' ? 'PTS' : g.league === 'nhl' ? (labels.includes('PTS') ? 'PTS' : 'G') : '__'); if (dk >= 0) { sel = { k: dk, asc: false }; def = true; } }
   if (!sel || sel.k >= labels.length) return { gk, k: -1, rows };
   const num = v => { const x = String(v == null ? '' : v).replace(/,/g, ''); let m; if ((m = x.match(/^(\d+):(\d+)$/))) return +m[1] * 60 + +m[2]; if ((m = x.match(/^(\d+)[-/](\d+)$/))) return +m[1] + +m[2] / 1000; const n = parseFloat(x); return isNaN(n) ? -1e9 : n; };
   const k2 = g.league === 'nhl' ? labels.indexOf('G') : -1;
@@ -3395,20 +3395,15 @@ async function loadLTeams(v) {
     defs.forEach(c => (c.names || []).forEach((n, i) => { const key = (tag ? tag + ':' : '') + c._n + '.' + n; if (!cols.some(x => x.key === key)) { const col = { key, tag: c._dup ? 'opp' : tag, name: n, grp: c.name, label: (c.labels || [])[i] || n, disp: (c.displayNames || [])[i] || n }; col.side = tSide(col); cols.push(col); } }));
     (j.teams || j.athletes || []).forEach(x => { const t = x.team || x.athlete || {}; if (!t.id) return; const id = String(t.id);
       if (!teams.has(id)) teams.set(id, { id, name: t.displayName || t.name || '', short: t.shortDisplayName || t.name || '', abbr: t.abbreviation || '', logo: (t.logos && t.logos[0] && t.logos[0].href) || t.logo || '' });
-      const m = vals[id] || (vals[id] = {}), cnt = {};
-      (x.categories || []).forEach((ac, ai) => { cnt[ac.name] = (cnt[ac.name] || 0) + 1; const want = cnt[ac.name] > 1 ? ac.name + '#' + cnt[ac.name] : ac.name; const def = defs.find(c => c._n === want) || defs[ai]; if (!def) return; const arr = ac.totals || ac.values || []; (def.names || []).forEach((n, i) => { const key = (tag ? tag + ':' : '') + def._n + '.' + n; if (arr[i] != null && m[key] == null) m[key] = arr[i]; }); });
+      const m = vals[id] || (vals[id] = {});
+      (x.categories || []).forEach(ac => { const def = defs.find(c => c.name === ac.name); if (!def) return; const arr = ac.totals || ac.values || [];
+        const isOpp = String(ac.splitId) === '900' || /^opponent/i.test(ac.displayName || '');
+        (def.names || []).forEach((n, i) => { let key = (tag ? tag + ':' : '') + def._n + '.' + n;
+          if (isOpp) { key = 'opp:' + key; if (!cols.some(z => z.key === key)) cols.push({ key, tag: 'opp', name: n, grp: def.name, label: (def.labels || [])[i] || n, disp: 'Opponent ' + ((def.displayNames || [])[i] || n), side: 'opp' }); }
+          if (arr[i] != null && m[key] == null) m[key] = arr[i]; }); });
       ['opponent', 'opponents', 'opponentCategories'].forEach(ok => { const oc = x[ok] && (x[ok].categories || x[ok]); if (Array.isArray(oc)) oc.forEach(ac => { const def = defs.find(c => c.name === ac.name); if (!def) return; const arr = ac.totals || ac.values || []; (def.names || []).forEach((n, i) => { const key = 'opp:' + def._n + '.' + n; if (!cols.some(z => z.key === key)) cols.push({ key, tag: 'opp', name: n, grp: def.name, label: (def.labels || [])[i] || n, disp: (def.displayNames || [])[i] || n, side: 'opp' }); if (arr[i] != null && m[key] == null) m[key] = arr[i]; }); }); }); }); };
   const cols = [], vals = {}, teams = new Map();
   parse(await getJson(base).catch(() => null), '', cols, vals, teams);
-  if (v.league !== 'nhl') {
-    const CAND = ['&view=defense', '&view=opponent', '&isOpponent=true', '&category=defense', '&category=opponent', '&opponent=true', '&table=defense'];
-    for (const q of CAND) { const c2 = [], v2 = {}, t2 = new Map(); parse(await getJson(base + q).catch(() => null), 'x', c2, v2, t2);
-      let diff = 0, nw = 0; c2.forEach(c => { const b = cols.find(z => !z.tag && z.grp === c.grp && z.name === c.name); if (!b) { nw++; return; } if ([...t2.keys()].some(id => String((v2[id] || {})[c.key]) !== String((vals[id] || {})[b.key]))) diff++; });
-      if (!diff && !nw) continue;
-      c2.forEach(c => { const b = cols.find(z => !z.tag && z.grp === c.grp && z.name === c.name); if (b && ![...t2.keys()].some(id => String((v2[id] || {})[c.key]) !== String((vals[id] || {})[b.key]))) return;
-        const col = Object.assign({}, c, { key: (b ? 'opp:' : 'def:') + c.key, tag: b ? 'opp' : 'def', side: b ? 'opp' : 'def' }); cols.push(col); t2.forEach((_, id) => { const m = vals[id] || (vals[id] = {}); m[col.key] = (v2[id] || {})[c.key]; }); });
-      break; }
-  }
   const ids = [...teams.keys()];
   const usable = cols.filter(c => { if (ids.filter(id => tnum((vals[id] || {})[c.key]) != null).length < Math.max(3, ids.length * .6)) return false;
     if (c.tag) { const b = cols.find(x => !x.tag && x.grp === c.grp && x.name === c.name); if (b && ids.every(id => String((vals[id] || {})[b.key]) === String((vals[id] || {})[c.key]))) return false; } return true; });
@@ -3468,7 +3463,7 @@ function renderDraft() {
   const v = state.lv; let body;
   if (!v.dd) body = msg(v.err || 'Loading draft…');
   else { const rd = v.dd.find(x => x.n === v.rd) || v.dd[0]; v.rd = rd.n;
-    body = `<div class="mstrip tgs">${v.dd.map(r => `<button class="mo ${r.n === v.rd ? 'on' : ''}" data-drr="${r.n}"><span>Rd ${r.n}</span></button>`).join('')}</div>` + rd.picks.map(p => { const tm = (state.teamList[v.league] || []).find(x => p.tid && x.id === p.tid[1]) || {}, a = p.a || {};
+    body = `<div class="mstrip tgs">${v.dd.map(r => `<button class="mo ${r.n === v.rd ? 'on' : ''}" data-drr="${r.n}"><span>Rd ${r.n}</span></button>`).join('')}</div>` + (!rd.done ? msg('Loading picks…') : '') + (!rd.done ? [] : rd.picks).map(p => { const tm = (state.teamList[v.league] || []).find(x => p.tid && x.id === p.tid[1]) || {}, a = p.a || {};
       return `<div class="drw" ${a.id ? `data-player="${esc(a.id)}" data-pl="${v.league}" data-pn="${esc(a.name)}" data-pp="${esc(a.pos)}" data-pj="" data-pt="${esc(tm.name || '')}"` : ''}><span class="dpk">${esc(p.overall || p.pick)}</span>${tm.logo ? logoImg(tm.logo) : '<span style="width:28px"></span>'}<div class="dnm">${esc(a.name || (rd.loading || !rd.done ? '…' : '–'))}<small>${esc([a.pos, tm.name, 'Pick ' + p.pick].filter(Boolean).join(' · '))}</small></div></div>`; }).join(''); }
   $app.innerHTML = `
     <header class="d"><div class="tabs"><button class="back" data-back aria-label="Back"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></button><button class="home" data-home aria-label="Home"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"><path d="M3 10.5 12 3l9 7.5"/><path d="M5.5 9v11h13V9"/><path d="M10 20v-6h4v6"/></svg></button></div></header>
@@ -3488,6 +3483,7 @@ function renderTLeaders() {
     const valOf = (t, col) => tVal(c, t, col);
     const di = () => { let i = cols.findIndex(x => x.label === R.def && (!R.defSec || x.sec === R.defSec)); if (i < 0) i = cols.findIndex(x => x.label === R.def); return Math.max(0, i); };
     let sk = cols.findIndex(x => x.key === v.tk); if (sk < 0) { sk = di(); v.tk = cols[sk] && cols[sk].key; v.tasc = null; }
+    if (!v.tclk) v.tclk = 1;
     const scol = cols[sk], low = v.tasc != null ? v.tasc : (scol && (scol.key === (cols[di()] || {}).key ? R.low : (LOWBETTER.test(scol.name || '') !== (scol.side === 'opp'))));
     v._low = low;
     const rows = c.teams.map(t => ({ t, vals: cols.map(col => valOf(t, col)) })).sort((a, b) => { const x = tnum(a.vals[sk]), y = tnum(b.vals[sk]); if (x == null) return 1; if (y == null) return -1; return (low ? 1 : -1) * (x - y); });
@@ -3495,7 +3491,7 @@ function renderTLeaders() {
     const fmt = (x, col) => tFmt(x, col, col.label === R.plus || (v.grp === 'Differential'));
     const secs = []; cols.forEach(x => { const l = secs[secs.length - 1]; if (l && l[0] === x.sec) l[1]++; else secs.push([x.sec, 1]); });
     const sst = new Set(); let ci = 0; secs.forEach(([t2, n]) => { sst.add(ci); ci += n; });
-    const gh = secs.some(x => x[0]) ? `<tr class="gh1"><th class="n"></th>${secs.map(([t2, n]) => `<th class="tgh sst" colspan="${n}">${esc(t2)}</th>`).join('')}</tr>` : '';
+    const gh = secs.some(x => x[0]) ? `<tr class="gh1"><th class="n"></th>${secs.map(([t2, n], si) => `<th class="tgh${si ? ' sst' : ''}" colspan="${n}">${esc(t2)}</th>`).join('')}</tr>` : '';
     const trs = rows.map((r, i) => { const tl = (state.teamList[v.league] || []).find(x => x.id === r.t.id) || {}, logo = dk(tl.logo || r.t.logo || '');
       return `<tr data-topen="${esc(r.t.id)}" data-tl="${v.league}" data-tn="${esc(tl.name || r.t.name)}" data-tlogo="${esc(logo)}"><td class="n"><div class="tc"><span class="rk">${i + 1}</span>${logoImg(logo)}<span class="pn">${esc(tl.short || r.t.short || tl.abbr || r.t.abbr)}</span></div></td>${r.vals.map((x, k) => `<td class="${k === sk ? 'on' : ''}">${nv(fmt(x, cols[k]))}</td>`).join('')}</tr>`; }).join('');
     body = cols.length ? `<section class="blk"><div class="tw"><table class="nfx sep lbt tlt" style="width:max(100%, ${tw}px)"><colgroup><col style="width:150px">${cols.map(x => `<col style="width:${w(x.label)}px">`).join('')}</colgroup><thead>${gh}<tr><th class="n">Team</th>${cols.map((x, k) => `<th data-tlsort="${esc(x.key)}" class="${k === sk ? 'on' : ''}${sst.has(k) && k ? ' sst' : ''}">${esc(x.label)}</th>`).join('')}</tr></thead><tbody>${trs.replace(/<td class="(on)?">/g, (m0, on) => m0)}</tbody></table></div></section>` : msg('Data not available for this category.');
@@ -3799,9 +3795,9 @@ $app.addEventListener('click', ev => {
   } else if (d.tlc) {
     window._fromList = true; window._ldY = state.lv.sy || null; window._tlk = d.tlc; location.hash = '#/tleaders/' + state.lv.league;
   } else if (d.tgrp) {
-    const v = state.lv; v.grp = d.tgrp; v.tk = null; v.tasc = null; v.sl = null; render();
+    const v = state.lv; v.grp = d.tgrp; v.tk = null; v.tasc = null; v.tclk = 0; v.sl = null; render();
   } else if (d.tlsort) {
-    const v = state.lv; if (v.tk === d.tlsort) v.tasc = !v._low; else { v.tk = d.tlsort; v.tasc = null; } v._slk = v.tk; render();
+    const v = state.lv; if (v.tk === d.tlsort && v.tclk === 1) { v.tasc = !v._low; v.tclk = 2; } else if (v.tk === d.tlsort && v.tclk === 2) { v.tk = null; v.tasc = null; v.tclk = 0; v.sl = null; } else { v.tk = d.tlsort; v.tasc = null; v.tclk = 1; } v._slk = v.tk; render();
   } else if (d.draft) {
     window._fromList = true; location.hash = '#/draft/' + state.player.league + '/' + d.draft;
   } else if (d.drr) {
