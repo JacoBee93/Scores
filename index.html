@@ -437,6 +437,7 @@ body{min-height:100vh}
 .gl2 td.gr{text-align:left !important;padding-left:0;padding-right:0}
 .gl2 .gh2 th.grh{text-align:left;padding-left:23px !important;padding-right:0}
 .gl2.nba .gh2 th.grh{padding-left:24px !important}
+.gl2.nhl .gh2 th.grh{padding-left:27px !important}
 .gl2 .gh2 th.l:first-child{padding-left:4px}
 .gl2 .gh2 th.l:nth-child(2){padding-left:3px}
 .gl2 .glr b{font-weight:400}
@@ -790,6 +791,14 @@ input[type=search]::-webkit-search-cancel-button{display:none;-webkit-appearance
 .dsh b{font-weight:inherit;text-align:right}
 .dsh b:last-child{text-align:left}
 .dsh i{font-style:normal;text-align:center}
+.sor{display:flex;align-items:center;gap:12px;padding:7px 0}
+.sor .pl{width:26px;flex:none;display:flex}
+.sor .pl img{width:24px;height:24px;object-fit:contain}
+.sor .som{width:20px;flex:none;text-align:center;font-weight:800;font-size:16px}
+.sor .som.y{color:#30d158}
+.sor .som.n{color:#ff453a}
+.sor .son{font-size:14.5px;font-weight:500}
+.fdl{color:var(--mut);font-size:12px;font-weight:700;letter-spacing:.4px;text-transform:uppercase;margin:6px 4px 4px}
 </style>
 </head>
 <body>
@@ -1252,9 +1261,11 @@ const GLOSS = {
   all: { GP: 'Games Played', G: 'Games / Goals', W: 'Wins', L: 'Losses', T: 'Ties', OTL: 'Overtime Losses', PCT: 'Winning Percentage', GB: 'Games Behind', HOME: 'Home Record', AWAY: 'Away Record', DIV: 'Division Record', CONF: 'Conference Record', DIFF: 'Differential', STRK: 'Current Streak', L10: 'Last 10 Games', TOT: 'Total', AVG: 'Average', YDS: 'Yards', TD: 'Touchdowns', INT: 'Interceptions', LNG: 'Longest', LONG: 'Longest', MIN: 'Minutes', RK: 'Rank' },
   nfl: { PF: 'Points For', PA: 'Points Against', CMP: 'Completions', ATT: 'Attempts', 'CMP%': 'Completion Percentage', 'C/ATT': 'Completions / Attempts', SACK: 'Sacks', SACKS: 'Sacks', RTG: 'Passer Rating', QBR: 'Total QBR', CAR: 'Carries', REC: 'Receptions', TGTS: 'Targets', YAC: 'Yards After Catch', FD: 'First Downs', FUM: 'Fumbles', LOST: 'Fumbles Lost', SOLO: 'Solo Tackles', AST: 'Assisted Tackles', TFL: 'Tackles For Loss', PD: 'Passes Defended', 'QB HTS': 'QB Hits', FF: 'Forced Fumbles', FR: 'Fumble Recoveries', BIG: 'Big Plays (20+ yds)', 'YDS/G': 'Yards Per Game', SYL: 'Sack Yards Lost', FG: 'Field Goals', XP: 'Extra Points', PTS: 'Points', NO: 'Number', YDSL: 'Yards Lost', G: 'Games', GS: 'Games Started', SFTY: 'Safeties', BLK: 'Blocked Kicks', KB: 'Kicks Blocked', FGM: 'Field Goals Made', FGA: 'Field Goals Attempted', 'FG%': 'Field Goal Percentage', XPM: 'Extra Points Made', XPA: 'Extra Points Attempted', 'XP%': 'Extra Point Percentage', PUNTS: 'Punts', P: 'Punts', NET: 'Net Punting Average', IN20: 'Punts Inside 20', 'IN 20': 'Punts Inside 20', TB: 'Touchbacks', FC: 'Fair Catches', RET: 'Returns', KR: 'Kick Returns', PR: 'Punt Returns', 'Y/R': 'Yards Per Reception', YPC: 'Yards Per Carry', 'Y/A': 'Yards Per Attempt', ADJQBR: 'Adjusted QBR', TCKL: 'Tackles', COMB: 'Combined Tackles', 'INT YDS': 'Interception Return Yards', 'INT TD': 'Interception Touchdowns', DEFTD: 'Defensive Touchdowns', FUML: 'Fumbles Lost', 'FG ATT': 'Field Goal Attempts', '1-19': 'FG Made 1-19 yds', '20-29': 'FG Made 20-29 yds', '30-39': 'FG Made 30-39 yds', '40-49': 'FG Made 40-49 yds', '50+': 'FG Made 50+ yds', FUMR: 'Fumble Recoveries', 'SCK YDS': 'Sack Yards' },
   nba: { G: 'Games', PTS: 'Points', Pts: 'Points', REB: 'Rebounds', AST: 'Assists', STL: 'Steals', BLK: 'Blocks', TO: 'Turnovers', PF: 'Personal Fouls', FG: 'Field Goals Made-Attempted', 'FG%': 'Field Goal Percentage', '3PT': '3-Point FG Made-Attempted', '3P%': '3-Point Percentage', '3PT%': '3-Point Percentage', FT: 'Free Throws Made-Attempted', 'FT%': 'Free Throw Percentage', OFF: 'Offensive Rebounds', OR: 'Offensive Rebounds', DR: 'Defensive Rebounds', DD2: 'Double Doubles', TD3: 'Triple Doubles', FGM: 'Field Goals Made', FGA: 'Field Goals Attempted', '3PM': '3-Pointers Made', '3PA': '3-Pointers Attempted', FTM: 'Free Throws Made', FTA: 'Free Throws Attempted', PPG: 'Points Per Game', 'OPP PPG': 'Opponent Points Per Game', GS: 'Games Started' },
-  nhl: { G: 'Goals', A: 'Assists', PTS: 'Points', '+/-': 'Plus/Minus Rating', PIM: 'Penalty Minutes', SOG: 'Shots On Goal', S: 'Shots', HIT: 'Hits', BKS: 'Blocked Shots', TOI: 'Time On Ice', 'TOI/G': 'Time On Ice Per Game', PPG: 'Power Play Goals', PPA: 'Power Play Assists', SHG: 'Short Handed Goals', SHA: 'Short Handed Assists', GWG: 'Game-Winning Goals', 'S%': 'Shooting Percentage', SPCT: 'Shooting Percentage', RW: 'Regulation Wins', ROW: 'Regulation + OT Wins', GF: 'Goals For', GA: 'Goals Against', GAA: 'Goals Against Average', 'SV%': 'Save Percentage', SV: 'Saves', SA: 'Shots Against', SO: 'Shutouts', GS: 'Games Started', FW: 'Faceoffs Won', FL: 'Faceoffs Lost', 'FO%': 'Faceoff Percentage' }
+  nhl: { G: 'Goals', A: 'Assists', PTS: 'Points', '+/-': 'Plus/Minus Rating', PIM: 'Penalty Minutes', SOG: 'Shots On Goal', S: 'Shots', HIT: 'Hits', BKS: 'Blocked Shots', TOI: 'Time On Ice', 'TOI/G': 'Time On Ice Per Game', PPG: 'Power Play Goals', PPA: 'Power Play Assists', SHG: 'Short Handed Goals', SHA: 'Short Handed Assists', GWG: 'Game-Winning Goals', 'S%': 'Shooting Percentage', SPCT: 'Shooting Percentage', RW: 'Regulation Wins', ROW: 'Regulation + OT Wins', GF: 'Goals For', GA: 'Goals Against', 'GA/G': 'Goals Against Average', 'SV%': 'Save Percentage', SV: 'Saves', SA: 'Shots Against', SO: 'Shutouts', GS: 'Games Started', FW: 'Faceoffs Won', FL: 'Faceoffs Lost', 'FO%': 'Faceoff Percentage' }
 };
-function relabel(root) { root.querySelectorAll('th, .cmpt td.cl').forEach(el => { if (el.children.length === 0 && el.textContent.trim() === 'LST') el.textContent = 'LOST'; }); }
+const RELAB = { LST: 'LOST', GAA: 'GA/G', WINS: 'W', Wins: 'W' };
+function relabel(root) { root.querySelectorAll('th, .cmpt td.cl, .ssl').forEach(el => { if (el.children.length) return; const t = el.textContent.trim(); if (RELAB[t]) el.textContent = RELAB[t]; else if (/^Wins?-L/i.test(t)) el.textContent = t.replace(/^Wins?/i, 'W'); });
+  root.querySelectorAll('.ssl, .ssv, .psub').forEach(el => { if (el.children.length) return; const t = el.textContent; if (/[A-Za-z0-9]-[A-Za-z0-9]/.test(t) && !/\d{4}-\d{2}/.test(t)) el.textContent = t.replace(/([A-Za-z0-9%])-(?=[A-Za-z0-9])/g, '$1\u2009-\u2009'); }); }
 function addGlossary(v) {
   if (!['player', 'team', 'lv', 'game', 'cmp'].includes(v)) return;
   if (v === 'lv' && state.lv && state.lv.kind === 'tleaders') return;
@@ -1275,7 +1286,7 @@ function addGlossary(v) {
 }
 function render() {
   const key = viewKey(), same = key === state.lastView, y = same ? window.scrollY : 0, v = topView();
-  const tws = same ? [...document.querySelectorAll('.tw')].map(x => x.scrollLeft) : null;
+  const tws = same && !window._twReset ? [...document.querySelectorAll('.tw')].map(x => x.scrollLeft) : null; window._twReset = 0;
   if (v === 'player') renderPlayer(); else if (v === 'game') renderGame(); else if (v === 'team') renderTeam();
   else if (v === 'lv') renderLV(); else if (v === 'cmp') renderCompare(); else if (v === 'search') renderSearch(); else renderList();
   state.lastView = key;
@@ -1321,6 +1332,11 @@ const dk = u => String(u || '').replace(/(\/teamlogos\/\w+\/)500\/(?:scoreboard\
 const logoImg = src => src ? `<img src="${esc(src)}" alt="" onerror="this.style.visibility='hidden'">` : '<span class="ph"></span>';
 
 function listBody(evs, lg) {
+  const fv = e => isFav(e.league || lg, e.home.id) || isFav(e.league || lg, e.away.id), favs = evs.filter(fv);
+  if (favs.length && favs.length < evs.length) { const rest = evs.filter(e => !fv(e));
+    const dl = e => { const d = new Date(e.date); return DAYS[d.getDay()] + ' ' + d.getDate() + '.' + (d.getMonth() + 1) + '.'; };
+    return `<div class="sec dh">★ Favorites</div>` + favs.sort((a, b) => new Date(a.date) - new Date(b.date)).map(e => (lg === 'nfl' ? `<div class="fdl">${esc(dl(e))}</div>` : '') + cardHTML(e)).join('') + listBody(rest, lg + '_'); }
+  lg = String(lg).replace(/_$/, '');
   if (lg === 'nfl') {
     let last = '';
     const lv = evs.filter(e => e.state === 'in');
@@ -1577,7 +1593,8 @@ function shotData(g) {
   const nba = g.league === 'nba';
   return allPlays(g).filter(p => { if (!p || !p.coordinate || p.coordinate.x == null || p.coordinate.y == null) return false; const t = String((p.type && p.type.text) || '');
     if (nba) { const x = +p.coordinate.x, y = +p.coordinate.y; return (p.shootingPlay || /shot|layup|dunk|jumper|tip|hook/i.test(t)) && !/free throw/i.test(t) && x >= 0 && x <= 50 && y >= 0 && y <= 94; }
-    return /shot|goal/i.test(t); });
+    const so = g.league === 'nhl' && ((p.period && p.period.number) || 0) >= 5 && !(g.sum && g.sum.header && g.sum.header.season && +g.sum.header.season.type === 3);
+    return !so && /shot|goal/i.test(t); });
 }
 const scKind = p => (state.game && state.game.league === 'nba') ? (p.scoringPlay ? 'g' : 'm') : p.scoringPlay || /^goal/i.test(String((p.type && p.type.text) || '')) ? 'g' : /block/i.test(p.type.text) ? 'b' : /miss/i.test(p.type.text) ? 'm' : 's';
 function rinkSVG(g, plays, f) {
@@ -2166,7 +2183,8 @@ function scoringHTML(g) {
       let na = 0, nh = 0;
       soHTML = `<section class="per"><div class="phd">SHOOTOUT</div>${sp.map(p => { const lg = p.team && logos[p.team.id], t = String(p.text || ''), gl = (p.scoringPlay || /\bgoal\b|scores/i.test(t)) && !/saved|miss|no goal|failed/i.test(t);
         if (gl && ev) { if (String(p.team && p.team.id) === String(ev.home.id)) nh++; else na++; }
-        return `<div class="play g so"><span class="pl">${lg ? `<img src="${esc(lg)}" alt="" onerror="this.style.visibility='hidden'">` : ''}</span><span class="som ${gl ? 'y' : 'n'}">${gl ? '✓' : '✕'}</span><span class="txt">${esc(t.replace(/\s*\(.*?shootout.*?\)/i, ''))}</span></div>`; }).join('') || msg('Shootout details not available.')}${ev && sp.length ? `<div class="sosum">${esc(ev.away.abbr)} ${na} – ${nh} ${esc(ev.home.abbr)}</div>` : ''}</section>`; } }
+        const who = (p.participants && p.participants[0] && p.participants[0].athlete && p.participants[0].athlete.displayName) || (t.match(/^(.+?)\s+(?:shootout|penalty shot|scores|goal|missed|misses|saved|shot|attempt|wrist|snap|backhand|slap)\b/i) || [])[1] || t;
+        return `<div class="sor"><span class="pl">${lg ? `<img src="${esc(lg)}" alt="" onerror="this.style.visibility='hidden'">` : ''}</span><span class="som ${gl ? 'y' : 'n'}">${gl ? '✓' : '✕'}</span><span class="son">${esc(who)}</span></div>`; }).join('') || msg('Shootout details not available.')}</section>`; } }
   return [...groups.keys()].sort((a, b) => a - b).map(k => {
     const rows = groups.get(k).map(p => {
       const lg = p.team && logos[p.team.id];
@@ -2281,6 +2299,11 @@ function pickStatCols(labels, league, n, names) {
   return cols.slice(0, n || 7);
 }
 const dl = (l, league) => league === 'nhl' && l === 'S' ? 'SOG' : l;
+const GOALIE_ALL = [['W', ['W', 'WINS']], ['L', ['L', 'LOSSES']], ['OTL', ['OTL', 'OT', 'OTLOSSES']], ['GA/G', ['GAA', 'GA/G']], ['SA', ['SA']], ['GA', ['GA']], ['SV', ['SV', 'SAVES']], ['SV%', ['SV%', 'SVPCT']], ['SO', ['SO', 'SHO']], ['TOI', ['TOI', 'TOI/G']], ['PIM', ['PIM']]];
+const GOALIE_GL = [['GA/G', ['GAA', 'GA/G']], ['SA', ['SA']], ['GA', ['GA']], ['SV', ['SV', 'SAVES']], ['SV%', ['SV%', 'SVPCT']], ['TOI', ['TOI', 'TOI/G']], ['PIM', ['PIM']]];
+const isGoalieCat = labels => (labels || []).some(l => /^(SV%|GAA|GA\/G)$/i.test(l));
+const goalieCols = (labels, spec, names) => { const U = (labels || []).map(x => String(x).toUpperCase()), out = [];
+  spec.forEach(([d, al]) => { let k = U.findIndex(x => al.includes(x)); if (d === 'SO' && names) { const j = names.findIndex(n => /^shutouts$/i.test(n)); if (j >= 0) k = j; } if (k >= 0 && !out.some(o => o[0] === k)) out.push([k, d]); }); return out; };
 const nhlShotIdx = names => { const n = names || []; let i = n.findIndex(x => /^shotsTotal$/i.test(x)); if (i < 0) i = n.findIndex(x => /^shots(OnGoal)?$/i.test(x)); return i; };
 const nhlHide = (labels, names, k) => { if (labels[k] === 'PROD') return true; if (names && /^shootout/i.test(names[k] || '')) return true; const si = nhlShotIdx(names); if (si >= 0) return (labels[k] === 'S' || labels[k] === 'SOG') && k !== si; return labels[k] === 'SOG' && labels.includes('S'); };
 const nhlLab = (labels, names, k) => nhlShotIdx(names) === k ? 'SOG' : dl(labels[k], 'nhl');
@@ -2316,7 +2339,7 @@ function gamelogHTML(p, o) {
     if (!idx.length) { labels.forEach((_, k) => idx.push(k)); groups = null; }
     cols = idx.map(k => [labels[k], k]);
   } else {
-    if (p.league === 'nhl') cols = labels.map((l, i) => [nhlLab(labels, j.names, i), i]).filter(c => !nhlHide(labels, j.names, c[1]));
+    if (p.league === 'nhl') cols = isGoalieCat(labels) ? goalieCols(labels, GOALIE_GL, j.names).map(([k, d]) => [d, k]) : labels.map((l, i) => [nhlLab(labels, j.names, i), i]).filter(c => !nhlHide(labels, j.names, c[1]));
     else cols = (GL_COLS[p.league] || []).filter(l => !(l === 'S' && labels.includes('SOG'))).map(l => [l, labels.indexOf(l)]).filter(c => c[1] >= 0);
     if (cols.length < 3) cols = labels.map((l, i) => [l, i]);
   }
@@ -2568,7 +2591,7 @@ function careerHTML(p, cats) {
   const pv = (c, pm, k) => { const nm = c.names && c.names[k]; if (!nm || !pm) return null; if (pm[nm] != null) return pm[nm]; if (/-/.test(nm)) { const q = nm.split('-'); if (pm[q[0]] != null && pm[q[1]] != null) { const f = x => /\./.test(String(x)) ? (+x).toFixed(1) : x; return f(pm[q[0]]) + '-' + f(pm[q[1]]); } } return null; };
   const out = list.map(c => {
     const cols = p.league === 'nba' ? NBA_ALL.map(([l, d, w]) => [c.labels.indexOf(l === '3P%' && !c.labels.includes('3P%') ? '3PT%' : l), d, w]).filter(x => x[0] >= 0)
-      : c.labels.map((l, k) => [k, p.league === 'nhl' ? nhlLab(c.labels, c.names, k) : dl(l, p.league), p.league === 'nhl' ? (String(l).length > 3 ? 46 : 36) : 53]).filter(x => !(p.league === 'nhl' && nhlHide(c.labels, c.names, x[0])) && !(p.league === 'nfl' && /^STF/i.test(c.labels[x[0]])));
+      : p.league === 'nhl' && isGoalieCat(c.labels) ? goalieCols(c.labels, GOALIE_ALL, c.names).map(([k, d]) => [k, d, d.length > 3 ? 48 : 40]) : c.labels.map((l, k) => [k, p.league === 'nhl' ? nhlLab(c.labels, c.names, k) : dl(l, p.league), p.league === 'nhl' ? (String(l).length > 3 ? 46 : 36) : 53]).filter(x => !(p.league === 'nhl' && nhlHide(c.labels, c.names, x[0])) && !(p.league === 'nfl' && /^STF/i.test(c.labels[x[0]])));
     const tw = 112 + cols.reduce((a, x) => a + x[2], 0);
     let rows, tot = null;
     if (mode !== 'post') {
@@ -2940,7 +2963,7 @@ function teamStatsHTML(t) {
   }
   return catList.map(c => {
     const title = c.name;
-    const cols = c.labels.map((_, k) => k).filter(k => !(t.league === 'nhl' && nhlHide(c.labels, c.names, k)) && !(t.league === 'nfl' && /^STF/i.test(c.labels[k]))); const cw = k => t.league === 'nhl' ? (title === 'Goalies' && /^(GA|GAA|SA|SV|SV%|SO)$/.test(c.labels[k]) ? 52 : String(c.labels[k]).length > 3 ? 46 : 36) : 50; const fcw = t.league === 'nfl' ? 108 : 124;
+    const cols = t.league === 'nhl' && isGoalieCat(c.labels) ? goalieCols(c.labels, GOALIE_ALL, c.names).map(x => x[0]) : c.labels.map((_, k) => k).filter(k => !(t.league === 'nhl' && nhlHide(c.labels, c.names, k)) && !(t.league === 'nfl' && /^STF/i.test(c.labels[k]))); const cw = k => t.league === 'nhl' ? (title === 'Goalies' && /^(GA|GAA|SA|SV|SV%|SO)$/.test(c.labels[k]) ? 52 : String(c.labels[k]).length > 3 ? 46 : 36) : 50; const fcw = t.league === 'nfl' ? 108 : 124;
     const gk = title + '|' + c.labels.join(',');
     const sel = (t.sort && t.sort[gk]) || {};
     const defK = cols.find(k => ['PTS', 'YDS', 'W'].includes(c.labels[k])) ?? cols[Math.min(1, cols.length - 1)];
@@ -3602,13 +3625,15 @@ async function loadLeaders() {
     if (q) { v._qbrAll = {}; (jq.athletes || []).forEach(a => { const ac = a.categories || [], x = ac.find(z => z.name === q.ci) || ac[0], arr = (x && (x.totals || x.values)) || []; if (a.athlete && a.athlete.id && arr[q.k] != null) v._qbrAll[String(a.athlete.id)] = arr[q.k]; }); } } catch (e) {} }
   const u = 'https://site.web.api.espn.com/apis/common/v3/sports/' + L.path + '/statistics/byathlete?region=us&lang=en&contentorigin=espn&isqualified=true&page=1&limit=100' + (v.sy ? '&seasontype=2&season=' + v.sy : '') + (cg ? '&category=' + cg : '') + (sort ? '&sort=' + sort + ':desc' : '');
   try {
-    const j = await getJson(u);
+    let j = await getJson(u);
+    if (cg === 'goaltending') { const has = x => JSON.stringify((x && x.categories) || []).includes('savePct');
+      if (!has(j)) for (const q of ['&view=goaltending', '&category=goalkeeping', '&position=g', '&category=goaltending&view=goaltending']) { const u2 = u.replace('&category=goaltending', '') + q; const j2 = await getJson(u2).catch(() => null); if (has(j2)) { j = j2; break; } } }
     const rc = j.categories || [];
     let cols = [];
     rc.forEach((c, ci) => (c.labels || []).forEach((l, k) => { cols.push({ label: l, name: (c.names || [])[k] || l, ci: c.name, k }); }));
     const WANT = {
       nba: ['gamesPlayed', 'avgMinutes', 'avgPoints', 'avgFieldGoalsMade', 'avgFieldGoalsAttempted', 'fieldGoalPct', 'avgThreePointFieldGoalsMade', 'avgThreePointFieldGoalsAttempted', 'threePointFieldGoalPct', 'avgFreeThrowsMade', 'avgFreeThrowsAttempted', 'freeThrowPct', 'avgRebounds', 'avgAssists', 'avgSteals', 'avgBlocks', 'avgTurnovers', 'doubleDouble', 'tripleDouble'],
-      nhl: cg === 'goaltending' ? ['gamesPlayed', 'wins', 'losses', 'overtimeLosses', 'otLosses', 'goalsAgainstAverage', 'savePct', 'saves', 'shotsAgainst', 'shutouts'] : ['gamesPlayed', 'goals', 'assists', 'points', 'plusMinus', 'penaltyMinutes', 'shotsTotal', 'shootingPct', 'powerPlayGoals', 'shortHandedGoals', 'gameWinningGoals', 'timeOnIcePerGame']
+      nhl: cg === 'goaltending' ? ['wins', 'losses', 'overtimeLosses', 'otLosses', 'goalsAgainstAverage', 'avgGoalsAgainst', 'shotsAgainst', 'goalsAgainst', 'saves', 'savePct', 'shutouts', 'timeOnIce', 'timeOnIcePerGame', 'avgTimeOnIce', 'penaltyMinutes'] : ['gamesPlayed', 'goals', 'assists', 'points', 'plusMinus', 'penaltyMinutes', 'shotsTotal', 'shootingPct', 'powerPlayGoals', 'shortHandedGoals', 'gameWinningGoals', 'timeOnIcePerGame']
     };
     if (WANT[v.league]) { const f = WANT[v.league].map(n => cols.find(c => c.name === n)).filter(Boolean); if (f.length >= 3) cols = f; else { const seen = new Set(); cols = cols.filter(c => !seen.has(c.label) && seen.add(c.label)); } }
     else if (v.league === 'nfl' && cg) { const grp = cg.split(':').pop().replace(/e$/, '').toLowerCase(); let gpDone = false; const f = cols.filter(c => c.ci === 'general' ? (/gamesPlayed/i.test(c.name) && !gpDone && (gpDone = true)) : String(c.ci).toLowerCase().indexOf(grp) === 0 || (grp === 'defens' && /defensive/i.test(c.ci))); const seen = new Set(); cols = (f.length >= 3 ? f : cols).filter(c => { const k = c.label + '|' + (f.length >= 3 ? c.ci : ''); return !seen.has(k) && seen.add(k); }); }
@@ -3822,6 +3847,7 @@ $app.addEventListener('click', ev => {
     const v = state.lv, k = +d.lsort; if (v.sk0 == null) v.sk0 = v.sk;
     if (v.sk === k && v.manual && v.asc) { v.sk = v.sk0; v.asc = false; v.manual = false; } else if (v.sk === k && v.manual) v.asc = true; else { v.sk = k; v.asc = false; v.manual = true; } render();
   } else if (d.pst) {
+    window._twReset = 1;
     state.player.pst = d.pst; if (d.pst === 'ncaa') loadNcaa(state.player); render();
   } else if (d.smode) {
     state.lv.mode = d.smode; render(); loadLV();
@@ -3868,10 +3894,12 @@ $app.addEventListener('click', ev => {
     setDate(new Date(+d.date.slice(0, 4), +d.date.slice(4, 6) - 1, +d.date.slice(6, 8), 12));
     loadList();
   } else if (d.tab) {
+    window._twReset = 1;
     state.game.tab = d.tab; state.game.tabSet = true; if (b.closest('.dtabs')) window.scrollTo(0, 0); render();
   } else if (d.xp !== undefined) {
     const e = state.player.exp = state.player.exp || new Set(); if (e.has(d.xp)) e.delete(d.xp); else e.add(d.xp); render();
   } else if (d.ptab) {
+    window._twReset = 1;
     state.player.tab = d.ptab; render();
   } else if (d.spm) {
     state.game.spm = d.spm; render();
@@ -3886,6 +3914,7 @@ $app.addEventListener('click', ev => {
   } else if (d.pvt !== undefined) {
     state.game.pvTeam = +d.pvt; render();
   } else if (d.ttab) {
+    window._twReset = 1;
     state.team.tab = d.ttab; if (d.ttab === 'stats' && state.team.done) loadTeamPlayers(state.team); render();
   } else if (d.team !== undefined) {
     state.game.team = parseInt(d.team); render();
