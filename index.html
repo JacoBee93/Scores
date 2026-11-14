@@ -326,6 +326,7 @@ details[open] summary::after{content:'⌃'}
 .scl i{display:inline-block;width:9px;height:9px;border-radius:50%;border:1.5px solid #aaa;margin-right:5px;vertical-align:-1px}
 .scl i.g{background:#fff}
 .scl i.m{opacity:.5}
+header [data-refresh]{display:none !important}
 #fhome{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(env(safe-area-inset-bottom) + 12px);z-index:120;width:96px;height:36px;border-radius:18px;background:rgba(58,58,60,.82);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);color:#fff;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 16px rgba(0,0,0,.45)}
 #fhome[hidden]{display:none}
 #fhome:active{transform:translateX(-50%) scale(.94)}
@@ -646,21 +647,42 @@ document.getElementById('fhome').addEventListener('click', () => {
     if (go) { ind.classList.add('spin'); const b = $app.querySelector('[data-refresh]'); if (b) b.click(); else if (typeof loadList === 'function') loadList(); setTimeout(() => { ind.classList.remove('spin', 'ready'); ind.style.opacity = 0; ind.style.transform = 'translate(-50%, 0)'; }, 900); }
     else { ind.classList.remove('ready'); ind.style.opacity = 0; ind.style.transform = 'translate(-50%, 0)'; } }, { passive: true });
 })();
+function tabHTML(k) {
+  const v = topView();
+  try {
+    if (v === 'game') { const g = state.game; return k === 'preview' ? previewHTML(g) : k === 'summary' ? summaryGameHTML(g) : k === 'tstats' ? teamStatsGameHTML(g) : k === 'stats' ? statsHTML(g) : playsHTML(g); }
+    if (v === 'player') { const p = state.player; if (!p.done) return ''; return k === 'ov' ? overviewHTML(p) : k === 'gl' ? gamelogFull(p) : k === 'bio' ? bioHTML(p) : statsTabHTML(p); }
+    if (v === 'team') { const t = state.team; if (!t.done) return ''; return k === 'roster' ? rosterHTML(t) : k === 'sched' ? scheduleHTML(t) : k === 'inj' ? teamInjHTML(t) : teamStatsHTML(t); }
+  } catch (e) {}
+  return '';
+}
 (() => {
-  let sx = null, sy = 0, hz = false, pane = null;
-  const reset = (anim) => { if (!pane) return; pane.style.transition = anim ? 'transform .2s ease-out, opacity .2s' : ''; pane.style.transform = ''; pane.style.opacity = ''; };
-  document.addEventListener('touchstart', e => { const t = e.target; sx = null; hz = false; pane = null; if (e.touches.length !== 1 || document.getElementById('wpov') || document.getElementById('brpop')) return;
-    if (!t.closest || !t.closest('.pane') || t.closest('.tw, .brsw, .mstrip, .wpw, .rkw, .ysel, .ylist, .seg, .scf, .cmpr, input, .lg')) return;
-    if ($app.querySelectorAll('.dtabs button').length < 2) return;
-    sx = e.touches[0].clientX; sy = e.touches[0].clientY; pane = t.closest('.pane'); }, { passive: true });
+  let sx = null, sy = 0, hz = false, pane = null, tw = null, gh = [], W = 0, bs = [], cur = -1, st0 = 0;
+  const keyOf = b => b && (b.dataset.tab || b.dataset.ptab || b.dataset.ttab);
+  const clear = () => { gh.forEach(x => x.remove()); gh = []; };
+  const setX = (x, anim) => { [pane, ...gh].forEach(el => { if (!el) return; el.style.transition = anim ? 'transform .22s cubic-bezier(.2,.7,.3,1)' : ''; }); if (pane) pane.style.transform = x ? `translateX(${x}px)` : ''; gh.forEach(el => el.style.transform = `translateX(${x + (+el.dataset.off) * W}px)`); };
+  document.addEventListener('touchstart', e => { const t = e.target; sx = null; hz = false; if (e.touches.length !== 1 || document.getElementById('wpov') || document.getElementById('brpop')) return;
+    if (!t.closest || !t.closest('.pane') || t.closest('.brsw, .mstrip, .wpw, .rkw, .ysel, .ylist, .scf, .cmpr, input, .ghost')) return;
+    bs = [...$app.querySelectorAll('.dtabs button')]; if (bs.length < 2) return; cur = bs.findIndex(b => b.classList.contains('on')); if (cur < 0) return;
+    sx = e.touches[0].clientX; sy = e.touches[0].clientY; pane = t.closest('.pane'); tw = t.closest('.tw'); st0 = tw ? tw.scrollLeft : 0; }, { passive: true });
   document.addEventListener('touchmove', e => { if (sx == null) return; const t = e.touches[0], dx = t.clientX - sx, dy = t.clientY - sy;
-    if (!hz) { if (Math.abs(dy) > 12 && Math.abs(dy) > Math.abs(dx)) { sx = null; reset(true); return; } if (Math.abs(dx) > 14) hz = true; else return; }
-    pane.style.transition = ''; pane.style.transform = `translateX(${dx * .45}px)`; pane.style.opacity = String(Math.max(.55, 1 - Math.abs(dx) / 600)); }, { passive: true });
+    if (!hz) {
+      if (Math.abs(dy) > 10 && Math.abs(dy) > Math.abs(dx)) { sx = null; return; }
+      if (Math.abs(dx) < 8) return;
+      if (tw && tw.scrollWidth > tw.clientWidth + 2) { const atL = st0 <= 1, atR = st0 >= tw.scrollWidth - tw.clientWidth - 1; if (!((dx > 0 && atL) || (dx < 0 && atR))) { sx = null; return; } }
+      hz = true; W = pane.offsetWidth; pane.parentNode.style.position = 'relative';
+      [[cur - 1, -1], [cur + 1, 1]].forEach(([k, off]) => { if (k < 0 || k >= bs.length) return; const g = document.createElement('div'); g.className = 'pane t ghost'; g.dataset.off = off;
+        g.style.cssText = `position:absolute;top:${pane.offsetTop}px;left:${pane.offsetLeft}px;width:${W}px;min-height:${pane.offsetHeight}px;margin:0;pointer-events:none`; g.innerHTML = tabHTML(keyOf(bs[k])); pane.parentNode.appendChild(g); gh.push(g); });
+    }
+    let x = dx; if ((dx > 0 && cur === 0) || (dx < 0 && cur === bs.length - 1)) x = dx * .25;
+    setX(x, false); }, { passive: true });
   document.addEventListener('touchend', e => { if (sx == null) return; const t = e.changedTouches[0], dx = t.clientX - sx; sx = null;
-    if (!hz || Math.abs(dx) < 70) { reset(true); return; }
-    const bs = [...$app.querySelectorAll('.dtabs button')], i = bs.findIndex(b => b.classList.contains('on')), j = i + (dx < 0 ? 1 : -1);
-    if (i < 0 || j < 0 || j >= bs.length) { reset(true); return; }
-    window._slide = dx < 0 ? 1 : -1; bs[j].click(); }, { passive: true });
+    if (!hz) return;
+    const j = cur + (dx < 0 ? 1 : -1), go = Math.abs(dx) > Math.min(90, W * .22) && j >= 0 && j < bs.length;
+    if (!go) { setX(0, true); setTimeout(() => { clear(); if (pane) pane.style.transform = ''; }, 230); return; }
+    setX(dx < 0 ? -W : W, true);
+    setTimeout(() => { clear(); window._noSlide = 1; bs[j].click(); window.scrollTo(0, Math.min(window.scrollY, 0) || window.scrollY); }, 210);
+  }, { passive: true });
 })();
 window.SIL = 'data:image/svg+xml,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" fill="#2c2c2e"/><circle cx="50" cy="38" r="18" fill="#0d0d0f"/><path d="M14 100c2-22 17-34 36-34s34 12 36 34z" fill="#0d0d0f"/></svg>');
 const CMP_SVG = '<svg viewBox="0 0 24 24"><path d="M4 8h14l-4-4M20 16H6l4 4"/></svg>';
@@ -928,6 +950,7 @@ function render() {
   if (v === 'player') renderPlayer(); else if (v === 'game') renderGame(); else if (v === 'team') renderTeam();
   else if (v === 'lv') renderLV(); else if (v === 'cmp') renderCompare(); else if (v === 'search') renderSearch(); else renderList();
   state.lastView = key;
+  if (window._noSlide) window._noSlide = 0;
   if (window._slide) { const p = $app.querySelector('.pane'), d = window._slide; window._slide = 0; if (p && p.animate) p.animate([{ transform: `translateX(${d * 70}px)`, opacity: .3 }, { transform: 'none', opacity: 1 }], { duration: 230, easing: 'cubic-bezier(.2,.7,.3,1)' }); }
   const fh = document.getElementById('fhome'); if (fh) fh.hidden = v === 'list';
   const bsw = document.getElementById('brsw');
