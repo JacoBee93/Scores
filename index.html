@@ -249,6 +249,19 @@ details[open] summary::after{content:'⌃'}
 .play.g .sco{display:flex;align-items:center}
 .sco .sbg{font-family:-apple-system,sans-serif;margin-left:7px;font-size:9px;line-height:13px;padding:0 3px;border-radius:4px;vertical-align:0}
 .play .ast{color:var(--mut);font-weight:400}
+.pb{display:grid;grid-template-columns:24px 42px 1fr auto;column-gap:10px;align-items:center;padding:9px 10px;margin:0 -10px;border-radius:12px}
+.pb .pl img{width:24px;height:24px;object-fit:contain;display:block}
+.pb .clk{font-family:var(--num);font-size:15px;font-weight:600;color:var(--mut)}
+.pb .txt{font-size:13.5px;line-height:1.3;color:rgba(255,255,255,.7)}
+.pb:not(.ps) + .pb:not(.ps){box-shadow:inset 0 1px 0 rgba(255,255,255,.05)}
+.pb.ps{margin:5px -10px;padding:11px 10px;background:linear-gradient(90deg,color-mix(in srgb,var(--tc) 42%,transparent),color-mix(in srgb,var(--tc) 10%,transparent) 75%);box-shadow:inset 3px 0 0 var(--tc)}
+.pb.ps .txt{color:#fff;font-weight:600}
+.pb.ps .clk{color:rgba(255,255,255,.85)}
+.pbs{display:flex;align-items:center;gap:3px;font-family:var(--num);font-size:19px;font-weight:700;color:rgba(255,255,255,.45);white-space:nowrap}
+.pbs i{font-style:normal;font-size:15px}
+.pbs b{font-weight:700}
+.pbs b.on{color:#fff}
+.pbs small{font-family:-apple-system,sans-serif;font-size:10.5px;font-weight:800;margin-left:6px;padding:2px 5px;border-radius:6px;background:var(--tc);color:#fff;min-width:22px;text-align:center}
 .sbg{display:inline-block;font-size:10.5px;font-weight:700;color:#ffd60a;border:1px solid #ffd60a;border-radius:5px;padding:0 4px;margin-left:4px;vertical-align:1px}
 .play.g .txt{font-size:14.5px}
 /* hráč */
@@ -2095,10 +2108,17 @@ function playsHTML(g) {
   const live = g.ev && g.ev.state === 'in';
   const keys = [...groups.keys()].sort((a, b) => a - b);
   if (live) keys.reverse();
+  const nba = g.league === 'nba' && g.ev, GC = nba ? gameCols(g) : null, pts = new Map();
+  if (nba) { let prev = 0; plays.forEach(p => { if (p.scoringPlay && p.awayScore != null) { const tot = +p.awayScore + +p.homeScore; pts.set(p, tot - prev); prev = tot; } }); }
   return keys.map((k, i) => {
     let list = groups.get(k); if (live) list = [...list].reverse();
     const open = state.closed.has(k) ? false : (state.open.has(k) || i === 0);
     const rows = list.map(p => {
+      if (nba) {
+        const lg = p.team && logos[p.team.id], side = p.team ? (String(p.team.id) === String(g.ev.home.id) ? 1 : String(p.team.id) === String(g.ev.away.id) ? 0 : -1) : -1, scr = p.scoringPlay && p.awayScore != null, pt = pts.get(p);
+        return `<div class="pb ${scr ? 'ps' : ''}" style="--tc:${side >= 0 ? GC[side] : '#8e8e93'}"><span class="pl">${lg ? `<img src="${esc(lg)}" alt="" onerror="this.style.visibility='hidden'">` : ''}</span>
+          <span class="clk">${esc((p.clock && p.clock.displayValue) || '')}</span><span class="txt">${esc(p.text || p.shortText || '')}</span>${scr ? `<span class="pbs"><b class="${side === 0 ? 'on' : ''}">${esc(p.awayScore)}</b><i>–</i><b class="${side === 1 ? 'on' : ''}">${esc(p.homeScore)}</b>${pt > 0 ? `<small>+${pt}</small>` : ''}</span>` : ''}</div>`;
+      }
       const lg = p.team && logos[p.team.id];
       const sc = p.scoringPlay && p.awayScore != null ? `<span class="sco">${esc(p.awayScore)} – ${esc(p.homeScore)}</span>` : '';
       return `<div class="play ${p.scoringPlay ? 'scr' : ''}"><span class="pl">${lg ? `<img src="${esc(lg)}" alt="" onerror="this.style.visibility='hidden'">` : ''}</span>
