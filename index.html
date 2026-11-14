@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
+<meta name="robots" content="noindex, nofollow">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 <meta name="theme-color" content="#000000">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -1022,12 +1023,13 @@ async function loadList(silent) {
 async function loadGame() {
   const g = state.game; if (!g) return;
   try {
-    const sum = await getJson(API + LEAGUES[g.league].path + '/summary?event=' + g.id, true);
+    const sum = await getJson(API + gPath(g) + '/summary?event=' + g.id, true);
     const comp = sum.header && sum.header.competitions && sum.header.competitions[0];
     g.sum = sum;
     if (comp) g.ev = normEvent({ id: sum.header.id, date: comp.date, status: comp.status, competitions: [comp] });
     g.err = null;
-    if (!g.tabInit) { g.tabInit = true; g.tab = g.ev && g.ev.state === 'pre' ? 'preview' : 'summary'; }
+    if (!g.tabInit) { g.tabInit = true; g.tab = g.ev && g.ev.state === 'pre' && !g.ncaa ? 'preview' : 'summary'; }
+    if (g.ncaa) { if (state.game === g && topView() === 'game') render(); return; }
     else if (g.ev && g.ev.state !== 'pre' && g.tab === 'preview' && !g.tabSet) g.tab = 'summary';
     if (g.ev && !g.ts && !g.tsLoading) loadPreviewStats(g);
     if (g.ev && !g.sl && !g.slLoading) loadSeasonLeaders(g);
@@ -1200,10 +1202,9 @@ function render() {
     const brightOk = /^#?[0-9a-f]{6}$/i.test(String(c || '')) && hx(c)[1] > .18;
     if (ok) { const n = parseInt(String(c).replace('#', ''), 16), r = n >> 16, gg = (n >> 8) & 255, b = n & 255, L = (0.299 * r + 0.587 * gg + 0.114 * b) / 255, k = brightOk || rawAlt ? 1 : L < 0.08 ? 1.6 : Math.min(1, 0.32 / Math.max(L, .01)), f = x => Math.max(0, Math.min(255, Math.round(x * k)));
       bg = '#' + [f(r), f(gg), f(b)].map(x => x.toString(16).padStart(2, '0')).join(''); }
-    if (bg === '#000000') { document.body.style.background = ''; document.documentElement.style.background = ''; }
-    else { const n = parseInt(bg.slice(1), 16), mx = (k, d) => Math.round(((n >> k) & 255) * .14 + d * .86), end = `rgb(${mx(16, 8)},${mx(8, 8)},${mx(0, 9)})`;
-      document.body.style.background = `linear-gradient(180deg, ${bg} 0, ${bg} 120px, ${end} 95vh) no-repeat, ${end}`; document.documentElement.style.background = end; }
+    document.body.style.background = bg === '#000000' ? '' : bg; document.documentElement.style.background = bg;
     const tm = document.querySelector('meta[name="theme-color"]'); if (tm) tm.setAttribute('content', bg); })();
+  if (v === 'game' && state.game && state.game.ncaa) $app.querySelectorAll('[data-player],[data-topen]').forEach(x => { x.removeAttribute('data-player'); x.removeAttribute('data-topen'); x.style.cursor = 'default'; });
   $app.classList.toggle('lst', v === 'list');
   try { alignGrp(); } catch (e) {}
   try { markSort(); } catch (e) {}
@@ -1383,9 +1384,11 @@ function toRows(list, cols, ti) {
     pos: (m.a.position && m.a.position.abbreviation) || '', jersey: m.a.jersey || '', ti,
     vals: cols.map(c => m.vals[c.key] !== undefined ? m.vals[c.key] : '-') }));
 }
-const gOv = g => (g.league === 'nfl' || g.league === 'nba') && g.ev && g.ev.state !== 'pre';
+const gPath = g => g.ncaa ? 'football/college-football' : LEAGUES[g.league].path;
+const gOv = g => !g.ncaa && (g.league === 'nfl' || g.league === 'nba') && g.ev && g.ev.state !== 'pre';
 const gOvSeg = (g, k) => gOv(g) && (k === 'preview' || k === 'summary') ? `<div class="seg pseg" style="max-width:240px;margin-bottom:14px"><button data-tab="preview" class="${k === 'preview' ? 'on' : ''}">Preview</button><button data-tab="summary" class="${k === 'summary' ? 'on' : ''}">Summary</button></div>` : '';
 function gTabs(g) {
+  if (g.ncaa) return [['summary', 'Summary'], ['stats', 'Player Stats'], ['tstats', 'Team Stats'], ['plays', 'Plays']];
   const live = g.ev && g.ev.state !== 'pre';
   if (!live) return [['preview', 'Preview']];
   if (gOv(g)) return [[g.tab === 'preview' ? 'preview' : 'summary', 'Overview'], ['stats', 'Player Stats'], ['tstats', 'Team Stats'], ['plays', 'Plays']];
@@ -1463,7 +1466,7 @@ function allPlays(g) {
   return P;
 }
 async function loadCorePlays(g) {
-  g.cpl = 1; const parts = LEAGUES[g.league].path.split('/'), out = [];
+  g.cpl = 1; const parts = gPath(g).split('/'), out = [];
   try { let page = 1, pages = 1;
     do { const j = await getJson('https://sports.core.api.espn.com/v2/sports/' + parts[0] + '/leagues/' + parts[1] + '/events/' + g.id + '/competitions/' + g.id + '/plays?limit=500&page=' + page + '&lang=en&region=us');
       pages = j.pageCount || 1; (j.items || []).forEach(p => { const tid = ((p.team && p.team.$ref) || '').match(/teams\/(\d+)/); out.push(Object.assign({}, p, { team: tid ? { id: tid[1] } : p.team })); }); page++; } while (page <= pages && page < 6);
@@ -2209,7 +2212,7 @@ function gamelogHTML(p, o) {
     const trs = rows.map(r => {
       const m = r.m, opp = (m.opponent && (m.opponent.abbreviation || m.opponent.displayName)) || '', ol = m.opponent ? dk((m.opponent.logo) || teamLogoOf(p.league, { id: m.opponent.id, abbr: m.opponent.abbreviation })) : '';
       const sm = String(m.score || '').match(/^(\S+)\s*(.*)$/) || [], wl = m.gameResult || '', d = m.gameDate ? new Date(m.gameDate) : null;
-      return `<tr data-game="${esc(r.id)}" data-gl="${p.league}"><td class="gd">${d ? `<small>${DAYS[d.getDay()]}</small> ${d.getDate()}.${d.getMonth() + 1}.` : ''}</td><td class="go"><small>${esc(m.atVs === '@' ? '@' : 'vs')}</small>${ol ? `<img src="${esc(ol)}" alt="" onerror="this.style.visibility='hidden'">` : ''}<span>${esc(opp)}</span></td><td class="gr">${(() => { const pr = String(sm[1] || '').split('-'); return `<span class="glr"><small>${esc(sm[2] || '')}</small><b>${esc(pr[0] || '')}</b><i>${pr.length > 1 ? '-' : ''}</i><b>${esc(pr[1] || '')}</b><span class="${wl === 'W' || wl === 'L' ? wl : 'T'}">${esc(wl)}</span></span>`; })()}</td>${cols.map((c, ci) => `<td class="${so && so.i === ci ? 'on' : ''}">${nv(String(r.s[c[1]] == null ? '' : r.s[c[1]]).replace(/,/g, ''))}</td>`).join('')}</tr>`;
+      return `<tr data-game="${esc(r.id)}" data-gl="${o.gl || p.league}"><td class="gd">${d ? `<small>${DAYS[d.getDay()]}</small> ${d.getDate()}.${d.getMonth() + 1}.` : ''}</td><td class="go"><small>${esc(m.atVs === '@' ? '@' : 'vs')}</small>${ol ? `<img src="${esc(ol)}" alt="" onerror="this.style.visibility='hidden'">` : ''}<span>${esc(opp)}</span></td><td class="gr">${(() => { const pr = String(sm[1] || '').split('-'); return `<span class="glr"><small>${esc(sm[2] || '')}</small><b>${esc(pr[0] || '')}</b><i>${pr.length > 1 ? '-' : ''}</i><b>${esc(pr[1] || '')}</b><span class="${wl === 'W' || wl === 'L' ? wl : 'T'}">${esc(wl)}</span></span>`; })()}</td>${cols.map((c, ci) => `<td class="${so && so.i === ci ? 'on' : ''}">${nv(String(r.s[c[1]] == null ? '' : r.s[c[1]]).replace(/,/g, ''))}</td>`).join('')}</tr>`;
     }).join('');
     const gh = groups && groups.length > 1 ? groups.map(g => `<th class="grp" colspan="${g[1]}">${esc(g[0])}</th>`).join('') : `<th colspan="${cols.length}"></th>`;
     return `<section class="glsec"><div class="tw"><table class="gl2 ${p.league}" style="width:max(100%, ${tw}px)"><colgroup><col style="width:${DW}px"><col style="width:${OW}px"><col style="width:${RW}px">${cols.map(c => `<col style="width:${w(c[0])}px">`).join('')}</colgroup>
@@ -2273,12 +2276,12 @@ function ncaaGamelog(p, seg) {
   const { L, cur } = glSeasons(p, d.j), sel = p.ncY || cur;
   const lbl = (L.find(x => x.y === sel) || {}).t || sel || '';
   const head = seg + (L.length ? `<div class="ysel"><button class="ybtn" data-glyo="1">${esc(lbl)}<i class="chev ${p.glYOpen ? 'up' : ''}"></i></button>${p.glYOpen ? `<div class="ylist">${L.map(x => `<button data-ncy="${x.y}" class="${x.y === sel ? 'on' : ''}">${esc(x.t)}</button>`).join('')}</div>` : ''}</div>` : '');
-  if (!sel || sel === cur) return gamelogHTML(p, { head, j: d.j });
+  if (!sel || sel === cur) return gamelogHTML(p, { gl: 'ncaaf', head, j: d.j });
   const g = p.ncBy[sel];
   if (!g) { loadNcGl(p, sel); return head + msg('Loading…'); }
   if (g.loading) return head + msg('Loading…');
   if (g.err) return head + msg('Data not available for this season.');
-  return gamelogHTML(p, { head, j: g.j });
+  return gamelogHTML(p, { gl: 'ncaaf', head, j: g.j });
 }
 function gamelogFull(p) {
   const seg = p.league === 'nfl' ? `<div class="seg pseg"><button data-glsrc="nfl" class="${p.glSrc !== 'ncaa' ? 'on' : ''}">NFL</button><button data-glsrc="ncaa" class="${p.glSrc === 'ncaa' ? 'on' : ''}">NCAA</button></div>` : '';
@@ -3411,9 +3414,9 @@ function renderSearch() {
 }
 
 /* ---------- navigace ---------- */
-function openGame(league, id) {
-  if (state.league !== 'fav') state.league = league;
-  state.game = { league, id, sum: null, ev: null, tab: 'stats', team: 0, pvTeam: 0, err: null, tabInit: false };
+function openGame(league, id, ncaa) {
+  if (state.league !== 'fav' && !ncaa) state.league = league;
+  state.game = { league, id, ncaa: !!ncaa, sum: null, ev: null, tab: 'stats', team: 0, pvTeam: 0, err: null, tabInit: false };
   state.open.clear(); state.closed.clear();
   render(); loadGame();
 }
@@ -3441,6 +3444,7 @@ function route() {
   }
   state.player = null;
   m = h.match(/^#\/game\/(\w+)\/(\d+)/);
+  if (m && m[1] === 'ncaaf') { if (state.game && state.game.id === m[2]) render(); else openGame('nfl', m[2], true); return; }
   if (m && LEAGUES[m[1]]) { if (state.game && state.game.id === m[2]) render(); else openGame(m[1], m[2]); return; }
   state.game = null;
   m = h.match(/^#\/team\/(\w+)\/(\d+)/);
