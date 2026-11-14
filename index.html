@@ -443,7 +443,8 @@ body{min-height:100vh}
 .gl2 td.gr .glr .W,.gl2 td.gr .glr .L,.gl2 td.gr .glr .T{width:auto;margin:0;text-align:center}
 .nfx tr.hid{display:none}
 .nfx tr.ctot{cursor:pointer}
-.nfx tr.csub td{background:#232326}
+.zb td{background:#26262a}
+.sep tbody tr td{border-bottom-color:transparent}
 .nfx tr.csub td.n .pn{color:var(--mut)}
 .tot2l{display:inline-flex;align-items:center;gap:1px;vertical-align:1px;margin-left:4px}
 .tot2l .tot2{line-height:1}
@@ -827,6 +828,10 @@ document.getElementById('fhome').addEventListener('click', () => {
     if (go) { window._forceT = Date.now(); ind.classList.add('spin'); const b = $app.querySelector('[data-refresh]'); if (b) b.click(); else if (typeof loadList === 'function') loadList(); setTimeout(() => { ind.classList.remove('spin', 'ready'); ind.style.opacity = 0; ind.style.transform = 'translate(-50%, 0)'; }, 900); }
     else { ind.classList.remove('ready'); ind.style.opacity = 0; ind.style.transform = 'translate(-50%, 0)'; } }, { passive: true });
 })();
+function zebra() {
+  $app.querySelectorAll('table.nfx, table.fx, table.lbt, table.gst, table.ros, table.sch').forEach(tb => { const bd = tb.tBodies[0]; if (!bd) return; let z = false, last = false;
+    [...bd.rows].forEach(r => { if (r.classList.contains('tot')) { r.classList.remove('zb'); return; } if (r.classList.contains('csub')) { r.classList.toggle('zb', last); return; } if (r.classList.contains('hid')) return; r.classList.toggle('zb', z); last = z; z = !z; }); });
+}
 function markSort(root) {
   (root || document).querySelectorAll('table').forEach(tb => { const th = tb.tHead; if (!th || !th.rows.length) return; const hr = th.rows[th.rows.length - 1];
     let ci = -1, c = 0; [...hr.cells].forEach(x => { if (x.classList.contains('on') && [...x.attributes].some(a => /^data-.*sort$/.test(a.name))) ci = c; c += x.colSpan || 1; });
@@ -1275,6 +1280,7 @@ function render() {
   $app.classList.toggle('lst', v === 'list');
   try { alignGrp(); } catch (e) {}
   try { markSort(); } catch (e) {}
+  try { zebra(); } catch (e) {}
   if (window._noSlide) window._noSlide = 0;
   if (window._slide) { const p = window._slideSel ? $app.querySelector('main') : $app.querySelector('.pane'), d = window._slide; window._slide = 0; window._slideSel = null; if (p && p.animate) p.animate([{ transform: `translateX(${d * 70}px)`, opacity: .3 }, { transform: 'none', opacity: 1 }], { duration: 230, easing: 'cubic-bezier(.2,.7,.3,1)' }); }
   const fh = document.getElementById('fhome'); if (fh) fh.hidden = true;
@@ -3366,7 +3372,7 @@ const TSPEC = {
       { t: 'Points', cols: [['PTS', NM('(totalPoints|points)', { side })], ['PTS/G', NM('(totalPointsPerGame|pointsPerGame)', { side })]] }];
     return [
       { name: 'Offense', sections: off('team'), def: 'YDS/G', defSec: 'Total' },
-      { name: 'Defense', sections: off('opp').concat([{ t: 'Tackles', cols: [['SOLO', NM('soloTackles', { side: 'def' })], ['AST', NM('assistTackles', { side: 'def' })], ['TOT', NM('totalTackles', { side: 'def' })]] }, { t: 'Sacks', cols: [['SACK', NM('sacks', { side: 'def' })], ['YDS', NM('sackYards', { side: 'def' })], ['TFL', NM('tacklesForLoss', { side: 'def' })]] }]), def: 'YDS/G', defSec: 'Total', low: true },
+      { name: 'Defense', sections: off('opp').concat([{ t: 'Sacks', cols: [['TOT', NM('sacks', { side: 'opp', g: /passing/i })], ['AVG', { div: ['Sacks.TOT', '.GP'] }]] }]), def: 'YDS/G', defSec: 'Total', low: true },
       { name: 'Special', sections: [GP,
         { t: 'Kickoffs', cols: [['ATT', NM('kickReturns')], ['YDS', NM('kickReturnYards')], ['AVG', NM('(yardsPerKickReturn|avgKickReturnYards|kickReturnAverage)')], ['LNG', NM('longKickReturn')], ['TD', NM('kickReturnTouchdowns')]] },
         { t: 'Punts', cols: [['ATT', NM('puntReturns')], ['YDS', NM('puntReturnYards')], ['AVG', NM('(yardsPerPuntReturn|avgPuntReturnYards|puntReturnAverage)')], ['LNG', NM('longPuntReturn')], ['TD', NM('puntReturnTouchdowns')], ['FC', NM('(puntReturnFairCatches|fairCatches)')]] }], def: 'AVG', defSec: 'Kickoffs' },
@@ -3381,7 +3387,7 @@ const TTOP = {
   nba: [{ h: 'Offensive Leaders', t: 'Points', g: 'Team', lab: 'PTS' }, { t: 'Field Goal %', g: 'Team', lab: 'FG%' }, { t: 'Points Differential', g: 'Differential', lab: 'PTS', plus: 1 },
     { h: 'Defensive Leaders', t: 'Points Allowed', g: 'Opponent', lab: 'PTS', low: 1 }, { t: 'Rebounds', g: 'Team', lab: 'REB' }, { t: 'Blocks', g: 'Team', lab: 'BLK' }],
   nfl: [{ h: 'Offensive Leaders', t: 'Total Yards', g: 'Offense', sec: 'Total', lab: 'YDS/G' }, { t: 'Passing', g: 'Offense', sec: 'Passing', lab: 'YDS/G' }, { t: 'Rushing', g: 'Offense', sec: 'Rushing', lab: 'YDS/G' },
-    { h: 'Defensive Leaders', t: 'Yards Allowed', g: 'Defense', sec: 'Total', lab: 'YDS/G', low: 1 }, { t: 'Sacks', g: 'Defense', sec: 'Sacks', lab: 'SACK', sp: NM('sacks', { g: /defens/i }) }, { t: 'Turnovers', g: 'Turnovers', lab: 'DIFF', plus: 1 }]
+    { h: 'Defensive Leaders', t: 'Yards Allowed', g: 'Defense', sec: 'Total', lab: 'YDS/G', low: 1 }, { t: 'Sacks', g: 'Defense', sec: 'Sacks', lab: 'TOT' }, { t: 'Turnovers', g: 'Turnovers', lab: 'DIFF', plus: 1 }]
 };
 const tSide = c => c.tag === 'opp' ? 'opp' : /opp/i.test(c.grp) || /^opp(onent)?\b/i.test(c.disp || '') ? 'opp' : /diff/i.test(c.grp) || /differential$/i.test(c.disp || '') ? 'diff' : 'team';
 const tFind = (cols, sp) => sp.side === 'def' ? (cols.find(c => sp.re.test(c.name) && c.side === 'def') || cols.find(c => sp.re.test(c.name) && c.side === 'team' && /defens/i.test(c.grp))) : cols.find(c => sp.re.test(c.name) && (!sp.g || sp.g.test(c.grp)) && (sp.side ? c.side === sp.side : c.side === 'team'));
@@ -3421,7 +3427,7 @@ async function loadLTeams(v) {
   state.lvC[k] = Object.assign(C, { cats, err: cats.length ? null : 'Team stats not available.' });
   if (state.lv === v && topView() === 'lv') render();
 }
-function tVal(c, t, col) { if (col.calc) { let s2 = 0; for (const p of col.calc) { const x = tnum(tVal(c, t, p.ref)); if (x == null) return null; s2 += p.neg ? -x : x; } return Math.round(s2 * 10) / 10; } return (c.vals[t.id] || {})[col.key]; }
+function tVal(c, t, col) { if (col.div) { const a = tnum(tVal(c, t, col.div[0])), b = tnum(tVal(c, t, col.div[1])); return a == null || !b ? null : (a / b).toFixed(1); } if (col.calc) { let s2 = 0; for (const p of col.calc) { const x = tnum(tVal(c, t, p.ref)); if (x == null) return null; s2 += p.neg ? -x : x; } return Math.round(s2 * 10) / 10; } return (c.vals[t.id] || {})[col.key]; }
 function tFmt(x, col, plus) { if (x == null || x === '') return '-'; const n = tnum(x), nm = col.name || '';
   if (n != null && /savePct/i.test(nm) && n <= 1) return n.toFixed(3).replace(/^0\./, '.');
   if (n != null && /pct|percent/i.test(nm) && Math.abs(n) <= 1) return (n * 100).toFixed(1);
@@ -3431,7 +3437,8 @@ function tGroupCols(lg, gr, c) {
   const out = [], byKey = {}, useAlt = gr.alt && !gr.sections.some(s => s.cols.some(([l, sp]) => l !== 'GP' && !sp.calc && tFind(c.cols, sp)));
   const late = [];
   (useAlt ? gr.alt : gr.sections).forEach(sec => { sec.cols.forEach(([l, sp]) => { let col;
-    if (sp.calc) { const parts = sp.calc.map(p => ({ neg: p[0] === '-', ref: byKey[p.replace(/^-/, '')] })); if (parts.some(p => !p.ref)) return; col = { key: 'calc:' + sec.t + '.' + l, label: l, calc: parts, disp: sec.t ? sec.t + ' ' + l : l }; }
+    if (sp.div) { const a2 = byKey[sp.div[0]], b2 = byKey[sp.div[1]]; if (!a2 || !b2) return; col = { key: 'div:' + sec.t + '.' + l, label: l, div: [a2, b2], disp: sec.t + ' Per Game' }; }
+    else if (sp.calc) { const parts = sp.calc.map(p => ({ neg: p[0] === '-', ref: byKey[p.replace(/^-/, '')] })); if (parts.some(p => !p.ref)) return; col = { key: 'calc:' + sec.t + '.' + l, label: l, calc: parts, disp: sec.t ? sec.t + ' ' + l : l }; }
     else { const f = tFind(c.cols, sp); if (!f) { if (l === 'DIFF') { const ph = { key: 'calc:DIFF', label: 'DIFF', disp: 'Turnover Differential', sec: sec.t, calc: null }; late.push(ph); out.push(ph); byKey[sec.t + '.' + l] = ph; } return; } col = Object.assign({}, f, { label: l }); }
     col.sec = sec.t; byKey[sec.t + '.' + l] = col; out.push(col); }); });
   late.forEach(ph => { const a = byKey['Takeaways.TOTAL'], b = byKey['Giveaways.TOTAL']; if (a && b) ph.calc = [{ ref: a }, { neg: true, ref: b }]; else out.splice(out.indexOf(ph), 1); });
@@ -3448,15 +3455,18 @@ function lteamsHTML(v) {
 async function loadDraft(v) {
   if (v.dd || v.dLoading) return; v.dLoading = true;
   const parts = LEAGUES[v.league].path.split('/');
-  try { const j = await getJson('https://sports.core.api.espn.com/v2/sports/' + parts[0] + '/leagues/' + parts[1] + '/seasons/' + v.y + '/draft/rounds?lang=en&region=us');
-    v.dd = ((j && j.items) || []).map(r => ({ n: r.number, name: r.displayName || ('Round ' + r.number), picks: (r.picks || []).map(p => ({ pick: p.pick, overall: p.overall, aref: p.athlete && p.athlete.$ref, tid: ((p.team && p.team.$ref) || '').match(/teams\/(\d+)/), a: null })) })).filter(r => r.picks.length);
+  const TO = pr => Promise.race([pr, new Promise((_, rj) => setTimeout(() => rj(new Error('timeout')), 20000))]);
+  try { const j = await TO(getJson('https://sports.core.api.espn.com/v2/sports/' + parts[0] + '/leagues/' + parts[1] + '/seasons/' + v.y + '/draft/rounds?lang=en&region=us&limit=50'));
+    let items = (j && j.items) || [];
+    if (items.length && items[0].$ref && !items[0].picks) items = (await Promise.all(items.map(x => TO(getJson(String(x.$ref).replace(/^http:/, 'https:'))).catch(() => null)))).filter(Boolean);
+    v.dd = items.map(r => ({ n: r.number, name: r.displayName || ('Round ' + r.number), picks: (r.picks || []).map(p => ({ pick: p.pick, overall: p.overall, aref: p.athlete && p.athlete.$ref, tid: ((p.team && p.team.$ref) || '').match(/teams\/(\d+)/), a: null })) })).filter(r => r.picks.length);
     if (!v.dd.length) v.err = 'Draft not available.'; } catch (e) { v.err = 'Draft not available.'; }
   v.dLoading = false; if (state.lv === v) { render(); loadDraftRound(v); }
 }
 async function loadDraftRound(v) {
   const r = v.dd && v.dd.find(x => x.n === v.rd); if (!r || r.loading || r.done) return; r.loading = true; await ensureTeams(v.league).catch(() => {});
   let i = 0; const w = async () => { while (i < r.picks.length) { const p = r.picks[i++]; if (!p.aref) continue; try { const a = await getJson(String(p.aref).replace(/^http:/, 'https:'));
-    const rid = ((a.athlete && a.athlete.$ref) || '').match(/athletes\/(\d+)/); p.a = { id: rid ? rid[1] : String(a.id || ''), name: a.displayName || a.fullName || '', pos: (a.position && (a.position.abbreviation || a.position.name)) || '', col: (a.team && a.team.$ref) ? '' : '' }; } catch (e) {} } };
+    const rid = ((a.athlete && a.athlete.$ref) || '').match(/athletes\/(\d+)/); p.a = { real: !!rid, id: rid ? rid[1] : String(a.id || ''), name: a.displayName || a.fullName || '', pos: (a.position && (a.position.abbreviation || a.position.name)) || '', col: (a.team && a.team.$ref) ? '' : '' }; } catch (e) {} } };
   await Promise.all(Array.from({ length: 8 }, w)); r.loading = false; r.done = true; if (state.lv === v && topView() === 'lv') render();
 }
 function renderDraft() {
@@ -3464,7 +3474,7 @@ function renderDraft() {
   if (!v.dd) body = msg(v.err || 'Loading draft…');
   else { const rd = v.dd.find(x => x.n === v.rd) || v.dd[0]; v.rd = rd.n;
     body = `<div class="mstrip tgs">${v.dd.map(r => `<button class="mo ${r.n === v.rd ? 'on' : ''}" data-drr="${r.n}"><span>Rd ${r.n}</span></button>`).join('')}</div>` + (!rd.done ? msg('Loading picks…') : '') + (!rd.done ? [] : rd.picks).map(p => { const tm = (state.teamList[v.league] || []).find(x => p.tid && x.id === p.tid[1]) || {}, a = p.a || {};
-      return `<div class="drw" ${a.id ? `data-player="${esc(a.id)}" data-pl="${v.league}" data-pn="${esc(a.name)}" data-pp="${esc(a.pos)}" data-pj="" data-pt="${esc(tm.name || '')}"` : ''}><span class="dpk">${esc(p.overall || p.pick)}</span>${tm.logo ? logoImg(tm.logo) : '<span style="width:28px"></span>'}<div class="dnm">${esc(a.name || (rd.loading || !rd.done ? '…' : '–'))}<small>${esc([a.pos, tm.name, 'Pick ' + p.pick].filter(Boolean).join(' · '))}</small></div></div>`; }).join(''); }
+      return `<div class="drw" ${a.name ? `data-drp="${esc(a.id)}" data-drr2="${a.real ? 1 : 0}" data-pn="${esc(a.name)}" data-pp="${esc(a.pos)}"` : ''}><span class="dpk">${esc(p.overall || p.pick)}</span>${tm.logo ? logoImg(tm.logo) : '<span style="width:28px"></span>'}<div class="dnm">${esc(a.name || (rd.loading || !rd.done ? '…' : '–'))}<small>${esc([a.pos, tm.name, 'Pick ' + p.pick].filter(Boolean).join(' · '))}</small></div></div>`; }).join(''); }
   $app.innerHTML = `
     <header class="d"><div class="tabs"><button class="back" data-back aria-label="Back"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></button><button class="home" data-home aria-label="Home"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"><path d="M3 10.5 12 3l9 7.5"/><path d="M5.5 9v11h13V9"/><path d="M10 20v-6h4v6"/></svg></button></div></header>
     <main><div class="lvt">${esc(LEAGUES[v.league].name + ' Draft ' + v.y)}</div><div class="pane t">${body}</div></main>`;
@@ -3503,6 +3513,7 @@ function renderTLeaders() {
     <header class="d"><div class="tabs"><button class="back" data-back aria-label="Back"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></button><button class="home" data-home aria-label="Home"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"><path d="M3 10.5 12 3l9 7.5"/><path d="M5.5 9v11h13V9"/><path d="M10 20v-6h4v6"/></svg></button></div></header>
     <main><div class="lvt">${esc(LEAGUES[v.league].name + ' · Team Stats · ' + seasonLbl2(v.league, sy))}</div><div class="pane t">${seg}${body}</div></main>`;
   const tw = $app.querySelector('.lbt') && $app.querySelector('.lbt').parentElement;
+  if (tw && v.forceL) { v.forceL = 0; v.sl = 0; v._slk = v.tk; }
   if (tw) { if (v.sl == null || v._slk !== v.tk) { const th = tw.querySelector('tr:last-child th.on'), n = tw.querySelector('th.n'); if (th && n) v.sl = Math.max(0, th.offsetLeft - n.offsetWidth - 10); v._slk = v.tk; } tw.scrollLeft = v.sl || 0; tw.addEventListener('scroll', () => { v.sl = tw.scrollLeft; }, { passive: true }); }
 }
 /* complete leaders */
@@ -3743,7 +3754,7 @@ window.addEventListener('hashchange', route);
 const $app = document.getElementById('app');
 $app.addEventListener('click', ev => {
   if (window._lpAt && Date.now() - window._lpAt < 900) { const lb = ev.target.closest('[data-league]'); if (lb) { ev.preventDefault(); return; } }
-  const b = ev.target.closest('[data-rclear],[data-go2],[data-home],[data-csort],[data-glm],[data-glyo],[data-cexp],[data-glsort],[data-cmpcar],[data-brpg],[data-cmpclr],[data-spm],[data-cmpyo],[data-cmpy],[data-scf],[data-bryo],[data-lsyo],[data-lsy],[data-draft],[data-drr],[data-f1],[data-sqx],[data-lvtm],[data-ltx],[data-tlc],[data-tgrp],[data-tlsort],[data-tyo],[data-ty],[data-bry],[data-cmpgo],[data-cmpl],[data-cmpp],[data-cmpx],[data-gsort],[data-glsrc],[data-ncy],[data-sstat],[data-gly],[data-league],[data-game],[data-date],[data-wk],[data-pst],[data-smode],[data-cl],[data-lsort],[data-drv],[data-pm],[data-tab],[data-ptab],[data-xp],[data-ttab],[data-pvt],[data-sort],[data-fav],[data-team],[data-player],[data-topen],[data-search],[data-month],[data-refresh],[data-back]');
+  const b = ev.target.closest('[data-rclear],[data-go2],[data-home],[data-csort],[data-glm],[data-glyo],[data-cexp],[data-glsort],[data-cmpcar],[data-brpg],[data-cmpclr],[data-spm],[data-cmpyo],[data-cmpy],[data-scf],[data-bryo],[data-lsyo],[data-lsy],[data-draft],[data-drr],[data-drp],[data-f1],[data-sqx],[data-lvtm],[data-ltx],[data-tlc],[data-tgrp],[data-tlsort],[data-tyo],[data-ty],[data-bry],[data-cmpgo],[data-cmpl],[data-cmpp],[data-cmpx],[data-gsort],[data-glsrc],[data-ncy],[data-sstat],[data-gly],[data-league],[data-game],[data-date],[data-wk],[data-pst],[data-smode],[data-cl],[data-lsort],[data-drv],[data-pm],[data-tab],[data-ptab],[data-xp],[data-ttab],[data-pvt],[data-sort],[data-fav],[data-team],[data-player],[data-topen],[data-search],[data-month],[data-refresh],[data-back]');
   if (!b) return;
   const d = b.dataset;
   if (topView() === 'search' && !ev.target.closest('.fstar')) { if (d.topen) addRecent({ k: 't', l: d.tl, id: d.topen, name: d.tn || '', logo: d.tlogo || '' }); else if (d.player) addRecent({ k: 'p', l: d.pl, id: d.player, name: d.pn || '', sub: d.pt || '' }); }
@@ -3795,11 +3806,15 @@ $app.addEventListener('click', ev => {
   } else if (d.tlc) {
     window._fromList = true; window._ldY = state.lv.sy || null; window._tlk = d.tlc; location.hash = '#/tleaders/' + state.lv.league;
   } else if (d.tgrp) {
-    const v = state.lv; v.grp = d.tgrp; v.tk = null; v.tasc = null; v.tclk = 0; v.sl = null; render();
+    const v = state.lv; v.grp = d.tgrp; v.tk = null; v.tasc = null; v.tclk = 0; v.sl = null; v.forceL = 1; render();
   } else if (d.tlsort) {
     const v = state.lv; if (v.tk === d.tlsort && v.tclk === 1) { v.tasc = !v._low; v.tclk = 2; } else if (v.tk === d.tlsort && v.tclk === 2) { v.tk = null; v.tasc = null; v.tclk = 0; v.sl = null; } else { v.tk = d.tlsort; v.tasc = null; v.tclk = 1; } v._slk = v.tk; render();
   } else if (d.draft) {
     window._fromList = true; location.hash = '#/draft/' + state.player.league + '/' + d.draft;
+  } else if (d.drp !== undefined) {
+    const lg = state.lv.league, go = id => playerNav({ player: id, pl: lg, pn: d.pn, pp: d.pp, pj: '', pt: '' });
+    if (d.drr2 === '1') go(d.drp);
+    else { b.style.opacity = '.5'; searchPlayers(d.pn, lg).then(r => { const n = String(d.pn).toLowerCase(), m = r.find(x => x.name.toLowerCase() === n) || r[0]; b.style.opacity = ''; go(m ? m.id : d.drp); }).catch(() => { b.style.opacity = ''; go(d.drp); }); }
   } else if (d.drr) {
     state.lv.rd = +d.drr; render(); loadDraftRound(state.lv);
   } else if (d.lvtm) {
