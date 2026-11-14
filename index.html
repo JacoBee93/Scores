@@ -55,6 +55,10 @@ header.d{padding:calc(env(safe-area-inset-top) + 30px) 12px 7px}
 .card .top .lgt{font-family:var(--num);font-weight:700;letter-spacing:.5px;font-size:13px}
 .back{font-size:46px;line-height:1;height:50px;padding:0 18px 8px 8px}
 .home{height:50px;padding:0 10px;display:flex;align-items:center;color:#fff;background:none;border:0}
+header .tys{margin:0}
+header .tys .ybtn{height:40px;border-radius:12px;background:var(--card);padding:0 14px;font-size:16px;font-weight:700;box-shadow:0 4px 12px rgba(0,0,0,.3)}
+header .tys .ylist{left:auto;right:0;z-index:60}
+header .tys{position:relative;z-index:60}
 header .back,header .home[data-home]{height:40px;min-width:48px;padding:0 13px;border-radius:12px;background:var(--card);display:flex;align-items:center;justify-content:center;color:#fff;font-size:16px;box-shadow:0 4px 12px rgba(0,0,0,.3)}
 header .home[data-home] svg{width:22px;height:22px}
 header.d .tabs{gap:8px;padding-bottom:4px}
@@ -352,6 +356,8 @@ html,body{overscroll-behavior-y:none;scrollbar-width:none}
 html::-webkit-scrollbar,body::-webkit-scrollbar{display:none;width:0;height:0;background:transparent}
 #fhome:active{transform:translateX(-50%) scale(.94)}
 main{padding-bottom:0}
+.pane:has(.ylist){overflow:visible}
+.pane:has(.ylist) .ylist{z-index:40}
 .pane > .msg.ld:only-child,.pane > .seg + .msg.ld{min-height:58vh}
 html,body{transition:background-color .35s ease}
 .pane{margin:12px -6px 14px !important;padding:28px 12px 18px !important;border-radius:22px;box-shadow:0 10px 32px rgba(0,0,0,.55),0 2px 6px rgba(0,0,0,.35),inset 0 1px 0 rgba(255,255,255,.07);overflow:hidden}
@@ -473,6 +479,7 @@ body{min-height:100vh}
 .ylist button{display:block;width:100%;text-align:left;padding:10px 16px;font-size:15px;border-bottom:1px solid #3a3a3c}
 .ylist button.on{color:var(--acc);font-weight:700}
 .phero{display:flex;align-items:center;gap:14px;margin:4px 4px 14px}
+.phero .hs.heart{border-radius:0;background:#c8102e;-webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath d='M50 92C18 69 3 52 3 31 3 15 15 4 29 4c9 0 17 5 21 13 4-8 12-13 21-13 14 0 26 11 26 27 0 21-15 38-47 61z'/%3E%3C/svg%3E") center/100% 100% no-repeat;mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath d='M50 92C18 69 3 52 3 31 3 15 15 4 29 4c9 0 17 5 21 13 4-8 12-13 21-13 14 0 26 11 26 27 0 21-15 38-47 61z'/%3E%3C/svg%3E") center/100% 100% no-repeat;width:84px !important;height:84px !important}
 .phero .hs{width:68px;height:68px;border-radius:50%;background:var(--card);object-fit:cover;flex:none}
 .phero.pp{flex-direction:row-reverse;justify-content:space-between;margin-left:0}
 .phero.pp > div{flex:1;min-width:0;padding-left:10px}
@@ -593,7 +600,8 @@ td.n .slg{width:20px;height:20px;object-fit:contain;vertical-align:-6px;margin-l
 .lvt{font-family:var(--num);font-weight:700;font-size:26px;margin:4px 4px 12px}
 .lvt.lvy{display:flex;align-items:center;justify-content:space-between;gap:10px}
 .lvt.lvy .ysel{margin:0;font-family:-apple-system,sans-serif;font-size:15px;font-weight:600}
-.lvt.lvy .ylist{left:auto;right:0}
+.lvt.lvy .ylist{left:auto;right:0;z-index:60}
+.lvt.lvy{position:relative;z-index:50}
 .stn tr{cursor:pointer}
 .stn tr.cut td{border-bottom:2px solid #e5484d !important}
 .stn td.n .tc{display:flex;align-items:center;gap:8px;min-width:0}
@@ -1088,14 +1096,15 @@ async function loadInj(p) {
 }
 async function loadTeam() {
   const t = state.team; if (!t) return;
-  const base = API + LEAGUES[t.league].path + '/teams/' + t.id;
-  const res = await Promise.allSettled([getJson(base), getJson(base + '/roster'), getJson(base + '/schedule'), getJson(base + '/statistics'),
-    getJson(base + '/schedule?seasontype=1'), getJson(base + '/schedule?seasontype=3'), ensureTeams(t.league)]);
+  const base = API + LEAGUES[t.league].path + '/teams/' + t.id, sq = t.sy ? 'season=' + t.sy : '', q1 = sq ? '?' + sq : '', q2 = sq ? '&' + sq : '', rq = t.req = (t.req || 0) + 1;
+  const res = await Promise.allSettled([getJson(base), getJson(base + '/roster' + q1), getJson(base + '/schedule' + q1), getJson(base + '/statistics' + q1),
+    getJson(base + '/schedule?seasontype=1' + q2), getJson(base + '/schedule?seasontype=3' + q2), ensureTeams(t.league)]);
+  if (t.req !== rq || state.team !== t) return;
   const val = r => r.status === 'fulfilled' ? r.value : null;
   const er = r => r.status === 'rejected' ? String((r.reason && r.reason.message) || r.reason) : null;
   t.info = val(res[0]); t.roster = val(res[1]); t.rosterErr = er(res[1]);
   t.sched = val(res[2]); t.schedErr = er(res[2]); t.stats = val(res[3]); t.statsErr = er(res[3]);
-  if (t.league === 'nhl') { const c = await coreTeamStats('nhl', t.id, seasonYear('nhl')); if (c) { t.stats = t.stats || {}; t.stats._core = c; } }
+  if (t.league === 'nhl') { const c = await coreTeamStats('nhl', t.id, t.sy || seasonYear('nhl')); if (c) { t.stats = t.stats || {}; t.stats._core = c; } }
   const seen = new Set(); t.events = [];
   [res[2], res[4], res[5]].forEach(r => {
     const j = val(r);
@@ -1143,7 +1152,7 @@ function render() {
   else if (v === 'lv') renderLV(); else if (v === 'cmp') renderCompare(); else if (v === 'search') renderSearch(); else renderList();
   state.lastView = key;
   (() => { let c = '', alt = '';
-    if (v === 'player') { const tm = state.player && state.player.bio && state.player.bio.team; c = tm && tm.color; alt = tm && tm.alternateColor; }
+    if (v === 'player') { const bio = state.player && state.player.bio, tm = bio && bio.team, ret = bio && (bio.active === false || /retired/i.test(String((bio.status && (bio.status.type || bio.status.name)) || ''))); if (!ret) { c = tm && tm.color; alt = tm && tm.alternateColor; } }
     else if (v === 'team') { const t = state.team, os = [t.info && t.info.team, t.roster && t.roster.team, t.sched && t.sched.team, (state.teamList[t.league] || []).find(x => x.id === t.id)].filter(Boolean); c = os.map(o => o.color).find(Boolean); alt = os.map(o => o.alternateColor || o.alt).find(Boolean); }
     const ok = /^#?[0-9a-f]{6}$/i.test(String(c || ''));
     let bg = '#000000';
@@ -1153,11 +1162,8 @@ function render() {
     let rawAlt = false;
     if (ok) { let hh = hx(c);
       if (hh[2] < .17 && hh[1] < .3 && /^#?[0-9a-f]{6}$/i.test(String(alt || ''))) { const ha = hx(alt); if (ha[1] > .5 && ha[2] > .25 && ha[2] < .8) { c = alt; hh = ha; rawAlt = true; } }
-      if (!rawAlt && hh[1] > .35 && hh[2] > .2) { const h = hh[0];
-        if (h >= 8 && h < 38) c = fromHsl(h, Math.min(hh[1], .95), .4);
-        else if (h >= 38 && h < 62) c = fromHsl(h, Math.min(hh[1], .85), .34);
-        else if (h >= 165 && h < 200) c = fromHsl(h, Math.min(hh[1], .9), .26); } }
-    const brightOk = /^#?[0-9a-f]{6}$/i.test(String(c || '')) && (() => { const h = hx(c)[0], sa = hx(c)[1]; return sa > .35 && ((h >= 8 && h < 62) || (h >= 165 && h < 200)); })();
+      if (hh[1] > .18) c = fromHsl(hh[0], hh[1], Math.min(hh[0] >= 38 && hh[0] < 80 ? .42 : hh[0] >= 8 && hh[0] < 38 ? .53 : .45, Math.max(.2, hh[2]))); }
+    const brightOk = /^#?[0-9a-f]{6}$/i.test(String(c || '')) && hx(c)[1] > .18;
     if (ok) { const n = parseInt(String(c).replace('#', ''), 16), r = n >> 16, gg = (n >> 8) & 255, b = n & 255, L = (0.299 * r + 0.587 * gg + 0.114 * b) / 255, k = brightOk || rawAlt ? 1 : L < 0.08 ? 1.6 : Math.min(1, 0.32 / Math.max(L, .01)), f = x => Math.max(0, Math.min(255, Math.round(x * k)));
       bg = '#' + [f(r), f(gg), f(b)].map(x => x.toString(16).padStart(2, '0')).join(''); }
     document.body.style.background = bg === '#000000' ? '' : bg; document.documentElement.style.background = bg;
@@ -2003,7 +2009,7 @@ function scoringHTML(g) {
       const lg = p.team && logos[p.team.id];
       const sc = p.awayScore != null && ev ? `<span class="sco">${esc(ev.away.abbr)} ${esc(p.awayScore)} – ${esc(ev.home.abbr)} ${esc(p.homeScore)}</span>` : '';
       return `<div class="play g"><span class="pl">${lg ? `<img src="${esc(lg)}" alt="" onerror="this.style.visibility='hidden'">` : ''}</span>
-        <span class="clk">${esc((p.clock && p.clock.displayValue) || '')}</span><span class="txt">${sc && g.league === 'nhl' ? sc.replace('</span>', strBadge(p) + '</span>') : sc}${g.league === 'nhl' ? (t => { const k = t.search(/,\s*(assists|unassisted)/i); return k < 0 ? esc(t) : esc(t.slice(0, k)) + `<span class="ast">${esc(t.slice(k))}</span>`; })(nhlGoalText(p)) : esc(p.text || p.shortText || '')}${!sc && g.league === 'nhl' ? strBadge(p) : ''}</span></div>`;
+        <span class="clk">${esc((p.clock && p.clock.displayValue) || '')}</span><span class="txt">${sc && g.league === 'nhl' ? sc.replace('</span>', strBadge(p) + '</span>') : sc}${g.league === 'nhl' ? (t => { const k = t.search(/,\s*(assists|unassisted)/i); return k < 0 ? esc(t) : esc(t.slice(0, k)) + `<span class="ast">${esc(t.slice(k))}</span>`; })(nhlGoalText(p)) : (t => { const k = t.search(/\s\(/); return k < 0 || g.league !== 'nfl' ? esc(t) : esc(t.slice(0, k)) + `<span class="ast">${esc(t.slice(k))}</span>`; })(String(p.text || p.shortText || ''))}${!sc && g.league === 'nhl' ? strBadge(p) : ''}</span></div>`;
     }).join('');
     return `<section class="per"><div class="phd">${periodLabel(g.league, k)}</div>${rows}</section>`;
   }).join('');
@@ -2079,7 +2085,7 @@ function renderPlayer() {
   const tab = (k, l) => `<button data-ptab="${k}" class="${p.tab === k ? 'on' : ''}">${l}</button>`;
   $app.innerHTML = `
     <header class="d"><div class="tabs"><button class="back" data-back aria-label="Back"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></button><button class="home" data-home aria-label="Home"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"><path d="M3 10.5 12 3l9 7.5"/><path d="M5.5 9v11h13V9"/><path d="M10 20v-6h4v6"/></svg></button><button class="home" data-refresh aria-label="Refresh"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12a8 8 0 1 1-2.34-5.66"/><path d="M20 4v5h-5"/></svg></button></div></header>
-    <main><div class="phero pp"><img class="hs" src="https://a.espncdn.com/i/headshots/${p.league}/players/full/${esc(p.id)}.png" alt="" onerror="this.onerror=null;this.src=SIL">
+    <main><div class="phero pp"><img class="hs${p.league === 'nfl' && String(p.id) === '3915511' ? ' heart' : ''}" src="https://a.espncdn.com/i/headshots/${p.league}/players/full/${esc(p.id)}.png" alt="" onerror="this.onerror=null;this.src=SIL">
       <div><div class="pname">${esc(p.name || 'Player')}</div><div class="psub">${esc(sub)}</div></div></div>
       <div class="dtabs sm even">${tab('ov', 'Overview')}${tab('stats', 'Stats')}${tab('gl', 'Gamelog')}${tab('bio', 'Bio')}</div>
       <div class="pane t">${body}</div></main>`;
@@ -2114,7 +2120,7 @@ function gamelogHTML(p, o) {
   o = o || {};
   const J = o.j !== undefined ? o.j : p.gl;
   const H = o.head || '';
-  if (o.j === undefined && p.glErr) return H + msg('Failed to load gamelog (' + p.glErr + ').');
+  if (o.j === undefined && p.glErr) return H + msg('Gamelog data not available.');
   if (!J) return H + msg('Gamelog not available.');
   const j = J, labels = j.labels || j.names || [], meta = j.events || {};
   const secs = [], seen = new Set();
@@ -2210,7 +2216,7 @@ function ncaaGamelog(p, seg) {
   const g = p.ncBy[sel];
   if (!g) { loadNcGl(p, sel); return head + msg('Loading…'); }
   if (g.loading) return head + msg('Loading…');
-  if (g.err) return head + msg('Failed to load gamelog.');
+  if (g.err) return head + msg('Data not available for this season.');
   return gamelogHTML(p, { head, j: g.j });
 }
 function gamelogFull(p) {
@@ -2223,7 +2229,7 @@ function gamelogFull(p) {
   const g = (p.glBy || {})[sel];
   if (!g) { loadGlSeason(p, sel); return head + msg('Loading…'); }
   if (g.loading) return head + msg('Loading…');
-  if (g.err) return head + msg('Failed to load gamelog.');
+  if (g.err) return head + msg('Data not available for this season.');
   return gamelogHTML(p, { head, j: g.j });
 }
 function ssCat(p, x) {
@@ -2486,11 +2492,12 @@ function renderTeam() {
   const body0 = !t.done ? msg('Loading…') : t.tab === 'roster' ? rosterHTML(t) : t.tab === 'sched' ? scheduleHTML(t) : t.tab === 'tstats' ? teamTabStatsHTML(t) : t.tab === 'inj' ? teamInjHTML(t) : teamStatsHTML(t);
   const body = t.done && (t.tab === 'stats' || t.tab === 'tstats') ? sseg + body0 : body0;
   $app.innerHTML = `
-    <header class="d"><div class="tabs"><button class="back" data-back aria-label="Back"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></button><button class="home" data-home aria-label="Home"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"><path d="M3 10.5 12 3l9 7.5"/><path d="M5.5 9v11h13V9"/><path d="M10 20v-6h4v6"/></svg></button><button class="home" data-refresh aria-label="Refresh"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12a8 8 0 1 1-2.34-5.66"/><path d="M20 4v5h-5"/></svg></button></div></header>
+    <header class="d"><div class="tabs"><button class="back" data-back aria-label="Back"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></button><button class="home" data-home aria-label="Home"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"><path d="M3 10.5 12 3l9 7.5"/><path d="M5.5 9v11h13V9"/><path d="M10 20v-6h4v6"/></svg></button><button class="home" data-refresh aria-label="Refresh"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12a8 8 0 1 1-2.34-5.66"/><path d="M20 4v5h-5"/></svg></button><span class="grow"></span>${(() => { const Y = brYears(t.league), y = t.sy || Y[0], yl = yy => t.league === 'nfl' ? String(yy) : (yy - 1) + '-' + String(yy).slice(2);
+      return `<div class="ysel tys"><button class="ybtn" data-tyo="1">${esc(yl(y))}<i class="chev ${t.yOpen ? 'up' : ''}"></i></button>${t.yOpen ? `<div class="ylist">${Y.map(x => `<button data-ty="${x}" class="${x === y ? 'on' : ''}">${esc(yl(x))}</button>`).join('')}</div>` : ''}</div>`; })()}</div></header>
     <main><div class="phero">${h.logo ? `<img class="tl" src="${esc(h.logo)}" alt="" onerror="this.style.visibility='hidden'">` : ''}
       <div class="grow"><div class="pname up">${esc(h.name)}</div><div class="psub">${esc(h.sub)}</div></div>
       <button class="fstar ${isFav(t.league, t.id) ? 'on' : ''}" data-fav="${esc(t.id)}" data-fl="${t.league}" data-fn="${esc(h.name)}" data-flogo="${esc(h.logo)}" aria-label="Favorite team">${STAR_SVG}</button></div>
-      <div class="dtabs sm even">${tab('roster', 'Roster')}${tab('sched', 'Schedule')}${tab('stats', 'Stats', t.tab === 'tstats')}${tab('inj', 'Injuries')}</div>
+      <div class="dtabs sm even">${tab('roster', 'Roster')}${tab('sched', 'Schedule')}${tab('stats', 'Stats', t.tab === 'tstats')}${t.sy ? '' : tab('inj', 'Injuries')}</div>
       <div class="pane t">${body}</div></main>`;
   const ms = document.getElementById('mstrip'), on = ms && ms.querySelector('.on');
   if (on) ms.scrollLeft = on.offsetLeft - (ms.clientWidth - on.offsetWidth) / 2;
@@ -2511,7 +2518,7 @@ function rosterHTML(t) {
     const ey = a.experience && a.experience.years != null ? a.experience.years : '', exp = ey === 0 || ey === '0' ? 'R' : ey;
     const ht = String(a.displayHeight || '').replace(/\s/g, ''), wt = String(a.displayWeight || '').replace(/\s*lbs?\.?/i, '');
     return `<tr data-player="${esc(a.id)}" data-pl="${t.league}" data-pn="${esc(nm)}" data-pp="${esc(pos)}" data-pj="${esc(a.jersey || '')}" data-pt="${esc(tn)}">
-      <td class="n"><span class="pn">${esc(nm)}</span></td><td>${esc(pos)}</td><td>${esc(a.jersey || '')}</td><td>${esc(exp)}</td><td>${esc(ht)}</td><td>${esc(wt)}</td><td>${esc(a.age)}</td></tr>`;
+      <td class="n"><span class="pn">${esc(nm)}</span></td><td>${esc(pos)}</td><td>${esc(a.jersey || '–')}</td><td>${esc(exp)}</td><td>${esc(ht)}</td><td>${esc(wt)}</td><td>${esc(a.age)}</td></tr>`;
   };
   const tbl = (title, list) => `<section class="blk"><div class="tw"><table class="ros"><thead><tr><th class="n">${esc(title)}</th><th>POS</th><th>#</th><th>EXP</th><th>HT</th><th>WT</th><th>AGE</th></tr></thead><tbody>${list.map(tr).join('')}</tbody></table></div></section>`;
   const grp = ROS_GRP[t.league];
@@ -2583,11 +2590,12 @@ async function teamPsFast(t, all, base, catNm) {
   const tcats = new Map();
   tj.forEach(j => statCats(j, lg).forEach(c => { if (c.rows.length && c.names && c.names.length === c.labels.length && !tcats.has(c.title)) tcats.set(c.title, c); }));
   if (!tcats.size) return null;
-  const seasonN = (() => { const c = [...tcats.values()][0]; return String(c.rows[c.rows.length - 1].n); })();
+  const seasonN = (() => { for (const c of tcats.values()) { const r = t.sy ? c.rows.find(x => +x.year === t.sy) : c.rows[c.rows.length - 1]; if (r) return String(r.n); } return ''; })();
+  if (!seasonN) return null;
   const Q = lg === 'nfl' ? ['offense:passing', 'offense:rushing', 'offense:receiving', 'defense', 'specialTeams'] : lg === 'nhl' ? ['', 'goaltending'] : [''];
   const ids = new Set(all.map(a => String(a.id))), M = {};
   let seen = 0, mine = 0;
-  const res = await Promise.all(Q.map(cg => getJson('https://site.web.api.espn.com/apis/common/v3/sports/' + LEAGUES[lg].path + '/statistics/byathlete?region=us&lang=en&contentorigin=espn&isqualified=false&page=1&limit=200&seasontype=2&season=' + seasonYear(lg) + '&team=' + t.id + (cg ? '&category=' + cg : '')).catch(() => null)));
+  const res = await Promise.all(Q.map(cg => getJson('https://site.web.api.espn.com/apis/common/v3/sports/' + LEAGUES[lg].path + '/statistics/byathlete?region=us&lang=en&contentorigin=espn&isqualified=false&page=1&limit=200&seasontype=2&season=' + (t.sy || seasonYear(lg)) + '&team=' + t.id + (cg ? '&category=' + cg : '')).catch(() => null)));
   res.forEach(j => { if (!j) return; const rc = j.categories || [];
     (j.athletes || []).forEach(x => { const id = String((x.athlete && x.athlete.id) || ''); seen++; if (!ids.has(id)) return; mine++;
       const m = M[id] || (M[id] = {});
@@ -2607,7 +2615,7 @@ async function teamPsFast(t, all, base, catNm) {
 }
 async function loadTeamPlayers(t) {
   if (t.ps) return;
-  const ck = 'tps_' + t.league + '_' + t.id, cached = lsGet(ck, 6 * 3600e3);
+  const ck = 'tps_' + t.league + '_' + t.id + (t.sy ? '_' + t.sy : ''), cached = lsGet(ck, t.sy ? 30 * 864e5 : 6 * 3600e3);
   const lastEnd = Math.max(0, ...(t.events || []).filter(e => e.state === 'post' || e.state === 'in').map(e => new Date(e.date).getTime() + 3.5 * 36e5).filter(x => x < Date.now()));
   if (cached && cached.ts && lastEnd > cached.ts) { /* od ulozeni se dohral zapas -> stahnout znovu */ }
   else if (cached && cached.rows && cached.rows.length) { t.ps = { loading: false, cats: psFromRows(cached.rows), season: cached.season }; return; }
@@ -2625,7 +2633,7 @@ async function loadTeamPlayers(t) {
       try {
         const j = await getJson(base + a.id + '/stats');
         statCats(j, t.league).forEach(c => {
-          const r = c.rows[c.rows.length - 1]; if (!r) return;
+          const r = t.sy ? c.rows.find(x => +x.year === t.sy) : c.rows[c.rows.length - 1]; if (!r) return;
           const L = c.labels, nm = (L.includes('GAA') || L.includes('SV%')) ? 'Goalies' : (L.includes('PTS') && L.includes('PIM')) ? 'Skaters' : (CAT_NAME[String(c.title).toLowerCase()] || c.title);
           rows.push({ a, cat: nm + '|' + L.join(','), name: nm, labels: L, names: c.names, season: String(r.n), vals: r.vals });
         });
@@ -2840,7 +2848,7 @@ async function loadLV() {
     if (v.kind === 'standings' && v.mode === 'br') { state.lvC[key] = await loadBracket(v); if (state.lv === v && topView() === 'lv') render(); return; }
     if (v.kind === 'standings') {
       await ensureTeams(v.league).catch(() => {});
-      const j = await getJson('https://site.api.espn.com/apis/v2/sports/' + L.path + '/standings?level=' + (v.mode === 'conf' ? 2 : 3));
+      const j = await getJson('https://site.api.espn.com/apis/v2/sports/' + L.path + '/standings?level=' + (v.mode === 'conf' ? 2 : 3) + (v.brY && v.brY !== seasonYear(v.league) ? '&season=' + v.brY : ''));
       if (v.mode === 'po') {
         const confs = (j.children || []).map(cn => { const divs = []; const w2 = n => { if (n !== cn && n.standings && n.standings.entries && n.standings.entries.length) divs.push({ name: n.name || '', entries: n.standings.entries }); (n.children || []).forEach(w2); }; w2(cn); return { name: cn.name || '', abbr: cn.abbreviation || '', divs, entries: (cn.standings && cn.standings.entries) || [] }; });
         state.lvC[key] = { confs, groups: [1] };
@@ -2857,7 +2865,7 @@ async function loadLV() {
       for (const u of ['https://sports.core.api.espn.com/v2/sports/' + parts[0] + '/leagues/' + parts[1] + '/seasons/' + (v.sy || seasonYear(v.league)) + '/types/2/leaders?limit=5&lang=en&region=us'].concat(v.sy ? [] : ['https://sports.core.api.espn.com/v2/sports/' + parts[0] + '/leagues/' + parts[1] + '/leaders?limit=5&lang=en&region=us'])) {
         try { j = await getJson(u); if (j && j.categories && j.categories.length) break; } catch (e) {}
       }
-      const cats = ((j && j.categories) || []).filter(c => c.leaders && c.leaders.length).map(c => ({ name: c.name, title: c.displayName || c.name, rows: c.leaders.slice(0, 5).map(l => ({ val: l.displayValue != null ? l.displayValue : l.value, ref: l.athlete && l.athlete.$ref, tid: ((l.team && l.team.$ref) || '').match(/teams\/(\d+)/), a: null })) }));
+      const cats = ((j && j.categories) || []).filter(c => c.leaders && c.leaders.length).map(c => ({ name: c.name, abbr: c.abbreviation || c.shortDisplayName || '', title: c.displayName || c.name, rows: c.leaders.slice(0, 5).map(l => ({ val: l.displayValue != null ? l.displayValue : l.value, ref: l.athlete && l.athlete.$ref, tid: ((l.team && l.team.$ref) || '').match(/teams\/(\d+)/), a: null })) }));
       if (v.league === 'nfl') {
         const ORD = [/^passingYards$/i, /^passingTouchdowns$/i, /^rushingYards$/i, /^rushingTouchdowns$/i, /^receivingYards$/i, /^receivingTouchdowns$/i, /^totalTackles$/i, /^sacks$/i, /^interceptions$/i, /^passesDefended$/i, /^fieldGoals?Made$/i, /long.*fieldGoal|fieldGoal.*long/i];
         const picked = ORD.map(re => cats.find(c => re.test(String(c.name)))).filter(Boolean);
@@ -2876,7 +2884,7 @@ async function loadLV() {
   } catch (e) { state.lvC[key] = { err: 'Failed to load data (' + (e.message || e) + ').' }; }
   if (state.lv === v && topView() === 'lv') render();
 }
-const lvKey = v => v.kind + v.league + (v.kind === 'lstats' && v.sy ? v.sy : '') + (v.kind === 'standings' ? v.mode + (v.mode === 'br' ? (v.brY || seasonYear(v.league)) : '') : '');
+const lvKey = v => v.kind + v.league + (v.kind === 'lstats' && v.sy ? v.sy : '') + (v.kind === 'standings' ? v.mode + (v.brY || seasonYear(v.league)) : '');
 function brYears(league) { const cur = seasonYear(league), L = []; for (let y = cur; y >= 2002; y--) { if (league === 'nhl' && y === 2005) continue; L.push(y); } return L; }
 const BR_ROUNDS = { nba: ['First Round', 'Conf. Semifinals', 'Conf. Finals', 'NBA Finals'], nhl: ['First Round', 'Second Round', 'Conf. Finals', 'Stanley Cup Final'], nfl: ['Wild Card', 'Divisional', 'Conf. Championship', 'Super Bowl'] };
 async function loadBracket(v) {
@@ -2961,7 +2969,7 @@ function brActual(v, c) {
 function bracketHTML(v, c) {
   const Y = brYears(v.league), y = c.y || v.brY || Y[0];
   const yl = yy => v.league === 'nfl' ? String(yy) : (yy - 1) + '-' + String(yy).slice(2);
-  const ysel = `<div class="ysel"><button class="ybtn" data-bryo="1">${esc(yl(y))}<i class="chev ${v.brOpen ? 'up' : ''}"></i></button>${v.brOpen ? `<div class="ylist">${Y.map(x => `<button data-bry="${x}" class="${x === y ? 'on' : ''}">${esc(yl(x))}</button>`).join('')}</div>` : ''}</div>`;
+  const ysel = '';
   if (!c.confs) return ysel + msg('Loading…');
   const proj = !c.evs.length;
   const items = proj ? brProjected(v, c) : brActual(v, c);
@@ -3047,7 +3055,7 @@ function lstatsHTML(v, c) {
   return c.cats.map(cat => `<section class="lcat"><div class="lh2">${esc(cat.title)}</div>${cat.rows.map((r, i) => {
     const a = r.a || {}, tid = r.tid && r.tid[1], tm = (state.teamList[v.league] || []).find(x => x.id === tid) || {}, pos = (a.position && a.position.abbreviation) || '';
     return `<div class="ldr ${i === 0 ? 'top' : ''}" data-player="${esc(a.id || '')}" data-pl="${v.league}" data-pn="${esc(a.displayName || '')}" data-pp="${esc(pos)}" data-pj="${esc(a.jersey || '')}" data-pt="${esc(tm.name || '')}"><span class="rk">${i + 1}</span><span class="hsw"><img class="hs" src="${esc(hsOf(a, v.league))}" alt="" onerror="this.onerror=null;this.src=SIL">${tm.logo || tm.abbr ? `<img class="tlb" src="${esc(teamLogoOf(v.league, { id: tm.id, abbr: tm.abbr }))}" alt="" onerror="this.remove()">` : ''}</span><div class="ln"><span class="pn" style="font-family:var(--num);font-weight:700;font-size:17px">${esc(a.displayName ? shortNm(a.displayName) : '…')}</span>${v.league === 'nhl' && pos ? `<small class="lpos">${esc(pos)}</small>` : ''}</div><span class="lv2">${esc(r.val)}</span></div>`;
-  }).join('')}<button class="cl" data-cl="${esc(cat.name || '')}">Complete leaders</button></section>`).join('');
+  }).join('')}<button class="cl" data-cl="${esc(cat.name || '')}" data-cla="${esc(cat.abbr || '')}" data-clt="${esc(cat.title || '')}">Complete leaders</button></section>`).join('');
 }
 async function loadCmp(i) {
   const c = state.cmp, sel = c.sel[i]; if (!sel) return;
@@ -3124,8 +3132,8 @@ function renderLV() {
   else body = v.kind === 'standings' ? standingsHTML(v, c) : lstatsHTML(v, c);
   $app.innerHTML = `
     <header class="d"><div class="tabs"><button class="back" data-back aria-label="Back"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></button><button class="home" data-home aria-label="Home"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"><path d="M3 10.5 12 3l9 7.5"/><path d="M5.5 9v11h13V9"/><path d="M10 20v-6h4v6"/></svg></button><button class="home" data-refresh aria-label="Refresh"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12a8 8 0 1 1-2.34-5.66"/><path d="M20 4v5h-5"/></svg></button></div></header>
-    <main><div class="lvt${v.kind === 'lstats' ? ' lvy' : ''}"><span>${esc(title)}</span>${v.kind === 'lstats' ? (() => { const Y = brYears(v.league), y = v.sy || Y[0], yl = yy => v.league === 'nfl' ? String(yy) : (yy - 1) + '-' + String(yy).slice(2);
-      return `<div class="ysel"><button class="ybtn" data-lsyo="1">${esc(yl(y))}<i class="chev ${v.syOpen ? 'up' : ''}"></i></button>${v.syOpen ? `<div class="ylist">${Y.map(x => `<button data-lsy="${x}" class="${x === y ? 'on' : ''}">${esc(yl(x))}</button>`).join('')}</div>` : ''}</div>`; })() : ''}</div><div class="pane t">${body}</div></main>`;
+    <main><div class="lvt lvy"><span>${esc(title)}</span>${(() => { const Y = brYears(v.league), ls = v.kind === 'lstats', y = (ls ? v.sy : v.brY) || Y[0], op = ls ? v.syOpen : v.brOpen, yl = yy => v.league === 'nfl' ? String(yy) : (yy - 1) + '-' + String(yy).slice(2);
+      return `<div class="ysel"><button class="ybtn" ${ls ? 'data-lsyo' : 'data-bryo'}="1">${esc(yl(y))}<i class="chev ${op ? 'up' : ''}"></i></button>${op ? `<div class="ylist">${Y.map(x => `<button ${ls ? 'data-lsy' : 'data-bry'}="${x}" class="${x === y ? 'on' : ''}">${esc(yl(x))}</button>`).join('')}</div>` : ''}</div>`; })()}</div><div class="pane t">${body}</div></main>`;
 }
 /* complete leaders */
 function byAthQuery(league, cat) {
@@ -3142,6 +3150,19 @@ function byAthQuery(league, cat) {
   }
   if (league === 'nhl' && /save|goalsAgainst|shutout|wins/i.test(c)) return ['goaltending', ''];
   return ['', ''];
+}
+function leaderCol(cols, v, keys) {
+  const lc = s => String(s || '').toLowerCase();
+  for (const k of keys) { const i = cols.findIndex(c => lc(c.name) === k); if (i >= 0) return i; }
+  const avg = /pergame|per game|average|^avg/i.test(String(v.cat) + ' ' + (v.title || '')), pct = /pct|percent|%/i.test(String(v.cat) + ' ' + (v.title || ''));
+  const norm = s => lc(s).replace(/pergame|per game|average|^avg|avg/g, '').replace(/percentage|percent|pct/g, 'pct').replace(/3|three/g, 'three').replace(/fieldgoals?|field goals?/g, 'fg').replace(/pointers?|points?/g, 'pt').replace(/[^a-z]/g, '');
+  if (v.lab) { const m = cols.map((c, k) => [c, k]).filter(([c]) => lc(c.label) === lc(v.lab)); if (m.length) { const b = m.find(([c]) => /^avg/i.test(c.name) === avg) || m[0]; return b[1]; } }
+  const nc = norm(v.cat), nt = norm(v.title);
+  const m2 = cols.map((c, k) => [c, k]).filter(([c]) => { const n = norm(c.name); return n && (n === nc || n === nt); });
+  if (m2.length) { const b = m2.find(([c]) => /^avg/i.test(c.name) === avg) || m2[0]; return b[1]; }
+  const m3 = cols.map((c, k) => [c, k]).filter(([c]) => { const n = norm(c.name); return n.length > 3 && (nc.includes(n) || n.includes(nc)); }).filter(([c]) => !pct || /pct|%/i.test(c.name + c.label));
+  if (m3.length) { const b = m3.find(([c]) => /^avg/i.test(c.name) === avg) || m3[0]; return b[1]; }
+  return -1;
 }
 function catKeys(cat) { if (cat === 'qbInterceptions') return ['interceptions']; const c = String(cat || ''); const b = c.replace(/PerGame$/i, ''); return [c, 'avg' + b.charAt(0).toUpperCase() + b.slice(1), b].map(x => x.toLowerCase()); }
 async function loadLeaders() {
@@ -3186,8 +3207,7 @@ async function loadLeaders() {
     if (!rows.length || !cols.length) throw new Error('empty');
     v.data = { cols, rows };
     const keys = catKeys(v.cat);
-    const di = cols.findIndex(c => keys.includes(String(c.name).toLowerCase()));
-    const li = di >= 0 ? di : v.lab ? cols.findIndex(c => String(c.label).toLowerCase() === String(v.lab).toLowerCase()) : -1;
+    const li = leaderCol(cols, v, keys);
     if (v.sk == null) v.sk = li >= 0 ? li : 0;
   } catch (e) {
     try {
@@ -3320,7 +3340,7 @@ function route() {
   if (m && LEAGUES[m[1]]) { openTeam(m[1], m[2]); return; }
   state.team = null;
   m = h.match(/^#\/leaders\/(\w+)\/(\w+)/);
-  if (m && LEAGUES[m[1]]) { const sy = window._ldY || null; window._ldY = null; if (!state.lv || state.lv.kind !== 'leaders' || state.lv.cat !== m[2] || (sy && state.lv.sy !== sy)) state.lv = { kind: 'leaders', league: m[1], cat: m[2], sk: null, asc: false, sy }; render(); loadLeaders(); return; }
+  if (m && LEAGUES[m[1]]) { const sy = window._ldY || null, ll = window._ldL || {}; window._ldY = null; window._ldL = null; if (!state.lv || state.lv.kind !== 'leaders' || state.lv.cat !== m[2] || (sy || null) !== (state.lv.sy || null)) state.lv = { kind: 'leaders', league: m[1], cat: m[2], sk: null, asc: false, sy, lab: ll.lab || '', title: ll.title || '' }; render(); loadLeaders(); return; }
   m = h.match(/^#\/(standings|lstats)\/(\w+)/);
   if (m && LEAGUES[m[2]]) { if (!state.lv || state.lv.kind !== m[1] || state.lv.league !== m[2]) state.lv = { kind: m[1], league: m[2], mode: m[2] === 'nba' ? 'conf' : 'div', sy: m[1] === 'lstats' ? (state.lsY || {})[m[2]] || null : null }; render(); loadLV(); return; }
   state.lv = null;
@@ -3335,7 +3355,7 @@ window.addEventListener('hashchange', route);
 const $app = document.getElementById('app');
 $app.addEventListener('click', ev => {
   if (window._lpAt && Date.now() - window._lpAt < 900) { const lb = ev.target.closest('[data-league]'); if (lb) { ev.preventDefault(); return; } }
-  const b = ev.target.closest('[data-rclear],[data-go2],[data-home],[data-csort],[data-glm],[data-glyo],[data-cexp],[data-glsort],[data-cmpcar],[data-brpg],[data-cmpclr],[data-spm],[data-cmpyo],[data-cmpy],[data-scf],[data-bryo],[data-lsyo],[data-lsy],[data-bry],[data-cmpgo],[data-cmpl],[data-cmpp],[data-cmpx],[data-gsort],[data-glsrc],[data-ncy],[data-sstat],[data-gly],[data-league],[data-game],[data-date],[data-wk],[data-pst],[data-smode],[data-cl],[data-lsort],[data-drv],[data-pm],[data-tab],[data-ptab],[data-xp],[data-ttab],[data-pvt],[data-sort],[data-fav],[data-team],[data-player],[data-topen],[data-search],[data-month],[data-refresh],[data-back]');
+  const b = ev.target.closest('[data-rclear],[data-go2],[data-home],[data-csort],[data-glm],[data-glyo],[data-cexp],[data-glsort],[data-cmpcar],[data-brpg],[data-cmpclr],[data-spm],[data-cmpyo],[data-cmpy],[data-scf],[data-bryo],[data-lsyo],[data-lsy],[data-tyo],[data-ty],[data-bry],[data-cmpgo],[data-cmpl],[data-cmpp],[data-cmpx],[data-gsort],[data-glsrc],[data-ncy],[data-sstat],[data-gly],[data-league],[data-game],[data-date],[data-wk],[data-pst],[data-smode],[data-cl],[data-lsort],[data-drv],[data-pm],[data-tab],[data-ptab],[data-xp],[data-ttab],[data-pvt],[data-sort],[data-fav],[data-team],[data-player],[data-topen],[data-search],[data-month],[data-refresh],[data-back]');
   if (!b) return;
   const d = b.dataset;
   if (topView() === 'search' && !ev.target.closest('.fstar')) { if (d.topen) addRecent({ k: 't', l: d.tl, id: d.topen, name: d.tn || '', logo: d.tlogo || '' }); else if (d.player) addRecent({ k: 'p', l: d.pl, id: d.player, name: d.pn || '', sub: d.pt || '' }); }
@@ -3362,7 +3382,7 @@ $app.addEventListener('click', ev => {
     state.lv = { kind: 'leaders', league: state.player.league, cat: d.sstat, sk: null, asc: false, title: d.sstl || '', lab: d.sslab || '' };
     window._fromList = true; location.hash = '#/leaders/' + state.player.league + '/' + d.sstat;
   } else if (d.cl !== undefined) {
-    window._fromList = true; window._ldY = state.lv.sy || null; location.hash = '#/leaders/' + state.lv.league + '/' + (d.cl || 'x');
+    window._fromList = true; window._ldY = state.lv.sy || null; window._ldL = { lab: d.cla || '', title: d.clt || '' }; location.hash = '#/leaders/' + state.lv.league + '/' + (d.cl || 'x');
   } else if (d.lsort !== undefined) {
     const v = state.lv, k = +d.lsort; if (v.sk0 == null) v.sk0 = v.sk;
     if (v.sk === k && v.manual && v.asc) { v.sk = v.sk0; v.asc = false; v.manual = false; } else if (v.sk === k && v.manual) v.asc = true; else { v.sk = k; v.asc = false; v.manual = true; } render();
@@ -3372,6 +3392,11 @@ $app.addEventListener('click', ev => {
     state.lv.mode = d.smode; render(); loadLV();
   } else if (d.brpg !== undefined) {
     const sw = document.getElementById('brsw'); if (sw) sw.scrollTo({ left: sw.clientWidth * +d.brpg, behavior: 'smooth' });
+  } else if (d.tyo) {
+    state.team.yOpen = !state.team.yOpen; render();
+  } else if (d.ty) {
+    const t = state.team, y = +d.ty, ny = y === seasonYear(t.league) ? null : y; t.yOpen = false;
+    if (ny !== (t.sy || null)) { t.sy = ny; t.done = false; t.ps = null; t.month = null; t.roster = null; t.events = []; if (t.tab === 'inj' && ny) t.tab = 'roster'; render(); loadTeam(); } else render();
   } else if (d.lsyo) {
     state.lv.syOpen = !state.lv.syOpen; render();
   } else if (d.lsy) {
