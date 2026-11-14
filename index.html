@@ -434,8 +434,11 @@ body{min-height:100vh}
 .gl2.nba .glr{grid-template-columns:18px 31px 8px 31px 15px}
 .gl2.nhl .glr{grid-template-columns:18px 15px 8px 15px 15px}
 .gl2 .glr small{text-align:right;font-size:10.5px}
-.gl2 td.gr{text-align:center !important;padding-left:0;padding-right:0}
-.gl2 .gh2 th.grh{text-align:center;padding-left:0;padding-right:14px}
+.gl2 td.gr{text-align:left !important;padding-left:0;padding-right:0}
+.gl2 .gh2 th.grh{text-align:left;padding-left:23px !important;padding-right:0}
+.gl2.nba .gh2 th.grh{padding-left:24px !important}
+.gl2 .gh2 th.l:first-child{padding-left:4px}
+.gl2 .gh2 th.l:nth-child(2){padding-left:3px}
 .gl2 .glr b{font-weight:400}
 .gl2 .glr b:first-of-type{text-align:right}
 .gl2 .glr b:last-of-type{text-align:left}
@@ -443,7 +446,9 @@ body{min-height:100vh}
 .gl2 td.gr .glr .W,.gl2 td.gr .glr .L,.gl2 td.gr .glr .T{width:auto;margin:0;text-align:center}
 .nfx tr.hid{display:none}
 .nfx tr.ctot{cursor:pointer}
-.zb td{background:#26262a}
+tr.zb > td{background:#26262a !important}
+.nfx td.n,.nfx th.n,.fx td.n,.fx th.n,.gst td.n,.gst th.n{padding-left:8px !important}
+.nfx th.n{overflow:visible}
 .sep tbody tr td{border-bottom-color:transparent}
 .nfx tr.csub td.n .pn{color:var(--mut)}
 .tot2l{display:inline-flex;align-items:center;gap:1px;vertical-align:1px;margin-left:4px}
@@ -775,6 +780,16 @@ input[type=search]::-webkit-search-cancel-button{display:none;-webkit-appearance
 .drw img{width:28px;height:28px;object-fit:contain;flex:none}
 .drw .dnm{flex:1;min-width:0;font-weight:600}
 .drw .dnm small{display:block;color:var(--mut);font-weight:400;font-size:12px}
+.play.so .som{width:42px;flex:none;font-weight:800;font-size:16px}
+.play.so .som.y{color:#30d158}
+.play.so .som.n{color:#ff453a}
+.sosum{text-align:right;font-family:var(--num);font-weight:700;font-size:16px;padding:6px 0 10px;color:var(--mut)}
+.gdd{display:inline-grid;grid-template-columns:30px 44px;align-items:baseline}
+.gdd > span{text-align:right}
+.dsh{display:inline-grid;align-items:baseline;font-variant-numeric:tabular-nums;column-gap:3px}
+.dsh b{font-weight:inherit;text-align:right}
+.dsh b:last-child{text-align:left}
+.dsh i{font-style:normal;text-align:center}
 </style>
 </head>
 <body>
@@ -828,6 +843,13 @@ document.getElementById('fhome').addEventListener('click', () => {
     if (go) { window._forceT = Date.now(); ind.classList.add('spin'); const b = $app.querySelector('[data-refresh]'); if (b) b.click(); else if (typeof loadList === 'function') loadList(); setTimeout(() => { ind.classList.remove('spin', 'ready'); ind.style.opacity = 0; ind.style.transform = 'translate(-50%, 0)'; }, 900); }
     else { ind.classList.remove('ready'); ind.style.opacity = 0; ind.style.transform = 'translate(-50%, 0)'; } }, { passive: true });
 })();
+function dashAlign() {
+  $app.querySelectorAll('table:not(.lsc)').forEach(tb => { const bd = tb.tBodies[0]; if (!bd) return; const RE = /^\s*(-?\d+(?:\.\d+)?)\s*-\s*(\d+(?:\.\d+)?)\s*$/, cols = {};
+    [...tb.rows].forEach(r => [...r.cells].forEach((c, i) => { if (c.classList.contains('n') || c.querySelector('*')) return; const m = c.textContent.match(RE); if (!m) return; (cols[i] = cols[i] || []).push([c, m[1], m[2]]); }));
+    Object.values(cols).forEach(list => { if (list.length < 2 && !list.some(x => x[0].parentNode.classList.contains('tot'))) { if (!list.length) return; }
+      const L = Math.max(...list.map(x => x[1].length)), R = Math.max(...list.map(x => x[2].length));
+      list.forEach(([c, a, b]) => { c.innerHTML = `<span class="dsh" style="grid-template-columns:${L}ch 6px ${R}ch"><b>${a}</b><i>-</i><b>${b}</b></span>`; }); }); });
+}
 function zebra() {
   $app.querySelectorAll('table.nfx, table.fx, table.lbt, table.gst, table.ros, table.sch').forEach(tb => { const bd = tb.tBodies[0]; if (!bd) return; let z = false, last = false;
     [...bd.rows].forEach(r => { if (r.classList.contains('tot')) { r.classList.remove('zb'); return; } if (r.classList.contains('csub')) { r.classList.toggle('zb', last); return; } if (r.classList.contains('hid')) return; r.classList.toggle('zb', z); last = z; z = !z; }); });
@@ -1281,6 +1303,7 @@ function render() {
   try { alignGrp(); } catch (e) {}
   try { markSort(); } catch (e) {}
   try { zebra(); } catch (e) {}
+  try { dashAlign(); } catch (e) {}
   if (window._noSlide) window._noSlide = 0;
   if (window._slide) { const p = window._slideSel ? $app.querySelector('main') : $app.querySelector('.pane'), d = window._slide; window._slide = 0; window._slideSel = null; if (p && p.animate) p.animate([{ transform: `translateX(${d * 70}px)`, opacity: .3 }, { transform: 'none', opacity: 1 }], { duration: 230, easing: 'cubic-bezier(.2,.7,.3,1)' }); }
   const fh = document.getElementById('fhome'); if (fh) fh.hidden = true;
@@ -2135,7 +2158,15 @@ function scoringHTML(g) {
   ((sum.header && sum.header.competitions && sum.header.competitions[0] && sum.header.competitions[0].competitors) || [])
     .forEach(c => { if (c.team) logos[c.team.id] = c.team.logo || (c.team.logos && c.team.logos[0] && c.team.logos[0].href) || ''; });
   const groups = new Map();
-  plays.forEach(p => { const n = (p.period && p.period.number) || 1; if (!groups.has(n)) groups.set(n, []); groups.get(n).push(p); });
+  const reg = !(sum.header && sum.header.season && +sum.header.season.type === 3), soP = g.league === 'nhl' && reg ? 5 : 99;
+  plays.forEach(p => { const n = (p.period && p.period.number) || 1; if (n >= soP) return; if (!groups.has(n)) groups.set(n, []); groups.get(n).push(p); });
+  let soHTML = '';
+  if (soP < 99) { const sp = getPlays(sum).filter(p => ((p.period && p.period.number) || 0) >= soP && /shootout|shot|goal|save|miss/i.test(((p.type && p.type.text) || '') + ' ' + (p.text || '')) && !/period|end of|start/i.test((p.type && p.type.text) || ''));
+    if (sp.length || plays.some(p => ((p.period && p.period.number) || 0) >= soP)) {
+      let na = 0, nh = 0;
+      soHTML = `<section class="per"><div class="phd">SHOOTOUT</div>${sp.map(p => { const lg = p.team && logos[p.team.id], t = String(p.text || ''), gl = (p.scoringPlay || /\bgoal\b|scores/i.test(t)) && !/saved|miss|no goal|failed/i.test(t);
+        if (gl && ev) { if (String(p.team && p.team.id) === String(ev.home.id)) nh++; else na++; }
+        return `<div class="play g so"><span class="pl">${lg ? `<img src="${esc(lg)}" alt="" onerror="this.style.visibility='hidden'">` : ''}</span><span class="som ${gl ? 'y' : 'n'}">${gl ? '✓' : '✕'}</span><span class="txt">${esc(t.replace(/\s*\(.*?shootout.*?\)/i, ''))}</span></div>`; }).join('') || msg('Shootout details not available.')}${ev && sp.length ? `<div class="sosum">${esc(ev.away.abbr)} ${na} – ${nh} ${esc(ev.home.abbr)}</div>` : ''}</section>`; } }
   return [...groups.keys()].sort((a, b) => a - b).map(k => {
     const rows = groups.get(k).map(p => {
       const lg = p.team && logos[p.team.id];
@@ -2144,7 +2175,7 @@ function scoringHTML(g) {
         <span class="clk">${esc((p.clock && p.clock.displayValue) || '')}</span><span class="txt">${sc && g.league === 'nhl' ? sc.replace('</span>', strBadge(p) + '</span>') : sc}${g.league === 'nhl' ? (t => { const k = t.search(/,\s*(assists|unassisted)/i); return k < 0 ? esc(t) : esc(t.slice(0, k)) + `<span class="ast nh">${esc(t.slice(k).replace(/^,\s*/, '').replace(/^./, x => x.toUpperCase()))}</span>`; })(nhlGoalText(p)) : g.league === 'nfl' ? nflScoreText(String(p.text || p.shortText || '')) : esc(p.text || p.shortText || '')}${!sc && g.league === 'nhl' ? strBadge(p) : ''}</span></div>`;
     }).join('');
     return `<section class="per"><div class="phd">${periodLabel(g.league, k)}</div>${rows}</section>`;
-  }).join('');
+  }).join('') + soHTML;
 }
 function nflPlayTitle(p) {
   const t = (p.type && p.type.text) || '', y = p.statYardage;
@@ -2300,7 +2331,7 @@ function gamelogHTML(p, o) {
     const trs = rows.map(r => {
       const m = r.m, opp = (m.opponent && (m.opponent.abbreviation || m.opponent.displayName)) || '', ol = m.opponent ? dk((m.opponent.logo) || teamLogoOf(p.league, { id: m.opponent.id, abbr: m.opponent.abbreviation })) : '';
       const sm = String(m.score || '').match(/^(\S+)\s*(.*)$/) || [], wl = m.gameResult || '', d = m.gameDate ? new Date(m.gameDate) : null;
-      return `<tr data-game="${esc(r.id)}" data-gl="${o.gl || p.league}"><td class="gd">${d ? `<small>${DAYS[d.getDay()]}</small> ${d.getDate()}.${d.getMonth() + 1}.` : ''}</td><td class="go"><small>${esc(m.atVs === '@' ? '@' : 'vs')}</small>${ol ? `<img src="${esc(ol)}" alt="" onerror="this.style.visibility='hidden'">` : ''}<span>${esc(opp)}</span></td><td class="gr">${(() => { const pr = String(sm[1] || '').split('-'); return `<span class="glr"><small>${esc(sm[2] || '')}</small><b>${esc(pr[0] || '')}</b><i>${pr.length > 1 ? '-' : ''}</i><b>${esc(pr[1] || '')}</b><span class="${wl === 'W' || wl === 'L' ? wl : 'T'}">${esc(wl)}</span></span>`; })()}</td>${cols.map((c, ci) => `<td class="${so && so.i === ci ? 'on' : ''}">${nv(String(r.s[c[1]] == null ? '' : r.s[c[1]]).replace(/,/g, ''))}</td>`).join('')}</tr>`;
+      return `<tr data-game="${esc(r.id)}" data-gl="${o.gl || p.league}"><td class="gd">${d ? `<span class="gdd"><small>${DAYS[d.getDay()]}</small><span>${d.getDate()}.${d.getMonth() + 1}.</span></span>` : ''}</td><td class="go"><small>${esc(m.atVs === '@' ? '@' : 'vs')}</small>${ol ? `<img src="${esc(ol)}" alt="" onerror="this.style.visibility='hidden'">` : ''}<span>${esc(opp)}</span></td><td class="gr">${(() => { const pr = String(sm[1] || '').split('-'); return `<span class="glr"><small>${esc(sm[2] || '')}</small><b>${esc(pr[0] || '')}</b><i>${pr.length > 1 ? '-' : ''}</i><b>${esc(pr[1] || '')}</b><span class="${wl === 'W' || wl === 'L' ? wl : 'T'}">${esc(wl)}</span></span>`; })()}</td>${cols.map((c, ci) => `<td class="${so && so.i === ci ? 'on' : ''}">${nv(String(r.s[c[1]] == null ? '' : r.s[c[1]]).replace(/,/g, ''))}</td>`).join('')}</tr>`;
     }).join('');
     const gh = groups && groups.length > 1 ? groups.map(g => `<th class="grp" colspan="${g[1]}">${esc(g[0])}</th>`).join('') : `<th colspan="${cols.length}"></th>`;
     return `<section class="glsec"><div class="tw"><table class="gl2 ${p.league}" style="width:max(100%, ${tw}px)"><colgroup><col style="width:${DW}px"><col style="width:${OW}px"><col style="width:${RW}px">${cols.map(c => `<col style="width:${w(c[0])}px">`).join('')}</colgroup>
@@ -2566,7 +2597,7 @@ function careerHTML(p, cats) {
     const sk = mode + '|' + c.title, so = (p.csort || {})[sk];
     if (so) { const num = x => { const n = parseFloat(String(x == null ? '' : x).replace(/,/g, '')); return isNaN(n) ? -1e12 : n; }; rows = [...rows].sort((a, b) => (so.asc ? 1 : -1) * (num(a.v[so.i]) - num(b.v[so.i]))); }
     cols.forEach((x, i) => { const L = Math.max(0, ...rows.map(r => String(r.v[i] == null ? '' : r.v[i]).length)), T = tot ? String(tot[i] == null ? '' : tot[i]).length : 0; x[2] = Math.max(x[2], Math.ceil(Math.max(L * 9, T * 10) + 10)); });
-    const hasTot = rows.some((r, i) => !r.tid && !/^[A-Z]{2,4}$/.test(String(r.sub || '')) && rows.some((x, k) => k !== i && x.n === r.n)), fc = (p.league === 'nba' ? 112 : 80) + (hasTot && mode !== 'ncaa' ? 22 : 0), tw2 = fc + cols.reduce((a, x) => a + x[2], 0);
+    const hasTot = rows.some((r, i) => !r.tid && !/^[A-Z]{2,4}$/.test(String(r.sub || '')) && rows.some((x, k) => k !== i && x.n === r.n)), fc = (p.league === 'nba' ? 112 : 104) + (hasTot && mode !== 'ncaa' ? 22 : 0), tw2 = fc + cols.reduce((a, x) => a + x[2], 0);
     return `<section class="blk"><div class="tw"><table class="nfx sep" style="width:max(100%, ${tw2}px)"><colgroup><col style="width:${fc}px">${cols.map(x => `<col style="width:${x[2]}px">`).join('')}</colgroup><thead><tr><th class="n">${esc(title)}</th>${cols.map((x, i) => `<th data-csort="${i}" data-cs="${esc(sk)}" class="${so && so.i === i ? 'on' : ''}">${esc(x[1])}</th>`).join('')}</tr></thead><tbody>${(() => { const RT = (r, cls, extra, logo) => `<tr class="${cls}" ${extra}><td class="n"><span class="pn">${esc(r.n)}</span>${mode === 'ncaa' ? (r.tid ? `<img class="slg" src="https://a.espncdn.com/i/teamlogos/ncaa/500-dark/${esc(r.tid)}.png" alt="" onerror="if(!this.dataset.f){this.dataset.f=1;this.src=this.src.replace('500-dark','500')}else this.remove()">` : '') : (logo != null ? logo : seasonLogo(p.league, r))}</td>${r.v.map((v, i) => `<td class="${so && so.i === i ? 'on' : ''}">${nv(clean(v))}</td>`).join('')}</tr>`;
       const isTot = r => !r.tid && !/^[A-Z]{2,4}$/.test(String(r.sub || ''));
       if (so || mode === 'ncaa') return rows.map(r => RT(r, '', '', null)).join('');
@@ -3494,7 +3525,7 @@ function renderTLeaders() {
     const di = () => { let i = cols.findIndex(x => x.label === R.def && (!R.defSec || x.sec === R.defSec)); if (i < 0) i = cols.findIndex(x => x.label === R.def); return Math.max(0, i); };
     let sk = cols.findIndex(x => x.key === v.tk); if (sk < 0) { sk = di(); v.tk = cols[sk] && cols[sk].key; v.tasc = null; }
     if (!v.tclk) v.tclk = 1;
-    const scol = cols[sk], low = v.tasc != null ? v.tasc : (scol && (scol.key === (cols[di()] || {}).key ? R.low : (LOWBETTER.test(scol.name || '') !== (scol.side === 'opp'))));
+    const scol = cols[sk], low = v.tasc != null ? v.tasc : (scol && (scol.key === (cols[di()] || {}).key ? R.low : (LOWBETTER.test(scol.name || '') !== (scol.side === 'opp' && !/sack/i.test(scol.name || '')))));
     v._low = low;
     const rows = c.teams.map(t => ({ t, vals: cols.map(col => valOf(t, col)) })).sort((a, b) => { const x = tnum(a.vals[sk]), y = tnum(b.vals[sk]); if (x == null) return 1; if (y == null) return -1; return (low ? 1 : -1) * (x - y); });
     const w = l => String(l).length > 4 ? 62 : 52, tw = 150 + cols.reduce((a, x) => a + w(x.label), 0);
