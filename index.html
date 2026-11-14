@@ -619,6 +619,7 @@ td.n .slg{width:20px;height:20px;object-fit:contain;vertical-align:-6px;margin-l
 .gst th[data-gsort],.nfx th[data-gsort]{cursor:pointer}
 .fx th.on,.nfx th.on{color:#8ab4ff;text-decoration:underline}
 .fx td.on,.nfx td.on{background:#26314a}
+.fx tbody td.on,.nfx tbody td.on,.gst tbody td.on,.lbt tbody td.on{background:#26314a !important}
 .nfx th[data-sort]{cursor:pointer}
 .fx th.n,.fx td.n{width:auto;padding-left:0;position:static}
 .fx .pn{max-width:100%}
@@ -662,6 +663,9 @@ td.n .slg{width:20px;height:20px;object-fit:contain;vertical-align:-6px;margin-l
 .sch .opp small{width:18px;margin-right:12px}
 .sch .rg.rgw{grid-template-columns:22px 70px 16px;column-gap:3px;margin-right:12px}
 .sch .rg.rgw .sc2{grid-template-columns:31px 8px 31px}
+.sch .rg.rgw:not(.w3){grid-template-columns:22px 56px 16px;margin-right:12px}
+.sch .rg.rgw:not(.w3) .sc2{grid-template-columns:24px 8px 24px}
+.sch .rg.rgw:not(.w3) .sf{margin-right:-2px !important}
 .sch .rg.rgw .sf{margin:0 !important;width:auto !important;text-align:right;vertical-align:0}
 .sch .rg.rgw .W,.sch .rg.rgw .L,.sch .rg.rgw .T{text-align:right !important}
 .sch td.rs{overflow:visible}
@@ -726,6 +730,12 @@ document.getElementById('fhome').addEventListener('click', () => {
     if (go) { ind.classList.add('spin'); const b = $app.querySelector('[data-refresh]'); if (b) b.click(); else if (typeof loadList === 'function') loadList(); setTimeout(() => { ind.classList.remove('spin', 'ready'); ind.style.opacity = 0; ind.style.transform = 'translate(-50%, 0)'; }, 900); }
     else { ind.classList.remove('ready'); ind.style.opacity = 0; ind.style.transform = 'translate(-50%, 0)'; } }, { passive: true });
 })();
+function markSort(root) {
+  (root || document).querySelectorAll('table').forEach(tb => { const th = tb.tHead; if (!th || !th.rows.length) return; const hr = th.rows[th.rows.length - 1];
+    let ci = -1, c = 0; [...hr.cells].forEach(x => { if (x.classList.contains('on') && [...x.attributes].some(a => /^data-.*sort$/.test(a.name))) ci = c; c += x.colSpan || 1; });
+    if (ci < 0 || !tb.tBodies[0]) return;
+    [...tb.tBodies[0].rows].forEach(r => { let k = 0; for (const cell of r.cells) { if (k === ci) { cell.classList.add('on'); break; } k += cell.colSpan || 1; if (k > ci) break; } }); });
+}
 function alignGrp(root) {
   (root || document).querySelectorAll('table').forEach(tb => { const th = tb.tHead; if (!th || th.rows.length < 2) return; const gs = th.rows[0].querySelectorAll('th.grp'); if (!gs.length) return;
     const subs = [...th.rows[1].cells];
@@ -748,13 +758,16 @@ function tabHTML(k) {
   const keyOf = b => b && (b.dataset.tab || b.dataset.ptab || b.dataset.ttab);
   const apply = () => { raf = 0; if (!S || !S.hz) return; const x = S.x;
     S.el.style.transform = `translate3d(${x}px,0,0)`; S.gh.forEach(g => g.style.transform = `translate3d(${x + g._off * S.P}px,0,0)`);
-    if (S.strip) S.strip.style.transform = `translate3d(${(x / S.P) * S.iw}px,0,0)`; };
+    if (S.strip) { S.strip.scrollLeft = S.sl0 - (x / S.P) * S.iw; const k = S.cur + (x < -S.P / 2 ? 1 : x > S.P / 2 ? -1 : 0); if (k !== S.onk && S.items[k]) { S.items.forEach(b => b.classList.remove('on')); S.items[k].classList.add('on'); S.onk = k; } } };
+  const stripTo = (st, to, ms) => { const s2 = st.strip; if (!s2) return; const a = s2.scrollLeft, b = st.sl0 - (to / st.P) * st.iw, t0 = performance.now();
+    const k = st.cur + (to < 0 ? 1 : to > 0 ? -1 : 0); if (st.items[k]) { st.items.forEach(x => x.classList.remove('on')); st.items[k].classList.add('on'); }
+    const f = now => { const u = Math.min(1, (now - t0) / ms), e = 1 - Math.pow(1 - u, 3); s2.scrollLeft = a + (b - a) * e; if (u < 1 && st.strip) requestAnimationFrame(f); }; requestAnimationFrame(f); };
   const anim = (st, to, ms, done) => { const els = [st.el, ...st.gh];
     els.forEach(e => { e.style.transition = `transform ${ms}ms cubic-bezier(.2,.8,.2,1)`; });
     st.el.style.transform = `translate3d(${to}px,0,0)`; st.gh.forEach(g => g.style.transform = `translate3d(${to + g._off * st.P}px,0,0)`);
-    if (st.strip) { st.strip.style.transition = `transform ${ms}ms cubic-bezier(.2,.8,.2,1)`; st.strip.style.transform = `translate3d(${(to / st.P) * st.iw}px,0,0)`; }
+    stripTo(st, to, ms);
     setTimeout(() => { done && done(); }, ms + 10); };
-  const cleanup = st => { st.gh.forEach(g => g.remove()); if (st.strip && st.strip.isConnected) { st.strip.style.transition = ''; st.strip.style.transform = ''; } if (st.el) { st.el.style.transition = ''; st.el.style.transform = ''; st.el.style.willChange = ''; } };
+  const cleanup = st => { st.gh.forEach(g => g.remove()); if (st.strip && st.strip.isConnected) { st.strip.style.scrollSnapType = ''; } st.strip = null; if (st.el) { st.el.style.transition = ''; st.el.style.transform = ''; st.el.style.willChange = ''; } };
   const ghost = (st, html, off) => { const g = document.createElement('div'); g.className = st.cls + ' ghost'; g._off = off;
     g.style.cssText = `position:absolute;top:${st.el.offsetTop}px;left:${st.el.offsetLeft}px;width:${st.W}px;min-height:${Math.max(st.el.offsetHeight, window.innerHeight)}px;margin:0;pointer-events:none;will-change:transform;transform:translate3d(${off * st.P}px,0,0)`;
     g.style.setProperty('margin', '0', 'important'); if (st.mode === 'day') { const cs = getComputedStyle(st.el); g.style.padding = cs.padding; g.style.boxSizing = 'border-box'; }
@@ -777,7 +790,7 @@ function tabHTML(k) {
         if (S.mode === 'tab') html = tabHTML(keyOf(S.items[k]));
         else { const n = neighborKeys()[off < 0 ? 0 : 1], ev = n && state.dayC[n.key]; html = Array.isArray(ev) ? (ev.length ? ev.map(cardHTML).join('') : msg('No games on this day.')) : msg('Loading…'); }
         ghost(S, html, off); });
-      if (S.mode === 'day') { S.strip = document.getElementById('strip'); if (S.strip) { S.iw = (S.items[1] ? S.items[1].offsetLeft - S.items[0].offsetLeft : 70); S.strip.style.willChange = 'transform'; } }
+      if (S.mode === 'day') { S.strip = document.getElementById('strip'); if (S.strip) { S.iw = (S.items[1] ? S.items[1].offsetLeft - S.items[0].offsetLeft : 70); S.sl0 = S.strip.scrollLeft; S.onk = S.cur; S.strip.style.scrollSnapType = 'none'; } }
       return;
     }
     let x = t.clientX - S.x0; if ((x > 0 && S.cur === 0) || (x < 0 && S.cur === S.items.length - 1)) x *= .3;
@@ -786,8 +799,7 @@ function tabHTML(k) {
     const vel = (st.x - (st.lx || 0)) / Math.max(1, (st.tt || 0) - (st.lt || 0)), dir = st.x < 0 ? 1 : -1, j = st.cur + dir;
     const go = j >= 0 && j < st.items.length && (Math.abs(st.x) > st.W * .22 || (Math.abs(vel) > .45 && Math.sign(vel) === Math.sign(st.x)));
     if (!go) { anim(st, 0, 220, () => cleanup(st)); return; }
-    anim(st, -dir * st.P, 240, () => { if (st.mode === 'day') { st.items.forEach(b => b.classList.remove('on')); st.items[j].classList.add('on'); window._noStripAnim = 1;
-      if (st.strip) { const s2 = st.strip; s2.style.transition = 'none'; s2.style.scrollSnapType = 'none'; s2.style.transform = ''; s2.scrollLeft = s2.scrollLeft + dir * st.iw; } } window._noSlide = 1; st.items[j].click(); cleanup(st); });
+    anim(st, -dir * st.P, 240, () => { if (st.mode === 'day') { st.items.forEach(b => b.classList.remove('on')); st.items[j].classList.add('on'); window._noStripAnim = 1; } window._noSlide = 1; st.items[j].click(); cleanup(st); });
   }, { passive: true });
 })();
 window.SIL = 'data:image/svg+xml,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" fill="#2c2c2e"/><circle cx="50" cy="38" r="18" fill="#0d0d0f"/><path d="M14 100c2-22 17-34 36-34s34 12 36 34z" fill="#0d0d0f"/></svg>');
@@ -1085,16 +1097,17 @@ function render() {
     const hsl = (r, g, b) => { r /= 255; g /= 255; b /= 255; const mx = Math.max(r, g, b), mn = Math.min(r, g, b), l = (mx + mn) / 2, d = mx - mn; let h = 0, sa = 0; if (d) { sa = d / (1 - Math.abs(2 * l - 1)); h = mx === r ? ((g - b) / d) % 6 : mx === g ? (b - r) / d + 2 : (r - g) / d + 4; h *= 60; if (h < 0) h += 360; } return [h, sa, l]; };
     const fromHsl = (h, sa, l) => { const C = (1 - Math.abs(2 * l - 1)) * sa, X = C * (1 - Math.abs((h / 60) % 2 - 1)), m = l - C / 2; const [r, g, b] = h < 60 ? [C, X, 0] : h < 120 ? [X, C, 0] : h < 180 ? [0, C, X] : h < 240 ? [0, X, C] : h < 300 ? [X, 0, C] : [C, 0, X]; return '#' + [r, g, b].map(v => Math.round((v + m) * 255).toString(16).padStart(2, '0')).join(''); };
     if (ok) { const n0 = parseInt(String(c).replace('#', ''), 16), hh = hsl(n0 >> 16, (n0 >> 8) & 255, n0 & 255);
-      if (hh[1] > .35 && hh[2] > .2 && ((hh[0] >= 12 && hh[0] < 60) || (hh[0] >= 165 && hh[0] < 200))) c = fromHsl(hh[0], Math.min(hh[1], .75), .17); }
+      if (hh[1] > .35 && hh[2] > .2 && ((hh[0] >= 12 && hh[0] < 60) || (hh[0] >= 165 && hh[0] < 200))) c = fromHsl(hh[0], Math.min(hh[1], .9), hh[0] < 60 ? .27 : .22); }
     if (ok) { const n = parseInt(String(c).replace('#', ''), 16), r = n >> 16, gg = (n >> 8) & 255, b = n & 255, L = (0.299 * r + 0.587 * gg + 0.114 * b) / 255, k = L < 0.08 ? 1.6 : Math.min(1, 0.32 / Math.max(L, .01)), f = x => Math.max(0, Math.min(255, Math.round(x * k)));
       bg = '#' + [f(r), f(gg), f(b)].map(x => x.toString(16).padStart(2, '0')).join(''); }
     document.body.style.background = bg === '#000000' ? '' : bg; document.documentElement.style.background = bg;
     const tm = document.querySelector('meta[name="theme-color"]'); if (tm) tm.setAttribute('content', bg); })();
   try { alignGrp(); } catch (e) {}
+  try { markSort(); } catch (e) {}
   if (window._noSlide) window._noSlide = 0;
   if (window._slide) { const p = window._slideSel ? $app.querySelector('main') : $app.querySelector('.pane'), d = window._slide; window._slide = 0; window._slideSel = null; if (p && p.animate) p.animate([{ transform: `translateX(${d * 70}px)`, opacity: .3 }, { transform: 'none', opacity: 1 }], { duration: 230, easing: 'cubic-bezier(.2,.7,.3,1)' }); }
   const fh = document.getElementById('fhome'); if (fh) fh.hidden = true;
-  if (v !== 'list' && v !== 'search') $app.insertAdjacentHTML('beforeend', '<div class="hpw"><button class="hpill" data-home>⌂&nbsp; Home</button></div>');
+  if (v !== 'search') $app.insertAdjacentHTML('beforeend', '<div class="hpw"><button class="hpill" data-home>⌂&nbsp; Home</button></div>');
   const bsw = document.getElementById('brsw');
   if (bsw && state.lv) { const lv = state.lv; bsw.scrollLeft = (lv.brPg || 0) * bsw.clientWidth;
     bsw.addEventListener('scroll', () => { const i = Math.round(bsw.scrollLeft / Math.max(1, bsw.clientWidth)); if (i !== lv.brPg) { lv.brPg = i; document.querySelectorAll('[data-brpg]').forEach((b, k) => b.classList.toggle('on', k === i)); } }, { passive: true }); }
@@ -1318,7 +1331,7 @@ function openArticle() {
   else if (a.description) paras = [['P', a.description]];
   const img = a.images && a.images[0] && (a.images[0].url || a.images[0].href);
   const ov = document.createElement('div'); ov.id = 'artpop';
-  ov.innerHTML = `<div class="artbox"><button class="artx" data-artclose="1" aria-label="Close">×</button>${img ? `<img class="artimg" src="${esc(img)}" alt="" onerror="this.remove()">` : ''}<h2>${esc(a.headline || '')}</h2>${a.byline ? `<div class="artby">${esc(a.byline)}</div>` : ''}${paras.map(([tg, t]) => /^H/.test(tg) ? `<h3>${hl(t)}</h3>` : `<p>${hl(t)}</p>`).join('')}</div>`;
+  ov.innerHTML = `<div class="artbox"><button class="artx" data-artclose="1" aria-label="Close">×</button><h2>${esc(a.headline || '')}</h2>${a.byline ? `<div class="artby">${esc(a.byline)}</div>` : ''}${paras.map(([tg, t]) => /^H/.test(tg) ? `<h3>${hl(t)}</h3>` : `<p>${hl(t)}</p>`).join('')}</div>`;
   document.body.appendChild(ov); document.body.style.overflow = 'hidden';
 }
 document.addEventListener('click', ev => {
@@ -2007,7 +2020,7 @@ function renderPlayer() {
     <header class="d"><div class="tabs"><button class="back" data-back aria-label="Back"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></button><button class="home" data-home aria-label="Home"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"><path d="M3 10.5 12 3l9 7.5"/><path d="M5.5 9v11h13V9"/><path d="M10 20v-6h4v6"/></svg></button><button class="home" data-refresh aria-label="Refresh"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12a8 8 0 1 1-2.34-5.66"/><path d="M20 4v5h-5"/></svg></button></div></header>
     <main><div class="phero pp"><img class="hs" src="https://a.espncdn.com/i/headshots/${p.league}/players/full/${esc(p.id)}.png" alt="" onerror="this.onerror=null;this.src=SIL">
       <div><div class="pname">${esc(p.name || 'Player')}</div><div class="psub">${esc(sub)}</div></div></div>
-      <div class="dtabs sm">${tab('ov', 'Overview')}${tab('stats', 'Stats')}${tab('gl', 'Gamelog')}${tab('bio', 'Bio')}</div>
+      <div class="dtabs sm even">${tab('ov', 'Overview')}${tab('stats', 'Stats')}${tab('gl', 'Gamelog')}${tab('bio', 'Bio')}</div>
       <div class="pane t">${body}</div></main>`;
   const gs = document.getElementById('glstrip'), go = gs && gs.querySelector('.on');
   if (go) gs.scrollLeft = go.offsetLeft - (gs.clientWidth - go.offsetWidth) / 2;
@@ -2416,25 +2429,35 @@ function renderTeam() {
     <main><div class="phero">${h.logo ? `<img class="tl" src="${esc(h.logo)}" alt="" onerror="this.style.visibility='hidden'">` : ''}
       <div class="grow"><div class="pname up">${esc(h.name)}</div><div class="psub">${esc(h.sub)}</div></div>
       <button class="fstar ${isFav(t.league, t.id) ? 'on' : ''}" data-fav="${esc(t.id)}" data-fl="${t.league}" data-fn="${esc(h.name)}" data-flogo="${esc(h.logo)}" aria-label="Favorite team">${STAR_SVG}</button></div>
-      <div class="dtabs sm">${tab('roster', 'Roster')}${tab('sched', 'Schedule')}${tab('stats', 'Stats', t.tab === 'tstats')}${tab('inj', 'Injuries')}</div>
+      <div class="dtabs sm even">${tab('roster', 'Roster')}${tab('sched', 'Schedule')}${tab('stats', 'Stats', t.tab === 'tstats')}${tab('inj', 'Injuries')}</div>
       <div class="pane t">${body}</div></main>`;
   const ms = document.getElementById('mstrip'), on = ms && ms.querySelector('.on');
   if (on) ms.scrollLeft = on.offsetLeft - (ms.clientWidth - on.offsetWidth) / 2;
 }
+const ROS_ORD = { nfl: ['QB','RB','FB','WR','TE','OT','T','OL','G','OG','C','DE','DT','NT','DL','EDGE','LB','OLB','ILB','MLB','CB','S','FS','SS','DB','PK','K','P','LS'], nba: ['PG','SG','G','SF','F','PF','C'], nhl: ['C','LW','RW','F','W','D','G'] };
+const ROS_GRP = { nfl: [['Offense', /^(QB|RB|FB|WR|TE|OT|T|OL|G|OG|C)$/], ['Defense', /^(DE|DT|NT|DL|EDGE|LB|OLB|ILB|MLB|CB|S|FS|SS|DB)$/], ['Special Teams', /^(PK|K|P|LS)$/]], nhl: [['Forwards', /^(C|LW|RW|F|W)$/], ['Defense', /^D$/], ['Goalies', /^G$/]] };
 function rosterHTML(t) {
   if (t.rosterErr || !t.roster) return msg('Failed to load roster' + (t.rosterErr ? ' (' + t.rosterErr + ')' : '.'));
   const all = [];
   (t.roster.athletes || []).forEach(a => { if (!a) return; if (Array.isArray(a.items)) a.items.forEach(x => all.push(x)); else all.push(a); });
   if (!all.length) return msg('Roster not available.');
-  const tn = teamHead(t).name;
-  const trs = all.map(a => {
+  const tn = teamHead(t).name, ord = ROS_ORD[t.league] || [], posOf = a => String((a.position && a.position.abbreviation) || '').toUpperCase();
+  const oi = a => { const i = ord.indexOf(posOf(a)); return i < 0 ? 99 : i; };
+  all.sort((a, b) => oi(a) - oi(b) || String(a.lastName || a.displayName || '').localeCompare(String(b.lastName || b.displayName || '')));
+  const tr = a => {
     const pos = (a.position && a.position.abbreviation) || '', nm = a.displayName || a.fullName || '';
-    const exp = a.experience && a.experience.years != null ? a.experience.years : '';
+    const ey = a.experience && a.experience.years != null ? a.experience.years : '', exp = ey === 0 || ey === '0' ? 'R' : ey;
     const ht = String(a.displayHeight || '').replace(/\s/g, ''), wt = String(a.displayWeight || '').replace(/\s*lbs?\.?/i, '');
     return `<tr data-player="${esc(a.id)}" data-pl="${t.league}" data-pn="${esc(nm)}" data-pp="${esc(pos)}" data-pj="${esc(a.jersey || '')}" data-pt="${esc(tn)}">
       <td class="n"><span class="pn">${esc(nm)}</span></td><td>${esc(pos)}</td><td>${esc(a.jersey || '')}</td><td>${esc(exp)}</td><td>${esc(ht)}</td><td>${esc(wt)}</td><td>${esc(a.age)}</td></tr>`;
-  }).join('');
-  return `<section class="blk"><div class="tw"><table class="ros"><thead><tr><th class="n">Roster</th><th>POS</th><th>#</th><th>EXP</th><th>HT</th><th>WT</th><th>AGE</th></tr></thead><tbody>${trs}</tbody></table></div></section>`;
+  };
+  const tbl = (title, list) => `<section class="blk"><div class="tw"><table class="ros"><thead><tr><th class="n">${esc(title)}</th><th>POS</th><th>#</th><th>EXP</th><th>HT</th><th>WT</th><th>AGE</th></tr></thead><tbody>${list.map(tr).join('')}</tbody></table></div></section>`;
+  const grp = ROS_GRP[t.league];
+  if (!grp) return tbl('Roster', all);
+  const used = new Set(); let html = '';
+  grp.forEach(([n, re]) => { const l = all.filter(a => !used.has(a) && re.test(posOf(a))); l.forEach(a => used.add(a)); if (l.length) html += tbl(n, l); });
+  const rest = all.filter(a => !used.has(a)); if (rest.length) html += tbl('Other', rest);
+  return html;
 }
 function teamShortOf(league, tm) {
   const x = (state.teamList[league] || []).find(y => y.id === String(tm.id));
@@ -2461,7 +2484,7 @@ function scheduleHTML(t) {
     else if (e.state === 'in') res = `<span class="live">${esc(e.short)}</span>`;
     else {
       const tie = String(mine.score) !== '' && String(mine.score) === String(opp.score), w = mine.winner, sfx = e.short.replace(/^Final\/?/, '');
-      res = `<span class="rg rgw"><small class="sf">${esc(sfx)}</small><span class="sc2"><b class="${w ? '' : 'mu'}">${esc(mine.score)}</b><i>:</i><b class="${w ? 'mu' : ''}">${esc(opp.score)}</b></span><span class="${tie ? 'T' : w ? 'W' : 'L'}">${tie ? 'T' : w ? 'W' : 'L'}</span></span>`;
+      res = `<span class="rg rgw${t.league === 'nba' ? ' w3' : ''}"><small class="sf">${esc(sfx)}</small><span class="sc2"><b class="${w ? '' : 'mu'}">${esc(mine.score)}</b><i>:</i><b class="${w ? 'mu' : ''}">${esc(opp.score)}</b></span><span class="${tie ? 'T' : w ? 'W' : 'L'}">${tie ? 'T' : w ? 'W' : 'L'}</span></span>`;
     }
     return `<tr data-game="${esc(e.id)}" data-gl="${t.league}"><td class="n"><span class="pn">${when}</span></td>
       <td class="opp"><small>${mine === e.home ? 'vs' : '@'}</small>${logoImg(opp.logo || teamLogoOf(t.league, opp))}<b>${esc(teamShortOf(t.league, opp))}</b></td><td class="rs">${res}</td></tr>`;
@@ -3332,6 +3355,7 @@ $app.addEventListener('click', ev => {
   } else if (d.go2) {
     window._fromList = true; location.hash = '#/' + d.go2 + '/' + state.league;
   } else if (d.home !== undefined) {
+    if (topView() === 'list') { window.scrollTo({ top: 0, behavior: 'smooth' }); return; }
     state.player = null; state.game = null; state.team = null; state.lv = null; state.search = false; state.cmpOn = false; window._fromList = false; location.hash = '';
     render(); window.scrollTo(0, 0);
   } else if (d.back !== undefined) {
