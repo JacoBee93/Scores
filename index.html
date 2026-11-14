@@ -10,6 +10,10 @@
 <meta name="apple-mobile-web-app-title" content="Score">
 <link rel="apple-touch-icon" href="icon.png">
 <link rel="manifest" href="manifest.webmanifest">
+<link rel="preconnect" href="https://site.api.espn.com" crossorigin>
+<link rel="preconnect" href="https://site.web.api.espn.com" crossorigin>
+<link rel="preconnect" href="https://sports.core.api.espn.com" crossorigin>
+<link rel="preconnect" href="https://a.espncdn.com">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@100..125,600..800&family=Barlow+Condensed:wght@600;700&display=swap" rel="stylesheet">
 <title>Scores</title>
@@ -196,6 +200,9 @@ header.d + main{padding-top:0}
 .l5r .rs2 b{font-weight:700}.l5r .rs2 i{font-style:normal;color:var(--mut)}
 .tw{overflow-x:auto;-webkit-overflow-scrolling:touch;overscroll-behavior-x:none;touch-action:pan-x pan-y}
 #app{overflow-x:hidden;overflow-x:clip}
+#app.lst{min-height:100vh;min-height:100svh;display:flex;flex-direction:column}
+#app.lst > main{flex:none}
+#app.lst > .hpw{margin-top:auto;padding-top:0}
 table{border-collapse:separate;border-spacing:0;width:100%;white-space:nowrap}
 th{color:#fff;font-weight:700;font-size:11px;text-align:center;padding:12px 5.6px 14px;border-bottom:1px solid #3a3a3c}
 th.n{text-align:left;font-family:var(--wide);font-stretch:112%;font-weight:800;letter-spacing:.5px;text-transform:uppercase;padding-left:0;position:sticky;left:0;background:var(--card)}
@@ -345,6 +352,8 @@ html,body{overscroll-behavior-y:none;scrollbar-width:none}
 html::-webkit-scrollbar,body::-webkit-scrollbar{display:none;width:0;height:0;background:transparent}
 #fhome:active{transform:translateX(-50%) scale(.94)}
 main{padding-bottom:0}
+.pane > .msg.ld:only-child,.pane > .seg + .msg.ld{min-height:58vh}
+html,body{transition:background-color .35s ease}
 .pane{margin:12px -6px 14px !important;padding:28px 12px 18px !important;border-radius:22px;box-shadow:0 10px 32px rgba(0,0,0,.55),0 2px 6px rgba(0,0,0,.35),inset 0 1px 0 rgba(255,255,255,.07);overflow:hidden}
 .pane.t{padding-top:12px !important}
 .pane .tw{margin-left:-12px;margin-right:-12px;padding-left:12px;padding-right:12px;max-width:none}
@@ -595,7 +604,7 @@ td.n .slg{width:20px;height:20px;object-fit:contain;vertical-align:-6px;margin-l
 .ldr .hs{width:38px;height:38px;border-radius:50%;background:#2c2c2e;object-fit:cover}
 .ldr .tlb{position:absolute;right:-2px;bottom:-2px;width:20px;height:20px;object-fit:contain;filter:drop-shadow(0 0 2px #000)}
 .ldr .ln{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.ldr .lv2{font-family:var(--num);font-weight:700;font-size:19px;flex:none}
+.ldr .lv2{font-family:var(--num);font-weight:700;font-size:19px;flex:none;padding-right:7px}
 .ldr.top .lv2{color:#fff}
 .lcat{margin-top:22px}
 .ldr .lpos{color:var(--mut);font-size:11px;font-weight:600;margin-left:6px}
@@ -727,7 +736,7 @@ document.getElementById('fhome').addEventListener('click', () => {
     if (!act && (dy < 8 || dx > dy)) { if (dx > 12 || dy < -4) y0 = null; return; }
     act = true; const d = Math.min(dy, 140); ind.style.opacity = Math.min(1, d / TH); ind.style.transform = `translate(-50%, ${Math.min(d * .6, 70)}px) rotate(${d * 2.5}deg)`; ind.classList.toggle('ready', dy >= TH); }, { passive: true });
   document.addEventListener('touchend', () => { if (y0 == null || !act) { y0 = null; return; } const go = dy >= TH; y0 = null; act = false;
-    if (go) { ind.classList.add('spin'); const b = $app.querySelector('[data-refresh]'); if (b) b.click(); else if (typeof loadList === 'function') loadList(); setTimeout(() => { ind.classList.remove('spin', 'ready'); ind.style.opacity = 0; ind.style.transform = 'translate(-50%, 0)'; }, 900); }
+    if (go) { window._forceT = Date.now(); ind.classList.add('spin'); const b = $app.querySelector('[data-refresh]'); if (b) b.click(); else if (typeof loadList === 'function') loadList(); setTimeout(() => { ind.classList.remove('spin', 'ready'); ind.style.opacity = 0; ind.style.transform = 'translate(-50%, 0)'; }, 900); }
     else { ind.classList.remove('ready'); ind.style.opacity = 0; ind.style.transform = 'translate(-50%, 0)'; } }, { passive: true });
 })();
 function markSort(root) {
@@ -807,8 +816,49 @@ const CMP_SVG = '<svg viewBox="0 0 24 24"><path d="M4 8h14l-4-4M20 16H6l4 4"/></
 const STAR_SVG = '<svg viewBox="0 0 24 24"><path d="M12 3.2l2.7 5.6 6.1.8-4.5 4.2 1.1 6.1L12 17l-5.4 2.9 1.1-6.1L3.2 9.6l6.1-.8z"/></svg>';
 const store = { get(k){ try { return localStorage.getItem(k); } catch(e){ return null; } }, set(k,v){ try { localStorage.setItem(k,v); } catch(e){} } };
 const nv = v => /^-\d/.test(String(v)) ? `<span class="neg">-</span>${esc(String(v).slice(1))}` : esc(v);
-const msg = t => `<div class="msg">${esc(t)}</div>`;
-async function getJson(url, fresh) { if (fresh) url += (url.includes('?') ? '&' : '?') + '_=' + Date.now(); const r = await fetch(url, { cache: fresh ? 'no-store' : 'no-cache' }); if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); }
+const msg = t => `<div class="msg${/^Loading/.test(t) ? ' ld' : ''}">${esc(t)}</div>`;
+/* ---- cache: pamet + IndexedDB, TTL podle typu dat; pull-to-refresh = vynucene stazeni ---- */
+const JC = new Map(), JIN = new Map(), MIN = 6e4, HR = 36e5;
+const IDB = (() => { let pr = null; const open = () => pr || (pr = new Promise(res => { try { const q = indexedDB.open('scorecache', 1); q.onupgradeneeded = () => q.result.createObjectStore('j'); q.onsuccess = () => res(q.result); q.onerror = () => res(null); } catch (e) { res(null); } }));
+  const tx = async (mode, fn) => { const db = await open(); if (!db) return null; return new Promise(res => { try { const t = db.transaction('j', mode), st = t.objectStore('j'), r = fn(st); t.oncomplete = () => res(r && r.result); t.onerror = t.onabort = () => res(null); } catch (e) { res(null); } }); };
+  return { get: k => tx('readonly', st => st.get(k)), put: (k, v) => tx('readwrite', st => st.put(v, k)),
+    prune: () => tx('readwrite', st => { const all = []; const c = st.openCursor(); c.onsuccess = () => { const cu = c.result; if (cu) { const v = cu.value || {}; if (!v.t || Date.now() - v.t > Math.max(v.ttl * 4, 2 * 864e5)) cu.delete(); else all.push([cu.key, v.t]); cu.continue(); } else if (all.length > 400) all.sort((a, b) => a[1] - b[1]).slice(0, all.length - 400).forEach(x => st.delete(x[0])); }; return null; }) };
+})();
+setTimeout(() => IDB.prune(), 4000);
+document.addEventListener('touchstart', e => { const t = e.target && e.target.closest && e.target.closest('[data-player],[data-game],[data-topen]'); if (!t) return; const d = t.dataset, pre = u => getJson(u).catch(() => null);
+  try {
+    if (d.player && LEAGUES[d.pl]) { const b = WEB + LEAGUES[d.pl].path + '/athletes/' + d.player; pre(b); pre(b + '/gamelog'); pre(b + '/stats'); }
+    else if (d.game && LEAGUES[d.gl]) pre(API + LEAGUES[d.gl].path + '/summary?event=' + d.game);
+    else if (d.topen && LEAGUES[d.tl]) { const b = API + LEAGUES[d.tl].path + '/teams/' + d.topen; pre(b); pre(b + '/roster'); pre(b + '/schedule'); }
+  } catch (x) {} }, { passive: true, capture: true });
+const stOf = e => (e && e.status && e.status.type && e.status.type.state) || (e && e.competitions && e.competitions[0] && e.competitions[0].status && e.competitions[0].status.type && e.competitions[0].status.type.state) || '';
+function ttlFor(u, j) {
+  if (/\/summary\?event=/.test(u)) { const c = j && j.header && j.header.competitions && j.header.competitions[0], t = c && c.status && c.status.type; return t && t.completed ? 7 * 24 * HR : t && t.state === 'pre' ? 2 * MIN : 15e3; }
+  if (/\/scoreboard/.test(u)) { const ev = (j && j.events) || [], st = ev.map(stOf); if (st.includes('in')) return 15e3; if (st.includes('pre')) return 2 * MIN; return ev.length ? 12 * HR : 30 * MIN; }
+  if (/\/plays\?|\/competitions\/\d+\?/.test(u)) return 30e3;
+  if (/standings/.test(u)) return 15 * MIN;
+  if (/\/schedule/.test(u)) return 10 * MIN;
+  if (/\/injuries/.test(u)) return HR;
+  if (/\/roster/.test(u)) return 12 * HR;
+  if (/\/teams(\?|$)/.test(u)) return 7 * 24 * HR;
+  if (/\/athletes\/\d+(\?|$)/.test(u)) return 24 * HR;
+  return 30 * MIN;
+}
+const forceNow = () => Date.now() - (window._forceT || 0) < 6000;
+async function netJson(url, fresh) { const u = fresh || forceNow() ? url + (url.includes('?') ? '&' : '?') + '_=' + Date.now() : url;
+  const r = await fetch(u, { cache: fresh || forceNow() ? 'no-store' : 'no-cache' }); if (!r.ok) throw new Error('HTTP ' + r.status); const j = await r.json();
+  const ttl = ttlFor(url, j), rec = { t: Date.now(), ttl, d: j }; JC.set(url, rec); if (ttl >= 2 * MIN) IDB.put(url, rec); return j; }
+async function getJson(url, fresh) {
+  const force = forceNow();
+  let rec = JC.get(url);
+  if (!rec && !force) { rec = await IDB.get(url); if (rec) JC.set(url, rec); }
+  const age = rec ? Date.now() - rec.t : 1e15;
+  if (rec && !force && age < rec.ttl) return rec.d;
+  if (rec && !force && rec.ttl >= 30 * MIN && age < rec.ttl * 4) { if (!JIN.has(url)) { const p = netJson(url).catch(() => null).finally(() => JIN.delete(url)); JIN.set(url, p); } return rec.d; }
+  if (JIN.has(url) && !force) { const r = await JIN.get(url); if (r) return r; }
+  const p = netJson(url, fresh); if (!force) JIN.set(url, p);
+  try { return await p; } catch (e) { if (rec) return rec.d; throw e; } finally { if (JIN.get(url) === p) JIN.delete(url); }
+}
 
 const state = {
   league: LEAGUES[store.get('league')] ? store.get('league') : 'nba',
@@ -1054,8 +1104,8 @@ async function loadTeam() {
     });
   });
   t.done = true;
-  if (t.tab === 'stats') loadTeamPlayers(t);
   if (state.team === t && topView() === 'team') render();
+  setTimeout(() => { if (state.team === t) loadTeamPlayers(t); }, t.tab === 'stats' ? 0 : 400);
 }
 
 /* ---------- vykreslení ---------- */
@@ -1089,19 +1139,26 @@ function render() {
   if (v === 'player') renderPlayer(); else if (v === 'game') renderGame(); else if (v === 'team') renderTeam();
   else if (v === 'lv') renderLV(); else if (v === 'cmp') renderCompare(); else if (v === 'search') renderSearch(); else renderList();
   state.lastView = key;
-  (() => { let c = '';
-    if (v === 'player') c = state.player && state.player.bio && state.player.bio.team && state.player.bio.team.color;
-    else if (v === 'team') { const t = state.team; c = [t.info && t.info.team, t.roster && t.roster.team, t.sched && t.sched.team].filter(Boolean).map(o => o.color).find(Boolean) || ((state.teamList[t.league] || []).find(x => x.id === t.id) || {}).color; }
+  (() => { let c = '', alt = '';
+    if (v === 'player') { const tm = state.player && state.player.bio && state.player.bio.team; c = tm && tm.color; alt = tm && tm.alternateColor; }
+    else if (v === 'team') { const t = state.team, os = [t.info && t.info.team, t.roster && t.roster.team, t.sched && t.sched.team, (state.teamList[t.league] || []).find(x => x.id === t.id)].filter(Boolean); c = os.map(o => o.color).find(Boolean); alt = os.map(o => o.alternateColor || o.alt).find(Boolean); }
     const ok = /^#?[0-9a-f]{6}$/i.test(String(c || ''));
     let bg = '#000000';
     const hsl = (r, g, b) => { r /= 255; g /= 255; b /= 255; const mx = Math.max(r, g, b), mn = Math.min(r, g, b), l = (mx + mn) / 2, d = mx - mn; let h = 0, sa = 0; if (d) { sa = d / (1 - Math.abs(2 * l - 1)); h = mx === r ? ((g - b) / d) % 6 : mx === g ? (b - r) / d + 2 : (r - g) / d + 4; h *= 60; if (h < 0) h += 360; } return [h, sa, l]; };
     const fromHsl = (h, sa, l) => { const C = (1 - Math.abs(2 * l - 1)) * sa, X = C * (1 - Math.abs((h / 60) % 2 - 1)), m = l - C / 2; const [r, g, b] = h < 60 ? [C, X, 0] : h < 120 ? [X, C, 0] : h < 180 ? [0, C, X] : h < 240 ? [0, X, C] : h < 300 ? [X, 0, C] : [C, 0, X]; return '#' + [r, g, b].map(v => Math.round((v + m) * 255).toString(16).padStart(2, '0')).join(''); };
-    if (ok) { const n0 = parseInt(String(c).replace('#', ''), 16), hh = hsl(n0 >> 16, (n0 >> 8) & 255, n0 & 255);
-      if (hh[1] > .35 && hh[2] > .2 && ((hh[0] >= 12 && hh[0] < 60) || (hh[0] >= 165 && hh[0] < 200))) c = fromHsl(hh[0], Math.min(hh[1], .9), hh[0] < 60 ? .27 : .22); }
-    if (ok) { const n = parseInt(String(c).replace('#', ''), 16), r = n >> 16, gg = (n >> 8) & 255, b = n & 255, L = (0.299 * r + 0.587 * gg + 0.114 * b) / 255, k = L < 0.08 ? 1.6 : Math.min(1, 0.32 / Math.max(L, .01)), f = x => Math.max(0, Math.min(255, Math.round(x * k)));
+    const hx = x => { const n = parseInt(String(x).replace('#', ''), 16); return hsl(n >> 16, (n >> 8) & 255, n & 255); };
+    if (ok) { let hh = hx(c);
+      if (hh[2] < .17 && hh[1] < .3 && /^#?[0-9a-f]{6}$/i.test(String(alt || ''))) { const ha = hx(alt); if (ha[1] > .5 && ha[2] > .25 && ha[2] < .8) { c = alt; hh = ha; } }
+      if (hh[1] > .35 && hh[2] > .2) { const h = hh[0];
+        if (h >= 8 && h < 38) c = fromHsl(h, Math.min(hh[1], .95), .4);
+        else if (h >= 38 && h < 62) c = fromHsl(h, Math.min(hh[1], .85), .34);
+        else if (h >= 165 && h < 200) c = fromHsl(h, Math.min(hh[1], .9), .26); } }
+    const brightOk = /^#?[0-9a-f]{6}$/i.test(String(c || '')) && (() => { const h = hx(c)[0], sa = hx(c)[1]; return sa > .35 && ((h >= 8 && h < 62) || (h >= 165 && h < 200)); })();
+    if (ok) { const n = parseInt(String(c).replace('#', ''), 16), r = n >> 16, gg = (n >> 8) & 255, b = n & 255, L = (0.299 * r + 0.587 * gg + 0.114 * b) / 255, k = brightOk ? 1 : L < 0.08 ? 1.6 : Math.min(1, 0.32 / Math.max(L, .01)), f = x => Math.max(0, Math.min(255, Math.round(x * k)));
       bg = '#' + [f(r), f(gg), f(b)].map(x => x.toString(16).padStart(2, '0')).join(''); }
     document.body.style.background = bg === '#000000' ? '' : bg; document.documentElement.style.background = bg;
     const tm = document.querySelector('meta[name="theme-color"]'); if (tm) tm.setAttribute('content', bg); })();
+  $app.classList.toggle('lst', v === 'list');
   try { alignGrp(); } catch (e) {}
   try { markSort(); } catch (e) {}
   if (window._noSlide) window._noSlide = 0;
@@ -2439,13 +2496,14 @@ const ROS_GRP = { nfl: [['Offense', /^(QB|RB|FB|WR|TE|OT|T|OL|G|OG|C)$/], ['Defe
 function rosterHTML(t) {
   if (t.rosterErr || !t.roster) return msg('Failed to load roster' + (t.rosterErr ? ' (' + t.rosterErr + ')' : '.'));
   const all = [];
-  (t.roster.athletes || []).forEach(a => { if (!a) return; if (Array.isArray(a.items)) a.items.forEach(x => all.push(x)); else all.push(a); });
+  const gp = g => { const x = String(g || ''); return /left/i.test(x) ? 'LW' : /right/i.test(x) ? 'RW' : /cent/i.test(x) ? 'C' : /defen/i.test(x) && t.league === 'nhl' ? 'D' : /goal/i.test(x) ? 'G' : ''; };
+  (t.roster.athletes || []).forEach(a => { if (!a) return; if (Array.isArray(a.items)) { const g = t.league === 'nhl' ? gp(a.position) : ''; a.items.forEach(x => { if (g) x._gpos = g; all.push(x); }); } else all.push(a); });
   if (!all.length) return msg('Roster not available.');
-  const tn = teamHead(t).name, ord = ROS_ORD[t.league] || [], posOf = a => String((a.position && a.position.abbreviation) || '').toUpperCase();
+  const tn = teamHead(t).name, ord = ROS_ORD[t.league] || [], posOf = a => String(a._gpos || (a.position && a.position.abbreviation) || '').toUpperCase();
   const oi = a => { const i = ord.indexOf(posOf(a)); return i < 0 ? 99 : i; };
   all.sort((a, b) => oi(a) - oi(b) || String(a.lastName || a.displayName || '').localeCompare(String(b.lastName || b.displayName || '')));
   const tr = a => {
-    const pos = (a.position && a.position.abbreviation) || '', nm = a.displayName || a.fullName || '';
+    const pos = a._gpos || (a.position && a.position.abbreviation) || '', nm = a.displayName || a.fullName || '';
     const ey = a.experience && a.experience.years != null ? a.experience.years : '', exp = ey === 0 || ey === '0' ? 'R' : ey;
     const ht = String(a.displayHeight || '').replace(/\s/g, ''), wt = String(a.displayWeight || '').replace(/\s*lbs?\.?/i, '');
     return `<tr data-player="${esc(a.id)}" data-pl="${t.league}" data-pn="${esc(nm)}" data-pp="${esc(pos)}" data-pj="${esc(a.jersey || '')}" data-pt="${esc(tn)}">
@@ -3308,6 +3366,7 @@ $app.addEventListener('click', ev => {
   } else if (d.team !== undefined) {
     state.game.team = parseInt(d.team); render();
   } else if (d.refresh !== undefined) {
+    window._forceT = Date.now();
     const v = topView();
     const rb = ev.target.closest('[data-refresh]'); if (rb) { rb.classList.add('spin'); setTimeout(() => rb.classList.remove('spin'), 800); }
     if (v === 'player') { const p = state.player; p.done = false; p.loaded = false; p.post = null; render(); loadPlayer(); }
