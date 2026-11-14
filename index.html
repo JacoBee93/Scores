@@ -333,8 +333,14 @@ header [data-refresh]{display:none !important}
 #fhome[hidden]{display:none}
 #fhome:active{transform:translateX(-50%) scale(.94)}
 main{padding-bottom:0}
-.pane{padding-bottom:110px !important;min-height:calc(100vh - 200px)}
-html{background:var(--card)}
+.pane{margin:12px -6px 24px !important;padding:28px 12px 36px !important;border-radius:22px;box-shadow:0 10px 32px rgba(0,0,0,.55),0 2px 6px rgba(0,0,0,.35),inset 0 1px 0 rgba(255,255,255,.07);overflow:hidden}
+.pane.t{padding-top:12px !important}
+.pane .tw{margin-left:-12px;margin-right:-12px;padding-left:12px;padding-right:12px;max-width:none}
+.pane .tw td.n,.pane .tw th.n{left:0;box-shadow:-12px 0 0 var(--card)}
+
+.pane .brsw{margin:0 -12px}
+.pane .brp{padding:0 12px}
+.pane .mstrip{margin:0 -12px;padding:0 12px 12px}
 body{min-height:100vh}
 #ptr{position:fixed;left:50%;top:calc(env(safe-area-inset-top) + 6px);z-index:130;width:38px;height:38px;border-radius:50%;background:#2c2c2e;color:var(--mut);display:flex;align-items:center;justify-content:center;opacity:0;transform:translate(-50%,0);pointer-events:none;box-shadow:0 4px 12px rgba(0,0,0,.4);transition:opacity .15s}
 #ptr.ready{color:#fff}
