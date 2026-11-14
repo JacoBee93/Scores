@@ -51,6 +51,10 @@ header.d{padding:calc(env(safe-area-inset-top) + 30px) 12px 7px}
 .card .top .lgt{font-family:var(--num);font-weight:700;letter-spacing:.5px;font-size:13px}
 .back{font-size:46px;line-height:1;height:50px;padding:0 18px 8px 8px}
 .home{height:50px;padding:0 10px;display:flex;align-items:center;color:#fff;background:none;border:0}
+header .back,header .home[data-home]{height:40px;min-width:48px;padding:0 13px;border-radius:12px;background:var(--card);display:flex;align-items:center;justify-content:center;color:#fff;font-size:16px;box-shadow:0 4px 12px rgba(0,0,0,.3)}
+header .home[data-home] svg{width:22px;height:22px}
+header.d .tabs{gap:8px;padding-bottom:4px}
+header .back:active,header .home:active{opacity:.6}
 .home.spin svg{animation:spn .8s linear}
 @keyframes spn{to{transform:rotate(360deg)}}
 .gloss{margin:30px 0 10px;padding-top:14px;border-top:1px solid #2c2c2e}
@@ -106,6 +110,9 @@ header.d + main{padding-top:0}
 .dtabs::-webkit-scrollbar{display:none}
 .dtabs button{flex:none;padding:12px 0 13px;font-weight:600;font-size:16px;letter-spacing:1px;color:var(--mut);border-bottom:3px solid transparent;margin-bottom:-1px;white-space:nowrap}
 .dtabs button.on{color:#fff;border-color:#fff}
+.dtabs{border-bottom-color:rgba(255,255,255,.16)}
+.dtabs button{color:rgba(255,255,255,.6)}
+.dtabs button.on{color:#fff}
 .dtabs.sm{gap:18px}
 .dtabs.sm button{font-size:13px;letter-spacing:.3px}
 .dtabs button{font-family:var(--wide);font-weight:800;font-stretch:105%}
@@ -331,10 +338,11 @@ details[open] summary::after{content:'⌃'}
 header [data-refresh]{display:none !important}
 #fhome{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(env(safe-area-inset-bottom) + 12px);z-index:120;width:96px;height:36px;border-radius:18px;background:rgba(58,58,60,.82);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);color:#fff;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 16px rgba(0,0,0,.45)}
 #fhome[hidden]{display:none}
-.hpw{display:flex;justify-content:center;padding:4px 0 calc(env(safe-area-inset-bottom) + 22px)}
-.hpill{min-width:130px;height:40px;border-radius:20px;background:rgba(255,255,255,.12);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);color:#fff;font-weight:700;font-size:15px;letter-spacing:.3px;padding:0 22px}
+.hpw{display:flex;justify-content:center;margin-top:-6px;padding:0 0 calc(env(safe-area-inset-bottom) + 22px)}
+.hpill{min-width:130px;height:40px;border-radius:12px;background:var(--card);box-shadow:0 6px 18px rgba(0,0,0,.45),inset 0 1px 0 rgba(255,255,255,.07);color:#fff;font-weight:700;font-size:15px;letter-spacing:.3px;padding:0 22px}
 .hpill:active{opacity:.6}
-html,body{overscroll-behavior-y:none}
+html,body{overscroll-behavior-y:none;scrollbar-width:none}
+html::-webkit-scrollbar,body::-webkit-scrollbar{display:none;width:0;height:0;background:transparent}
 #fhome:active{transform:translateX(-50%) scale(.94)}
 main{padding-bottom:0}
 .pane{margin:12px -6px 14px !important;padding:28px 12px 18px !important;border-radius:22px;box-shadow:0 10px 32px rgba(0,0,0,.55),0 2px 6px rgba(0,0,0,.35),inset 0 1px 0 rgba(255,255,255,.07);overflow:hidden}
@@ -387,7 +395,7 @@ body{min-height:100vh}
 .gl2 td.go small{display:inline-block;width:16px;color:var(--mut);font-size:11.5px}
 .gl2 td.go img{width:20px;height:20px;object-fit:contain;vertical-align:-5px;margin-right:4px}
 .gl2 td.go span{font-size:14px}
-.gl2 td.gr .W,.gl2 td.gr .L,.gl2 td.gr .T{font-weight:700;display:inline-block;width:14px}
+.gl2 td.gr .W,.gl2 td.gr .L,.gl2 td.gr .T{font-weight:700;display:inline-block;width:14px;margin-left:3px}
 .gl2 td.gr small{font-size:11px;color:var(--mut)}
 .nfx tr.hid{display:none}
 .nfx tr.ctot{cursor:pointer}
@@ -438,7 +446,7 @@ body{min-height:100vh}
 .tsb{grid-column:1 / -1;display:flex;gap:3px;height:5px;margin-top:7px}
 .tsb i{display:block;height:100%;border-radius:3px}
 .ssum{background:#2c2c2e;border-radius:22px;overflow:hidden;margin:6px 0 18px}
-.ssh{padding:7px 10px;text-align:center;font-family:var(--wide);font-stretch:112%;font-weight:800;font-size:12px;letter-spacing:.5px;text-transform:uppercase;color:#fff}
+.ssh{background:#3a3a3c;padding:7px 10px;text-align:center;font-family:var(--wide);font-stretch:112%;font-weight:800;font-size:12px;letter-spacing:.5px;text-transform:uppercase;color:#fff}
 .ssg{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;padding:10px 4px 12px;text-align:center}
 .ssl{font-size:13px;color:var(--mut);font-weight:500}
 .ssv{font-family:var(--num);font-weight:700;font-size:30px;line-height:1.15;font-kerning:none}
@@ -652,8 +660,10 @@ td.n .slg{width:20px;height:20px;object-fit:contain;vertical-align:-6px;margin-l
 .sch .rs .sf.sfb{margin:0 4px 0 0}
 .sch .rs .sf{font-size:10px;margin:0 0 0 4px;width:auto;color:var(--mut);font-family:-apple-system,sans-serif;font-weight:600;vertical-align:2px}
 .sch .opp small{width:18px;margin-right:12px}
-.sch .rg.rgw{grid-template-columns:18px 66px;column-gap:3px;margin-right:22px}
-.sch .rg.rgw .sc2{grid-template-columns:26px 8px 32px}
+.sch .rg.rgw{grid-template-columns:22px 70px 16px;column-gap:3px;margin-right:12px}
+.sch .rg.rgw .sc2{grid-template-columns:31px 8px 31px}
+.sch .rg.rgw .sf{margin:0 !important;width:auto !important;text-align:right;vertical-align:0}
+.sch .rg.rgw .W,.sch .rg.rgw .L,.sch .rg.rgw .T{text-align:right !important}
 .sch td.rs{overflow:visible}
 .sch .rg .W,.sch .rg .L{width:auto;margin:0}
 .sch .sc2{display:grid;grid-template-columns:1fr 12px 1fr;align-items:center}
@@ -716,6 +726,13 @@ document.getElementById('fhome').addEventListener('click', () => {
     if (go) { ind.classList.add('spin'); const b = $app.querySelector('[data-refresh]'); if (b) b.click(); else if (typeof loadList === 'function') loadList(); setTimeout(() => { ind.classList.remove('spin', 'ready'); ind.style.opacity = 0; ind.style.transform = 'translate(-50%, 0)'; }, 900); }
     else { ind.classList.remove('ready'); ind.style.opacity = 0; ind.style.transform = 'translate(-50%, 0)'; } }, { passive: true });
 })();
+function alignGrp(root) {
+  (root || document).querySelectorAll('table').forEach(tb => { const th = tb.tHead; if (!th || th.rows.length < 2) return; const gs = th.rows[0].querySelectorAll('th.grp'); if (!gs.length) return;
+    const subs = [...th.rows[1].cells];
+    gs.forEach(g => { const gr = g.getBoundingClientRect(); if (!gr.width) return; const c = subs.find(x => Math.abs(x.getBoundingClientRect().left - gr.left) < 3); if (!c) return;
+      const rg = document.createRange(); rg.selectNodeContents(c); const tr = rg.getBoundingClientRect(); if (!tr.width) return;
+      g.style.setProperty('padding-left', Math.max(0, Math.round(tr.left - gr.left)) + 'px', 'important'); }); });
+}
 function tabHTML(k) {
   const v = topView();
   try {
@@ -730,16 +747,16 @@ function tabHTML(k) {
   const pop = () => document.getElementById('wpov') || document.getElementById('brpop') || document.getElementById('artpop');
   const keyOf = b => b && (b.dataset.tab || b.dataset.ptab || b.dataset.ttab);
   const apply = () => { raf = 0; if (!S || !S.hz) return; const x = S.x;
-    S.el.style.transform = `translate3d(${x}px,0,0)`; S.gh.forEach(g => g.style.transform = `translate3d(${x + g._off * S.W}px,0,0)`);
-    if (S.strip) S.strip.style.transform = `translate3d(${(x / S.W) * S.iw}px,0,0)`; };
+    S.el.style.transform = `translate3d(${x}px,0,0)`; S.gh.forEach(g => g.style.transform = `translate3d(${x + g._off * S.P}px,0,0)`);
+    if (S.strip) S.strip.style.transform = `translate3d(${(x / S.P) * S.iw}px,0,0)`; };
   const anim = (st, to, ms, done) => { const els = [st.el, ...st.gh];
     els.forEach(e => { e.style.transition = `transform ${ms}ms cubic-bezier(.2,.8,.2,1)`; });
-    st.el.style.transform = `translate3d(${to}px,0,0)`; st.gh.forEach(g => g.style.transform = `translate3d(${to + g._off * st.W}px,0,0)`);
-    if (st.strip) { st.strip.style.transition = `transform ${ms}ms cubic-bezier(.2,.8,.2,1)`; st.strip.style.transform = `translate3d(${(to / st.W) * st.iw}px,0,0)`; }
+    st.el.style.transform = `translate3d(${to}px,0,0)`; st.gh.forEach(g => g.style.transform = `translate3d(${to + g._off * st.P}px,0,0)`);
+    if (st.strip) { st.strip.style.transition = `transform ${ms}ms cubic-bezier(.2,.8,.2,1)`; st.strip.style.transform = `translate3d(${(to / st.P) * st.iw}px,0,0)`; }
     setTimeout(() => { done && done(); }, ms + 10); };
   const cleanup = st => { st.gh.forEach(g => g.remove()); if (st.strip && st.strip.isConnected) { st.strip.style.transition = ''; st.strip.style.transform = ''; } if (st.el) { st.el.style.transition = ''; st.el.style.transform = ''; st.el.style.willChange = ''; } };
   const ghost = (st, html, off) => { const g = document.createElement('div'); g.className = st.cls + ' ghost'; g._off = off;
-    g.style.cssText = `position:absolute;top:${st.el.offsetTop}px;left:${st.el.offsetLeft}px;width:${st.W}px;min-height:${Math.max(st.el.offsetHeight, window.innerHeight)}px;margin:0;pointer-events:none;will-change:transform;transform:translate3d(${off * st.W}px,0,0)`;
+    g.style.cssText = `position:absolute;top:${st.el.offsetTop}px;left:${st.el.offsetLeft}px;width:${st.W}px;min-height:${Math.max(st.el.offsetHeight, window.innerHeight)}px;margin:0;pointer-events:none;will-change:transform;transform:translate3d(${off * st.P}px,0,0)`;
     g.style.setProperty('margin', '0', 'important'); if (st.mode === 'day') { const cs = getComputedStyle(st.el); g.style.padding = cs.padding; g.style.boxSizing = 'border-box'; }
     g.innerHTML = html; st.el.parentNode.appendChild(g); st.gh.push(g); };
   document.addEventListener('touchstart', e => { S = null; if (e.touches.length !== 1 || pop()) return; const t = e.target; if (!t.closest) return;
@@ -754,7 +771,7 @@ function tabHTML(k) {
       if (Math.abs(dy) > 10 && Math.abs(dy) > Math.abs(dx)) { S = null; return; }
       if (Math.abs(dx) < 8) return;
       if (S.tw && S.tw.scrollWidth > S.tw.clientWidth + 2) { const atL = S.st0 <= 1, atR = S.st0 >= S.tw.scrollWidth - S.tw.clientWidth - 1; if (!((dx > 0 && atL) || (dx < 0 && atR))) { S = null; return; } }
-      S.hz = true; S.W = S.el.offsetWidth; S.el.parentNode.style.position = 'relative'; S.el.style.willChange = 'transform'; S.x0 = t.clientX;
+      S.hz = true; S.W = S.el.offsetWidth; S.P = S.W + (S.mode === 'tab' ? 18 : 0); S.el.parentNode.style.position = 'relative'; S.el.style.willChange = 'transform'; S.x0 = t.clientX;
       [[S.cur - 1, -1], [S.cur + 1, 1]].forEach(([k, off]) => { if (k < 0 || k >= S.items.length) return;
         let html = '';
         if (S.mode === 'tab') html = tabHTML(keyOf(S.items[k]));
@@ -769,7 +786,8 @@ function tabHTML(k) {
     const vel = (st.x - (st.lx || 0)) / Math.max(1, (st.tt || 0) - (st.lt || 0)), dir = st.x < 0 ? 1 : -1, j = st.cur + dir;
     const go = j >= 0 && j < st.items.length && (Math.abs(st.x) > st.W * .22 || (Math.abs(vel) > .45 && Math.sign(vel) === Math.sign(st.x)));
     if (!go) { anim(st, 0, 220, () => cleanup(st)); return; }
-    anim(st, -dir * st.W, 240, () => { if (st.mode === 'day') { st.items.forEach(b => b.classList.remove('on')); st.items[j].classList.add('on'); window._noStripAnim = 1; } window._noSlide = 1; st.items[j].click(); cleanup(st); });
+    anim(st, -dir * st.P, 240, () => { if (st.mode === 'day') { st.items.forEach(b => b.classList.remove('on')); st.items[j].classList.add('on'); window._noStripAnim = 1;
+      if (st.strip) { const s2 = st.strip; s2.style.transition = 'none'; s2.style.scrollSnapType = 'none'; s2.style.transform = ''; s2.scrollLeft = s2.scrollLeft + dir * st.iw; } } window._noSlide = 1; st.items[j].click(); cleanup(st); });
   }, { passive: true });
 })();
 window.SIL = 'data:image/svg+xml,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" fill="#2c2c2e"/><circle cx="50" cy="38" r="18" fill="#0d0d0f"/><path d="M14 100c2-22 17-34 36-34s34 12 36 34z" fill="#0d0d0f"/></svg>');
@@ -1064,10 +1082,15 @@ function render() {
     else if (v === 'team') { const t = state.team; c = [t.info && t.info.team, t.roster && t.roster.team, t.sched && t.sched.team].filter(Boolean).map(o => o.color).find(Boolean) || ((state.teamList[t.league] || []).find(x => x.id === t.id) || {}).color; }
     const ok = /^#?[0-9a-f]{6}$/i.test(String(c || ''));
     let bg = '#000000';
+    const hsl = (r, g, b) => { r /= 255; g /= 255; b /= 255; const mx = Math.max(r, g, b), mn = Math.min(r, g, b), l = (mx + mn) / 2, d = mx - mn; let h = 0, sa = 0; if (d) { sa = d / (1 - Math.abs(2 * l - 1)); h = mx === r ? ((g - b) / d) % 6 : mx === g ? (b - r) / d + 2 : (r - g) / d + 4; h *= 60; if (h < 0) h += 360; } return [h, sa, l]; };
+    const fromHsl = (h, sa, l) => { const C = (1 - Math.abs(2 * l - 1)) * sa, X = C * (1 - Math.abs((h / 60) % 2 - 1)), m = l - C / 2; const [r, g, b] = h < 60 ? [C, X, 0] : h < 120 ? [X, C, 0] : h < 180 ? [0, C, X] : h < 240 ? [0, X, C] : h < 300 ? [X, 0, C] : [C, 0, X]; return '#' + [r, g, b].map(v => Math.round((v + m) * 255).toString(16).padStart(2, '0')).join(''); };
+    if (ok) { const n0 = parseInt(String(c).replace('#', ''), 16), hh = hsl(n0 >> 16, (n0 >> 8) & 255, n0 & 255);
+      if (hh[1] > .35 && hh[2] > .2 && ((hh[0] >= 12 && hh[0] < 60) || (hh[0] >= 165 && hh[0] < 200))) c = fromHsl(hh[0], Math.min(hh[1], .75), .17); }
     if (ok) { const n = parseInt(String(c).replace('#', ''), 16), r = n >> 16, gg = (n >> 8) & 255, b = n & 255, L = (0.299 * r + 0.587 * gg + 0.114 * b) / 255, k = L < 0.08 ? 1.6 : Math.min(1, 0.32 / Math.max(L, .01)), f = x => Math.max(0, Math.min(255, Math.round(x * k)));
       bg = '#' + [f(r), f(gg), f(b)].map(x => x.toString(16).padStart(2, '0')).join(''); }
     document.body.style.background = bg === '#000000' ? '' : bg; document.documentElement.style.background = bg;
     const tm = document.querySelector('meta[name="theme-color"]'); if (tm) tm.setAttribute('content', bg); })();
+  try { alignGrp(); } catch (e) {}
   if (window._noSlide) window._noSlide = 0;
   if (window._slide) { const p = window._slideSel ? $app.querySelector('main') : $app.querySelector('.pane'), d = window._slide; window._slide = 0; window._slideSel = null; if (p && p.animate) p.animate([{ transform: `translateX(${d * 70}px)`, opacity: .3 }, { transform: 'none', opacity: 1 }], { duration: 230, easing: 'cubic-bezier(.2,.7,.3,1)' }); }
   const fh = document.getElementById('fhome'); if (fh) fh.hidden = true;
@@ -1181,7 +1204,7 @@ function renderGame() {
       ${side(e.home, pre)}</div>`;
   }
   $app.innerHTML = `
-    <header class="d"><div class="tabs"><button class="back" data-back aria-label="Back">‹</button><button class="home" data-home aria-label="Home"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"><path d="M3 10.5 12 3l9 7.5"/><path d="M5.5 9v11h13V9"/><path d="M10 20v-6h4v6"/></svg></button><button class="home" data-refresh aria-label="Refresh"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12a8 8 0 1 1-2.34-5.66"/><path d="M20 4v5h-5"/></svg></button></div></header>
+    <header class="d"><div class="tabs"><button class="back" data-back aria-label="Back"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></button><button class="home" data-home aria-label="Home"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"><path d="M3 10.5 12 3l9 7.5"/><path d="M5.5 9v11h13V9"/><path d="M10 20v-6h4v6"/></svg></button><button class="home" data-refresh aria-label="Refresh"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12a8 8 0 1 1-2.34-5.66"/><path d="M20 4v5h-5"/></svg></button></div></header>
     <main>${hero}
       ${g.tabInit ? `<div class="dtabs sm ${gTabs(g).length > 4 ? 'five' : 'even'}">${gTabs(g).map(([k, l]) => `<button data-tab="${k}" class="${g.tab === k ? 'on' : ''}">${l}</button>`).join('')}</div>` : '<div class="dtabs sm"></div>'}
       <div class="pane t">${body}</div></main>`;
@@ -1981,7 +2004,7 @@ function renderPlayer() {
   const sub = [p.jersey ? '#' + p.jersey : '', p.pos, p.team].filter(Boolean).join(' · ');
   const tab = (k, l) => `<button data-ptab="${k}" class="${p.tab === k ? 'on' : ''}">${l}</button>`;
   $app.innerHTML = `
-    <header class="d"><div class="tabs"><button class="back" data-back aria-label="Back">‹</button><button class="home" data-home aria-label="Home"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"><path d="M3 10.5 12 3l9 7.5"/><path d="M5.5 9v11h13V9"/><path d="M10 20v-6h4v6"/></svg></button><button class="home" data-refresh aria-label="Refresh"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12a8 8 0 1 1-2.34-5.66"/><path d="M20 4v5h-5"/></svg></button></div></header>
+    <header class="d"><div class="tabs"><button class="back" data-back aria-label="Back"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></button><button class="home" data-home aria-label="Home"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"><path d="M3 10.5 12 3l9 7.5"/><path d="M5.5 9v11h13V9"/><path d="M10 20v-6h4v6"/></svg></button><button class="home" data-refresh aria-label="Refresh"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12a8 8 0 1 1-2.34-5.66"/><path d="M20 4v5h-5"/></svg></button></div></header>
     <main><div class="phero pp"><img class="hs" src="https://a.espncdn.com/i/headshots/${p.league}/players/full/${esc(p.id)}.png" alt="" onerror="this.onerror=null;this.src=SIL">
       <div><div class="pname">${esc(p.name || 'Player')}</div><div class="psub">${esc(sub)}</div></div></div>
       <div class="dtabs sm">${tab('ov', 'Overview')}${tab('stats', 'Stats')}${tab('gl', 'Gamelog')}${tab('bio', 'Bio')}</div>
@@ -2053,7 +2076,7 @@ function gamelogHTML(p, o) {
     const trs = rows.map(r => {
       const m = r.m, opp = (m.opponent && (m.opponent.abbreviation || m.opponent.displayName)) || '', ol = m.opponent ? dk((m.opponent.logo) || teamLogoOf(p.league, { id: m.opponent.id, abbr: m.opponent.abbreviation })) : '';
       const sm = String(m.score || '').match(/^(\S+)\s*(.*)$/) || [], wl = m.gameResult || '', d = m.gameDate ? new Date(m.gameDate) : null;
-      return `<tr data-game="${esc(r.id)}" data-gl="${p.league}"><td class="gd">${d ? `<small>${DAYS[d.getDay()]}</small> ${d.getDate()}.${d.getMonth() + 1}.` : ''}</td><td class="go"><small>${esc(m.atVs === '@' ? '@' : 'vs')}</small>${ol ? `<img src="${esc(ol)}" alt="" onerror="this.style.visibility='hidden'">` : ''}<span>${esc(opp)}</span></td><td class="gr"><span class="${wl === 'W' || wl === 'L' ? wl : 'T'}">${esc(wl)}</span> ${esc(sm[1] || '')}${sm[2] ? ` <small>${esc(sm[2])}</small>` : ''}</td>${cols.map((c, ci) => `<td class="${so && so.i === ci ? 'on' : ''}">${nv(String(r.s[c[1]] == null ? '' : r.s[c[1]]).replace(/,/g, ''))}</td>`).join('')}</tr>`;
+      return `<tr data-game="${esc(r.id)}" data-gl="${p.league}"><td class="gd">${d ? `<small>${DAYS[d.getDay()]}</small> ${d.getDate()}.${d.getMonth() + 1}.` : ''}</td><td class="go"><small>${esc(m.atVs === '@' ? '@' : 'vs')}</small>${ol ? `<img src="${esc(ol)}" alt="" onerror="this.style.visibility='hidden'">` : ''}<span>${esc(opp)}</span></td><td class="gr">${sm[2] ? `<small>${esc(sm[2])}</small> ` : ''}${esc(sm[1] || '')} <span class="${wl === 'W' || wl === 'L' ? wl : 'T'}">${esc(wl)}</span></td>${cols.map((c, ci) => `<td class="${so && so.i === ci ? 'on' : ''}">${nv(String(r.s[c[1]] == null ? '' : r.s[c[1]]).replace(/,/g, ''))}</td>`).join('')}</tr>`;
     }).join('');
     const gh = groups && groups.length > 1 ? groups.map(g => `<th class="grp" colspan="${g[1]}">${esc(g[0])}</th>`).join('') : `<th colspan="${cols.length}"></th>`;
     return `<section class="glsec"><div class="tw"><table class="gl2" style="width:max(100%, ${tw}px)"><colgroup><col style="width:${DW}px"><col style="width:${OW}px"><col style="width:${RW}px">${cols.map(c => `<col style="width:${w(c[0])}px">`).join('')}</colgroup>
@@ -2138,7 +2161,7 @@ function summaryHTML(p) {
   const a = p.bio || {}, ss = a.statsSummary, st = ((ss && ss.statistics) || []).filter(x => x && x.displayValue != null).slice(0, 4);
   if (!st.length) return '';
   const col = a.team && a.team.color ? '#' + String(a.team.color).replace('#', '') : 'var(--acc)';
-  return `<section class="ssum"><div class="ssh" style="background:${esc(col)}">${esc(ss.displayName || 'Season stats')}</div><div class="ssg">${st.map(x => `<div data-sstat="${esc(ssCat(p, x))}" data-sstl="${esc(x.displayName || x.abbreviation || '')}" data-sslab="${esc(x.abbreviation || x.shortDisplayName || '')}"><div class="ssl">${esc(x.abbreviation || x.shortDisplayName || x.displayName || '')}</div><div class="ssv">${esc(x.displayValue)}</div><div class="ssr">${esc(x.rankDisplayValue || '')}</div></div>`).join('')}</div></section>`;
+  return `<section class="ssum"><div class="ssh">${esc(ss.displayName || 'Season stats')}</div><div class="ssg">${st.map(x => `<div data-sstat="${esc(ssCat(p, x))}" data-sstl="${esc(x.displayName || x.abbreviation || '')}" data-sslab="${esc(x.abbreviation || x.shortDisplayName || '')}"><div class="ssl">${esc(x.abbreviation || x.shortDisplayName || x.displayName || '')}</div><div class="ssv">${esc(x.displayValue)}</div><div class="ssr">${esc(x.rankDisplayValue || '')}</div></div>`).join('')}</div></section>`;
 }
 function overviewHTML(p) {
   const sum = summaryHTML(p);
@@ -2389,7 +2412,7 @@ function renderTeam() {
   const body0 = !t.done ? msg('Loading…') : t.tab === 'roster' ? rosterHTML(t) : t.tab === 'sched' ? scheduleHTML(t) : t.tab === 'tstats' ? teamTabStatsHTML(t) : t.tab === 'inj' ? teamInjHTML(t) : teamStatsHTML(t);
   const body = t.done && (t.tab === 'stats' || t.tab === 'tstats') ? sseg + body0 : body0;
   $app.innerHTML = `
-    <header class="d"><div class="tabs"><button class="back" data-back aria-label="Back">‹</button><button class="home" data-home aria-label="Home"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"><path d="M3 10.5 12 3l9 7.5"/><path d="M5.5 9v11h13V9"/><path d="M10 20v-6h4v6"/></svg></button><button class="home" data-refresh aria-label="Refresh"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12a8 8 0 1 1-2.34-5.66"/><path d="M20 4v5h-5"/></svg></button></div></header>
+    <header class="d"><div class="tabs"><button class="back" data-back aria-label="Back"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></button><button class="home" data-home aria-label="Home"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"><path d="M3 10.5 12 3l9 7.5"/><path d="M5.5 9v11h13V9"/><path d="M10 20v-6h4v6"/></svg></button><button class="home" data-refresh aria-label="Refresh"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12a8 8 0 1 1-2.34-5.66"/><path d="M20 4v5h-5"/></svg></button></div></header>
     <main><div class="phero">${h.logo ? `<img class="tl" src="${esc(h.logo)}" alt="" onerror="this.style.visibility='hidden'">` : ''}
       <div class="grow"><div class="pname up">${esc(h.name)}</div><div class="psub">${esc(h.sub)}</div></div>
       <button class="fstar ${isFav(t.league, t.id) ? 'on' : ''}" data-fav="${esc(t.id)}" data-fl="${t.league}" data-fn="${esc(h.name)}" data-flogo="${esc(h.logo)}" aria-label="Favorite team">${STAR_SVG}</button></div>
@@ -2434,17 +2457,17 @@ function scheduleHTML(t) {
     const mine = e.home.id === t.id ? e.home : e.away, opp = mine === e.home ? e.away : e.home;
     const d = new Date(e.date), when = DAYS[d.getDay()] + ' ' + d.getDate() + '.' + (d.getMonth() + 1) + '.';
     let res;
-    if (e.state === 'pre') res = `<span class="rg rgw"><i></i><span class="tm">${esc(fmtTime(e.date))}</span></span>`;
+    if (e.state === 'pre') res = `<span class="rg rgw"><i></i><span class="tm">${esc(fmtTime(e.date))}</span><i></i></span>`;
     else if (e.state === 'in') res = `<span class="live">${esc(e.short)}</span>`;
     else {
       const tie = String(mine.score) !== '' && String(mine.score) === String(opp.score), w = mine.winner, sfx = e.short.replace(/^Final\/?/, '');
-      res = `<span class="rg rgw"><span class="${tie ? 'T' : w ? 'W' : 'L'}">${tie ? 'T' : w ? 'W' : 'L'}</span><span class="sc2"><b class="${w ? '' : 'mu'}">${esc(mine.score)}</b><i>:</i><b class="${w ? 'mu' : ''}">${esc(opp.score)}${sfx ? `<small class="sf">${esc(sfx)}</small>` : ''}</b></span></span>`;
+      res = `<span class="rg rgw"><small class="sf">${esc(sfx)}</small><span class="sc2"><b class="${w ? '' : 'mu'}">${esc(mine.score)}</b><i>:</i><b class="${w ? 'mu' : ''}">${esc(opp.score)}</b></span><span class="${tie ? 'T' : w ? 'W' : 'L'}">${tie ? 'T' : w ? 'W' : 'L'}</span></span>`;
     }
     return `<tr data-game="${esc(e.id)}" data-gl="${t.league}"><td class="n"><span class="pn">${when}</span></td>
       <td class="opp"><small>${mine === e.home ? 'vs' : '@'}</small>${logoImg(opp.logo || teamLogoOf(t.league, opp))}<b>${esc(teamShortOf(t.league, opp))}</b></td><td class="rs">${res}</td></tr>`;
   };
   let html = '', cur = null, rows = '';
-  const flush = () => { if (cur !== null && rows) html += `<section class="blk"><div class="schw"><table class="sch"><colgroup><col style="width:74px"><col><col style="width:126px"></colgroup><thead><tr><th class="n">${esc(cur || 'Games')}</th><th></th><th></th></tr></thead><tbody>${rows}</tbody></table></div></section>`; rows = ''; };
+  const flush = () => { if (cur !== null && rows) html += `<section class="blk"><div class="schw"><table class="sch"><colgroup><col style="width:74px"><col><col style="width:134px"></colgroup><thead><tr><th class="n">${esc(cur || 'Games')}</th><th></th><th></th></tr></thead><tbody>${rows}</tbody></table></div></section>`; rows = ''; };
   sorted.filter(e => key(e) === t.month).forEach(e => { const st = e.stype || ''; if (st !== cur) { flush(); cur = st; } rows += row(e); });
   flush();
   return `<div class="mstrip" id="mstrip">${strip}</div>${html}`;
@@ -2919,7 +2942,7 @@ function renderCompare() {
   if (!document.getElementById('cmpw')) {
     const lseg = `<div class="seg pseg" style="max-width:260px">${Object.entries(LEAGUES).map(([k, v]) => `<button data-cmpl="${k}" class="${c.league === k ? 'on' : ''}">${v.name}</button>`).join('')}</div>`;
     const inp = i => `<div class="cmpi"><input id="cq${i}" class="sinp" type="search" autocomplete="off" placeholder="Player ${i + 1}" value="${esc(c.q[i])}"><button class="cmpx" data-cmpx="${i}" aria-label="Clear">×</button><div class="cmpr" id="cr${i}"></div></div>`;
-    $app.innerHTML = `<header class="d"><div class="tabs"><button class="back" data-back aria-label="Back">‹</button><button class="home" data-home aria-label="Home"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"><path d="M3 10.5 12 3l9 7.5"/><path d="M5.5 9v11h13V9"/><path d="M10 20v-6h4v6"/></svg></button></div></header>
+    $app.innerHTML = `<header class="d"><div class="tabs"><button class="back" data-back aria-label="Back"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></button><button class="home" data-home aria-label="Home"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"><path d="M3 10.5 12 3l9 7.5"/><path d="M5.5 9v11h13V9"/><path d="M10 20v-6h4v6"/></svg></button></div></header>
     <main id="cmpw"><div class="cmptl"><div class="lvt">Compare players</div><button class="cmpclr" data-cmpclr="1">Clear</button></div><div class="cmpin">${inp(0)}${inp(1)}</div><div class="pane t" id="cmpbody"></div></main>`;
   }
   paintCompare();
@@ -2979,7 +3002,7 @@ function renderLV() {
   else if (c.err && !c.cats) body = msg(c.err);
   else body = v.kind === 'standings' ? standingsHTML(v, c) : lstatsHTML(v, c);
   $app.innerHTML = `
-    <header class="d"><div class="tabs"><button class="back" data-back aria-label="Back">‹</button><button class="home" data-home aria-label="Home"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"><path d="M3 10.5 12 3l9 7.5"/><path d="M5.5 9v11h13V9"/><path d="M10 20v-6h4v6"/></svg></button><button class="home" data-refresh aria-label="Refresh"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12a8 8 0 1 1-2.34-5.66"/><path d="M20 4v5h-5"/></svg></button></div></header>
+    <header class="d"><div class="tabs"><button class="back" data-back aria-label="Back"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></button><button class="home" data-home aria-label="Home"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"><path d="M3 10.5 12 3l9 7.5"/><path d="M5.5 9v11h13V9"/><path d="M10 20v-6h4v6"/></svg></button><button class="home" data-refresh aria-label="Refresh"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12a8 8 0 1 1-2.34-5.66"/><path d="M20 4v5h-5"/></svg></button></div></header>
     <main><div class="lvt">${esc(title)}</div><div class="pane t">${body}</div></main>`;
 }
 /* complete leaders */
@@ -3080,7 +3103,7 @@ function renderLeaders() {
     body = `<section class="blk"><div class="tw"><table class="nfx sep lbt" style="width:max(100%, ${tw}px)"><colgroup><col>${D.cols.map(c => `<col style="width:${w(c.label)}px">`).join('')}</colgroup><thead><tr><th class="n">Name</th>${D.cols.map((c, k) => `<th data-lsort="${k}" class="${k === v.sk ? 'on' : ''}">${esc(c.label)}</th>`).join('')}</tr></thead><tbody>${trs}</tbody></table></div></section>`;
   }
   $app.innerHTML = `
-    <header class="d"><div class="tabs"><button class="back" data-back aria-label="Back">‹</button><button class="home" data-home aria-label="Home"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"><path d="M3 10.5 12 3l9 7.5"/><path d="M5.5 9v11h13V9"/><path d="M10 20v-6h4v6"/></svg></button><button class="home" data-refresh aria-label="Refresh"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12a8 8 0 1 1-2.34-5.66"/><path d="M20 4v5h-5"/></svg></button></div></header>
+    <header class="d"><div class="tabs"><button class="back" data-back aria-label="Back"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></button><button class="home" data-home aria-label="Home"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"><path d="M3 10.5 12 3l9 7.5"/><path d="M5.5 9v11h13V9"/><path d="M10 20v-6h4v6"/></svg></button><button class="home" data-refresh aria-label="Refresh"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12a8 8 0 1 1-2.34-5.66"/><path d="M20 4v5h-5"/></svg></button></div></header>
     <main><div class="lvt">${esc(LEAGUES[v.league].name + ' · ' + title)}</div><div class="pane t">${body}</div></main>`;
   const tw = document.querySelector('.lbt') && document.querySelector('.lbt').parentElement;
   if (D && tw) { if (v.sl == null) { const th = tw.querySelector('th.on'), n = tw.querySelector('th.n'); if (th && n) v.sl = Math.max(0, th.offsetLeft - n.offsetWidth); } tw.scrollLeft = v.sl || 0; tw.addEventListener('scroll', () => { v.sl = tw.scrollLeft; }, { passive: true }); }
@@ -3128,7 +3151,7 @@ function renderLeaders() {
 })();
 function renderSearch() {
   if (!document.getElementById('sq')) {
-    $app.innerHTML = `<header class="d"><div class="tabs"><button class="back" data-back aria-label="Back">‹</button><button class="home" data-home aria-label="Home"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"><path d="M3 10.5 12 3l9 7.5"/><path d="M5.5 9v11h13V9"/><path d="M10 20v-6h4v6"/></svg></button><button class="home" data-refresh aria-label="Refresh"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12a8 8 0 1 1-2.34-5.66"/><path d="M20 4v5h-5"/></svg></button><input id="sq" class="sinp" type="search" placeholder="Search team or player" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" enterkeyhint="search" value="${esc(state.sq)}"></div></header><main><div id="sres"></div></main>`;
+    $app.innerHTML = `<header class="d"><div class="tabs"><button class="back" data-back aria-label="Back"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></button><button class="home" data-home aria-label="Home"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"><path d="M3 10.5 12 3l9 7.5"/><path d="M5.5 9v11h13V9"/><path d="M10 20v-6h4v6"/></svg></button><button class="home" data-refresh aria-label="Refresh"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12a8 8 0 1 1-2.34-5.66"/><path d="M20 4v5h-5"/></svg></button><input id="sq" class="sinp" type="search" placeholder="Search team or player" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" enterkeyhint="search" value="${esc(state.sq)}"></div></header><main><div id="sres"></div></main>`;
     if (!state.sq) { const el = document.getElementById('sq'); setTimeout(() => el && el.focus(), 80); }
   }
   paintSearch();
