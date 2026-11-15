@@ -72,7 +72,7 @@ header .back:active,header .home:active{opacity:.6}
 .gloss b{color:#fff;font-weight:700}
 main{padding:6px 16px 0}
 header.d + main{padding-top:0}
-.strip{display:flex;gap:6px;overflow-x:auto;margin:10px 0 0;padding:0;scrollbar-width:none;-webkit-overflow-scrolling:touch;scroll-snap-type:x mandatory}
+.strip{display:flex;gap:6px;overflow-x:auto;margin:10px 0 -3px;padding:0 0 3px;scrollbar-width:none;-webkit-overflow-scrolling:touch;scroll-snap-type:x mandatory}
 .strip .snap{scroll-snap-align:start;scroll-snap-stop:always}
 .strip::-webkit-scrollbar{display:none}
 .dy{flex:none;width:calc((100vw - 56px) / 5);background:var(--card);border-radius:12px;padding:5px 0;font-family:var(--num);font-weight:700;font-size:15px;display:flex;flex-direction:column;align-items:center;line-height:1.15;color:var(--mut)}
@@ -821,16 +821,17 @@ header.d + main{padding-top:0}
 .play.g.gs .ast{color:rgba(255,255,255,.62)}
 html.one,html.one body{overflow:hidden;height:100%}
 html.one #app.lst,html.one body{min-height:0}
-.stkw .hero{transition:padding .2s ease}
-.stkw .hero .s{transition:font-size .2s ease}
-.stkw .hero img{transition:width .2s ease,height .2s ease}
+.stkw .hero{transition:padding .28s ease}
+.stkw .hero .s{transition:font-size .28s ease}
+.stkw .hero .t img,.stkw .hero .t .ph{transition:width .28s ease,height .28s ease}
+.stkw .hero .t .rc,.stkw .hero .wk{transition:max-height .28s ease,opacity .2s ease,margin .28s ease;max-height:24px;overflow:hidden}
+.stkw .hero .m .dt1,.stkw .hero .m .fin{transition:font-size .28s ease}
 .stkw.mini .hero{padding:6px 0}
-.stkw.mini .hero .s{font-size:28px !important}
-.stkw.mini .hero .t img,.stkw.mini .hero .t .ph{width:28px !important;height:28px !important}
-.stkw.mini .hero .t .rc,.stkw.mini .hero .wk{display:none}
-.stkw.mini .hero .t{flex-direction:row;gap:6px}
-.stkw.mini .hero .m .dt1{font-size:16px}
-.stkw .hero .t img{transition:width .2s,height .2s}
+.stkw.mini .hero .s{font-size:30px !important}
+.stkw.mini .hero .t img,.stkw.mini .hero .t .ph{width:26px !important;height:26px !important}
+.stkw.mini .hero .t .rc,.stkw.mini .hero .wk{max-height:0;opacity:0;margin:0}
+.stkw.mini .hero .t{gap:2px;font-size:12px}
+.stkw.mini .hero .m .dt1,.stkw.mini .hero .m .fin{font-size:16px}
 </style>
 </head>
 <body>
@@ -943,9 +944,9 @@ function tabHTML(k) {
     setTimeout(() => { done && done(); }, ms + 10); };
   const cleanup = st => { st.gh.forEach(g => g.remove()); if (st.strip && st.strip.isConnected) { st.strip.style.scrollSnapType = ''; } st.strip = null; if (st.el) { st.el.style.transition = ''; st.el.style.transform = ''; st.el.style.willChange = ''; } };
   const ghost = (st, html, off) => { const g = document.createElement('div'); g.className = st.cls + ' ghost'; g._off = off;
-    g.style.cssText = `position:absolute;top:${st.el.offsetTop}px;left:${st.el.offsetLeft}px;width:${st.W}px;min-height:${Math.max(st.el.offsetHeight, window.innerHeight)}px;margin:0;pointer-events:none;will-change:transform;transform:translate3d(${off * st.P}px,0,0)`;
+    g.style.cssText = `position:absolute;top:${st.el.offsetTop}px;left:${st.el.offsetLeft}px;width:${st.W}px;min-height:${st.mode === 'day' ? Math.max(st.el.offsetHeight, window.innerHeight) : st.el.offsetHeight}px;margin:0;pointer-events:none;will-change:transform;transform:translate3d(${off * st.P}px,0,0)`;
     g.style.setProperty('margin', '0', 'important'); if (st.mode === 'day') { const cs = getComputedStyle(st.el); g.style.padding = cs.padding; g.style.boxSizing = 'border-box'; }
-    g.innerHTML = html; try { relabel(g); markSort(g); zebra(g); dashAlign(g); pmAlign(g); } catch (e) {} st.el.parentNode.appendChild(g); st.gh.push(g); };
+    g.innerHTML = html; try { relabel(g); markSort(g); zebra(g); dashAlign(g); pmAlign(g); } catch (e) {} st.el.parentNode.appendChild(g); try { alignGrp(g); } catch (e) {} if (st.mode !== 'day') g.querySelectorAll('.gloss').forEach(x => { if (state.player && state.player.tab !== 'ov') return; }); st.gh.push(g); };
   document.addEventListener('touchstart', e => { S = null; if (e.touches.length !== 1 || pop()) return; const t = e.target; if (!t.closest) return;
     const v = topView(), x = e.touches[0].clientX, y = e.touches[0].clientY, base = { x0: x, y0: y, t0: Date.now(), x: 0, hz: false, gh: [] };
     if (v === 'list') { if (state.league === 'fav' || t.closest('header, #fhome, #ptr')) return; const items = [...$app.querySelectorAll('.dy')], cur = items.findIndex(b => b.classList.contains('on')); if (cur < 0) return;
@@ -990,7 +991,7 @@ function tabHTML(k) {
     state.search = false; state.cmpOn = true; window._fromList = true; state.lastView = null; $app.innerHTML = ''; render(); loadCmp(0);
     const inp = document.getElementById('cq1'); if (inp) inp.focus(); location.hash = '#/compare'; }, { passive: false });
 })();
-window.addEventListener('scroll', () => { const w = document.querySelector('.stkw.det'); if (!w) return; w.classList.toggle('mini', topView() === 'game' && window.scrollY > 30); }, { passive: true });
+window.addEventListener('scroll', () => { const w = document.querySelector('.stkw.det'); if (!w) return; const y = window.scrollY, on = w.classList.contains('mini'); if (topView() !== 'game') { w.classList.remove('mini'); return; } if (!on && y > 70) w.classList.add('mini'); else if (on && y < 8) w.classList.remove('mini'); }, { passive: true });
 window.SIL = 'data:image/svg+xml,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" fill="#2c2c2e"/><circle cx="50" cy="38" r="18" fill="#0d0d0f"/><path d="M14 100c2-22 17-34 36-34s34 12 36 34z" fill="#0d0d0f"/></svg>');
 const CMP_SVG = '<svg viewBox="0 0 24 24"><path d="M4 8h14l-4-4M20 16H6l4 4"/></svg>';
 const STAR_SVG = '<svg viewBox="0 0 24 24"><path d="M12 3.2l2.7 5.6 6.1.8-4.5 4.2 1.1 6.1L12 17l-5.4 2.9 1.1-6.1L3.2 9.6l6.1-.8z"/></svg>';
@@ -1359,7 +1360,7 @@ function render() {
   try { dashAlign(); } catch (e) {}
   try { pmAlign(); } catch (e) {}
   try { stickTop(v); } catch (e) {}
-  { const ov = v === 'player' && state.player && state.player.tab === 'ov'; document.documentElement.classList.toggle('one', false); if (ov) requestAnimationFrame(() => { const extra = document.documentElement.scrollHeight - window.innerHeight; if (extra < 140) { document.documentElement.classList.add('one'); window.scrollTo(0, 0); } }); }
+  { const ov = v === 'player' && state.player && state.player.tab === 'ov'; document.documentElement.classList.toggle('one', false); if (ov && false) requestAnimationFrame(() => { const extra = document.documentElement.scrollHeight - window.innerHeight; if (extra < 140) { document.documentElement.classList.add('one'); window.scrollTo(0, 0); } }); }
   if (window._noSlide) window._noSlide = 0;
   if (window._slide) { const p = window._slideSel ? $app.querySelector('main') : $app.querySelector('.pane'), d = window._slide; window._slide = 0; window._slideSel = null; if (p && p.animate) p.animate([{ transform: `translateX(${d * 70}px)`, opacity: .3 }, { transform: 'none', opacity: 1 }], { duration: 230, easing: 'cubic-bezier(.2,.7,.3,1)' }); }
   const fh = document.getElementById('fhome'); if (fh) fh.hidden = true;
