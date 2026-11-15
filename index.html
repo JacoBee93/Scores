@@ -1413,7 +1413,7 @@ function render() {
   try { dashAlign(); } catch (e) {}
   try { pmAlign(); } catch (e) {}
   try { stickTop(v); } catch (e) {}
-  { const ov = v === 'player' && state.player && state.player.tab === 'ov'; document.documentElement.classList.remove('lock1'); if (v === 'player' && state.player && /^(ov|bio)$/.test(state.player.tab)) requestAnimationFrame(() => { if (state.player && /^(ov|bio)$/.test(state.player.tab) && document.documentElement.scrollHeight - window.innerHeight < 160) { window.scrollTo(0, 0); document.documentElement.classList.add('lock1'); } }); if (v === 'list') requestAnimationFrame(listLock); if (false) requestAnimationFrame(() => { const extra = document.documentElement.scrollHeight - window.innerHeight; if (extra < 140) { document.documentElement.classList.add('one'); window.scrollTo(0, 0); } }); }
+  { const ov = v === 'player' && state.player && state.player.tab === 'ov'; document.documentElement.classList.remove('lock1'); const lk = () => (v === 'player' && state.player && /^(ov|bio|news)$/.test(state.player.tab)) || (v === 'team' && state.team && state.team.tab === 'news'); if (lk()) requestAnimationFrame(() => { if (lk() && topView() === v && document.documentElement.scrollHeight - window.innerHeight < 160) { window.scrollTo(0, 0); document.documentElement.classList.add('lock1'); } }); if (v === 'list') requestAnimationFrame(listLock); if (false) requestAnimationFrame(() => { const extra = document.documentElement.scrollHeight - window.innerHeight; if (extra < 140) { document.documentElement.classList.add('one'); window.scrollTo(0, 0); } }); }
   if (window._noSlide) window._noSlide = 0;
   if (window._slide) { const p = window._slideSel ? $app.querySelector('main') : $app.querySelector('.pane'), d = window._slide; window._slide = 0; window._slideSel = null; if (p && p.animate) p.animate([{ transform: `translateX(${d * 70}px)`, opacity: .3 }, { transform: 'none', opacity: 1 }], { duration: 230, easing: 'cubic-bezier(.2,.7,.3,1)' }); }
   const fh = document.getElementById('fhome'); if (fh) fh.hidden = true;
@@ -1639,18 +1639,18 @@ function penaltiesHTML(g) {
 
 /* ----- news ----- */
 const isVideoArt = a => /media|video/i.test(String(a.type || '')) || (!a.story && Array.isArray(a.video) && a.video.length > 0 && !(a.links && a.links.api && a.links.api.news));
+const NEWS_SKIP = /\bhighlights?\b|best plays|top plays|\bmoments?\b.*\b(touchdowns?|goals?|dunks?|plays?)\b|\b(touchdowns?|goals?|dunks?|plays?)\b.*\bmoments?\b|every (touchdown|goal|basket)|\bwatch\b:|\bbetting\b|\bbets?\b|(?<!against the )\bodds\b|\bspread\b|player props|\bparlays?\b|\bsportsbook\b|\bpicks?\b.*\b(ats|against the spread)\b/i;
 async function loadNews(o, lg, kind) {
   if (!o || o.news) return; const nw = o.news = { loading: true }, id = String(o.id), path = LEAGUES[lg].path, SA = 'https://site.api.espn.com/apis/site/v2/sports/' + path;
-  const urls = kind === 'player' ? [[WEB + path + '/athletes/' + id + '/overview', 0], [SA + '/news?player=' + id + '&limit=40', 1], [SA + '/news?athletes=' + id + '&limit=40', 1]]
-    : [[SA + '/news?team=' + id + '&limit=40', 1], [SA + '/teams/' + id + '/news?limit=40', 1]];
-  let items = [];
-  for (const [u, chk] of urls) { try { const j = await getJson(u); let arr = (j && (j.news || j.articles)) || []; if (!Array.isArray(arr)) arr = arr.articles || arr.items || [];
-      arr = arr.filter(a => a && a.headline && !isVideoArt(a));
-      if (chk) { const mine = c => kind === 'player' ? String(c.athleteId || (c.athlete && c.athlete.id) || '') === id : String(c.teamId || (c.team && c.team.id) || '') === id;
-        if (arr.some(a => Array.isArray(a.categories) && a.categories.length)) arr = arr.filter(a => (a.categories || []).some(mine)); else arr = []; }
-      if (arr.length) { items = arr; break; } } catch (e) {} }
-  items.sort((a, b) => new Date(b.published || b.lastModified || 0) - new Date(a.published || a.lastModified || 0));
-  nw.items = items.slice(0, 5); nw.loading = false;
+  const tid = kind === 'player' ? String((o.bio && o.bio.team && o.bio.team.id) || '') : id;
+  const mine = a => (a.categories || []).some(c => kind === 'player' ? String(c.athleteId || (c.athlete && c.athlete.id) || '') === id : String(c.teamId || (c.team && c.team.id) || '') === id);
+  const src = kind === 'player' ? [[WEB + path + '/athletes/' + id + '/overview', 0], [SA + '/news?player=' + id + '&limit=50', 1]].concat(tid ? [[SA + '/news?team=' + tid + '&limit=50', 1]] : []).concat([[SA + '/news?limit=50', 1]])
+    : [[SA + '/news?team=' + id + '&limit=50', 1], [SA + '/news?limit=50', 1]];
+  const all = new Map();
+  await Promise.all(src.map(async ([u, chk]) => { try { const j = await getJson(u); let arr = (j && (j.news || j.articles)) || []; if (!Array.isArray(arr)) arr = arr.articles || arr.items || [];
+    arr.forEach(a => { if (!a || !a.headline || isVideoArt(a) || NEWS_SKIP.test(a.headline + ' ' + (a.description || '')) || (chk && !mine(a))) return; const k = String(a.id || a.dataSourceIdentifier || a.headline); if (!all.has(k)) all.set(k, a); }); } catch (e) {} }));
+  const items = [...all.values()].sort((a, b) => new Date(b.published || b.lastModified || 0) - new Date(a.published || a.lastModified || 0));
+  nw.items = items.slice(0, 4); nw.loading = false;
   if ((kind === 'player' ? state.player : state.team) === o) render();
 }
 const agoTxt = iso => { const t = new Date(iso).getTime(); if (!t) return ''; const m = Math.round((Date.now() - t) / 60000); if (m < 60) return Math.max(1, m) + 'm ago'; const h = Math.round(m / 60); if (h < 24) return h + 'h ago'; const d = Math.round(h / 24); if (d < 7) return d + 'd ago'; const x = new Date(t); return x.getDate() + '.' + (x.getMonth() + 1) + '.' + x.getFullYear(); };
@@ -2893,7 +2893,7 @@ function renderTeam() {
     <main><div class="phero">${h.logo ? `<img class="tl" src="${esc(h.logo)}" alt="" onerror="this.style.visibility='hidden'">` : ''}
       <div class="grow"><div class="pname up">${esc(h.name)}</div><div class="psub">${esc(h.sub)}</div></div>
       <button class="fstar ${isFav(t.league, t.id) ? 'on' : ''}" data-fav="${esc(t.id)}" data-fl="${t.league}" data-fn="${esc(h.name)}" data-flogo="${esc(h.logo)}" aria-label="Favorite team">${STAR_SVG}</button></div>
-      <div class="dtabs sm even">${tab('sched', 'Schedule')}${tab('stats', 'Stats', t.tab === 'tstats')}${tab(t.infoSub || 'news', 'Info', t.tab === 'roster' || t.tab === 'news')}${tab('inj', 'Injuries')}</div>
+      <div class="dtabs sm even">${tab(t.infoSub || 'news', 'Info', t.tab === 'roster' || t.tab === 'news')}${tab('sched', 'Schedule')}${tab('stats', 'Stats', t.tab === 'tstats')}${tab('inj', 'Injuries')}</div>
       <div class="pane t">${body}</div></main>`;
   const ms = document.getElementById('mstrip'), on = ms && ms.querySelector('.on');
   if (on) ms.scrollLeft = on.offsetLeft - (ms.clientWidth - on.offsetWidth) / 2;
