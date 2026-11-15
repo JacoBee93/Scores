@@ -840,6 +840,9 @@ html.one #app.lst,html.one body{min-height:0}
 .stkw.det .hero .m .dt1,.stkw.det .hero .m .fin{font-size:17px}
 .stkw.det .dtabs{margin-left:-6px;margin-right:-6px;padding-left:12px;padding-right:12px}
 .stkw.det .phero{margin-top:0;margin-bottom:8px}
+.stkw.det .hero{height:94px;box-sizing:border-box;align-content:center;padding-top:0;padding-bottom:0}
+.stkw.det .hero.hw{height:110px}
+.stkw.det .hero.hw .wk{margin-bottom:4px}
 .stkw.det{padding-bottom:10px}
 .sch .rg.rgw.w1 .sc2{grid-template-columns:14px 8px 14px}
 .sch .rg.rgw.w1{grid-template-columns:22px 36px 16px;margin-right:30px}
@@ -948,21 +951,22 @@ function tabHTML(k) {
   const pop = () => document.getElementById('wpov') || document.getElementById('brpop') || document.getElementById('artpop');
   const keyOf = b => b && (b.dataset.tab || b.dataset.ptab || b.dataset.ttab);
   const apply = () => { raf = 0; if (!S || !S.hz) return; const x = S.x;
-    S.el.style.transform = `translate3d(${x}px,0,0)`; S.gh.forEach(g => g.style.transform = `translate3d(${x + g._off * S.P}px,0,0)`);
+    S.el.style.transform = `translate3d(${x}px,0,0)`; if (S.hp) S.hp.style.transform = `translate3d(${x}px,0,0)`; S.gh.forEach(g => g.style.transform = `translate3d(${x + g._off * S.P}px,0,0)`);
     if (S.strip) { S.strip.scrollLeft = S.sl0 - (x / S.P) * S.iw; const k = S.cur + (x < -S.P / 2 ? 1 : x > S.P / 2 ? -1 : 0); if (k !== S.onk && S.items[k]) { S.items.forEach(b => b.classList.remove('on')); S.items[k].classList.add('on'); S.onk = k; } } };
   const stripTo = (st, to, ms) => { const s2 = st.strip; if (!s2) return; const a = s2.scrollLeft, b = st.sl0 - (to / st.P) * st.iw, t0 = performance.now();
     const k = st.cur + (to < 0 ? 1 : to > 0 ? -1 : 0); if (st.items[k]) { st.items.forEach(x => x.classList.remove('on')); st.items[k].classList.add('on'); }
     const f = now => { const u = Math.min(1, (now - t0) / ms), e = 1 - Math.pow(1 - u, 3); s2.scrollLeft = a + (b - a) * e; if (u < 1 && st.strip) requestAnimationFrame(f); }; requestAnimationFrame(f); };
-  const anim = (st, to, ms, done) => { const els = [st.el, ...st.gh];
+  const anim = (st, to, ms, done) => { const els = [st.el, ...st.gh].concat(st.hp ? [st.hp] : []); if (st.hp) st.hp.style.transform = `translate3d(${to}px,0,0)`;
     els.forEach(e => { e.style.transition = `transform ${ms}ms cubic-bezier(.2,.8,.2,1)`; });
     st.el.style.transform = `translate3d(${to}px,0,0)`; st.gh.forEach(g => g.style.transform = `translate3d(${to + g._off * st.P}px,0,0)`);
     stripTo(st, to, ms);
     setTimeout(() => { done && done(); }, ms + 10); };
-  const cleanup = st => { st.gh.forEach(g => g.remove()); if (st.strip && st.strip.isConnected) { st.strip.style.scrollSnapType = ''; } st.strip = null; if (st.el) { st.el.style.transition = ''; st.el.style.transform = ''; st.el.style.willChange = ''; } };
+  const cleanup = st => { st.gh.forEach(g => g.remove()); if (st.strip && st.strip.isConnected) { st.strip.style.scrollSnapType = ''; } st.strip = null; if (st.el) { st.el.style.transition = ''; st.el.style.transform = ''; st.el.style.willChange = ''; } if (st.hp) { st.hp.style.transition = ''; st.hp.style.transform = ''; } };
   const ghost = (st, html, off) => { const g = document.createElement('div'); g.className = st.cls + ' ghost'; g._off = off;
     g.style.cssText = `position:absolute;top:${st.el.offsetTop}px;left:${st.el.offsetLeft}px;width:${st.W}px;min-height:${st.mode === 'day' ? Math.max(st.el.offsetHeight, window.innerHeight) : 0}px;margin:0;pointer-events:none;will-change:transform;transform:translate3d(${off * st.P}px,0,0)`;
     g.style.setProperty('margin', '0', 'important'); if (st.mode === 'day') { const cs = getComputedStyle(st.el); g.style.padding = cs.padding; g.style.boxSizing = 'border-box'; }
-    g.innerHTML = html; try { relabel(g); markSort(g); zebra(g); dashAlign(g); pmAlign(g); } catch (e) {} st.el.parentNode.appendChild(g); try { alignGrp(g); if (st.mode !== 'day') addGlossary(topView(), g); } catch (e) {} if (st.mode !== 'day') g.querySelectorAll('.gloss').forEach(x => { if (state.player && state.player.tab !== 'ov') return; }); st.gh.push(g); };
+    g.innerHTML = html; try { relabel(g); markSort(g); zebra(g); dashAlign(g); pmAlign(g); } catch (e) {} st.el.parentNode.appendChild(g); try { alignGrp(g); if (st.mode !== 'day') addGlossary(topView(), g); } catch (e) {} st.gh.push(g);
+    if (st.hp && st.hpGap != null) { const c = st.hp.cloneNode(true); c._off = off; c.classList.add('ghost'); c.style.cssText = `position:absolute;left:${g.offsetLeft}px;width:${g.offsetWidth}px;top:${g.offsetTop + g.offsetHeight + st.hpGap}px;margin:0;pointer-events:none;will-change:transform;transform:translate3d(${off * st.P}px,0,0)`; st.el.parentNode.appendChild(c); st.gh.push(c); } };
   document.addEventListener('touchcancel', () => { const st = S; S = null; if (!st || !st.hz) return; if (raf) { cancelAnimationFrame(raf); raf = 0; } anim(st, 0, 200, () => cleanup(st)); }, { passive: true });
   document.addEventListener('touchstart', e => { if (S && S.hz) { try { cleanup(S); } catch (er) {} } S = null; $app.querySelectorAll('.ghost').forEach(g => g.remove()); if (e.touches.length !== 1 || pop()) return; const t = e.target; if (!t.closest) return;
     const v = topView(), x = e.touches[0].clientX, y = e.touches[0].clientY, base = { x0: x, y0: y, t0: Date.now(), x: 0, hz: false, gh: [] };
@@ -976,7 +980,8 @@ function tabHTML(k) {
       if (Math.abs(dy) > 10 && Math.abs(dy) > Math.abs(dx)) { S = null; return; }
       if (Math.abs(dx) < 8) return;
       if (S.tw && S.tw.scrollWidth > S.tw.clientWidth + 2) { const atL = S.st0 <= 1, atR = S.st0 >= S.tw.scrollWidth - S.tw.clientWidth - 1; if (!((dx > 0 && atL) || (dx < 0 && atR))) { S = null; return; } }
-      S.hz = true; S.W = S.el.offsetWidth; S.P = S.W + (S.mode === 'tab' ? 18 : 0); S.el.parentNode.style.position = 'relative'; S.el.style.willChange = 'transform'; S.x0 = t.clientX;
+      S.hz = true; S.W = S.el.offsetWidth; S.P = S.W + (S.mode === 'tab' ? 18 : 0); S.el.parentNode.style.position = 'relative';
+      if (S.mode === 'tab') { const hp = $app.querySelector(':scope > .hpw'); if (hp) { S.hp = hp; S.hpGap = hp.getBoundingClientRect().top - S.el.getBoundingClientRect().bottom; } } S.el.style.willChange = 'transform'; S.x0 = t.clientX;
       [[S.cur - 1, -1], [S.cur + 1, 1]].forEach(([k, off]) => { if (k < 0 || k >= S.items.length) return;
         let html = '';
         if (S.mode === 'tab') { window._ghk = keyOf(S.items[k]); html = tabHTML(window._ghk); }
@@ -1494,7 +1499,7 @@ function renderGame() {
               : esc(e.short).replace(' - ', '<br>');
     const hd = (g.sum && g.sum.header) || {}, hc = (hd.competitions && hd.competitions[0]) || {};
     const wk = e.week || hd.week, st = e.stype || (hd.season && hd.season.type), note = e.note || (hc.notes && hc.notes[0] && hc.notes[0].headline) || '';
-    const wlab = note || (st === 3 ? poLabel(g.league, wk, (hd.season && hd.season.year) || new Date(e.date).getFullYear() - (new Date(e.date).getMonth() < 6 ? 1 : 0), e) : g.league === 'nfl' && wk ? (st === 1 ? 'Preseason · Week ' + wk : 'Week ' + wk) : '');
+    const wlab = (g.league !== 'nfl' && st !== 3) ? '' : note || (st === 3 ? poLabel(g.league, wk, (hd.season && hd.season.year) || new Date(e.date).getFullYear() - (new Date(e.date).getMonth() < 6 ? 1 : 0), e) : g.league === 'nfl' && wk ? (st === 1 ? 'Preseason · Week ' + wk : 'Week ' + wk) : '');
     const pre = e.state === 'pre', ab = t => `<span class="s ab ${String(t.abbr || '').length > 3 ? 'ab4' : ''}" data-topen="${esc(t.id)}" data-tl="${g.league}" data-tn="${esc(t.name)}" data-tlogo="${esc(t.logo)}">${esc(t.abbr || '')}</span>`;
     hero = `<div class="hero${wlab ? ' hw' : ''}${pre ? ' hpre' : ''}">${wlab ? `<div class="wk">${esc(wlab)}</div>` : ''}${side(e.away, pre)}
       ${pre ? ab(e.away) : `<span class="s ${e.state === 'post' && !e.away.winner ? 'lose' : ''}">${esc(e.away.score)}</span>`}
@@ -3196,6 +3201,24 @@ const STD_COLS = {
 state.lvC = {}; state.athC = lsGet('athc', 7 * 864e5) || {};
 let _athSave = null;
 const saveAth = () => { clearTimeout(_athSave); _athSave = setTimeout(() => { const o = {}; Object.entries(state.athC).slice(-600).forEach(([k, a]) => { if (a && a.displayName) o[k] = { id: a.id, displayName: a.displayName, shortName: a.shortName, jersey: a.jersey, position: a.position && { abbreviation: a.position.abbreviation }, headshot: a.headshot && { href: a.headshot.href } }; }); lsSet('athc', o); }, 800); };
+const NHLQ = {};
+async function nhlGoalieQual(sy) {
+  const key = String(sy || ''); if (NHLQ[key] && Date.now() - NHLQ[key].t < 10 * 60e3) return NHLQ[key];
+  const j = await getJson('https://site.web.api.espn.com/apis/common/v3/sports/hockey/nhl/statistics/byathlete?region=us&lang=en&contentorigin=espn&isqualified=false&page=1&limit=400&sort=defensive.savePct:desc' + (sy ? '&seasontype=2&season=' + sy : ''));
+  const F = {}; (j.categories || []).forEach(c => (c.names || []).forEach((n, k) => { if (!F[n]) F[n] = [c.name, k]; }));
+  const val = (a, n) => { const f = F[n]; if (!f) return NaN; const x = (a.categories || []).find(q => q.name === f[0]), arr = (x && (x.totals || x.values)) || []; const t = String(arr[f[1]] == null ? '' : arr[f[1]]).trim(), m = t.match(/^(\d+):(\d{2})$/); return m ? +m[1] + m[2] / 60 : parseFloat(t.replace(/,/g, '')); };
+  let mx = 0; const rows = [];
+  (j.athletes || []).forEach(x => { const gp = val(x, 'gamesPlayed') || val(x, 'games') || 0; if (gp > mx) mx = gp; const sv = val(x, 'savePct'); if (!(sv > 0)) return;
+    const ga = val(x, 'goalsAgainst'), tpg = val(x, 'timeOnIcePerGame'), tot = (tpg > 200 ? tpg / 60 : tpg) * gp; let gaa = ga >= 0 && tot > 30 ? ga * 60 / tot : val(x, 'avgGoalsAgainst'); if (!(gaa > 0 && gaa < 10)) gaa = val(x, 'avgGoalsAgainst');
+    const a = x.athlete || {}; let tid = a.teamId || (a.team && a.team.id); if (!tid && a.teamShortName) { const tm = (state.teamList.nhl || []).find(z => z.abbr === a.teamShortName); if (tm) tid = tm.id; }
+    rows.push({ a, gp, sv: sv > 1 ? sv / 100 : sv, gaa, tid: tid ? String(tid) : '' }); });
+  const tgp = {}; try { const sj = await getJson('https://site.api.espn.com/apis/v2/sports/hockey/nhl/standings?level=1' + (sy ? '&season=' + sy : ''));
+    const walk = n => { ((n.standings && n.standings.entries) || []).forEach(en => { const id = String((en.team || {}).id || ''); if (!id) return; const st = en.stats || [], g = nm => { const x = st.find(q => q.name === nm || q.type === nm); return x ? parseFloat(x.value) : NaN; };
+      let gp = g('gamesPlayed'); if (!(gp > 0)) gp = [g('wins'), g('losses'), g('otLosses') || g('overtimeLosses') || 0].reduce((a, b) => a + (b || 0), 0); if (gp > 0) tgp[id] = gp; }); (n.children || []).forEach(walk); }; walk(sj); } catch (e) {}
+  const gmin = Math.max(1, Math.ceil(mx * 0.3125)), byId = {};
+  rows.forEach(r => { const t = tgp[r.tid]; r.min = t > 0 ? Math.max(1, Math.ceil(t * 0.3125)) : gmin; if (r.a && r.a.id) byId[String(r.a.id)] = r.min; });
+  const r = { t: Date.now(), rows, teamGP: mx, min: gmin, byId }; NHLQ[key] = r; return r;
+}
 async function loadLV() {
   const v = state.lv; if (!v) return;
   if (v.kind === 'draft') { v.dd = null; return loadDraft(v); }
@@ -3238,6 +3261,9 @@ async function loadLV() {
       const worker = async () => { while (i < all.length) { const r = all[i++]; const id = (r.ref.match(/athletes\/(\d+)/) || [])[1]; try { r.a = state.athC[id] || (state.athC[id] = await getJson(String(r.ref).replace(/^http:/, 'https:'))); } catch (e) { r.a = { id, displayName: '' }; } } };
       await Promise.all(Array.from({ length: 8 }, worker));
       saveAth();
+      if (v.league === 'nhl') { const gc = cats.filter(c => /savePct|savePercentage|goalsAgainstAverage|avgGoalsAgainst/i.test(String(c.name))); if (gc.length) try { const G = await nhlGoalieQual(v.sy);
+        gc.forEach(c => { const sv = /save/i.test(String(c.name)), list = G.rows.filter(r => r.gp >= r.min && (sv ? r.sv > 0 : r.gaa > 0)).sort((x, y) => sv ? y.sv - x.sv : x.gaa - y.gaa).slice(0, 5);
+          if (list.length) c.rows = list.map(r => ({ val: sv ? r.sv.toFixed(3).replace(/^0\./, '.') : r.gaa.toFixed(2), a: r.a, tid: r.tid ? [0, r.tid] : null })); }); } catch (e) {} }
       if (v.sy) (async () => { const cgs = [...new Set(cats.map(c => byAthQuery(v.league, c.name)[0]))], tmap = {};
         await Promise.all(cgs.map(async cg => { try { const j = await getJson('https://site.web.api.espn.com/apis/common/v3/sports/' + L.path + '/statistics/byathlete?region=us&lang=en&contentorigin=espn&isqualified=false&limit=1000&page=1&seasontype=2&season=' + v.sy + (cg ? '&category=' + cg : ''));
           (j.athletes || []).forEach(x => { const a = x.athlete || {}, t = a.teamId || (a.team && a.team.id); if (!a.id) return; if (t) tmap[a.id] = String(t); else if (a.teamShortName) { const tm = (state.teamList[v.league] || []).find(z => z.abbr === a.teamShortName); if (tm) tmap[a.id] = tm.id; } }); } catch (e) {} }));
@@ -3731,7 +3757,7 @@ async function loadLeaders() {
     if (q) { v._qbrAll = {}; (jq.athletes || []).forEach(a => { const ac = a.categories || [], x = ac.find(z => z.name === q.ci) || ac[0], arr = (x && (x.totals || x.values)) || []; if (a.athlete && a.athlete.id && arr[q.k] != null) v._qbrAll[String(a.athlete.id)] = arr[q.k]; }); } } catch (e) {} }
   const u = 'https://site.web.api.espn.com/apis/common/v3/sports/' + L.path + '/statistics/byathlete?region=us&lang=en&contentorigin=espn&isqualified=true&page=1&limit=100' + (v.sy ? '&seasontype=2&season=' + v.sy : '') + (cg ? '&category=' + cg : '') + (sort ? '&sort=' + sort + ':desc' : '');
   try {
-    const gq = cg === 'goaltending', uu = gq ? u.replace('&category=goaltending', '').replace(/&sort=[^&]*/, '') + '&sort=defensive.savePct:desc' : u;
+    const gq = cg === 'goaltending', uu = gq ? u.replace('&category=goaltending', '').replace(/&sort=[^&]*/, '').replace('isqualified=true', 'isqualified=false').replace('limit=100', 'limit=400') + '&sort=defensive.savePct:desc' : u;
     let j = await getJson(uu);
     if (gq) { const rc0 = j.categories || [], dc = rc0.find(c => (c.names || []).includes('savePct')); if (dc) { const k = dc.names.indexOf('savePct'); j.athletes = (j.athletes || []).filter(a => { const x = (a.categories || []).find(q => q.name === dc.name), arr = (x && (x.totals || x.values)) || []; const n = parseFloat(arr[k]); return !isNaN(n) && n > 0; }); } }
     if (cg === 'goaltending') { const has = x => /savePct|savePercentage|goalsAgainstAverage|avgGoalsAgainst|"SV%"/.test(JSON.stringify((x && x.categories) || []));
@@ -3753,13 +3779,13 @@ async function loadLeaders() {
       return { a: at, vals };
     });
     if (!rows.length || !cols.length) throw new Error('empty');
-    if (cg === 'goaltending') { const gi = cols.findIndex(c => c.name === 'gamesPlayed' || c.name === 'games'); if (gi >= 0) { const gp = r => parseFloat(rows[r] ? rows[r].vals[gi] : 0) || 0, mx = Math.max(0, ...rows.map((_, r) => gp(r))), lim = Math.max(1, Math.round(mx * .3)); for (let r = rows.length - 1; r >= 0; r--) if (gp(r) < lim) rows.splice(r, 1); } }
+    if (cg === 'goaltending') { let qmin = 0, qby = {}; try { const Q = await nhlGoalieQual(v.sy); qmin = Q.min; qby = Q.byId || {}; } catch (e) {} const gi = cols.findIndex(c => c.name === 'gamesPlayed' || c.name === 'games'); if (gi >= 0) { const gp = r => parseFloat(rows[r] ? rows[r].vals[gi] : 0) || 0, mx = Math.max(0, ...rows.map((_, r) => gp(r))), lim = qmin || Math.max(1, Math.ceil(mx * .3125 / .85)); for (let r = rows.length - 1; r >= 0; r--) { const id = String((rows[r].a || {}).id || ''); if (gp(r) < (qby[id] || lim)) rows.splice(r, 1); } } }
     const QM = v._qbr || v._qbrAll;
     if (QM) { let qi = cols.findIndex(c => /^QBR$/i.test(c.label) || /QBR/i.test(c.name));
       if (qi >= 0) rows.forEach(r => { const q = QM[String(r.a.id)]; r.vals[qi] = q != null ? q : ''; });
       else if (v._qbr) { cols.push({ label: 'QBR', name: 'qbr', ci: '', k: -1 }); qi = cols.length - 1; rows.forEach(r => r.vals.push(QM[String(r.a.id)] != null ? QM[String(r.a.id)] : '')); }
       if (v._qbr) { for (let i = rows.length - 1; i >= 0; i--) if (rows[i].vals[qi] === '' || rows[i].vals[qi] == null) rows.splice(i, 1); v.data = { cols, rows }; v.sk = qi; v.loading = false; if (state.lv === v) render(); return; } }
-    try { const lc = state.lvC['lstats' + v.league + (v.sy || '')], cc = lc && lc.cats && lc.cats.find(c => c.name === v.cat), top = cc ? cc.rows.map(r => r.a && String(r.a.id)).filter(Boolean) : [];
+    if (cg !== 'goaltending') try { const lc = state.lvC['lstats' + v.league + (v.sy || '')], cc = lc && lc.cats && lc.cats.find(c => c.name === v.cat), top = cc ? cc.rows.map(r => r.a && String(r.a.id)).filter(Boolean) : [];
       const have = new Set(rows.map(r => String(r.a.id))), miss = top.filter(id => !have.has(id));
       if (miss.length) { const j2 = await getJson(u.replace('isqualified=true', 'isqualified=false').replace('limit=100', 'limit=1000'));
         (j2.athletes || []).forEach(a => { const id = String((a.athlete || {}).id); if (!miss.includes(id)) return; const ac = a.categories || [];
