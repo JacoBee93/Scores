@@ -401,7 +401,7 @@ body{min-height:100vh}
 .rcd{font-size:13.5px;color:var(--mut);margin-top:5px;line-height:1.35}
 .rcm{font-size:13px;font-weight:600;color:#8ab4ff;margin-top:8px}
 .iseg{margin:2px auto 10px !important}
-.nws{display:flex;flex-direction:column;gap:2px;margin:2px 0 0}
+.nws{display:flex;flex-direction:column;gap:8px;margin:2px 0 0}
 .nwi{display:flex;gap:12px;align-items:center;background:#2c2c2e;border-radius:0;padding:10px 12px 10px 10px;cursor:pointer}
 .nwi:first-child{border-radius:22px 22px 0 0}
 .nwi:last-child{border-radius:0 0 22px 22px}
@@ -416,7 +416,7 @@ body{min-height:100vh}
 .nwh{font-weight:700;font-size:14px;line-height:1.25;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
 .nwd{font-size:11.5px;color:var(--mut);margin-top:2px}
 .pane > .glsec:last-child{margin-bottom:0}
-#artpop{position:fixed;inset:0;z-index:160;background:rgba(0,0,0,.65);display:flex;align-items:flex-end;justify-content:center}
+#artpop{position:fixed;inset:0;z-index:160;background:transparent;display:flex;align-items:flex-end;justify-content:center}
 .artbox{position:relative;width:100%;max-width:620px;max-height:88vh;overflow-y:auto;background:#1c1c1e;border-radius:22px 22px 0 0;padding:18px 18px calc(28px + env(safe-area-inset-bottom));box-sizing:border-box;-webkit-overflow-scrolling:touch}
 .artbox h2{font-size:21px;line-height:1.25;margin:4px 40px 6px 0}
 .artbox h3{font-size:16px;margin:16px 0 4px}
@@ -858,7 +858,9 @@ html.one #app.lst,html.one body{min-height:0}
 .stkw.det .hero .wk{margin-bottom:3px}
 .stkw.det .hero .m .dt1,.stkw.det .hero .m .fin{font-size:17px}
 .stkw.det .dtabs{margin-left:-6px;margin-right:-6px;padding-left:12px;padding-right:12px}
-.stkw.det .phero{margin-top:-5px;margin-bottom:0;height:108px;min-height:108px}
+.stkw.det .phero{margin-top:-5px;margin-bottom:0;height:100px;min-height:100px}
+.stkw.det .dtabs{margin-top:0}
+.stkw.det .dtabs.even{padding-left:34px;padding-right:34px}
 .hero.hu,.stkw.det .hero.hu{height:auto;padding:7px 0 23px;align-items:center}
 .hero.hu .wk{min-height:15px;line-height:15px;font-size:12.5px;margin:0 0 5px !important;max-height:none !important;opacity:1 !important}
 .hero.hu .t{position:relative;gap:0 !important}
@@ -1385,7 +1387,9 @@ function addGlossary(v, pane0) {
 let _stA = 0;
 function smoothTop(ms) { ms = ms || 380; const y0 = window.scrollY; cancelAnimationFrame(_stA); if (y0 < 2) { window.scrollTo(0, 0); return; }
   document.body.style.minHeight = (y0 + window.innerHeight) + 'px'; window._stAnim = 1; const t0 = performance.now();
-  const f = now => { const u = Math.min(1, (now - t0) / ms), e = 1 - Math.pow(1 - u, 3); window.scrollTo(0, Math.round(y0 * (1 - e))); if (u < 1) _stA = requestAnimationFrame(f); else { document.body.style.minHeight = ''; window._stAnim = 0; try { listLock(); } catch (er) {} } }; _stA = requestAnimationFrame(f); }
+  const f = now => { const u = Math.min(1, (now - t0) / ms), e = 1 - Math.pow(1 - u, 3); window.scrollTo(0, Math.round(y0 * (1 - e))); if (u < 1) _stA = requestAnimationFrame(f); else { document.body.style.minHeight = ''; window._stAnim = 0; try { listLock(); detLock(); } catch (er) {} } }; _stA = requestAnimationFrame(f); }
+function detLock() { const v = topView(); if (window._stAnim) return; const lk = (v === 'player' && state.player && /^(ov|bio|news)$/.test(state.player.tab)) || (v === 'team' && state.team && state.team.tab === 'news');
+  if (lk && document.documentElement.scrollHeight - window.innerHeight < 280) { window.scrollTo(0, 0); document.documentElement.classList.add('lock1'); } }
 function listLock() { if (topView() !== 'list' || window._stAnim) return; const m = $app.querySelector(':scope > main'), n = m ? m.querySelectorAll('[data-game]').length : 99; if (n <= 4 && document.documentElement.scrollHeight - window.innerHeight < 220) { window.scrollTo(0, 0); document.documentElement.classList.add('lock1'); } }
 function render() {
   const key = viewKey(), same = key === state.lastView, y = same ? window.scrollY : 0, v = topView();
@@ -1422,7 +1426,7 @@ function render() {
   try { stickTop(v); } catch (e) {}
   try { const pn = $app.querySelector('.pane'); if (pn && v === 'player' && state.player && state.player.tab === 'ov' && state.player.done && pn.querySelector('.ssum, .glsec')) { const h = pn.offsetHeight; if (h > 200) { window._ovH = h; try { localStorage.setItem('ovH', String(h)); } catch (e) {} } }
     const nwOn = (v === 'player' && state.player && state.player.tab === 'news') || (v === 'team' && state.team && state.team.tab === 'news'); if (pn && nwOn) { const h = window._ovH || +(localStorage.getItem('ovH') || 0) || 415; if (h > 200) pn.style.minHeight = h + 'px'; pn.classList.add('nwp'); } } catch (e) {}
-  { const ov = v === 'player' && state.player && state.player.tab === 'ov'; document.documentElement.classList.remove('lock1'); const lk = () => (v === 'player' && state.player && /^(ov|bio|news)$/.test(state.player.tab)) || (v === 'team' && state.team && state.team.tab === 'news'); if (lk()) requestAnimationFrame(() => { if (lk() && topView() === v && document.documentElement.scrollHeight - window.innerHeight < 160) { window.scrollTo(0, 0); document.documentElement.classList.add('lock1'); } }); if (v === 'list') requestAnimationFrame(listLock); if (false) requestAnimationFrame(() => { const extra = document.documentElement.scrollHeight - window.innerHeight; if (extra < 140) { document.documentElement.classList.add('one'); window.scrollTo(0, 0); } }); }
+  { const ov = v === 'player' && state.player && state.player.tab === 'ov'; document.documentElement.classList.remove('lock1'); requestAnimationFrame(detLock); if (v === 'list') requestAnimationFrame(listLock); if (false) requestAnimationFrame(() => { const extra = document.documentElement.scrollHeight - window.innerHeight; if (extra < 140) { document.documentElement.classList.add('one'); window.scrollTo(0, 0); } }); }
   if (window._noSlide) window._noSlide = 0;
   if (window._slide) { const p = window._slideSel ? $app.querySelector('main') : $app.querySelector('.pane'), d = window._slide; window._slide = 0; window._slideSel = null; if (p && p.animate) p.animate([{ transform: `translateX(${d * 70}px)`, opacity: .3 }, { transform: 'none', opacity: 1 }], { duration: 230, easing: 'cubic-bezier(.2,.7,.3,1)' }); }
   const fh = document.getElementById('fhome'); if (fh) fh.hidden = true;
@@ -2507,7 +2511,7 @@ function gamelogHTML(p, o) {
   const secs = [], seen = new Set();
   (j.seasonTypes || []).forEach(st => { const rows = [];
     (st.categories || []).forEach(cat => (cat.events || []).forEach(e => { if (seen.has(e.eventId) || !e.stats) return; seen.add(e.eventId); rows.push({ id: e.eventId, m: meta[e.eventId] || {}, s: e.stats }); }));
-    if (rows.length) secs.push({ name: st.displayName || '', rows }); });
+    if (rows.length) secs.push({ name: String(st.displayName || '').replace(/^(\d{4})(?=\s)/, y => p && p.league === 'nfl' ? y + '-' + String(+y + 1).slice(2) : y), rows }); });
   if (!secs.length) return H + msg('No games played.');
   const rank = n => /post|playoff/i.test(n) ? 0 : /regular/i.test(n) ? 1 : 2;
   secs.sort((a, b) => rank(a.name) - rank(b.name));
@@ -2554,11 +2558,11 @@ function gamelogHTML(p, o) {
   };
   return H + secs.map(x => { const tl = o.limit ? [] : secTeams(x); return table((x.name || 'Games') + (tl.length ? ' (' + tl.join(', ') + ')' : ''), x.rows, x.name); }).join('');
 }
-function seasonLbl(p, y) { y = +y; return p.league === 'nfl' ? String(y) : (y - 1) + '-' + String(y).slice(2); }
+function seasonLbl(p, y) { y = +y; return p.league === 'nfl' ? y + '-' + String(y + 1).slice(2) : (y - 1) + '-' + String(y).slice(2); }
 function glSeasons(p, J) {
   const G = J !== undefined ? J : p.gl;
   const f = ((G && G.filters) || []).find(x => x && /season$/i.test(x.name || '') && Array.isArray(x.options));
-  let L = f ? f.options.map(x => ({ y: String(x.value), t: x.displayValue || seasonLbl(p, x.value) })).filter(x => /^\d{4}$/.test(x.y)) : [];
+  let L = f ? f.options.map(x => ({ y: String(x.value), t: p.league === 'nfl' ? seasonLbl(p, x.value) : (x.displayValue || seasonLbl(p, x.value)) })).filter(x => /^\d{4}$/.test(x.y)) : [];
   if (!L.length && J === undefined) L = [...new Set(statCats(p.st, p.league).flatMap(c => c.rows.map(r => r.year)).filter(Boolean))].map(y => ({ y: String(y), t: seasonLbl(p, y) }));
   const cur = f && f.value ? String(f.value) : (L[0] && L[0].y);
   L.sort((a, b) => b.y - a.y);
@@ -2630,7 +2634,7 @@ function summaryHTML(p) {
   const a = p.bio || {}, ss = a.statsSummary, st = ((ss && ss.statistics) || []).filter(x => x && x.displayValue != null).slice(0, 4);
   if (!st.length) return '';
   const col = a.team && a.team.color ? '#' + String(a.team.color).replace('#', '') : 'var(--acc)';
-  return `<section class="ssum"><div class="ssh">${esc(ss.displayName || 'Season stats')}</div><div class="ssg">${st.map(x => `<div ${a.active === false ? 'data-x' : 'data-sstat'}="${esc(ssCat(p, x))}" data-sstl="${esc(x.displayName || x.abbreviation || '')}" data-sslab="${esc(x.abbreviation || x.shortDisplayName || '')}"><div class="ssl">${esc(x.abbreviation || x.shortDisplayName || x.displayName || '')}</div><div class="ssv${String(x.displayValue).length > 5 || (p.league === 'nhl' && /^G$/i.test(p.pos || '')) ? ' lng' : ''}">${esc(x.displayValue)}</div><div class="ssr">${esc(x.rankDisplayValue || '')}</div></div>`).join('')}</div></section>`;
+  return `<section class="ssum"><div class="ssh">${esc(String(ss.displayName || 'Season stats').replace(/^(\d{4})(?=\s)/, y => p.league === 'nfl' ? y + '-' + String(+y + 1).slice(2) : y))}</div><div class="ssg">${st.map(x => `<div ${a.active === false ? 'data-x' : 'data-sstat'}="${esc(ssCat(p, x))}" data-sstl="${esc(x.displayName || x.abbreviation || '')}" data-sslab="${esc(x.abbreviation || x.shortDisplayName || '')}"><div class="ssl">${esc(x.abbreviation || x.shortDisplayName || x.displayName || '')}</div><div class="ssv${String(x.displayValue).length > 5 || (p.league === 'nhl' && /^G$/i.test(p.pos || '')) ? ' lng' : ''}">${esc(x.displayValue)}</div><div class="ssr">${esc(x.rankDisplayValue || '')}</div></div>`).join('')}</div></section>`;
 }
 function overviewHTML(p) {
   const sum = summaryHTML(p);
@@ -2896,7 +2900,7 @@ function renderTeam() {
   const body0 = !t.done ? msg('Loading…') : (t.tab === 'roster' || t.tab === 'news') ? teamInfoHTML(t) : t.tab === 'sched' ? scheduleHTML(t) : t.tab === 'tstats' ? teamTabStatsHTML(t) : t.tab === 'inj' ? teamInjHTML(t) : teamStatsHTML(t);
   const body = t.done && (t.tab === 'stats' || t.tab === 'tstats') ? sseg + body0 : body0;
   $app.innerHTML = `
-    <header class="d"><div class="tabs"><button class="back" data-back aria-label="Back"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></button><button class="home" data-home aria-label="Home"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"><path d="M3 10.5 12 3l9 7.5"/><path d="M5.5 9v11h13V9"/><path d="M10 20v-6h4v6"/></svg></button><button class="home" data-refresh aria-label="Refresh"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12a8 8 0 1 1-2.34-5.66"/><path d="M20 4v5h-5"/></svg></button><span class="grow"></span>${(() => { const Y = brYears(t.league), y = t.sy || Y[0], ty = t.stype || 2, yl = yy => t.league === 'nfl' ? String(yy) : (yy - 1) + '-' + String(yy).slice(2), lab = (yy, tt) => yl(yy) + (tt === 3 ? ' Postseason' : ' Reg. Season');
+    <header class="d"><div class="tabs"><button class="back" data-back aria-label="Back"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></button><button class="home" data-home aria-label="Home"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"><path d="M3 10.5 12 3l9 7.5"/><path d="M5.5 9v11h13V9"/><path d="M10 20v-6h4v6"/></svg></button><button class="home" data-refresh aria-label="Refresh"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12a8 8 0 1 1-2.34-5.66"/><path d="M20 4v5h-5"/></svg></button><span class="grow"></span>${(() => { const Y = brYears(t.league), y = t.sy || Y[0], ty = t.stype || 2, yl = yy => t.league === 'nfl' ? yy + '-' + String(yy + 1).slice(2) : (yy - 1) + '-' + String(yy).slice(2), lab = (yy, tt) => yl(yy) + (tt === 3 ? ' Postseason' : ' Reg. Season');
       const opts = []; Y.forEach((x, i) => { if (i > 0) opts.push([x, 3]); opts.push([x, 2]); });
       return `<div class="ysel tys"><button class="ybtn" data-tyo="1">${esc(lab(y, ty))}<i class="chev ${t.yOpen ? 'up' : ''}"></i></button>${t.yOpen ? `<div class="ylist">${opts.map(([x, tt]) => `<button data-ty="${x}|${tt}" class="${x === y && tt === ty ? 'on' : ''}">${esc(lab(x, tt))}</button>`).join('')}</div>` : ''}</div>`; })()}</div></header>
     <main><div class="phero">${h.logo ? `<img class="tl" src="${esc(h.logo)}" alt="" onerror="this.style.visibility='hidden'">` : ''}
@@ -3447,7 +3451,7 @@ function brActual(v, c) {
 }
 function bracketHTML(v, c) {
   const Y = brYears(v.league), y = c.y || v.brY || Y[0];
-  const yl = yy => v.league === 'nfl' ? String(yy) : (yy - 1) + '-' + String(yy).slice(2);
+  const yl = yy => v.league === 'nfl' ? yy + '-' + String(yy + 1).slice(2) : (yy - 1) + '-' + String(yy).slice(2);
   const ysel = '';
   if (!c.confs) return ysel + msg('Loading…');
   const proj = !c.evs.length;
@@ -3576,7 +3580,7 @@ function paintCompare() {
   const c0 = cats(A).filter(x => !(lg === 'nba' && /misc/i.test(x.title))), c1 = cats(B).filter(x => !(lg === 'nba' && /misc/i.test(x.title))), common = c0.filter(x => c1.some(y => y.title === x.title)).slice(0, 4).map(x => [x, c1.find(z => z.title === x.title)]);
   const yrs = cs => new Set(cs.flatMap(x => x.rows.map(r => r.year)).filter(Boolean));
   const ya = yrs(c0), yb = yrs(c1), Y = [...ya].filter(y => yb.has(y)).sort((a, b) => b - a);
-  const yl = y => lg === 'nfl' ? String(y) : (y - 1) + '-' + String(y).slice(2);
+  const yl = y => lg === 'nfl' ? y + '-' + String(y + 1).slice(2) : (y - 1) + '-' + String(y).slice(2);
   if (!c.cy || !Y.includes(c.cy)) c.cy = Y[0];
   const pick = (cat, y) => { const rs = cat.rows.filter(r => r.year === y); if (!rs.length) return null; return (rs.find(r => !r.tid && !/^[A-Z]{2,4}$/.test(String(r.sub || ''))) || rs[rs.length - 1]).vals; };
   const ORDN = ['GP', 'GS', 'MIN', 'PTS', 'FG%', 'FG', '3P%', '3PT%', '3PT', 'FT%', 'FT', 'OR', 'DR', 'REB', 'AST', 'TO', 'STL', 'BLK', 'PF'];
@@ -3612,7 +3616,7 @@ function renderLV() {
   else if (!c || (c.loading && !c.cats)) body = (v.kind === 'standings' ? standingsHTML(v, {}).replace(/<div class="msg">.*$/, '') : '') + msg('Loading…');
   else if (c.err && !c.cats) body = msg(c.err);
   else body = v.kind === 'standings' ? standingsHTML(v, c) : lstatsHTML(v, c);
-  const ysel = (() => { const Y = brYears(v.league), y = (ls ? v.sy : v.brY) || Y[0], op = ls ? v.syOpen : v.brOpen, yl = yy => ls ? seasonLbl2(v.league, yy) : v.league === 'nfl' ? String(yy) : (yy - 1) + '-' + String(yy).slice(2);
+  const ysel = (() => { const Y = brYears(v.league), y = (ls ? v.sy : v.brY) || Y[0], op = ls ? v.syOpen : v.brOpen, yl = yy => ls ? seasonLbl2(v.league, yy) : v.league === 'nfl' ? yy + '-' + String(yy + 1).slice(2) : (yy - 1) + '-' + String(yy).slice(2);
       return `<div class="ysel tys"><button class="ybtn" ${ls ? 'data-lsyo' : 'data-bryo'}="1">${esc(yl(y))}<i class="chev ${op ? 'up' : ''}"></i></button>${op ? `<div class="ylist">${Y.map(x => `<button ${ls ? 'data-lsy' : 'data-bry'}="${x}" class="${x === y ? 'on' : ''}">${esc(yl(x))}</button>`).join('')}</div>` : ''}</div>`; })();
   const top = ls ? `<div class="seg pseg lvseg"><button data-lvtm="players" class="${tm ? '' : 'on'}">Players</button><button data-lvtm="teams" class="${tm ? 'on' : ''}">Teams</button></div>` : `<div class="lvt">${esc(title)}</div>`;
   $app.innerHTML = `
@@ -4132,12 +4136,12 @@ $app.addEventListener('click', ev => {
     loadList();
   } else if (d.tab) {
     window._twReset = 1;
-    if (b.closest('.dtabs')) state.game.gsort = {}; state.game.tab = d.tab; state.game.tabSet = true; if (b.closest('.dtabs')) window.scrollTo(0, 0); render();
+    if (b.closest('.dtabs')) state.game.gsort = {}; state.game.tab = d.tab; state.game.tabSet = true; if (b.closest('.dtabs')) smoothTop(); render();
   } else if (d.xp !== undefined) {
     const e = state.player.exp = state.player.exp || new Set(); if (e.has(d.xp)) e.delete(d.xp); else e.add(d.xp); render();
   } else if (d.ptab) {
     window._twReset = 1;
-    if (b.closest('.iseg') && state.player.tab !== d.ptab) window.scrollTo(0, 0); state.player.tab = d.ptab; if (d.ptab === 'ov' || d.ptab === 'news') state.player.infoSub = d.ptab; state.player.glsort = {}; state.player.csort = {}; render();
+    if (b.closest('.dtabs') && state.player.tab !== d.ptab) smoothTop(); else if (b.closest('.iseg') && state.player.tab !== d.ptab) window.scrollTo(0, 0); state.player.tab = d.ptab; if (d.ptab === 'ov' || d.ptab === 'news') state.player.infoSub = d.ptab; state.player.glsort = {}; state.player.csort = {}; render();
   } else if (d.spm) {
     state.game.spm = d.spm; render();
   } else if (d.scf) {
@@ -4152,7 +4156,7 @@ $app.addEventListener('click', ev => {
     state.game.pvTeam = +d.pvt; render();
   } else if (d.ttab) {
     window._twReset = 1;
-    state.team.sort = {}; if (b.closest('.iseg') && state.team.tab !== d.ttab) window.scrollTo(0, 0); state.team.tab = d.ttab; if (d.ttab === 'news' || d.ttab === 'roster') state.team.infoSub = d.ttab; if (d.ttab === 'stats' && state.team.done) loadTeamPlayers(state.team); render();
+    state.team.sort = {}; if (b.closest('.dtabs') && state.team.tab !== d.ttab) smoothTop(); else if (b.closest('.iseg') && state.team.tab !== d.ttab) window.scrollTo(0, 0); state.team.tab = d.ttab; if (d.ttab === 'news' || d.ttab === 'roster') state.team.infoSub = d.ttab; if (d.ttab === 'stats' && state.team.done) loadTeamPlayers(state.team); render();
   } else if (d.team !== undefined) {
     state.game.team = parseInt(d.team); render();
   } else if (d.refresh !== undefined) {
