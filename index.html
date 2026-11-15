@@ -570,9 +570,9 @@ tr.zb > td{background:#26262a !important}
 .jn{display:inline-block;width:24px;color:var(--mut);font-family:-apple-system,sans-serif;font-size:11px;font-weight:600}
 .pane > .blk:first-child{margin-top:6px}
 .sch th.n,.sch td.n{width:auto;min-width:92px}
-.sch.sch-nfl td.n{padding-left:22px !important}
-.sch.sch-nba td.n{padding-left:14px !important}
-.sch.sch-nhl td.n{padding-left:32px !important}
+.sch td.n{padding-left:14px !important}
+.sch.sch-nfl .rg.rgw:not(.w3){margin-right:12px}
+.sch.sch-nhl .rg.rgw:not(.w3){margin-right:12px}
 .sch{table-layout:fixed;width:100%}
 .schw{overflow:hidden}
 .sch .opp{width:auto;text-align:left;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -785,7 +785,8 @@ td.n .slg{width:20px;height:20px;object-fit:contain;vertical-align:-6px;margin-l
 .play.g .ast.nh{display:block}
 .sch .sc2.tmc b{font-weight:600;color:#fff}
 .sch .rg.lvr .sf{color:var(--live) !important;font-weight:700}
-.sch .rg.lvr .sc2 b{color:#fff}
+.sch .rg.lvr .sc2 b{color:var(--live)}
+.sch .rg.lvr .sc2 i{color:var(--live)}
 .sch .rg.lvr .ldot{width:7px;height:7px;border-radius:50%;background:var(--live);justify-self:center;animation:blink 1.4s infinite}
 @keyframes blink{50%{opacity:.25}}
 .rkbig{position:relative}
@@ -967,6 +968,19 @@ function fitNames(root) {
   (root || $app).querySelectorAll('[data-player] .pn').forEach(el => { if (el.children.length || el.dataset.fit) return; const t = el.textContent.trim(); if (!/\s/.test(t) || /\.\s/.test(t.split(' ')[0] + ' ')) return;
     if (el.scrollWidth > el.clientWidth + 1) { const sh = shortNm(t); if (sh !== t) { el.textContent = sh; el.dataset.fit = '1'; } } });
 }
+function tblAlign(root) {
+  (root || $app).querySelectorAll('.pane').forEach(pn => {
+    const G = [...pn.querySelectorAll('table.gst')]; const by = {};
+    G.forEach(tb => { const hr = tb.tHead && tb.tHead.rows[0]; if (hr) (by[hr.cells.length] = by[hr.cells.length] || []).push(tb); });
+    Object.values(by).forEach(list => { if (list.length < 2) return; list.forEach(tb => [...tb.tHead.rows[0].cells].forEach(c => { c.style.width = ''; c.style.minWidth = ''; }));
+      const n = list[0].tHead.rows[0].cells.length, W = []; for (let i = 0; i < n; i++) W[i] = Math.max(...list.map(tb => tb.tHead.rows[0].cells[i].getBoundingClientRect().width));
+      list.forEach(tb => [...tb.tHead.rows[0].cells].forEach((c, i) => { c.style.width = W[i] + 'px'; c.style.minWidth = W[i] + 'px'; })); });
+    const N = [...pn.querySelectorAll('table.nfx')].filter(tb => !tb.closest('.ghost') || true); if (N.length < 2) return;
+    const nw = tb => { const th = tb.querySelector('th.n'); return th ? th.getBoundingClientRect().width : 0; }, fit = tb => { const w = tb.closest('.tw'); return !w || tb.offsetWidth <= w.clientWidth + 1; };
+    N.forEach(tb => { if (tb.dataset.aw) { tb.style.width = tb.dataset.aw; tb.querySelector('colgroup col').style.width = ''; } });
+    const F = N.filter(fit), base = F.length ? Math.min(...F.map(nw)) : 0; if (!base) return;
+    N.forEach(tb => { const cs = tb.querySelectorAll('colgroup col'); if (!cs.length || fit(tb) || nw(tb) >= base - 1) return; if (!tb.dataset.aw) tb.dataset.aw = tb.style.width; let sum = 0; [...cs].slice(1).forEach(c => { sum += parseFloat(c.style.width) || 0; }); cs[0].style.width = base + 'px'; tb.style.width = (base + sum) + 'px'; }); });
+}
 function pmAlign(root) {
   (root || $app).querySelectorAll('table').forEach(tb => { const hr = tb.tHead && tb.tHead.rows[tb.tHead.rows.length - 1]; if (!hr) return; let ci = -1, c = 0; [...hr.cells].forEach(x => { if (x.textContent.trim() === '+/-') ci = c; c += x.colSpan || 1; }); if (ci < 0 || !tb.tBodies[0]) return;
     const L = Math.max(1, ...[...tb.tBodies[0].rows].map(r => { const m = r.cells[ci] && r.cells[ci].textContent.trim().match(/^([+-]?)(\d+)$/); return m ? m[2].length : 0; }));
@@ -1003,21 +1017,21 @@ function tabHTML(k) {
   const pop = () => document.getElementById('wpov') || document.getElementById('brpop');
   const keyOf = b => b && (b.dataset.tab || b.dataset.ptab || b.dataset.ttab);
   const apply = () => { raf = 0; if (!S || !S.hz) return; const x = S.x;
-    S.el.style.transform = `translate3d(${x}px,0,0)`; if (S.hp) S.hp.style.transform = `translate3d(${x}px,0,0)`; S.gh.forEach(g => g.style.transform = `translate3d(${x + g._off * S.P}px,0,0)`);
+    S.el.style.transform = `translate3d(${x}px,0,0)`; if (S.hp) S.hp.style.transform = `translate3d(${x}px,0,0)`; if (S.ap) S.ap.style.transform = `translate3d(${x}px,0,0)`; S.gh.forEach(g => g.style.transform = `translate3d(${x + g._off * S.P}px,0,0)`);
     if (S.strip) { S.strip.scrollLeft = S.sl0 - (x / S.P) * S.iw; const k = S.cur + (x < -S.P / 2 ? 1 : x > S.P / 2 ? -1 : 0); if (k !== S.onk && S.items[k]) { S.items.forEach(b => b.classList.remove('on')); S.items[k].classList.add('on'); S.onk = k; } } };
   const stripTo = (st, to, ms) => { const s2 = st.strip; if (!s2) return; const a = s2.scrollLeft, b = st.sl0 - (to / st.P) * st.iw, t0 = performance.now();
     const k = st.cur + (to < 0 ? 1 : to > 0 ? -1 : 0); if (st.items[k]) { st.items.forEach(x => x.classList.remove('on')); st.items[k].classList.add('on'); }
     const f = now => { const u = Math.min(1, (now - t0) / ms), e = 1 - Math.pow(1 - u, 3); s2.scrollLeft = a + (b - a) * e; if (u < 1 && st.strip) requestAnimationFrame(f); }; requestAnimationFrame(f); };
-  const anim = (st, to, ms, done) => { const els = [st.el, ...st.gh].concat(st.hp ? [st.hp] : []); if (st.hp) st.hp.style.transform = `translate3d(${to}px,0,0)`;
+  const anim = (st, to, ms, done) => { const els = [st.el, ...st.gh].concat(st.hp ? [st.hp] : [], st.ap ? [st.ap] : []); if (st.hp) st.hp.style.transform = `translate3d(${to}px,0,0)`; if (st.ap) st.ap.style.transform = `translate3d(${to}px,0,0)`;
     els.forEach(e => { e.style.transition = `transform ${ms}ms cubic-bezier(.2,.8,.2,1)`; });
     st.el.style.transform = `translate3d(${to}px,0,0)`; st.gh.forEach(g => g.style.transform = `translate3d(${to + g._off * st.P}px,0,0)`);
     stripTo(st, to, ms);
     setTimeout(() => { done && done(); }, ms + 10); };
-  const cleanup = st => { st.gh.forEach(g => g.remove()); if (st.strip && st.strip.isConnected) { st.strip.style.scrollSnapType = ''; } st.strip = null; if (st.el) { st.el.style.transition = ''; st.el.style.transform = ''; st.el.style.willChange = ''; } if (st.hp) { st.hp.style.transition = ''; st.hp.style.transform = ''; } };
+  const cleanup = st => { st.gh.forEach(g => g.remove()); if (st.strip && st.strip.isConnected) { st.strip.style.scrollSnapType = ''; } st.strip = null; if (st.el) { st.el.style.transition = ''; st.el.style.transform = ''; st.el.style.willChange = ''; } if (st.hp) { st.hp.style.transition = ''; st.hp.style.transform = ''; } if (st.ap) { st.ap.style.transition = ''; st.ap.style.transform = ''; } };
   const ghost = (st, html, off) => { const g = document.createElement('div'); g.className = st.cls + ' ghost'; g._off = off;
     g.style.cssText = `position:absolute;top:${st.el.offsetTop}px;left:${st.el.offsetLeft}px;width:${st.W}px;min-height:${st.mode === 'day' ? Math.max(st.el.offsetHeight, window.innerHeight) : 0}px;margin:0;pointer-events:none;will-change:transform;transform:translate3d(${off * st.P}px,0,0)`;
     g.style.setProperty('margin', '0', 'important'); if (st.mode === 'day') { const cs = getComputedStyle(st.el); g.style.padding = cs.padding; g.style.boxSizing = 'border-box'; }
-    g.innerHTML = html; try { relabel(g); markSort(g); zebra(g); dashAlign(g); pmAlign(g); } catch (e) {} st.el.parentNode.appendChild(g); try { alignGrp(g); if (st.mode !== 'day') addGlossary(topView(), g); } catch (e) {} if (st.mode !== 'day' && g.querySelector('.nws')) { const h = window._ovH || +(localStorage.getItem('ovH') || 0) || 415; g.style.minHeight = h + 'px'; g.classList.add('nwp'); } else if (st.mode !== 'day' && g.querySelector('tr.nomore')) { const h = window._ovH || +(localStorage.getItem('ovH') || 0); if (h > 200) g.style.minHeight = h + 'px'; }
+    g.innerHTML = html; try { relabel(g); markSort(g); zebra(g); dashAlign(g); pmAlign(g); } catch (e) {} st.el.parentNode.appendChild(g); try { tblAlign(g.parentNode); alignGrp(g); if (st.mode !== 'day') addGlossary(topView(), g); } catch (e) {} if (st.mode !== 'day' && g.querySelector('.nws')) { const h = window._ovH || +(localStorage.getItem('ovH') || 0) || 415; g.style.minHeight = h + 'px'; g.classList.add('nwp'); } else if (st.mode !== 'day' && g.querySelector('tr.nomore')) { const h = window._ovH || +(localStorage.getItem('ovH') || 0); if (h > 200) g.style.minHeight = h + 'px'; }
     st.gh.push(g);
     if (st.hp) { const c = st.hp.cloneNode(true); c._off = off; c.classList.add('ghost'); const day = st.hpGap == null; c.style.cssText = `position:absolute;left:${day ? st.hp.offsetLeft : g.offsetLeft}px;width:${day ? st.hp.offsetWidth : g.offsetWidth}px;top:${day ? st.hpTop : g.offsetTop + g.offsetHeight + st.hpGap}px;margin:0;pointer-events:none;will-change:transform;transform:translate3d(${off * st.P}px,0,0)`; st.el.parentNode.appendChild(c); st.gh.push(c); } };
   document.addEventListener('touchcancel', () => { const st = S; S = null; if (!st || !st.hz) return; if (raf) { cancelAnimationFrame(raf); raf = 0; } anim(st, 0, 200, () => cleanup(st)); }, { passive: true });
@@ -1035,7 +1049,7 @@ function tabHTML(k) {
       if (Math.abs(dy) > 10 && Math.abs(dy) > Math.abs(dx)) { S = null; return; }
       if (Math.abs(dx) < 8) return;
       if (S.tw && S.tw.scrollWidth > S.tw.clientWidth + 2) { const atL = S.st0 <= 1, atR = S.st0 >= S.tw.scrollWidth - S.tw.clientWidth - 1; if (!((dx > 0 && atL) || (dx < 0 && atR))) { S = null; return; } }
-      { const ap = document.getElementById('artpop'); if (ap) { ap.remove(); document.body.style.overflow = ''; } }
+      { const ap = document.querySelector('#artpop .artbox'); if (ap && S.mode === 'tab') S.ap = ap; }
       S.hz = true; S.W = S.el.offsetWidth; S.P = S.W + (S.mode === 'tab' ? 18 : 0); S.el.parentNode.style.position = 'relative';
       { const hp = $app.querySelector(':scope > .hpw'); if (hp) { S.hp = hp; S.hpGap = S.mode === 'tab' ? hp.getBoundingClientRect().top - S.el.getBoundingClientRect().bottom : null; S.hpTop = hp.offsetTop; } } S.el.style.willChange = 'transform'; S.x0 = t.clientX;
       [[S.cur - 1, -1], [S.cur + 1, 1]].forEach(([k, off]) => { if (k < 0 || k >= S.items.length) return;
@@ -1052,7 +1066,7 @@ function tabHTML(k) {
     const vel = (st.x - (st.lx || 0)) / Math.max(1, (st.tt || 0) - (st.lt || 0)), dir = st.x < 0 ? 1 : -1, j = st.cur + dir;
     const go = j >= 0 && j < st.items.length && (Math.abs(st.x) > st.W * .22 || (Math.abs(vel) > .45 && Math.sign(vel) === Math.sign(st.x)));
     if (!go) { anim(st, 0, 220, () => cleanup(st)); return; }
-    anim(st, -dir * st.P, 240, () => { if (st.mode === 'day') { st.items.forEach(b => b.classList.remove('on')); st.items[j].classList.add('on'); window._noStripAnim = 1; } window._noSlide = 1; st.items[j].click(); cleanup(st); });
+    anim(st, -dir * st.P, 240, () => { if (st.mode === 'day') { st.items.forEach(b => b.classList.remove('on')); st.items[j].classList.add('on'); window._noStripAnim = 1; } window._noSlide = 1; { const ap = document.getElementById('artpop'); if (ap) { ap.remove(); document.body.style.overflow = ''; } } st.items[j].click(); cleanup(st); });
   }, { passive: true });
 })();
 (() => { let tm = null, st = null, ready = null, x0 = 0, y0 = 0, HOLD = 1000;
@@ -1427,11 +1441,11 @@ window.isSAm = () => navigator.standalone === true || (window.matchMedia && matc
 (() => { let E = null; const reset = () => { $app.style.transition = ''; $app.style.transform = ''; $app.style.willChange = ''; };
   document.addEventListener('touchstart', e => { E = null; if (!isSAm() || e.touches.length !== 1 || topView() === 'list' || document.getElementById('wpov')) return; const x = e.touches[0].clientX; if (x > 24) return; E = { x0: x, y0: e.touches[0].clientY, dx: 0, on: false }; }, { passive: true });
   document.addEventListener('touchmove', e => { if (!E) return; const t = e.touches[0], dx = t.clientX - E.x0, dy = t.clientY - E.y0;
-    if (!E.on) { if (Math.abs(dy) > 12 && Math.abs(dy) > dx) { E = null; return; } if (dx < 10) return; E.on = true; $app.style.willChange = 'transform'; const ap = document.getElementById('artpop'); if (ap) { ap.remove(); document.body.style.overflow = ''; } }
+    if (!E.on) { if (Math.abs(dy) > 12 && Math.abs(dy) > dx) { E = null; return; } if (dx < 10) return; E.on = true; $app.style.willChange = 'transform'; const ap = document.getElementById('artpop'); if (ap) ap.style.visibility = 'hidden'; }
     E.dx = Math.max(0, dx); $app.style.transform = `translate3d(${E.dx}px,0,0)`; }, { passive: true });
   const end = () => { const st = E; E = null; if (!st || !st.on) return; const W = window.innerWidth, go = st.dx > W * .28;
     $app.style.transition = 'transform .22s cubic-bezier(.2,.8,.2,1)'; $app.style.transform = `translate3d(${go ? W : 0}px,0,0)`;
-    setTimeout(() => { if (go) { const bb = $app.querySelector('[data-back]'); $app.style.transition = ''; $app.style.opacity = '0'; let done = false; const fin = () => { if (done) return; done = true; requestAnimationFrame(() => { reset(); $app.style.opacity = ''; }); }; window.addEventListener('hashchange', () => setTimeout(fin, 0), { once: true }); setTimeout(fin, 400); if (bb) bb.click(); else history.back(); } else reset(); }, 230); };
+    setTimeout(() => { { const ap = document.getElementById('artpop'); if (ap) { if (go) { ap.remove(); document.body.style.overflow = ''; } else ap.style.visibility = ''; } } if (go) { const bb = $app.querySelector('[data-back]'); $app.style.transition = ''; $app.style.opacity = '0'; let done = false; const fin = () => { if (done) return; done = true; requestAnimationFrame(() => { reset(); $app.style.opacity = ''; }); }; window.addEventListener('hashchange', () => setTimeout(fin, 0), { once: true }); setTimeout(fin, 400); if (bb) bb.click(); else history.back(); } else reset(); }, 230); };
   document.addEventListener('touchend', end, { passive: true }); document.addEventListener('touchcancel', end, { passive: true });
 })();
 function smoothTop(ms) { ms = ms || 380; const y0 = window.scrollY; cancelAnimationFrame(_stA); if (y0 < 2) { window.scrollTo(0, 0); return; }
@@ -1472,6 +1486,7 @@ function render() {
   try { zebra(); } catch (e) {}
   try { dashAlign(); } catch (e) {}
   try { pmAlign(); } catch (e) {}
+  try { tblAlign(); } catch (e) {}
   try { stickTop(v); } catch (e) {}
   try { const pn = $app.querySelector('.pane'); if (pn && v === 'player' && state.player && state.player.tab === 'ov' && state.player.done && pn.querySelector('.ssum') && pn.querySelector('.glsec') && !pn.querySelector('tr.nomore')) { const h = pn.offsetHeight; if (h > 200) { window._ovH = h; try { localStorage.setItem('ovH', String(h)); } catch (e) {} } }
     const nwOn = (v === 'player' && state.player && (state.player.tab === 'news' || (state.player.tab === 'ov' && state.player.done && !(pn && pn.querySelector('.ssum') && pn.querySelector('.glsec') && !pn.querySelector('tr.nomore'))))) || (v === 'team' && state.team && state.team.tab === 'news'); if (pn && nwOn) { const h = window._ovH || +(localStorage.getItem('ovH') || 0) || 415; if (h > 200) pn.style.minHeight = h + 'px'; if (pn.querySelector('.nws')) pn.classList.add('nwp'); } } catch (e) {}
@@ -1487,6 +1502,8 @@ function render() {
   addGlossary(v);
   $app.querySelectorAll('img[src*="/teamlogos/"]').forEach(im => { const d = dk(im.getAttribute('src')); if (d !== im.getAttribute('src')) im.setAttribute('src', d); });
   if (tws) document.querySelectorAll('.tw').forEach((x, i) => { if (tws[i]) x.scrollLeft = tws[i]; });
+  if (!same) document.body.style.minHeight = '';
+  if (window._backPend && y > 0) document.body.style.minHeight = (y + window.innerHeight) + 'px';
   window.scrollTo(0, y); if (window._backPend && Math.abs(window.scrollY - (window._backY || 0)) < 2) window._backPend = false;
 }
 const dk = u => String(u || '').replace(/(\/teamlogos\/\w+\/)500\/(?:scoreboard\/)?([\w-]+\.png)/, '$1500-dark/$2');
@@ -2920,6 +2937,15 @@ function statsTabHTML(p) {
 
 /* ---------- tým ---------- */
 const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+function liveOf(t, e) {
+  const pools = [state.events || []].concat(Object.values(state.dayC || {}).filter(Array.isArray)), f = x => x && String(x.id) === String(e.id) && x.state === 'in' ? x : null;
+  const stale = !t.live || (!t.live.p && Date.now() - t.live.ts > 25e3);
+  if (stale) { t.live = Object.assign(t.live || {}, { p: 1 });
+    getJson(API + LEAGUES[t.league].path + '/scoreboard', true).then(j => ({ evs: ((j && j.events) || []).map(normEvent) })).then(r => { t.live = { evs: r.evs || [], ts: Date.now() }; if (state.team === t && topView() === 'team' && t.tab === 'sched' && t.live.evs.some(x => x.state === 'in')) render(); }).catch(() => { t.live = { evs: [], ts: Date.now() }; }); }
+  const L = t.live && t.live.evs && t.live.evs.find(f); if (L) return L;
+  for (const P of pools) { const x = P.find(f); if (x) return x; }
+  return null;
+}
 function teamHead(t) {
   const meta = (state.teamList[t.league] || []).find(x => x.id === t.id) || {};
   const pre = t.pre || {};
@@ -3025,7 +3051,9 @@ function scheduleHTML(t) {
     let res;
     const lgc = t.league === 'nba' ? ' w3' : t.league === 'nhl' ? ' w1' : '', tsc = x => { const m = String(x).match(/^(\d{1,2}):(\d{2})$/); return m ? `<span class="sc2 tmc"><b>${m[1]}</b><i>:</i><b>${m[2]}</b></span>` : `<span class="tm">${esc(x)}</span>`; };
     if (e.state === 'pre') res = `<span class="rg rgw${lgc}"><i></i>${e.tbd ? '<span class="tm">TBD</span>' : tsc(fmtTime(e.date))}<i></i></span>`;
-    else if (e.state === 'in') { const per = (String(e.short).split(/\s*-\s*/)[1] || String(e.short)).replace(/^(End|Start) of /i, '').replace(/ (Quarter|Period)$/i, ''), hs = mine.score != null && mine.score !== '' && opp.score != null && opp.score !== '';
+    else if (e.state === 'in') { const lv = liveOf(t, e); if (lv) { e = Object.assign({}, e, { short: lv.short || e.short, home: Object.assign({}, e.home, { score: lv.home.score }), away: Object.assign({}, e.away, { score: lv.away.score }) }); }
+      const mine = e.home.id === t.id ? e.home : e.away, opp = mine === e.home ? e.away : e.home;
+      const per = (String(e.short).split(/\s*-\s*/)[1] || String(e.short)).replace(/^(End|Start) of /i, '').replace(/ (Quarter|Period)$/i, ''), hs = mine.score != null && mine.score !== '' && opp.score != null && opp.score !== '';
       const clk = String(e.short).split(/\s*-\s*/)[0];
       res = !hs && /\d/.test(clk) ? `<span class="rg rgw lvr${lgc}"><small class="sf">${esc(per)}</small>${tsc(clk)}<span class="ldot"></span></span>` : hs ? `<span class="rg rgw lvr${lgc}"><small class="sf">${esc(per)}</small><span class="sc2"><b>${esc(mine.score)}</b><i>:</i><b>${esc(opp.score)}</b></span><span class="ldot"></span></span>` : `<span class="live">${esc(e.short)}</span>`; }
     else {
@@ -3036,7 +3064,7 @@ function scheduleHTML(t) {
       <td class="opp"><small>${mine === e.home ? 'vs' : '@'}</small>${logoImg(opp.logo || teamLogoOf(t.league, opp))}<b>${esc(teamShortOf(t.league, opp))}</b></td><td class="rs">${res}</td></tr>`;
   };
   let html = '', cur = null, rows = '';
-  const flush = () => { if (cur !== null && rows) html += `<section class="blk"><div class="schw"><table class="sch sch-${t.league}"><colgroup><col style="width:74px"><col><col style="width:134px"></colgroup><thead><tr><th class="n">${esc(cur || 'Games')}</th><th></th><th></th></tr></thead><tbody>${rows}</tbody></table></div></section>`; rows = ''; };
+  const flush = () => { if (cur !== null && rows) html += `<section class="blk"><div class="schw"><table class="sch sch-${t.league}"><colgroup><col style="width:100px"><col><col style="width:134px"></colgroup><thead><tr><th class="n">${esc(cur || 'Games')}</th><th></th><th></th></tr></thead><tbody>${rows}</tbody></table></div></section>`; rows = ''; };
   if (t.league === 'nfl') {
     const rk = n => /pre/i.test(n) ? 0 : /post|playoff/i.test(n) ? 2 : 1;
     [...sorted].sort((a, b) => rk(a.stype || '') - rk(b.stype || '') || new Date(a.date) - new Date(b.date)).forEach(e => { const st = e.stype || ''; if (st !== cur) { flush(); cur = st; } rows += row(e); });
@@ -3926,9 +3954,9 @@ async function loadLeaders() {
     rc.forEach((c, ci) => (c.labels || []).forEach((l, k) => { cols.push({ label: l, name: (c.names || [])[k] || l, ci: c.name, k }); }));
     const WANT = {
       nba: ['gamesPlayed', 'avgMinutes', 'avgPoints', 'avgFieldGoalsMade', 'avgFieldGoalsAttempted', 'fieldGoalPct', 'avgThreePointFieldGoalsMade', 'avgThreePointFieldGoalsAttempted', 'threePointFieldGoalPct', 'avgFreeThrowsMade', 'avgFreeThrowsAttempted', 'freeThrowPct', 'avgRebounds', 'avgAssists', 'avgSteals', 'avgBlocks', 'avgTurnovers', 'doubleDouble', 'tripleDouble'],
-      nhl: cg === 'goaltending' ? ['gamesPlayed', 'games', 'wins', 'losses', 'overtimeLosses', 'otLosses', 'goalsAgainstAverage', 'avgGoalsAgainst', 'shotsAgainst', 'goalsAgainst', 'saves', 'savePct', 'shutouts', 'timeOnIcePerGame'] : ['gamesPlayed', 'goals', 'assists', 'points', 'plusMinus', 'penaltyMinutes', 'shotsTotal', 'shootingPct', 'powerPlayGoals', 'shortHandedGoals', 'gameWinningGoals', 'timeOnIcePerGame']
+      nhl: cg === 'goaltending' ? ['gamesPlayed', 'games', 'wins', 'losses', 'overtimeLosses', 'otLosses', 'goalsAgainstAverage', 'avgGoalsAgainst', 'shotsAgainst', 'goalsAgainst', 'saves', 'savePct', 'shutouts', 'timeOnIcePerGame'] : ['gamesPlayed', 'goals', 'assists', 'points', 'plusMinus', 'penaltyMinutes', 'shotsTotal', 'shootingPct', 'powerPlayGoals', 'powerPlayAssists', 'shortHandedGoals', 'shortHandedAssists', 'gameWinningGoals', 'timeOnIcePerGame']
     };
-    if (WANT[v.league]) { const f = WANT[v.league].map(n => cols.find(c => c.name === n)).filter(Boolean); if (f.length >= 3) cols = f; else { const seen = new Set(); cols = cols.filter(c => !seen.has(c.label) && seen.add(c.label)); } }
+    if (WANT[v.league]) { const LB = { powerPlayGoals: 'PPG', powerPlayAssists: 'PPA', shortHandedGoals: 'SHG', shortHandedAssists: 'SHA', gameWinningGoals: 'GWG' }; const f = [...new Set(WANT[v.league].map(n => cols.find(c => c.name === n) || cols.find(c => String(c.name).toLowerCase() === n.toLowerCase()) || (LB[n] && cols.find(c => String(c.label).toUpperCase() === LB[n]))).filter(Boolean))]; if (f.length >= 3) cols = f; else { const seen = new Set(); cols = cols.filter(c => !seen.has(c.label) && seen.add(c.label)); } }
     else if (v.league === 'nfl' && cg) { const grp = cg.split(':').pop().replace(/e$/, '').toLowerCase(); let gpDone = false; const f = cols.filter(c => c.ci === 'general' ? (/gamesPlayed/i.test(c.name) && !gpDone && (gpDone = true)) : String(c.ci).toLowerCase().indexOf(grp) === 0 || (grp === 'defens' && /defensive/i.test(c.ci))); const seen = new Set(); cols = (f.length >= 3 ? f : cols).filter(c => { const k = c.label + '|' + (f.length >= 3 ? c.ci : ''); return !seen.has(k) && seen.add(k); }); }
     else { const seen = new Set(); cols = cols.filter(c => !seen.has(c.label) && seen.add(c.label)); }
     const rows = (j.athletes || []).map(a => {
@@ -4304,6 +4332,7 @@ setInterval(() => {
   if (document.hidden) return;
   const v = topView();
   if (v === 'game') { if (state.game.ev && state.game.ev.state === 'in') loadGame(); }
+  if (v === 'team' && state.team && state.team.tab === 'sched' && (state.team.events || []).some(e => e.state === 'in')) { if (state.team.live) state.team.live.ts = 0, state.team.live.p = 0; render(); }
   if (state.league !== 'fav' && state.events.some(e => e.state === 'in') && (v === 'list' || v === 'game' || v === 'team' || v === 'player' || v === 'lv')) loadList(true);
 }, 30000);
 document.addEventListener('visibilitychange', () => {
