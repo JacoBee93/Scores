@@ -400,6 +400,15 @@ body{min-height:100vh}
 .rch{font-weight:700;font-size:16px;line-height:1.3}
 .rcd{font-size:13.5px;color:var(--mut);margin-top:5px;line-height:1.35}
 .rcm{font-size:13px;font-weight:600;color:#8ab4ff;margin-top:8px}
+.iseg{margin:2px auto 10px !important}
+.nws{display:flex;flex-direction:column;gap:10px;margin:4px 0 2px}
+.nwi{display:flex;gap:12px;align-items:center;background:#2c2c2e;border-radius:22px;padding:10px;cursor:pointer}
+.nwi:active{opacity:.7}
+.nwim{flex:none;width:104px;height:68px;border-radius:14px;object-fit:cover;background:#3a3a3c;display:block}
+.nwt{min-width:0;flex:1}
+.nwh{font-weight:700;font-size:14.5px;line-height:1.3;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.nwd{font-size:12px;color:var(--mut);margin-top:4px}
+.pane > .glsec:last-child{margin-bottom:0}
 #artpop{position:fixed;inset:0;z-index:160;background:rgba(0,0,0,.65);display:flex;align-items:flex-end;justify-content:center}
 .artbox{position:relative;width:100%;max-width:620px;max-height:88vh;overflow-y:auto;background:#1c1c1e;border-radius:22px 22px 0 0;padding:18px 18px calc(28px + env(safe-area-inset-bottom));box-sizing:border-box;-webkit-overflow-scrolling:touch}
 .artbox h2{font-size:21px;line-height:1.25;margin:4px 40px 6px 0}
@@ -954,8 +963,8 @@ function tabHTML(k) {
   const v = topView();
   try {
     if (v === 'game') { const g = state.game; return k === 'preview' ? gOvSeg(g, k) + previewHTML(g) : k === 'summary' ? gOvSeg(g, k) + summaryGameHTML(g) : k === 'tstats' ? teamStatsGameHTML(g) : k === 'stats' ? statsHTML(g) : playsHTML(g); }
-    if (v === 'player') { const p = state.player; if (!p.done) return ''; return k === 'ov' ? overviewHTML(p) : k === 'gl' ? gamelogFull(p) : k === 'bio' ? bioHTML(p) : statsTabHTML(p); }
-    if (v === 'team') { const t = state.team; if (!t.done) return ''; return k === 'roster' ? rosterHTML(t) : k === 'sched' ? scheduleHTML(t) : k === 'inj' ? teamInjHTML(t) : teamStatsHTML(t); }
+    if (v === 'player') { const p = state.player; if (!p.done) return ''; return (k === 'ov' || k === 'news') ? playerInfoHTML(p, k) : k === 'gl' ? gamelogFull(p) : k === 'bio' ? bioHTML(p) : statsTabHTML(p); }
+    if (v === 'team') { const t = state.team; if (!t.done) return ''; return (k === 'roster' || k === 'news') ? teamInfoHTML(t, k) : k === 'sched' ? scheduleHTML(t) : k === 'inj' ? teamInjHTML(t) : teamStatsHTML(t); }
   } catch (e) {}
   return '';
 }
@@ -1627,6 +1636,44 @@ function penaltiesHTML(g) {
     const m = String(p.text || '').match(/(\d+)\s*min/i);
     return `<div class="play g"><span class="pl">${lg ? `<img src="${esc(lg)}" alt="" onerror="this.style.visibility='hidden'">` : ''}</span><span class="clk">${esc((p.clock && p.clock.displayValue) || '')}</span><span class="txt">${m ? `<span class="sco">${esc(m[1])} MIN</span>` : ''}${esc(p.text || p.shortText || '')}</span></div>`; }).join('')}</section>`).join('');
 }
+
+/* ----- news ----- */
+const isVideoArt = a => /media|video/i.test(String(a.type || '')) || (!a.story && Array.isArray(a.video) && a.video.length > 0 && !(a.links && a.links.api && a.links.api.news));
+async function loadNews(o, lg, kind) {
+  if (!o || o.news) return; const nw = o.news = { loading: true }, id = String(o.id), path = LEAGUES[lg].path, SA = 'https://site.api.espn.com/apis/site/v2/sports/' + path;
+  const urls = kind === 'player' ? [[WEB + path + '/athletes/' + id + '/overview', 0], [SA + '/news?player=' + id + '&limit=40', 1], [SA + '/news?athletes=' + id + '&limit=40', 1]]
+    : [[SA + '/news?team=' + id + '&limit=40', 1], [SA + '/teams/' + id + '/news?limit=40', 1]];
+  let items = [];
+  for (const [u, chk] of urls) { try { const j = await getJson(u); let arr = (j && (j.news || j.articles)) || []; if (!Array.isArray(arr)) arr = arr.articles || arr.items || [];
+      arr = arr.filter(a => a && a.headline && !isVideoArt(a));
+      if (chk) { const mine = c => kind === 'player' ? String(c.athleteId || (c.athlete && c.athlete.id) || '') === id : String(c.teamId || (c.team && c.team.id) || '') === id;
+        if (arr.some(a => Array.isArray(a.categories) && a.categories.length)) arr = arr.filter(a => (a.categories || []).some(mine)); else arr = []; }
+      if (arr.length) { items = arr; break; } } catch (e) {} }
+  items.sort((a, b) => new Date(b.published || b.lastModified || 0) - new Date(a.published || a.lastModified || 0));
+  nw.items = items.slice(0, 5); nw.loading = false;
+  if ((kind === 'player' ? state.player : state.team) === o) render();
+}
+const agoTxt = iso => { const t = new Date(iso).getTime(); if (!t) return ''; const m = Math.round((Date.now() - t) / 60000); if (m < 60) return Math.max(1, m) + 'm ago'; const h = Math.round(m / 60); if (h < 24) return h + 'h ago'; const d = Math.round(h / 24); if (d < 7) return d + 'd ago'; const x = new Date(t); return x.getDate() + '.' + (x.getMonth() + 1) + '.' + x.getFullYear(); };
+function newsHTML(o, lg, kind) {
+  if (!o.news) { loadNews(o, lg, kind); return msg('Loading news…'); }
+  if (o.news.loading) return msg('Loading news…');
+  if (!o.news.items.length) return msg('No news available.');
+  return `<div class="nws">${o.news.items.map((a, i) => { const im = a.images && a.images.find(x => x && (x.url || x.href)), src = im ? (im.url || im.href) : '';
+    return `<div class="nwi" data-news="${i}" data-nk="${kind}">${src ? `<img class="nwim" src="${esc(src)}" alt="" loading="lazy" onerror="this.style.visibility='hidden'">` : '<span class="nwim"></span>'}<div class="nwt"><div class="nwh">${esc(a.headline)}</div><div class="nwd">${esc(agoTxt(a.published || a.lastModified))}</div></div></div>`; }).join('')}</div>`;
+}
+const infoSeg = (attr, a, b, cur) => `<div class="seg pseg iseg" style="max-width:240px"><button data-${attr}="${a[0]}" class="${cur === a[0] ? 'on' : ''}">${a[1]}</button><button data-${attr}="${b[0]}" class="${cur === b[0] ? 'on' : ''}">${b[1]}</button></div>`;
+function playerInfoHTML(p, k) { k = k || p.tab; return infoSeg('ptab', ['ov', 'Overview'], ['news', 'News'], k) + (k === 'news' ? newsHTML(p, p.league, 'player') : overviewHTML(p)); }
+function teamInfoHTML(t, k) { k = k || t.tab; return infoSeg('ttab', ['news', 'News'], ['roster', 'Roster'], k) + (k === 'news' ? newsHTML(t, t.league, 'team') : rosterHTML(t)); }
+async function openNews(kind, i) {
+  const o = kind === 'player' ? state.player : state.team, a0 = o && o.news && o.news.items && o.news.items[i]; if (!a0) return;
+  let a = a0;
+  if (!a.story) { showArt({ headline: a0.headline, description: 'Loading…' });
+    const api = a0.links && a0.links.api && ((a0.links.api.news && a0.links.api.news.href) || (a0.links.api.self && a0.links.api.self.href));
+    if (api) { try { const j = await getJson(String(api).replace(/^http:/, 'https:')); const h = (j.headlines && j.headlines[0]) || j.article || j; if (h && (h.story || h.description)) { a = Object.assign({}, a0, h); a0.story = h.story; } } catch (e) {} }
+    if (!document.getElementById('artpop')) return; }
+  const pn = kind === 'player' ? (o.name || (o.bio && o.bio.displayName) || '') : '', names = pn ? [pn] : [];
+  showArt(a, names, a.story ? '' : ((a0.links && a0.links.web && a0.links.web.href) || ''));
+}
 function recapCard(g) {
   const a = g.sum && g.sum.article; if (!a || !(a.headline || a.story || a.description)) return '';
   return `<section class="pv"><div class="sec">Recap</div><div class="rcp" data-artopen="1"><div class="rch">${esc(a.headline || '')}</div>${a.description ? `<div class="rcd">${esc(a.description)}</div>` : ''}<div class="rcm">Read more ›</div></div></section>`;
@@ -1635,6 +1682,10 @@ function openArticle() {
   const g = state.game, a = g && g.sum && g.sum.article; if (!a) return;
   const names = new Set(); ((g.sum.boxscore && g.sum.boxscore.players) || []).forEach(t => (t.statistics || []).forEach(st => (st.athletes || []).forEach(x => { if (x.athlete && x.athlete.displayName) names.add(x.athlete.displayName); })));
   ((g.sum.leaders) || []).forEach(t => (t.leaders || []).forEach(c => (c.leaders || []).forEach(l => { if (l.athlete && l.athlete.displayName) names.add(l.athlete.displayName); })));
+  showArt(a, [...names]);
+}
+function showArt(a, names0, web) {
+  const names = new Set(names0 || []);
   const lasts = [...names].map(n => n.split(' ').filter(w => !/^(Jr\.?|Sr\.?|II|III|IV)$/.test(w)).pop()).filter(l => l && l.length > 3);
   const list = [...new Set([...names, ...lasts])].filter(n => n.length > 3).sort((x, y) => y.length - x.length).map(n => n.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
   const re = list.length ? new RegExp('\\b(' + list.join('|') + ')\\b', 'g') : null;
@@ -1643,13 +1694,14 @@ function openArticle() {
   if (a.story) { const d = new DOMParser().parseFromString('<div>' + a.story + '</div>', 'text/html'); d.querySelectorAll('script,style,photo,video,alsosee,inline').forEach(x => x.remove());
     const ps = [...d.querySelectorAll('p, h2, h3')]; paras = (ps.length ? ps.map(p => [p.tagName, p.textContent.trim()]) : d.body.textContent.split(/\n{2,}/).map(t => ['P', t.trim()])).filter(x => x[1]); }
   else if (a.description) paras = [['P', a.description]];
-  const img = a.images && a.images[0] && (a.images[0].url || a.images[0].href);
-  const ov = document.createElement('div'); ov.id = 'artpop';
-  ov.innerHTML = `<div class="artbox"><button class="artx" data-artclose="1" aria-label="Close">×</button><h2>${esc(a.headline || '')}</h2>${a.byline ? `<div class="artby">${esc(a.byline)}</div>` : ''}${paras.map(([tg, t]) => /^H/.test(tg) ? `<h3>${hl(t)}</h3>` : `<p>${hl(t)}</p>`).join('')}</div>`;
-  document.body.appendChild(ov); document.body.style.overflow = 'hidden';
+  let ov = document.getElementById('artpop'); const keep = ov ? ov.querySelector('.artbox').scrollTop : 0;
+  if (!ov) { ov = document.createElement('div'); ov.id = 'artpop'; document.body.appendChild(ov); document.body.style.overflow = 'hidden'; }
+  ov.innerHTML = `<div class="artbox"><button class="artx" data-artclose="1" aria-label="Close">×</button><h2>${esc(a.headline || '')}</h2>${a.byline ? `<div class="artby">${esc(a.byline)}</div>` : ''}${paras.map(([tg, t]) => /^H/.test(tg) ? `<h3>${hl(t)}</h3>` : `<p>${hl(t)}</p>`).join('')}${web ? `<p><a class="rcm" href="${esc(web)}" target="_blank" rel="noopener">Read on ESPN ›</a></p>` : ''}</div>`;
+  ov.querySelector('.artbox').scrollTop = keep;
 }
 document.addEventListener('click', ev => {
   if (ev.target.closest('[data-artopen]')) { openArticle(); return; }
+  { const nwi = ev.target.closest('[data-news]'); if (nwi && !document.getElementById('artpop')) { openNews(nwi.dataset.nk, +nwi.dataset.news); return; } }
   const p = document.getElementById('artpop'); if (p && (ev.target.closest('[data-artclose]') || ev.target === p)) { p.remove(); document.body.style.overflow = ''; }
 });
 window.addEventListener('hashchange', () => { const p = document.getElementById('artpop'); if (p) { p.remove(); document.body.style.overflow = ''; } });
@@ -2391,7 +2443,7 @@ function playsHTML(g) {
 /* ----- stránka hráče ----- */
 function renderPlayer() {
   const p = state.player;
-  const body = !p.done ? msg('Loading…') : p.tab === 'ov' ? overviewHTML(p) : p.tab === 'gl' ? gamelogFull(p) : p.tab === 'bio' ? bioHTML(p) : statsTabHTML(p);
+  const body = !p.done ? msg('Loading…') : (p.tab === 'ov' || p.tab === 'news') ? playerInfoHTML(p) : p.tab === 'gl' ? gamelogFull(p) : p.tab === 'bio' ? bioHTML(p) : statsTabHTML(p);
   const sub = [p.jersey ? '#' + p.jersey : '', p.pos].filter(Boolean).join(' · ');
   const ptm = p.bio && p.bio.team, plogo = ptm && !(p.bio.active === false) ? dk((ptm.logos && ptm.logos[0] && ptm.logos[0].href) || ptm.logo || ((state.teamList[p.league] || []).find(x => x.id === String(ptm.id)) || {}).logo || '') : '';
   const tab = (k, l) => `<button data-ptab="${k}" class="${p.tab === k ? 'on' : ''}">${l}</button>`;
@@ -2399,7 +2451,7 @@ function renderPlayer() {
     <header class="d"><div class="tabs"><button class="back" data-back aria-label="Back"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></button><button class="home" data-home aria-label="Home"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"><path d="M3 10.5 12 3l9 7.5"/><path d="M5.5 9v11h13V9"/><path d="M10 20v-6h4v6"/></svg></button><button class="home" data-refresh aria-label="Refresh"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12a8 8 0 1 1-2.34-5.66"/><path d="M20 4v5h-5"/></svg></button></div></header>
     <main><div class="phero pp"><span class="phw"><img class="hs${p.league === 'nfl' && String(p.id) === '3915511' ? ' heart' : ''}" src="https://a.espncdn.com/i/headshots/${p.league}/players/full/${esc(p.id)}.png" alt="" onerror="this.onerror=null;this.src=SIL">${plogo ? `<img class="ptl" data-topen="${esc(ptm.id)}" data-tl="${p.league}" data-tn="${esc(ptm.displayName || '')}" data-tlogo="${esc(plogo)}" src="${esc(plogo)}" alt="" onerror="this.remove()">` : ''}</span>
       <div><div class="pname">${esc(p.name || 'Player')}</div><div class="psub">${esc(sub)}</div></div></div>
-      <div class="dtabs sm even">${tab('ov', 'Overview')}${tab('stats', 'Career')}${tab('gl', 'Gamelog')}${tab('bio', 'Bio')}</div>
+      <div class="dtabs sm even"><button data-ptab="${p.infoSub || 'ov'}" class="${p.tab === 'ov' || p.tab === 'news' ? 'on' : ''}">Info</button>${tab('stats', 'Career')}${tab('gl', 'Gamelog')}${tab('bio', 'Bio')}</div>
       <div class="pane t">${body}</div></main>`;
   const gs = document.getElementById('glstrip'), go = gs && gs.querySelector('.on');
   if (go) gs.scrollLeft = go.offsetLeft - (gs.clientWidth - go.offsetWidth) / 2;
@@ -2832,7 +2884,7 @@ function renderTeam() {
   const t = state.team, h = teamHead(t);
   const tab = (k, l, x) => `<button data-ttab="${k}" class="${t.tab === k || x ? 'on' : ''}">${l}</button>`;
   const sseg = `<div class="seg pseg" style="max-width:240px"><button data-ttab="stats" class="${t.tab === 'stats' ? 'on' : ''}">Players</button><button data-ttab="tstats" class="${t.tab === 'tstats' ? 'on' : ''}">Team</button></div>`;
-  const body0 = !t.done ? msg('Loading…') : t.tab === 'roster' ? rosterHTML(t) : t.tab === 'sched' ? scheduleHTML(t) : t.tab === 'tstats' ? teamTabStatsHTML(t) : t.tab === 'inj' ? teamInjHTML(t) : teamStatsHTML(t);
+  const body0 = !t.done ? msg('Loading…') : (t.tab === 'roster' || t.tab === 'news') ? teamInfoHTML(t) : t.tab === 'sched' ? scheduleHTML(t) : t.tab === 'tstats' ? teamTabStatsHTML(t) : t.tab === 'inj' ? teamInjHTML(t) : teamStatsHTML(t);
   const body = t.done && (t.tab === 'stats' || t.tab === 'tstats') ? sseg + body0 : body0;
   $app.innerHTML = `
     <header class="d"><div class="tabs"><button class="back" data-back aria-label="Back"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></button><button class="home" data-home aria-label="Home"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"><path d="M3 10.5 12 3l9 7.5"/><path d="M5.5 9v11h13V9"/><path d="M10 20v-6h4v6"/></svg></button><button class="home" data-refresh aria-label="Refresh"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12a8 8 0 1 1-2.34-5.66"/><path d="M20 4v5h-5"/></svg></button><span class="grow"></span>${(() => { const Y = brYears(t.league), y = t.sy || Y[0], ty = t.stype || 2, yl = yy => t.league === 'nfl' ? String(yy) : (yy - 1) + '-' + String(yy).slice(2), lab = (yy, tt) => yl(yy) + (tt === 3 ? ' Postseason' : ' Reg. Season');
@@ -2841,7 +2893,7 @@ function renderTeam() {
     <main><div class="phero">${h.logo ? `<img class="tl" src="${esc(h.logo)}" alt="" onerror="this.style.visibility='hidden'">` : ''}
       <div class="grow"><div class="pname up">${esc(h.name)}</div><div class="psub">${esc(h.sub)}</div></div>
       <button class="fstar ${isFav(t.league, t.id) ? 'on' : ''}" data-fav="${esc(t.id)}" data-fl="${t.league}" data-fn="${esc(h.name)}" data-flogo="${esc(h.logo)}" aria-label="Favorite team">${STAR_SVG}</button></div>
-      <div class="dtabs sm even">${tab('sched', 'Schedule')}${tab('stats', 'Stats', t.tab === 'tstats')}${tab('roster', 'Roster')}${tab('inj', 'Injuries')}</div>
+      <div class="dtabs sm even">${tab('sched', 'Schedule')}${tab('stats', 'Stats', t.tab === 'tstats')}${tab(t.infoSub || 'news', 'Info', t.tab === 'roster' || t.tab === 'news')}${tab('inj', 'Injuries')}</div>
       <div class="pane t">${body}</div></main>`;
   const ms = document.getElementById('mstrip'), on = ms && ms.querySelector('.on');
   if (on) ms.scrollLeft = on.offsetLeft - (ms.clientWidth - on.offsetWidth) / 2;
@@ -4076,7 +4128,7 @@ $app.addEventListener('click', ev => {
     const e = state.player.exp = state.player.exp || new Set(); if (e.has(d.xp)) e.delete(d.xp); else e.add(d.xp); render();
   } else if (d.ptab) {
     window._twReset = 1;
-    state.player.tab = d.ptab; state.player.glsort = {}; state.player.csort = {}; render();
+    state.player.tab = d.ptab; if (d.ptab === 'ov' || d.ptab === 'news') state.player.infoSub = d.ptab; state.player.glsort = {}; state.player.csort = {}; render();
   } else if (d.spm) {
     state.game.spm = d.spm; render();
   } else if (d.scf) {
@@ -4091,16 +4143,16 @@ $app.addEventListener('click', ev => {
     state.game.pvTeam = +d.pvt; render();
   } else if (d.ttab) {
     window._twReset = 1;
-    state.team.sort = {}; state.team.tab = d.ttab; if (d.ttab === 'stats' && state.team.done) loadTeamPlayers(state.team); render();
+    state.team.sort = {}; state.team.tab = d.ttab; if (d.ttab === 'news' || d.ttab === 'roster') state.team.infoSub = d.ttab; if (d.ttab === 'stats' && state.team.done) loadTeamPlayers(state.team); render();
   } else if (d.team !== undefined) {
     state.game.team = parseInt(d.team); render();
   } else if (d.refresh !== undefined) {
     window._forceT = Date.now();
     const v = topView();
     const rb = ev.target.closest('[data-refresh]'); if (rb) { rb.classList.add('spin'); setTimeout(() => rb.classList.remove('spin'), 800); }
-    if (v === 'player') { const p = state.player; p.done = false; p.loaded = false; p.post = null; render(); loadPlayer(); }
+    if (v === 'player') { const p = state.player; p.done = false; p.loaded = false; p.post = null; p.news = null; render(); loadPlayer(); }
     else if (v === 'game') { const g = state.game; g.ts = null; g.sl = null; g.l5x = null; loadGame(); }
-    else if (v === 'team') { const t = state.team; t.done = false; t.ps = null; try { localStorage.removeItem('tps_' + t.league + '_' + t.id); } catch (e) {} render(); loadTeam(); }
+    else if (v === 'team') { const t = state.team; t.done = false; t.ps = null; t.news = null; try { localStorage.removeItem('tps_' + t.league + '_' + t.id); } catch (e) {} render(); loadTeam(); }
     else if (v === 'lv') { const lv = state.lv; if (lv.kind === 'leaders') { lv.data = null; lv.loading = false; render(); loadLeaders(); } else { Object.keys(state.lvC).forEach(k => { if (k.indexOf(lv.kind + lv.league) === 0) delete state.lvC[k]; }); render(); loadLV(); } }
     else if (v === 'list') loadList();
   } else if (d.csort !== undefined) {
