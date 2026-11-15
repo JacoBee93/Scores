@@ -255,7 +255,7 @@ details[open] summary::after{content:'⌃'}
 .pb .clk{font-family:var(--num);font-size:15px;font-weight:600;color:var(--mut)}
 .pb .txt{font-size:13.5px;line-height:1.3;color:rgba(255,255,255,.7)}
 .pb:not(.ps) + .pb:not(.ps){box-shadow:inset 0 1px 0 rgba(255,255,255,.05)}
-.pb.ps{margin:5px -10px;padding:11px 10px;background:linear-gradient(90deg,color-mix(in srgb,var(--tc) 42%,transparent),color-mix(in srgb,var(--tc) 10%,transparent) 75%);}
+.pb.ps{margin:5px -10px;padding:11px 10px;background:linear-gradient(90deg,color-mix(in srgb,var(--tc) 62%,transparent),color-mix(in srgb,var(--tc) 16%,transparent) 80%);}
 .pb.ps .txt{color:#fff;font-weight:600}
 .pb.ps .clk{color:rgba(255,255,255,.85)}
 .pbs{display:flex;align-items:center;gap:3px;font-family:var(--num);font-size:19px;font-weight:700;color:rgba(255,255,255,.45);white-space:nowrap}
@@ -377,7 +377,7 @@ main{padding-bottom:0}
 .pane:has(.ylist){overflow:visible}
 .pane:has(.ylist) .ylist{z-index:40}
 .pane > .msg.ld:only-child,.pane > .seg + .msg.ld{min-height:58vh}
-html,body{transition:background-color .35s ease}
+
 .pane{margin:12px -6px 14px !important;padding:28px 12px 18px !important;border-radius:22px;box-shadow:0 10px 32px rgba(0,0,0,.55),0 2px 6px rgba(0,0,0,.35),inset 0 1px 0 rgba(255,255,255,.07);overflow:hidden}
 .pane.t{padding-top:12px !important}
 .pane .tw{margin-left:-12px;margin-right:-12px;padding-left:12px;padding-right:12px;max-width:none}
@@ -723,8 +723,8 @@ td.n .slg{width:20px;height:20px;object-fit:contain;vertical-align:-6px;margin-l
 .sch .opp small{width:18px;margin-right:12px}
 .sch .rg.rgw{grid-template-columns:22px 70px 16px;column-gap:3px;margin-right:12px}
 .sch .rg.rgw .sc2{grid-template-columns:31px 8px 31px}
-.sch .rg.rgw:not(.w3){grid-template-columns:22px 56px 16px;margin-right:12px}
-.sch .rg.rgw:not(.w3) .sc2{grid-template-columns:24px 8px 24px}
+.sch .rg.rgw:not(.w3){grid-template-columns:22px 48px 16px;margin-right:20px}
+.sch .rg.rgw:not(.w3) .sc2{grid-template-columns:20px 8px 20px}
 .sch .rg.rgw:not(.w3) .sf{margin-right:-2px !important}
 .sch .rg.rgw .sf{margin:0 !important;width:auto !important;text-align:right;vertical-align:0}
 .sch .rg.rgw .W,.sch .rg.rgw .L,.sch .rg.rgw .T{text-align:center !important}
@@ -734,7 +734,7 @@ td.n .slg{width:20px;height:20px;object-fit:contain;vertical-align:-6px;margin-l
 .sch .sc2 b{font-size:18px;font-variant-numeric:tabular-nums}
 .sch .sc2 b:first-child{text-align:right}
 .sch .sc2 b:last-child{text-align:left}
-.sch .sc2 i{font-style:normal;text-align:center;font-family:var(--num);font-weight:600;font-size:17px;color:var(--mut);position:relative;top:-1px}
+.sch .sc2 i{font-style:normal;text-align:center;font-family:var(--num);font-weight:600;font-size:17px;color:var(--mut);position:relative;top:1px}
 .sch .rg.rgw .sf{margin-right:-4px !important}
 .sch .rg .tm{text-align:center;font-family:var(--num);font-weight:600;font-size:18px}
 .sch .rg .sf{width:auto;margin-left:3px}
@@ -789,7 +789,7 @@ input[type=search]::-webkit-search-cancel-button{display:none;-webkit-appearance
 .sosum{text-align:right;font-family:var(--num);font-weight:700;font-size:16px;padding:6px 0 10px;color:var(--mut)}
 .gdd{display:inline-grid;grid-template-columns:30px 44px;align-items:baseline}
 .gdd > span{text-align:right}
-.dsh{display:inline-grid;align-items:baseline;font-variant-numeric:tabular-nums;column-gap:3px}
+.dsh{display:inline-grid;align-items:baseline;font-variant-numeric:tabular-nums;column-gap:2px}
 .dsh b{font-weight:inherit;text-align:right}
 .dsh b:last-child{text-align:left}
 .dsh i{font-style:normal;text-align:center}
@@ -810,13 +810,27 @@ input[type=search]::-webkit-search-cancel-button{display:none;-webkit-appearance
 .pma{display:inline-grid;grid-template-columns:.6em 2ch;text-align:right}
 .pma i{font-style:normal;text-align:right}
 .gst td,.gst th{padding-left:6px !important;padding-right:6px !important}
-.stk + main > .sec.dh:first-child,.stk + main > .favh:first-child{margin-top:4px}
-.stk{position:sticky;top:0;z-index:40;background:var(--pbg,#000)}
-.stk.det{padding:0 16px}
-.stk.det > header{margin:0 -16px}
-.stk.det > .dtabs{margin-bottom:0}
-.play.g.gs{border-radius:12px;margin:5px -10px;padding:11px 10px;background:linear-gradient(90deg,color-mix(in srgb,var(--tc,#555) 42%,transparent),color-mix(in srgb,var(--tc,#555) 10%,transparent) 75%)}
+.stkw + main > .sec.dh:first-child,.stkw + main > .favh:first-child{margin-top:-4px}
+.stkw{position:sticky;top:0;z-index:40;background:var(--pbg,#000)}
+.stkw.det{padding:0 16px 12px}
+.stkw.det > header{margin:0 -16px}
+.stkw.det > :last-child{margin-bottom:0 !important}
+.stkw.det + main > .pane:first-child{margin-top:0 !important}
+header.d + main{padding-top:0}
+.play.g.gs{border-radius:12px;margin:5px -10px;padding:11px 10px;background:linear-gradient(90deg,color-mix(in srgb,var(--tc,#555) 62%,transparent),color-mix(in srgb,var(--tc,#555) 16%,transparent) 80%)}
 .play.g.gs .ast{color:rgba(255,255,255,.62)}
+html.one,html.one body{overflow:hidden;height:100%}
+html.one #app.lst,html.one body{min-height:0}
+.stkw .hero{transition:padding .2s ease}
+.stkw .hero .s{transition:font-size .2s ease}
+.stkw .hero img{transition:width .2s ease,height .2s ease}
+.stkw.mini .hero{padding:6px 0}
+.stkw.mini .hero .s{font-size:28px !important}
+.stkw.mini .hero .t img,.stkw.mini .hero .t .ph{width:28px !important;height:28px !important}
+.stkw.mini .hero .t .rc,.stkw.mini .hero .wk{display:none}
+.stkw.mini .hero .t{flex-direction:row;gap:6px}
+.stkw.mini .hero .m .dt1{font-size:16px}
+.stkw .hero .t img{transition:width .2s,height .2s}
 </style>
 </head>
 <body>
@@ -870,8 +884,8 @@ document.getElementById('fhome').addEventListener('click', () => {
     if (go) { window._forceT = Date.now(); ind.classList.add('spin'); const b = $app.querySelector('[data-refresh]'); if (b) b.click(); else if (typeof loadList === 'function') loadList(); setTimeout(() => { ind.classList.remove('spin', 'ready'); ind.style.opacity = 0; ind.style.transform = 'translate(-50%, 0)'; }, 900); }
     else { ind.classList.remove('ready'); ind.style.opacity = 0; ind.style.transform = 'translate(-50%, 0)'; } }, { passive: true });
 })();
-function dashAlign() {
-  $app.querySelectorAll('table:not(.lsc)').forEach(tb => { const bd = tb.tBodies[0]; if (!bd) return; const RE = /^\s*(-?\d+(?:\.\d+)?)\s*-\s*(\d+(?:\.\d+)?)\s*$/, cols = {};
+function dashAlign(root) {
+  (root || $app).querySelectorAll('table:not(.lsc)').forEach(tb => { const bd = tb.tBodies[0]; if (!bd) return; const RE = /^\s*(-?\d+(?:\.\d+)?)\s*-\s*(\d+(?:\.\d+)?)\s*$/, cols = {};
     [...tb.rows].forEach(r => [...r.cells].forEach((c, i) => { if (c.classList.contains('n') || c.querySelector('*')) return; const m = c.textContent.match(RE); if (!m) return; (cols[i] = cols[i] || []).push([c, m[1], m[2]]); }));
     Object.values(cols).forEach(list => { if (list.length < 2 && !list.some(x => x[0].parentNode.classList.contains('tot'))) { if (!list.length) return; }
       const L = Math.max(...list.map(x => x[1].length), ...list.map(x => x[2].length)), R = L;
@@ -879,15 +893,15 @@ function dashAlign() {
 }
 function stickTop(v) {
   if (v === 'cmp') return; const hd = $app.querySelector(':scope > header'); if (!hd) return;
-  const w = document.createElement('div'); w.className = 'stk'; $app.insertBefore(w, hd); w.appendChild(hd);
+  const w = document.createElement('div'); w.className = 'stkw'; $app.insertBefore(w, hd); w.appendChild(hd);
   const main = $app.querySelector(':scope > main'); if (main && v !== 'list' && v !== 'search') { const pane = main.querySelector(':scope > .pane'); if (pane) while (main.firstChild && main.firstChild !== pane) w.appendChild(main.firstChild); w.classList.add('det'); }
 }
-function pmAlign() {
-  $app.querySelectorAll('table').forEach(tb => { const hr = tb.tHead && tb.tHead.rows[tb.tHead.rows.length - 1]; if (!hr) return; let ci = -1, c = 0; [...hr.cells].forEach(x => { if (x.textContent.trim() === '+/-') ci = c; c += x.colSpan || 1; }); if (ci < 0 || !tb.tBodies[0]) return;
+function pmAlign(root) {
+  (root || $app).querySelectorAll('table').forEach(tb => { const hr = tb.tHead && tb.tHead.rows[tb.tHead.rows.length - 1]; if (!hr) return; let ci = -1, c = 0; [...hr.cells].forEach(x => { if (x.textContent.trim() === '+/-') ci = c; c += x.colSpan || 1; }); if (ci < 0 || !tb.tBodies[0]) return;
     [...tb.tBodies[0].rows].forEach(r => { const cell = r.cells[ci]; if (!cell) return; const t = cell.textContent.trim(), m = t.match(/^([+-]?)(\d+)$/); if (!m) return; cell.innerHTML = `<span class="pma"><i>${m[1] || (t === '0' ? '' : '')}</i>${m[2]}</span>`; }); });
 }
-function zebra() {
-  $app.querySelectorAll('table.nfx, table.fx, table.lbt, table.gst, table.ros, table.sch').forEach(tb => { const bd = tb.tBodies[0]; if (!bd) return; let z = false, last = false;
+function zebra(root) {
+  (root || $app).querySelectorAll('table.nfx, table.fx, table.lbt, table.gst, table.ros, table.sch').forEach(tb => { const bd = tb.tBodies[0]; if (!bd) return; let z = false, last = false;
     [...bd.rows].forEach(r => { if (r.classList.contains('tot')) { r.classList.remove('zb'); return; } if (r.classList.contains('csub')) { r.classList.toggle('zb', last); return; } if (r.classList.contains('hid')) return; r.classList.toggle('zb', z); last = z; z = !z; }); });
 }
 function markSort(root) {
@@ -931,7 +945,7 @@ function tabHTML(k) {
   const ghost = (st, html, off) => { const g = document.createElement('div'); g.className = st.cls + ' ghost'; g._off = off;
     g.style.cssText = `position:absolute;top:${st.el.offsetTop}px;left:${st.el.offsetLeft}px;width:${st.W}px;min-height:${Math.max(st.el.offsetHeight, window.innerHeight)}px;margin:0;pointer-events:none;will-change:transform;transform:translate3d(${off * st.P}px,0,0)`;
     g.style.setProperty('margin', '0', 'important'); if (st.mode === 'day') { const cs = getComputedStyle(st.el); g.style.padding = cs.padding; g.style.boxSizing = 'border-box'; }
-    g.innerHTML = html; st.el.parentNode.appendChild(g); st.gh.push(g); };
+    g.innerHTML = html; try { relabel(g); markSort(g); zebra(g); dashAlign(g); pmAlign(g); } catch (e) {} st.el.parentNode.appendChild(g); st.gh.push(g); };
   document.addEventListener('touchstart', e => { S = null; if (e.touches.length !== 1 || pop()) return; const t = e.target; if (!t.closest) return;
     const v = topView(), x = e.touches[0].clientX, y = e.touches[0].clientY, base = { x0: x, y0: y, t0: Date.now(), x: 0, hz: false, gh: [] };
     if (v === 'list') { if (state.league === 'fav' || t.closest('header, #fhome, #ptr')) return; const items = [...$app.querySelectorAll('.dy')], cur = items.findIndex(b => b.classList.contains('on')); if (cur < 0) return;
@@ -976,6 +990,7 @@ function tabHTML(k) {
     state.search = false; state.cmpOn = true; window._fromList = true; state.lastView = null; $app.innerHTML = ''; render(); loadCmp(0);
     const inp = document.getElementById('cq1'); if (inp) inp.focus(); location.hash = '#/compare'; }, { passive: false });
 })();
+window.addEventListener('scroll', () => { const w = document.querySelector('.stkw.det'); if (!w) return; w.classList.toggle('mini', topView() === 'game' && window.scrollY > 30); }, { passive: true });
 window.SIL = 'data:image/svg+xml,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" fill="#2c2c2e"/><circle cx="50" cy="38" r="18" fill="#0d0d0f"/><path d="M14 100c2-22 17-34 36-34s34 12 36 34z" fill="#0d0d0f"/></svg>');
 const CMP_SVG = '<svg viewBox="0 0 24 24"><path d="M4 8h14l-4-4M20 16H6l4 4"/></svg>';
 const STAR_SVG = '<svg viewBox="0 0 24 24"><path d="M12 3.2l2.7 5.6 6.1.8-4.5 4.2 1.1 6.1L12 17l-5.4 2.9 1.1-6.1L3.2 9.6l6.1-.8z"/></svg>';
@@ -1319,9 +1334,9 @@ function render() {
   state.lastView = key;
   (() => { let c = '', alt = '';
     if (v === 'player') { const bio = state.player && state.player.bio, tm = bio && bio.team, ret = bio && (bio.active === false || /retired/i.test(String((bio.status && (bio.status.type || bio.status.name)) || ''))); if (!ret) { c = tm && tm.color; alt = tm && tm.alternateColor; } }
-    else if (v === 'team') { const t = state.team, os = [t.info && t.info.team, t.roster && t.roster.team, t.sched && t.sched.team, (state.teamList[t.league] || []).find(x => x.id === t.id)].filter(Boolean); c = os.map(o => o.color).find(Boolean); alt = os.map(o => o.alternateColor || o.alt).find(Boolean); }
+    else if (v === 'team') { const t = state.team, os = [(state.teamList[t.league] || []).find(x => x.id === t.id), t.info && t.info.team, t.roster && t.roster.team, t.sched && t.sched.team].filter(Boolean); c = os.map(o => o.color).find(Boolean); alt = os.map(o => o.alternateColor || o.alt).find(Boolean); }
     { const ab = v === 'team' ? (((state.team.info && state.team.info.team) || {}).abbreviation || ((state.teamList[state.team.league] || []).find(x => x.id === state.team.id) || {}).abbr) : v === 'player' && state.player && state.player.bio && state.player.bio.team ? state.player.bio.team.abbreviation : '', lg = v === 'team' ? state.team.league : state.player && state.player.league;
-      const OVR = { 'nhl:SEA': '0f6b72' }; if (c && OVR[lg + ':' + ab]) c = OVR[lg + ':' + ab]; }
+      const tc = tcol(lg, ab || (v === 'team' && state.tmeta && state.tmeta.id === state.team.id ? '' : '')); if (tc && (c || v === 'team')) { c = tc[0]; alt = ''; } }
     const ok = /^#?[0-9a-f]{6}$/i.test(String(c || ''));
     let bg = '#000000';
     const hsl = (r, g, b) => { r /= 255; g /= 255; b /= 255; const mx = Math.max(r, g, b), mn = Math.min(r, g, b), l = (mx + mn) / 2, d = mx - mn; let h = 0, sa = 0; if (d) { sa = d / (1 - Math.abs(2 * l - 1)); h = mx === r ? ((g - b) / d) % 6 : mx === g ? (b - r) / d + 2 : (r - g) / d + 4; h *= 60; if (h < 0) h += 360; } return [h, sa, l]; };
@@ -1344,6 +1359,7 @@ function render() {
   try { dashAlign(); } catch (e) {}
   try { pmAlign(); } catch (e) {}
   try { stickTop(v); } catch (e) {}
+  { const ov = v === 'player' && state.player && state.player.tab === 'ov'; document.documentElement.classList.toggle('one', false); if (ov) requestAnimationFrame(() => { const extra = document.documentElement.scrollHeight - window.innerHeight; if (extra < 140) { document.documentElement.classList.add('one'); window.scrollTo(0, 0); } }); }
   if (window._noSlide) window._noSlide = 0;
   if (window._slide) { const p = window._slideSel ? $app.querySelector('main') : $app.querySelector('.pane'), d = window._slide; window._slide = 0; window._slideSel = null; if (p && p.animate) p.animate([{ transform: `translateX(${d * 70}px)`, opacity: .3 }, { transform: 'none', opacity: 1 }], { duration: 230, easing: 'cubic-bezier(.2,.7,.3,1)' }); }
   const fh = document.getElementById('fhome'); if (fh) fh.hidden = true;
@@ -1831,12 +1847,31 @@ async function loadPreviewStats(g) {
 const lumOf = h => { const n = parseInt(h, 16); const r = n >> 16, gg = (n >> 8) & 255, b = n & 255; return (0.299 * r + 0.587 * gg + 0.114 * b) / 255; };
 function gameCols(g) {
   const e = g.ev, comps = (g.sum && g.sum.header && g.sum.header.competitions && g.sum.header.competitions[0] && g.sum.header.competitions[0].competitors) || [];
-  const cmp = t => comps.find(c => c.team && String(c.team.id) === String(t.id)) || { team: { color: t.color, alternateColor: t.alt } };
-  const ca = teamColor(cmp(e.away), '#4aa3ff'); let ch = teamColor(cmp(e.home), '#d9c27a');
-  const rgb = h => { const n = parseInt(String(h).replace('#', ''), 16); return [n >> 16, (n >> 8) & 255, n & 255]; };
-  const dist = (x, y) => { const a = rgb(x), b = rgb(y); return Math.hypot(a[0] - b[0], a[1] - b[1], a[2] - b[2]); };
-  if (dist(ca, ch) < 110) { const ht = cmp(e.home).team || {}, alt = ht.alternateColor && teamColor({ team: { color: ht.alternateColor } }, ''); ch = alt && dist(ca, alt) >= 110 && lumOf(alt.replace('#', '')) < 0.85 ? alt : '#c7c7cc'; }
+  const cmp = t => comps.find(c => c.team && String(c.team.id) === String(t.id)) || { team: { color: t.color, alternateColor: t.alt, abbreviation: t.abbr } };
+  const pick = (t, i) => { const tc = tcol(g.league, t.abbr || (cmp(t).team || {}).abbreviation), tm = cmp(t).team || {}; return tc ? tc[i] : String((i ? tm.alternateColor : tm.color) || (i ? t.alt : t.color) || '').replace('#', ''); };
+  const ok = x => /^[0-9a-f]{6}$/i.test(x || '');
+  let a0 = pick(e.away, 0), h0 = pick(e.home, 0);
+  const rgb = h => { const n = parseInt(h, 16); return [n >> 16, (n >> 8) & 255, n & 255]; };
+  const dist = (x, y) => { const p = rgb(x), q = rgb(y); return Math.hypot(p[0] - q[0], p[1] - q[1], p[2] - q[2]); };
+  if (!ok(a0)) a0 = '4aa3ff'; if (!ok(h0)) h0 = 'd9c27a';
+  let ca = bgOf(a0), ch = bgOf(h0);
+  if (dist(ca.slice(1), ch.slice(1)) < 90) { const alt = pick(e.away, 1); if (ok(alt)) { const ca2 = bgOf(alt); if (dist(ca2.slice(1), ch.slice(1)) >= 90) ca = ca2; else ca = '#8e8e93'; } else ca = '#8e8e93'; }
   return [ca, ch];
+}
+const TCOL = {
+  nfl: { ARI: ['97233f', 'ffb612'], ATL: ['a71930', '000000'], BAL: ['241773', '9e7c0c'], BUF: ['00338d', 'c60c30'], CAR: ['0085ca', '101820'], CHI: ['0b162a', 'c83803'], CIN: ['fb4f14', '000000'], CLE: ['ff3c00', '311d00'], DAL: ['003594', '869397'], DEN: ['fb4f14', '0a2343'], DET: ['0076b6', 'b0b7bc'], GB: ['203731', 'ffb612'], HOU: ['03202f', 'a71930'], IND: ['002c5f', 'a2aaad'], JAX: ['006778', 'd7a22a'], KC: ['e31837', 'ffb81c'], LV: ['a5acaf', '000000'], LAC: ['0080c6', 'ffc20e'], LAR: ['003594', 'ffa300'], MIA: ['008e97', 'fc4c02'], MIN: ['4f2683', 'ffc62f'], NE: ['002244', 'c60c30'], NO: ['d3bc8d', '101820'], NYG: ['0b2265', 'a71930'], NYJ: ['125740', 'ffffff'], PHI: ['004c54', 'a5acaf'], PIT: ['ffb612', '101820'], SF: ['aa0000', 'b3995d'], SEA: ['002244', '69be28'], TB: ['d50a0a', 'ff7900'], TEN: ['4b92db', '0c2340'], WSH: ['5a1414', 'ffb612'] },
+  nba: { ATL: ['e03a3e', 'c1d32f'], BOS: ['007a33', 'ba9653'], BKN: ['000000', 'ffffff'], CHA: ['00788c', '1d1160'], CHI: ['ce1141', '000000'], CLE: ['860038', 'fdbb30'], DAL: ['0053bc', '00285e'], DEN: ['0e2240', 'fec524'], DET: ['c8102e', '1d42ba'], GS: ['1d428a', 'ffc72c'], HOU: ['ce1141', '000000'], IND: ['002d62', 'fdbb30'], LAC: ['c8102e', '1d428a'], LAL: ['552583', 'fdb927'], MEM: ['5d76a9', '12173f'], MIA: ['98002e', 'f9a01b'], MIL: ['00471b', 'eee1c6'], MIN: ['236192', '78be20'], NO: ['0c2340', 'c8102e'], NY: ['006bb6', 'f58426'], OKC: ['007ac1', 'ef3b24'], ORL: ['0077c0', 'c4ced4'], PHI: ['006bb6', 'ed174c'], PHX: ['e56020', '1d1160'], POR: ['e03a3e', '000000'], SAC: ['5a2d81', '63727a'], SA: ['8a8d8f', '000000'], TOR: ['ce1141', '000000'], UTAH: ['753bbd', '000000'], UTA: ['753bbd', '000000'], WSH: ['002b5c', 'e31837'] },
+  nhl: { ANA: ['fc4c02', 'b9975b'], BOS: ['fcb514', '000000'], BUF: ['003087', 'ffb81c'], CGY: ['d2001c', 'faaf19'], CAR: ['ce1126', '000000'], CHI: ['cf0a2c', '000000'], COL: ['6f263d', '236192'], CBJ: ['002654', 'ce1126'], DAL: ['006847', '8f8f8c'], DET: ['ce1126', 'ffffff'], EDM: ['fc4c00', '041e42'], FLA: ['c8102e', '041e42'], LA: ['a2aaad', '111111'], MIN: ['154734', 'a6192e'], MTL: ['af1e2d', '192168'], NSH: ['ffb81c', '041e42'], NJ: ['ce1126', '000000'], NYI: ['00539b', 'f47d30'], NYR: ['0038a8', 'ce1126'], OTT: ['c52032', 'c2912c'], PHI: ['f74902', '000000'], PIT: ['fcb514', '000000'], SJ: ['006d75', 'ea7200'], SEA: ['0f6b72', 'e9072b'], STL: ['002f87', 'fcb514'], TB: ['002868', 'ffffff'], TOR: ['00205b', 'ffffff'], UTAH: ['71afe5', '090909'], UTA: ['71afe5', '090909'], VAN: ['00205b', '00843d'], VGK: ['b4975a', '333f42'], WPG: ['041e42', 'ac162c'], WSH: ['c8102e', '041e42'] }
+};
+const tcol = (lg, ab) => ((TCOL[lg] || {})[String(ab || '').toUpperCase()]) || null;
+function bgOf(hex) {
+  const n = parseInt(String(hex).replace('#', ''), 16); let r = (n >> 16) / 255, g = ((n >> 8) & 255) / 255, b = (n & 255) / 255;
+  const mx = Math.max(r, g, b), mn = Math.min(r, g, b), d = mx - mn; let l = (mx + mn) / 2, sa = d ? d / (1 - Math.abs(2 * l - 1)) : 0, h = 0;
+  if (d) { h = mx === r ? ((g - b) / d) % 6 : mx === g ? (b - r) / d + 2 : (r - g) / d + 4; h *= 60; if (h < 0) h += 360; }
+  if (sa > .18) l = Math.min(h >= 38 && h < 80 ? .42 : h >= 8 && h < 38 ? .53 : .45, Math.max(.2, l));
+  else { if (l < .08) l = .13; else l = Math.min(l, .32); }
+  const C = (1 - Math.abs(2 * l - 1)) * sa, X = C * (1 - Math.abs((h / 60) % 2 - 1)), m = l - C / 2, [R, G, B] = h < 60 ? [C, X, 0] : h < 120 ? [X, C, 0] : h < 180 ? [0, C, X] : h < 240 ? [0, X, C] : h < 300 ? [X, 0, C] : [C, 0, X];
+  return '#' + [R, G, B].map(v => Math.round((v + m) * 255).toString(16).padStart(2, '0')).join('');
 }
 function teamColor(c, fb) {
   const t = (c && c.team) || {};
@@ -1894,7 +1929,8 @@ async function loadSeasonLeaders(g) {
     const rc = j.categories || [], fi = (n) => { for (const c of rc) { const k = (c.names || []).indexOf(n); if (k >= 0) return [c.name, k]; } return null; }, sv = fi('savePct'), gp = fi('gamesPlayed') || fi('games');
     if (!sv) return; const val = (a, f) => { if (!f) return null; const x = (a.categories || []).find(q => q.name === f[0]), arr = (x && (x.totals || x.values)) || []; return arr[f[1]]; };
     [e.away, e.home].forEach((tm, i) => { if (!r[i] || r[i].some(c => c.name === 'Save Percentage')) return;
-      const list = (j.athletes || []).filter(a => { const at = a.athlete || {}; const tid = String(at.teamId || (at.team && at.team.id) || ''); return tid ? tid === String(tm.id) : (at.teamShortName && at.teamShortName === tm.abbr); }).map(a => ({ a: a.athlete, sv: parseFloat(val(a, sv)), gp: parseFloat(val(a, gp)) || 0, raw: val(a, sv) })).filter(x => !isNaN(x.sv) && x.sv > 0);
+      const ids = new Set(); try { ((g.sum.boxscore && g.sum.boxscore.players) || []).concat(g.sum.rosters || []).forEach(x => { if (String(x.team && x.team.id) !== String(tm.id)) return; (x.statistics || []).forEach(st => (st.athletes || []).forEach(q => q.athlete && ids.add(String(q.athlete.id)))); (x.roster || []).forEach(q => q.athlete && ids.add(String(q.athlete.id))); }); } catch (x) {}
+      const list = (j.athletes || []).filter(a => { const at = a.athlete || {}; if (ids.has(String(at.id))) return true; const tid = String(at.teamId || (at.team && at.team.id) || a.teamId || ((String(at.teamUid || a.teamUid || '').match(/t:(\d+)/) || [])[1]) || ''); if (tid) return tid === String(tm.id); const ab = String(at.teamShortName || at.teamAbbreviation || a.teamShortName || '').toUpperCase(); return !!ab && ab.split('/').includes(String(tm.abbr).toUpperCase()); }).map(a => ({ a: a.athlete, sv: parseFloat(val(a, sv)), gp: parseFloat(val(a, gp)) || 0, raw: val(a, sv) })).filter(x => !isNaN(x.sv) && x.sv > 0);
       if (!list.length) return; const mx = Math.max(...list.map(x => x.gp)); const ok = list.filter(x => x.gp >= Math.max(1, mx * .3)).sort((x, y) => y.sv - x.sv)[0]; if (!ok) return;
       r[i].push({ name: 'Save Percentage', displayName: 'Save Percentage', leaders: [{ athlete: { id: ok.a.id, displayName: ok.a.displayName, shortName: ok.a.shortName || shortNm(ok.a.displayName), position: { abbreviation: 'G' }, jersey: ok.a.jersey }, mainStat: { value: (ok.sv > 1 ? ok.sv / 100 : ok.sv).toFixed(3).replace(/^0\./, '.'), label: '' } }] }); });
     if (state.game === g && topView() === 'game') render(); } catch (err) {} })();
@@ -3445,6 +3481,7 @@ function renderLV() {
   $app.innerHTML = `
     <header class="d"><div class="tabs"><button class="back" data-back aria-label="Back"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></button><button class="home" data-home aria-label="Home"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"><path d="M3 10.5 12 3l9 7.5"/><path d="M5.5 9v11h13V9"/><path d="M10 20v-6h4v6"/></svg></button><button class="home" data-refresh aria-label="Refresh"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12a8 8 0 1 1-2.34-5.66"/><path d="M20 4v5h-5"/></svg></button><span class="grow"></span>${ysel}</div></header>
     <main>${top}<div class="pane t">${body}</div></main>`;
+  const pn = $app.querySelector('main > .pane'), sg = pn && pn.querySelector(':scope > .seg'); if (sg && v.kind === 'standings') { sg.classList.add('lvseg'); pn.before(sg); }
 }
 const GRP_NAME = {};
 const grpName = g => String(g);
@@ -3560,8 +3597,8 @@ async function loadDraft(v) {
   v.dLoading = false; if (state.lv === v) { render(); loadDraftRound(v); }
 }
 async function loadDraftRound(v) {
-  const r = v.dd && v.dd.find(x => x.n === v.rd); if (!r || r.loading || r.done) return; r.loading = true; await ensureTeams(v.league).catch(() => {});
-  let i = 0; const w = async () => { while (i < r.picks.length) { const p = r.picks[i++]; if (!p.aref) continue; try { const a = await getJson(String(p.aref).replace(/^http:/, 'https:'));
+  const r = v.dd && v.dd.find(x => x.n === v.rd); if (!r || r.loading || r.done) return; r.loading = true; await Promise.race([ensureTeams(v.league).catch(() => {}), new Promise(res => setTimeout(res, 6000))]);
+  let i = 0; const TO2 = pr => Promise.race([pr, new Promise((_, rj) => setTimeout(() => rj(new Error('t')), 9000))]); const w = async () => { while (i < r.picks.length) { const p = r.picks[i++]; if (!p.aref) continue; try { const a = await TO2(getJson(String(p.aref).replace(/^http:/, 'https:')));
     const rid = ((a.athlete && a.athlete.$ref) || '').match(/athletes\/(\d+)/); p.a = { real: !!rid, id: rid ? rid[1] : String(a.id || ''), name: a.displayName || a.fullName || '', pos: (a.position && (a.position.abbreviation || a.position.name)) || '', col: (a.team && a.team.$ref) ? '' : '' }; } catch (e) {} } };
   await Promise.all(Array.from({ length: 8 }, w)); r.loading = false; r.done = true; if (state.lv === v && topView() === 'lv') render();
 }
