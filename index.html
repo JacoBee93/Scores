@@ -427,7 +427,7 @@ body{min-height:100vh}
 .ld.sil .nd{margin:0}
 .nmw{position:sticky;left:0;width:calc(100vw - 44px);max-width:576px;text-align:center}
 .gl2 tr.nomore td{text-align:center !important;color:var(--mut);font-size:13px;padding:14px 0 4px !important;background:none !important}
-#artpop{position:fixed;inset:0;z-index:160;background:transparent;pointer-events:none;display:flex;align-items:flex-end;justify-content:center}
+#artpop{position:fixed;top:0;left:0;width:0;height:0;overflow:visible;z-index:160;background:transparent;pointer-events:none;display:flex;align-items:flex-end;justify-content:center}
 .artbox{touch-action:pan-y;overscroll-behavior:contain;pointer-events:auto;box-shadow:0 18px 26px -10px rgba(0,0,0,.6),0 4px 6px -2px rgba(0,0,0,.35),inset 0 1px 0 rgba(255,255,255,.07);position:relative;width:calc(100% - 20px);max-width:620px;max-height:88vh;overflow-y:auto;background:#1c1c1e;border-radius:22px 22px 0 0;padding:18px 18px calc(28px + env(safe-area-inset-bottom));box-sizing:border-box;-webkit-overflow-scrolling:touch}
 .artbox h2{font-size:21px;line-height:1.25;margin:4px 40px 6px 0}
 .artbox h3{font-size:16px;margin:16px 0 4px}
@@ -784,7 +784,8 @@ td.n .slg{width:20px;height:20px;object-fit:contain;vertical-align:-6px;margin-l
 .play.g .ast.nx{display:inline-block}
 .play.g .ast.nh{display:block}
 .sch .sc2.tmc b{font-weight:600;color:#fff}
-.sch .rg.rgw .sc2.tmc{grid-template-columns:22px 8px 22px !important}
+.sch .rg.rgw:not(.w3) .sc2.tmc{grid-template-columns:22px 8px 22px !important}
+.sch .sc2{justify-content:center}
 .sch .rg.lvr .sf{color:var(--live) !important;font-weight:700}
 .sch .rg.lvr .sc2 b{color:var(--live)}
 .sch .rg.lvr .sc2 i{color:var(--live)}
@@ -846,12 +847,14 @@ input[type=search]::-webkit-search-cancel-button{display:none;-webkit-appearance
 .pma{align-items:baseline;vertical-align:baseline;display:inline-grid;grid-template-columns:.6em 2ch;text-align:right}
 .pma i{font-style:normal;text-align:right}
 .gst td,.gst th{padding-left:6px !important;padding-right:6px !important}
-.stkw + main > .sec.dh:first-child,.stkw + main > .favh:first-child,.ghost > .sec.dh:first-child,.ghost > .favh:first-child{margin-top:-4px !important}
+.stkw + main > .sec.dh:first-child,.stkw + main > .favh:first-child,.stksp + main > .sec.dh:first-child,.stksp + main > .favh:first-child,.ghost > .sec.dh:first-child,.ghost > .favh:first-child{margin-top:-4px !important}
 .stkw{position:sticky;top:0;z-index:40;background:var(--pbg,#000)}
+.stkw.fx0{position:fixed;left:0;right:0;top:0}
+.stksp{flex:none}
 .stkw.det{padding:0 16px 12px}
 .stkw.det > header{margin:0 -16px}
 .stkw.det > :last-child{margin-bottom:0 !important}
-.stkw.det + main > .pane:first-child{margin-top:0 !important}
+.stkw.det + main > .pane:first-child,.stkw.det + .stksp + main > .pane:first-child{margin-top:0 !important}
 header.d + main{padding-top:0}
 .play.g.gs{border-radius:12px;margin:5px -10px;padding:11px 10px;background:linear-gradient(90deg,color-mix(in srgb,var(--tc,#555) 62%,transparent),color-mix(in srgb,var(--tc,#555) 16%,transparent) 80%)}
 .play.g.gs .ast{color:rgba(255,255,255,.62)}
@@ -963,6 +966,8 @@ function stickTop(v) {
   const w = document.createElement('div'); w.className = 'stkw v-' + v; $app.insertBefore(w, hd); w.appendChild(hd);
   const main = $app.querySelector(':scope > main'); if (main && v !== 'list' && v !== 'search') { const pane = main.querySelector(':scope > .pane'); if (pane) while (main.firstChild && main.firstChild !== pane) w.appendChild(main.firstChild); w.classList.add('det'); }
   keep.forEach(([x, l]) => { if (l) x.scrollLeft = l; });
+  const sp = document.createElement('div'); sp.className = 'stksp'; w.after(sp); w.classList.add('fx0');
+  const fit = () => { sp.style.height = w.offsetHeight + 'px'; }; fit(); try { if (window._stkRO) window._stkRO.disconnect(); window._stkRO = new ResizeObserver(fit); window._stkRO.observe(w); } catch (e) {}
   try { shrinkUpd(); } catch (e) {}
 }
 function fitNames(root) {
@@ -1647,7 +1652,7 @@ function tbl(title, labels, rows) {
 }
 function nflTbl(title, labels, rows, totals) {
   const S = gSort(title, labels, rows); rows = S.rows;
-  const w = l => /\//.test(l) ? 62 : String(l).length > 5 ? 58 : 46;
+  const w = l => 50;
   const tw = 112 + labels.reduce((a, l) => a + w(l), 0);
   const trs = rows.map(r => `<tr data-player="${esc(r.id)}" data-pn="${esc(r.name)}" data-pp="${esc(r.pos)}" data-pj="${esc(r.jersey)}" data-pl="nfl" data-pt="${esc(teamNameOf(r.ti))}">
     <td class="n"><span class="pn">${esc(shortNm(r.name || r.short))}</span><small>${esc(r.pos)}</small></td>${gTd(S, r.vals)}</tr>`).join('') + (totals ? `<tr class="tot"><td class="n">Total</td>${labels.map((l, k) => `<td>${nv(totals[k] != null ? totals[k] : '')}</td>`).join('')}</tr>` : '');
@@ -2716,10 +2721,10 @@ function overviewHTML(p) {
 function nhlAddShots(c, gs) {
   const L = c.labels, N = c.names || [], gi = L.indexOf('G'), pi = L.indexOf('SPCT');
   if (gi < 0 || pi < 0 || L.includes('S') || N.some(n => /^shots(Total)?$/i.test(n))) return c;
-  const calc = vals => { const g = parseFloat(String(vals[gi]).replace(/,/g, '')), q = parseFloat(vals[pi]); return g > 0 && q > 0 ? String(Math.round(g * 100 / q)) : g === 0 ? '' : ''; };
+  const calc = vals => { const g = parseFloat(String(vals[gi]).replace(/,/g, '')), q = parseFloat(vals[pi]); return g > 0 && q > 0 ? String(Math.round(g * 100 / q)) : '-'; };
   const ins = (arr, v) => { const a2 = [...arr]; a2.splice(pi, 0, v); return a2; };
   c.labels = ins(L, 'S'); if (c.names && c.names.length) c.names = ins(N, 'shotsTotal');
-  c.rows.forEach(r => { let v = calc(r.vals); if (!v && gs && r.year != null && gs[r.year] != null) v = gs[r.year]; if (!v && parseFloat(String(r.vals[gi])) === 0 && parseFloat(r.vals[pi]) === 0 && gs && gs[r.year] == null) v = ''; r.vals = ins(r.vals, v); });
+  c.rows.forEach(r => { let v = calc(r.vals); if (v === '-' && gs && r.year != null && gs[r.year] != null) v = gs[r.year];  r.vals = ins(r.vals, v); });
   if (c.totals) { const sv = c.rows.map(r => parseFloat(r.vals[pi])); c.totals = ins(c.totals, sv.length && sv.every(x => !isNaN(x)) ? String(sv.reduce((x, y) => x + y, 0)) : calc(c.totals)); }
   return c;
 }
