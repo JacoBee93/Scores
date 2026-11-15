@@ -750,6 +750,7 @@ td.n .slg{width:20px;height:20px;object-fit:contain;vertical-align:-6px;margin-l
 .pc{display:block;width:100%;box-sizing:border-box}
 .play.g .ast.nx{display:inline-block}
 .play.g .ast.nh{display:block}
+.sch .sc2.tmc b{font-weight:600;color:#fff}
 .sch .rg.lvr .sf{color:var(--live) !important;font-weight:700}
 .sch .rg.lvr .sc2 b{color:#fff}
 .sch .rg.lvr .ldot{width:7px;height:7px;border-radius:50%;background:var(--live);justify-self:center;animation:blink 1.4s infinite}
@@ -820,6 +821,8 @@ header.d + main{padding-top:0}
 .play.g.gs{border-radius:12px;margin:5px -10px;padding:11px 10px;background:linear-gradient(90deg,color-mix(in srgb,var(--tc,#555) 62%,transparent),color-mix(in srgb,var(--tc,#555) 16%,transparent) 80%)}
 .play.g.gs .ast{color:rgba(255,255,255,.62)}
 html.one,html.one body{overflow:hidden;height:100%}
+html.lock1 body{touch-action:none}
+html.lock1 .tw{touch-action:pan-x}
 html.one #app.lst,html.one body{min-height:0}
 .stkw .hero{padding:calc(16px - 10px * var(--p,0)) 0}
 .stkw .hero .s{font-size:calc(42px - 12px * var(--p,0)) !important}
@@ -829,6 +832,15 @@ html.one #app.lst,html.one body{min-height:0}
 .stkw .hero .t{gap:calc(5px - 3px * var(--p,0))}
 .stkw .hero .m .dt1,.stkw .hero .m .fin{font-size:calc(19px - 3px * var(--p,0))}
 .stkw.det.v-lv{padding-bottom:8px}
+.stkw.det .hero{margin-left:-6px;margin-right:-6px;padding:9px 0}
+.stkw.det .hero .s{font-size:36px !important}
+.stkw.det .hero .t img,.stkw.det .hero .t .ph{width:36px !important;height:36px !important}
+.stkw.det .hero .t{gap:3px}
+.stkw.det .hero .wk{margin-bottom:3px}
+.stkw.det .hero .m .dt1,.stkw.det .hero .m .fin{font-size:17px}
+.stkw.det .dtabs{margin-left:-6px;margin-right:-6px;padding-left:12px;padding-right:12px}
+.stkw.det .phero{margin-top:0;margin-bottom:8px}
+.stkw.det{padding-bottom:10px}
 .sch .rg.rgw.w1 .sc2{grid-template-columns:14px 8px 14px}
 .sch .rg.rgw.w1{grid-template-columns:22px 36px 16px;margin-right:30px}
 .sch .rg.rgw .sf{position:relative;top:1px}
@@ -951,7 +963,8 @@ function tabHTML(k) {
     g.style.cssText = `position:absolute;top:${st.el.offsetTop}px;left:${st.el.offsetLeft}px;width:${st.W}px;min-height:${st.mode === 'day' ? Math.max(st.el.offsetHeight, window.innerHeight) : 0}px;margin:0;pointer-events:none;will-change:transform;transform:translate3d(${off * st.P}px,0,0)`;
     g.style.setProperty('margin', '0', 'important'); if (st.mode === 'day') { const cs = getComputedStyle(st.el); g.style.padding = cs.padding; g.style.boxSizing = 'border-box'; }
     g.innerHTML = html; try { relabel(g); markSort(g); zebra(g); dashAlign(g); pmAlign(g); } catch (e) {} st.el.parentNode.appendChild(g); try { alignGrp(g); if (st.mode !== 'day') addGlossary(topView(), g); } catch (e) {} if (st.mode !== 'day') g.querySelectorAll('.gloss').forEach(x => { if (state.player && state.player.tab !== 'ov') return; }); st.gh.push(g); };
-  document.addEventListener('touchstart', e => { S = null; if (e.touches.length !== 1 || pop()) return; const t = e.target; if (!t.closest) return;
+  document.addEventListener('touchcancel', () => { const st = S; S = null; if (!st || !st.hz) return; if (raf) { cancelAnimationFrame(raf); raf = 0; } anim(st, 0, 200, () => cleanup(st)); }, { passive: true });
+  document.addEventListener('touchstart', e => { if (S && S.hz) { try { cleanup(S); } catch (er) {} } S = null; $app.querySelectorAll('.ghost').forEach(g => g.remove()); if (e.touches.length !== 1 || pop()) return; const t = e.target; if (!t.closest) return;
     const v = topView(), x = e.touches[0].clientX, y = e.touches[0].clientY, base = { x0: x, y0: y, t0: Date.now(), x: 0, hz: false, gh: [] };
     if (v === 'list') { if (state.league === 'fav' || t.closest('header, #fhome, #ptr')) return; const items = [...$app.querySelectorAll('.dy')], cur = items.findIndex(b => b.classList.contains('on')); if (cur < 0) return;
       S = Object.assign(base, { mode: 'day', el: $app.querySelector('main'), cls: '', items, cur }); return; }
@@ -998,7 +1011,7 @@ function tabHTML(k) {
 let _shR = 0; const shrinkUpd = () => { _shR = 0; const w = document.querySelector('.stkw.det'); if (!w) return; const p = 0; w.style.setProperty('--p', p.toFixed(3)); };
 window.addEventListener('scroll', () => { if (!_shR) _shR = requestAnimationFrame(shrinkUpd); }, { passive: true });
 (() => { let x0 = 0, y0 = 0; document.addEventListener('touchstart', e => { x0 = e.touches[0].clientX; y0 = e.touches[0].clientY; }, { passive: true });
-  document.addEventListener('touchmove', e => { if (!document.documentElement.classList.contains('lock1') || e.touches.length !== 1) return; const dx = Math.abs(e.touches[0].clientX - x0), dy = Math.abs(e.touches[0].clientY - y0); if (dy > dx) e.preventDefault(); }, { passive: false }); })();
+  document.addEventListener('touchmove', e => { if (!document.documentElement.classList.contains('lock1') || e.touches.length !== 1) return; const dx = Math.abs(e.touches[0].clientX - x0), dy = Math.abs(e.touches[0].clientY - y0); void dx; void dy; }, { passive: true }); })();
 window.SIL = 'data:image/svg+xml,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" fill="#2c2c2e"/><circle cx="50" cy="38" r="18" fill="#0d0d0f"/><path d="M14 100c2-22 17-34 36-34s34 12 36 34z" fill="#0d0d0f"/></svg>');
 const CMP_SVG = '<svg viewBox="0 0 24 24"><path d="M4 8h14l-4-4M20 16H6l4 4"/></svg>';
 const STAR_SVG = '<svg viewBox="0 0 24 24"><path d="M12 3.2l2.7 5.6 6.1.8-4.5 4.2 1.1 6.1L12 17l-5.4 2.9 1.1-6.1L3.2 9.6l6.1-.8z"/></svg>';
@@ -2871,10 +2884,11 @@ function scheduleHTML(t) {
     const mine = e.home.id === t.id ? e.home : e.away, opp = mine === e.home ? e.away : e.home;
     const d = new Date(e.date), when = DAYS[d.getDay()] + ' ' + d.getDate() + '.' + (d.getMonth() + 1) + '.';
     let res;
-    if (e.state === 'pre') res = `<span class="rg rgw"><i></i><span class="tm">${esc(e.tbd ? 'TBD' : fmtTime(e.date))}</span><i></i></span>`;
+    const lgc = t.league === 'nba' ? ' w3' : t.league === 'nhl' ? ' w1' : '', tsc = x => { const m = String(x).match(/^(\d{1,2}):(\d{2})$/); return m ? `<span class="sc2 tmc"><b>${m[1]}</b><i>:</i><b>${m[2]}</b></span>` : `<span class="tm">${esc(x)}</span>`; };
+    if (e.state === 'pre') res = `<span class="rg rgw${lgc}"><i></i>${e.tbd ? '<span class="tm">TBD</span>' : tsc(fmtTime(e.date))}<i></i></span>`;
     else if (e.state === 'in') { const per = (String(e.short).split(/\s*-\s*/)[1] || String(e.short)).replace(/^(End|Start) of /i, '').replace(/ (Quarter|Period)$/i, ''), hs = mine.score != null && mine.score !== '' && opp.score != null && opp.score !== '';
       const clk = String(e.short).split(/\s*-\s*/)[0];
-      res = !hs && /\d/.test(clk) ? `<span class="rg rgw lvr${t.league === 'nba' ? ' w3' : ''}"><small class="sf">${esc(per)}</small><span class="tm">${esc(clk)}</span><span class="ldot"></span></span>` : hs ? `<span class="rg rgw lvr${t.league === 'nba' ? ' w3' : ''}"><small class="sf">${esc(per)}</small><span class="sc2"><b>${esc(mine.score)}</b><i>:</i><b>${esc(opp.score)}</b></span><span class="ldot"></span></span>` : `<span class="live">${esc(e.short)}</span>`; }
+      res = !hs && /\d/.test(clk) ? `<span class="rg rgw lvr${lgc}"><small class="sf">${esc(per)}</small>${tsc(clk)}<span class="ldot"></span></span>` : hs ? `<span class="rg rgw lvr${lgc}"><small class="sf">${esc(per)}</small><span class="sc2"><b>${esc(mine.score)}</b><i>:</i><b>${esc(opp.score)}</b></span><span class="ldot"></span></span>` : `<span class="live">${esc(e.short)}</span>`; }
     else {
       const tie = String(mine.score) !== '' && String(mine.score) === String(opp.score), w = mine.winner, sfx = e.short.replace(/^Final\/?/, '');
       res = `<span class="rg rgw${t.league === 'nba' ? ' w3' : t.league === 'nhl' ? ' w1' : ''}"><small class="sf">${esc(sfx)}</small><span class="sc2"><b class="${w ? '' : 'mu'}">${esc(mine.score)}</b><i>:</i><b class="${w ? 'mu' : ''}">${esc(opp.score)}</b></span><span class="${tie ? 'T' : w ? 'W' : 'L'}">${tie ? 'T' : w ? 'W' : 'L'}</span></span>`;
@@ -3750,10 +3764,13 @@ async function loadLeaders() {
       if (miss.length) { const j2 = await getJson(u.replace('isqualified=true', 'isqualified=false').replace('limit=100', 'limit=1000'));
         (j2.athletes || []).forEach(a => { const id = String((a.athlete || {}).id); if (!miss.includes(id)) return; const ac = a.categories || [];
           rows.push({ a: a.athlete || {}, vals: cols.map(col => { const x = ac.find(q => q.name === col.ci); if (!x) return ''; const arr = x.totals || x.values || []; return arr[col.k] != null ? arr[col.k] : ''; }) }); }); } } catch (e) {}
+    if (cg === 'goaltending') { const ix = n => cols.findIndex(c => c.name === n), gaI = ix('goalsAgainst'), tI = ix('timeOnIcePerGame'), gpI = Math.max(ix('gamesPlayed'), ix('games')), aI = Math.max(ix('avgGoalsAgainst'), ix('goalsAgainstAverage'));
+      const mins = x => { const t = String(x == null ? '' : x).trim(), m = t.match(/^(\d+):(\d{2})$/); if (m) return +m[1] + m[2] / 60; const n = parseFloat(t.replace(/,/g, '')); return isNaN(n) ? NaN : n > 200 ? n / 60 : n; };
+      if (gaI >= 0 && tI >= 0 && gpI >= 0 && aI >= 0) rows.forEach(r => { const ga = parseFloat(r.vals[gaI]), gp = parseFloat(r.vals[gpI]), tm = mins(r.vals[tI]) * gp; if (ga >= 0 && tm > 30) { const g = ga * 60 / tm; if (g > 0 && g < 10) r.vals[aI] = g.toFixed(2); } }); }
     v.data = { cols, rows };
     const keys = catKeys(v.cat);
     const li = leaderCol(cols, v, keys);
-    if (v.sk == null) v.sk = li >= 0 ? li : 0;
+    if (v.sk == null) { v.sk = li >= 0 ? li : 0; const sc = cols[v.sk] || {}; v.asc = v.asc0 = /^(avgGoalsAgainst|goalsAgainstAverage)$/i.test(sc.name || ''); }
   } catch (e) {
     try {
       const j = await getJson('https://sports.core.api.espn.com/v2/sports/' + parts[0] + '/leagues/' + parts[1] + '/seasons/' + seasonYear(v.league) + '/types/2/leaders?limit=50&lang=en&region=us');
@@ -3942,7 +3959,7 @@ $app.addEventListener('click', ev => {
     window._fromList = true; window._ldY = state.lv.sy || null; window._ldL = { lab: d.cla || '', title: d.clt || '' }; location.hash = '#/leaders/' + state.lv.league + '/' + (d.cl || 'x');
   } else if (d.lsort !== undefined) {
     const v = state.lv, k = +d.lsort; if (v.sk0 == null) v.sk0 = v.sk;
-    if (v.sk === k && v.manual && v.asc) { v.sk = v.sk0; v.asc = false; v.manual = false; } else if (v.sk === k && v.manual) v.asc = true; else { v.sk = k; v.asc = false; v.manual = true; } render();
+    if (v.sk === k && v.manual && v.asc) { v.sk = v.sk0; v.asc = !!v.asc0; v.manual = false; } else if (v.sk === k && v.manual) v.asc = true; else { v.sk = k; v.asc = false; v.manual = true; } render();
   } else if (d.pst) {
     window._twReset = 1;
     state.player.pst = d.pst; if (d.pst === 'ncaa') loadNcaa(state.player); render();
