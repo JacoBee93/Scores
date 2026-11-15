@@ -221,8 +221,6 @@ th:last-child,td:last-child{padding-right:1px}
 tbody tr:first-child td{padding-top:11px}
 td.n{text-align:left;padding-left:0;position:sticky;left:0;background:var(--card);font-family:var(--num);font-weight:700;font-size:16.5px;line-height:1.1}
 .pn{display:inline-block;max-width:118px;overflow:hidden;text-overflow:ellipsis;vertical-align:bottom}
-td.n .pn:has(+ small:not(:empty)){max-width:min(118px, calc(100% - 2.4em))}
-.fx td.n .pn:has(+ small:not(:empty)),.nfx td.n .pn:has(+ small:not(:empty)){max-width:calc(100% - 2.4em)}
 td.n small{color:var(--mut);font-family:-apple-system,sans-serif;font-size:10px;font-weight:600;margin-left:4px}
 .neg{display:inline-block;width:.45em;margin-left:-.45em;text-align:right}
 tr[data-player]{cursor:pointer}
@@ -428,8 +426,8 @@ body{min-height:100vh}
 .ld.sil .lv{color:var(--mut)}
 .nmw{position:sticky;left:0;width:calc(100vw - 44px);max-width:576px;text-align:center}
 .gl2 tr.nomore td{text-align:center !important;color:var(--mut);font-size:13px;padding:14px 0 4px !important;background:none !important}
-#artpop{position:fixed;inset:0;z-index:160;background:transparent;display:flex;align-items:flex-end;justify-content:center}
-.artbox{position:relative;width:calc(100% - 20px);max-width:620px;max-height:88vh;overflow-y:auto;background:#1c1c1e;border-radius:22px 22px 0 0;padding:18px 18px calc(28px + env(safe-area-inset-bottom));box-sizing:border-box;-webkit-overflow-scrolling:touch}
+#artpop{position:fixed;inset:0;z-index:160;background:transparent;pointer-events:none;display:flex;align-items:flex-end;justify-content:center}
+.artbox{pointer-events:auto;box-shadow:0 18px 26px -10px rgba(0,0,0,.6),0 4px 6px -2px rgba(0,0,0,.35),inset 0 1px 0 rgba(255,255,255,.07);position:relative;width:calc(100% - 20px);max-width:620px;max-height:88vh;overflow-y:auto;background:#1c1c1e;border-radius:22px 22px 0 0;padding:18px 18px calc(28px + env(safe-area-inset-bottom));box-sizing:border-box;-webkit-overflow-scrolling:touch}
 .artbox h2{font-size:21px;line-height:1.25;margin:4px 40px 6px 0}
 .artbox h3{font-size:16px;margin:16px 0 4px}
 .artbox p{font-size:15.5px;line-height:1.5;color:#e5e5ea;margin:10px 0}
@@ -997,7 +995,7 @@ function tabHTML(k) {
 }
 (() => {
   let S = null, raf = 0;
-  const pop = () => document.getElementById('wpov') || document.getElementById('brpop') || document.getElementById('artpop');
+  const pop = () => document.getElementById('wpov') || document.getElementById('brpop');
   const keyOf = b => b && (b.dataset.tab || b.dataset.ptab || b.dataset.ttab);
   const apply = () => { raf = 0; if (!S || !S.hz) return; const x = S.x;
     S.el.style.transform = `translate3d(${x}px,0,0)`; if (S.hp) S.hp.style.transform = `translate3d(${x}px,0,0)`; S.gh.forEach(g => g.style.transform = `translate3d(${x + g._off * S.P}px,0,0)`);
@@ -1014,14 +1012,16 @@ function tabHTML(k) {
   const ghost = (st, html, off) => { const g = document.createElement('div'); g.className = st.cls + ' ghost'; g._off = off;
     g.style.cssText = `position:absolute;top:${st.el.offsetTop}px;left:${st.el.offsetLeft}px;width:${st.W}px;min-height:${st.mode === 'day' ? Math.max(st.el.offsetHeight, window.innerHeight) : 0}px;margin:0;pointer-events:none;will-change:transform;transform:translate3d(${off * st.P}px,0,0)`;
     g.style.setProperty('margin', '0', 'important'); if (st.mode === 'day') { const cs = getComputedStyle(st.el); g.style.padding = cs.padding; g.style.boxSizing = 'border-box'; }
-    g.innerHTML = html; try { relabel(g); markSort(g); zebra(g); dashAlign(g); pmAlign(g); } catch (e) {} st.el.parentNode.appendChild(g); try { alignGrp(g); if (st.mode !== 'day') addGlossary(topView(), g); } catch (e) {} st.gh.push(g);
+    g.innerHTML = html; try { relabel(g); markSort(g); zebra(g); dashAlign(g); pmAlign(g); } catch (e) {} st.el.parentNode.appendChild(g); try { alignGrp(g); if (st.mode !== 'day') addGlossary(topView(), g); } catch (e) {} if (st.mode !== 'day' && g.querySelector('.nws')) { const h = window._ovH || +(localStorage.getItem('ovH') || 0) || 415; g.style.minHeight = h + 'px'; g.classList.add('nwp'); } else if (st.mode !== 'day' && g.querySelector('tr.nomore')) { const h = window._ovH || +(localStorage.getItem('ovH') || 0); if (h > 200) g.style.minHeight = h + 'px'; }
+    st.gh.push(g);
     if (st.hp) { const c = st.hp.cloneNode(true); c._off = off; c.classList.add('ghost'); const day = st.hpGap == null; c.style.cssText = `position:absolute;left:${day ? st.hp.offsetLeft : g.offsetLeft}px;width:${day ? st.hp.offsetWidth : g.offsetWidth}px;top:${day ? st.hpTop : g.offsetTop + g.offsetHeight + st.hpGap}px;margin:0;pointer-events:none;will-change:transform;transform:translate3d(${off * st.P}px,0,0)`; st.el.parentNode.appendChild(c); st.gh.push(c); } };
   document.addEventListener('touchcancel', () => { const st = S; S = null; if (!st || !st.hz) return; if (raf) { cancelAnimationFrame(raf); raf = 0; } anim(st, 0, 200, () => cleanup(st)); }, { passive: true });
   document.addEventListener('touchstart', e => { if (S && S.hz) { try { cleanup(S); } catch (er) {} } S = null; $app.querySelectorAll('.ghost').forEach(g => g.remove()); if (e.touches.length !== 1 || pop()) return; const t = e.target; if (!t.closest) return;
+    if (window.isSAm && isSAm() && e.touches[0].clientX <= 24 && topView() !== 'list') return;
     const v = topView(), x = e.touches[0].clientX, y = e.touches[0].clientY, base = { x0: x, y0: y, t0: Date.now(), x: 0, hz: false, gh: [] };
     if (v === 'list') { if (state.league === 'fav' || t.closest('header, #fhome, #ptr')) return; const items = [...$app.querySelectorAll('.dy')], cur = items.findIndex(b => b.classList.contains('on')); if (cur < 0) return;
       S = Object.assign(base, { mode: 'day', el: $app.querySelector('main'), cls: '', items, cur }); return; }
-    const pe = t.closest('.pane') || (!t.closest('.stkw, header, #artpop, .hpill, input') ? $app.querySelector(':scope > main > .pane') : null);
+    const pe = t.closest('.pane') || (!t.closest('.stkw, header, .hpill, input') ? $app.querySelector(':scope > main > .pane') : null);
     if (!pe || t.closest('.brsw, .mstrip, .wpw, .rkw, .ysel, .ylist, .scf, .cmpr, input, .ghost')) return;
     const bs = [...$app.querySelectorAll('.dtabs button')]; if (bs.length < 2) return; const cur = bs.findIndex(b => b.classList.contains('on')); if (cur < 0) return;
     const tw = t.closest('.tw'); S = Object.assign(base, { mode: 'tab', el: pe, cls: 'pane t', items: bs, cur, tw, st0: tw ? tw.scrollLeft : 0 }); }, { passive: true });
@@ -1030,6 +1030,7 @@ function tabHTML(k) {
       if (Math.abs(dy) > 10 && Math.abs(dy) > Math.abs(dx)) { S = null; return; }
       if (Math.abs(dx) < 8) return;
       if (S.tw && S.tw.scrollWidth > S.tw.clientWidth + 2) { const atL = S.st0 <= 1, atR = S.st0 >= S.tw.scrollWidth - S.tw.clientWidth - 1; if (!((dx > 0 && atL) || (dx < 0 && atR))) { S = null; return; } }
+      { const ap = document.getElementById('artpop'); if (ap) { ap.remove(); document.body.style.overflow = ''; } }
       S.hz = true; S.W = S.el.offsetWidth; S.P = S.W + (S.mode === 'tab' ? 18 : 0); S.el.parentNode.style.position = 'relative';
       { const hp = $app.querySelector(':scope > .hpw'); if (hp) { S.hp = hp; S.hpGap = S.mode === 'tab' ? hp.getBoundingClientRect().top - S.el.getBoundingClientRect().bottom : null; S.hpTop = hp.offsetTop; } } S.el.style.willChange = 'transform'; S.x0 = t.clientX;
       [[S.cur - 1, -1], [S.cur + 1, 1]].forEach(([k, off]) => { if (k < 0 || k >= S.items.length) return;
@@ -1418,6 +1419,17 @@ function addGlossary(v, pane0) {
   pane.insertAdjacentHTML('beforeend', `<section class="gloss"><h4>Glossary</h4><div class="gg">${items.map(([k, d]) => `<div class="${onK.has(String(k).toUpperCase()) ? 'gon' : ''}"><b>${esc(k)}:</b> ${esc(d)}</div>`).join('')}</div></section>`);
 }
 let _stA = 0;
+window.isSAm = () => navigator.standalone === true || (window.matchMedia && matchMedia('(display-mode: standalone)').matches);
+(() => { let E = null; const reset = () => { $app.style.transition = ''; $app.style.transform = ''; $app.style.willChange = ''; };
+  document.addEventListener('touchstart', e => { E = null; if (!isSAm() || e.touches.length !== 1 || topView() === 'list' || document.getElementById('wpov')) return; const x = e.touches[0].clientX; if (x > 24) return; E = { x0: x, y0: e.touches[0].clientY, dx: 0, on: false }; }, { passive: true });
+  document.addEventListener('touchmove', e => { if (!E) return; const t = e.touches[0], dx = t.clientX - E.x0, dy = t.clientY - E.y0;
+    if (!E.on) { if (Math.abs(dy) > 12 && Math.abs(dy) > dx) { E = null; return; } if (dx < 10) return; E.on = true; $app.style.willChange = 'transform'; const ap = document.getElementById('artpop'); if (ap) { ap.remove(); document.body.style.overflow = ''; } }
+    E.dx = Math.max(0, dx); $app.style.transform = `translate3d(${E.dx}px,0,0)`; }, { passive: true });
+  const end = () => { const st = E; E = null; if (!st || !st.on) return; const W = window.innerWidth, go = st.dx > W * .28;
+    $app.style.transition = 'transform .22s cubic-bezier(.2,.8,.2,1)'; $app.style.transform = `translate3d(${go ? W : 0}px,0,0)`;
+    setTimeout(() => { if (go) { const bb = $app.querySelector('[data-back]'); $app.style.transition = ''; $app.style.opacity = '0'; let done = false; const fin = () => { if (done) return; done = true; requestAnimationFrame(() => { reset(); $app.style.opacity = ''; }); }; window.addEventListener('hashchange', () => setTimeout(fin, 0), { once: true }); setTimeout(fin, 400); if (bb) bb.click(); else history.back(); } else reset(); }, 230); };
+  document.addEventListener('touchend', end, { passive: true }); document.addEventListener('touchcancel', end, { passive: true });
+})();
 function smoothTop(ms) { ms = ms || 380; const y0 = window.scrollY; cancelAnimationFrame(_stA); if (y0 < 2) { window.scrollTo(0, 0); return; }
   document.body.style.minHeight = (y0 + window.innerHeight) + 'px'; window._stAnim = 1; const t0 = performance.now();
   const f = now => { const u = Math.min(1, (now - t0) / ms), e = 1 - Math.pow(1 - u, 3); window.scrollTo(0, Math.round(y0 * (1 - e))); if (u < 1) _stA = requestAnimationFrame(f); else { document.body.style.minHeight = ''; window._stAnim = 0; try { listLock(); detLock(); } catch (er) {} } }; _stA = requestAnimationFrame(f); }
@@ -1605,7 +1617,7 @@ const gTd = (S, vals) => vals.map((v, k) => `<td class="${S.k === k ? 'on' : ''}
 function tbl(title, labels, rows) {
   const S = gSort(title, labels, rows); rows = S.rows;
   const trs = rows.map(r => `<tr data-player="${esc(r.id)}" data-pn="${esc(r.name)}" data-pp="${esc(r.pos)}" data-pj="${esc(r.jersey)}" data-pl="${esc(state.game ? state.game.league : '')}" data-pt="${esc(teamNameOf(r.ti))}">
-    <td class="n"><span class="pn">${esc(r.name || r.short)}</span><small>${esc(r.pos)}</small></td>${gTd(S, r.vals)}</tr>`).join('');
+    <td class="n"><span class="pn">${esc(shortNm(r.name || r.short))}</span><small>${esc(r.pos)}</small></td>${gTd(S, r.vals)}</tr>`).join('');
   return `<section class="blk"><div class="tw"><table class="gst"><thead><tr><th class="n">${esc(title)}</th>${gTh(S, labels)}</tr></thead><tbody>${trs}</tbody></table></div></section>`;
 }
 function nflTbl(title, labels, rows, totals) {
@@ -1613,7 +1625,7 @@ function nflTbl(title, labels, rows, totals) {
   const w = l => /\//.test(l) ? 62 : String(l).length > 4 ? 58 : 46;
   const tw = 128 + labels.reduce((a, l) => a + w(l), 0);
   const trs = rows.map(r => `<tr data-player="${esc(r.id)}" data-pn="${esc(r.name)}" data-pp="${esc(r.pos)}" data-pj="${esc(r.jersey)}" data-pl="nfl" data-pt="${esc(teamNameOf(r.ti))}">
-    <td class="n"><span class="pn">${esc(r.name || r.short)}</span><small>${esc(r.pos)}</small></td>${gTd(S, r.vals)}</tr>`).join('') + (totals ? `<tr class="tot"><td class="n">Total</td>${labels.map((l, k) => `<td>${nv(totals[k] != null ? totals[k] : '')}</td>`).join('')}</tr>` : '');
+    <td class="n"><span class="pn">${esc(shortNm(r.name || r.short))}</span><small>${esc(r.pos)}</small></td>${gTd(S, r.vals)}</tr>`).join('') + (totals ? `<tr class="tot"><td class="n">Total</td>${labels.map((l, k) => `<td>${nv(totals[k] != null ? totals[k] : '')}</td>`).join('')}</tr>` : '');
   return `<section class="blk"><div class="tw"><table class="nfx" style="width:max(100%, ${tw}px)"><colgroup><col>${labels.map(l => `<col style="width:${w(l)}px">`).join('')}</colgroup><thead><tr><th class="n">${esc(title)}</th>${gTh(S, labels)}</tr></thead><tbody>${trs}</tbody></table></div></section>`;
 }
 function mergedAthletes(t) {
@@ -1749,7 +1761,7 @@ function showArt(a, names0, web) {
 document.addEventListener('click', ev => {
   if (ev.target.closest('[data-artopen]')) { openArticle(); return; }
   { const nwi = ev.target.closest('[data-news]'); if (nwi && !document.getElementById('artpop')) { openNews(nwi.dataset.nk, +nwi.dataset.news); return; } }
-  const p = document.getElementById('artpop'); if (p && (ev.target.closest('[data-artclose]') || ev.target === p)) { p.remove(); document.body.style.overflow = ''; }
+  const p = document.getElementById('artpop'); if (p && (ev.target.closest('[data-artclose]') || !ev.target.closest('.artbox'))) { p.remove(); document.body.style.overflow = ''; }
 });
 window.addEventListener('hashchange', () => { const p = document.getElementById('artpop'); if (p) { p.remove(); document.body.style.overflow = ''; } });
 function summaryGameHTML(g) {
@@ -2028,7 +2040,7 @@ function teamColor(c, fb) {
   return '#' + h;
 }
 const SL_CATS = {
-  nfl: [[/^passingYards$/i, 'Passing Yards', 'YDS'], [/^rushingYards$/i, 'Rushing Yards', 'YDS'], [/^receivingYards$/i, 'Receiving Yards', 'YDS'], [/^sacks$/i, 'Sacks', 'SACKS']],
+  nfl: [[/^passingYards$/i, 'Passing Yards', 'YDS'], [/^rushingYards$/i, 'Rushing Yards', 'YDS'], [/^receivingYards$/i, 'Receiving Yards', 'YDS'], [/^sacks$/i, 'Sacks', 'SACKS'], [/^interceptions$/i, 'Interceptions', 'INT']],
   nba: [[/^pointsPerGame$|^avgPoints$/i, 'Points', 'PPG'], [/^reboundsPerGame$|^avgRebounds$/i, 'Rebounds', 'RPG'], [/^assistsPerGame$|^avgAssists$/i, 'Assists', 'APG'], [/^stealsPerGame$|^avgSteals$/i, 'Steals', 'SPG']],
   nhl: [[/^goals$/i, 'Goals', 'G'], [/^assists$/i, 'Assists', 'A'], [/^points$/i, 'Points', 'PTS'], [/^plusMinus$|^plusminus$|^plusMinusRating$/i, 'Plus/Minus', ''], [/^savePct$|^savePercentage$|^savepercentage$/i, 'Save Percentage', 'SV%']]
 };
@@ -2145,8 +2157,9 @@ function pvLeaders(g, gm) {
   const names = []; [...la, ...lh].forEach(c => { if (c && c.name && !names.includes(c.name)) names.push(c.name); });
   const ord = (SL_CATS[g.league] || []).map(x => x[1]); names.sort((a, b) => (ord.indexOf(a) + 99) % 99 - (ord.indexOf(b) + 99) % 99);
   if (useSl) { names.length = 0; ord.forEach(x => names.push(x)); }
+  else if (gm && g.league === 'nfl') { const pool = names.slice(); names.length = 0; SL_CATS.nfl.forEach(([re, title]) => { names.push(pool.find(x => re.test(x)) || title); }); }
   const side = (top, right, tm) => {
-    if (!top || !top.athlete) return `<div class="ld ldx sil ${right ? 'r' : ''}"><img class="hs" src="${SIL}" alt=""><div class="lt"><div class="lv">–</div></div></div>`;
+    if (!top || !top.athlete) return `<div class="ld sil ${right ? 'r' : ''}"><img class="hs" src="${SIL}" alt=""><div class="lt"><div class="lv">–</div></div></div>`;
     const a = top.athlete, ms = top.mainStat; let val = ms ? `${ms.value} ${ms.label || ''}` : (top.displayValue || ''), sub = ms ? (top.summary || '') : '';
     if (!ms && /,/.test(val)) { const ps = val.split(/,\s*/), mi = Math.max(0, ps.findIndex(x => /\b(YDS|PTS)\b/i.test(x))); sub = ps.filter((_, k) => k !== mi).join(', '); val = ps[mi]; }
     const pos = (a.position && a.position.abbreviation) || '';
@@ -4283,7 +4296,7 @@ setInterval(() => {
   if (document.hidden) return;
   const v = topView();
   if (v === 'game') { if (state.game.ev && state.game.ev.state === 'in') loadGame(); }
-  else if (v === 'list' && state.events.some(e => e.state === 'in')) loadList(true);
+  if (state.league !== 'fav' && state.events.some(e => e.state === 'in') && (v === 'list' || v === 'game' || v === 'team' || v === 'player' || v === 'lv')) loadList(true);
 }, 30000);
 document.addEventListener('visibilitychange', () => {
   if (document.hidden) return;
