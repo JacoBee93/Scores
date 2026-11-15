@@ -423,11 +423,12 @@ body{min-height:100vh}
 .nwd{font-size:11.5px;color:var(--mut);margin-top:2px}
 .pane > .glsec:last-child{margin-bottom:0}
 .ld.sil .hs{opacity:.55}
-.ld.sil .lv{color:var(--mut)}
+.ld.sil{align-items:center}
+.ld.sil .nd{margin:0}
 .nmw{position:sticky;left:0;width:calc(100vw - 44px);max-width:576px;text-align:center}
 .gl2 tr.nomore td{text-align:center !important;color:var(--mut);font-size:13px;padding:14px 0 4px !important;background:none !important}
 #artpop{position:fixed;inset:0;z-index:160;background:transparent;pointer-events:none;display:flex;align-items:flex-end;justify-content:center}
-.artbox{pointer-events:auto;box-shadow:0 18px 26px -10px rgba(0,0,0,.6),0 4px 6px -2px rgba(0,0,0,.35),inset 0 1px 0 rgba(255,255,255,.07);position:relative;width:calc(100% - 20px);max-width:620px;max-height:88vh;overflow-y:auto;background:#1c1c1e;border-radius:22px 22px 0 0;padding:18px 18px calc(28px + env(safe-area-inset-bottom));box-sizing:border-box;-webkit-overflow-scrolling:touch}
+.artbox{touch-action:pan-y;overscroll-behavior:contain;pointer-events:auto;box-shadow:0 18px 26px -10px rgba(0,0,0,.6),0 4px 6px -2px rgba(0,0,0,.35),inset 0 1px 0 rgba(255,255,255,.07);position:relative;width:calc(100% - 20px);max-width:620px;max-height:88vh;overflow-y:auto;background:#1c1c1e;border-radius:22px 22px 0 0;padding:18px 18px calc(28px + env(safe-area-inset-bottom));box-sizing:border-box;-webkit-overflow-scrolling:touch}
 .artbox h2{font-size:21px;line-height:1.25;margin:4px 40px 6px 0}
 .artbox h3{font-size:16px;margin:16px 0 4px}
 .artbox p{font-size:15.5px;line-height:1.5;color:#e5e5ea;margin:10px 0}
@@ -486,6 +487,7 @@ tr.zb > td{background:#26262a !important}
 .tot2l .slg{width:16px !important;height:16px !important;margin:0 !important}
 .tot2l .slg + .slg{margin-left:-3px !important}
 .nfx tr.ctot td.n{text-overflow:clip !important}
+.nfx td.n{text-overflow:clip !important}
 .tot2l .chev{margin-left:6px}
 .lsc{width:100%}
 .lsc th,.lsc td{text-align:center;padding:9px 4px;font-size:15px}
@@ -568,6 +570,9 @@ tr.zb > td{background:#26262a !important}
 .jn{display:inline-block;width:24px;color:var(--mut);font-family:-apple-system,sans-serif;font-size:11px;font-weight:600}
 .pane > .blk:first-child{margin-top:6px}
 .sch th.n,.sch td.n{width:auto;min-width:92px}
+.sch.sch-nfl td.n{padding-left:22px !important}
+.sch.sch-nba td.n{padding-left:14px !important}
+.sch.sch-nhl td.n{padding-left:32px !important}
 .sch{table-layout:fixed;width:100%}
 .schw{overflow:hidden}
 .sch .opp{width:auto;text-align:left;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -1360,8 +1365,7 @@ async function loadTeam() {
   const t = state.team; if (!t) return;
   const base = API + LEAGUES[t.league].path + '/teams/' + t.id, sq = t.sy ? 'season=' + t.sy : '', q1 = sq ? '?' + sq : '', q2 = sq ? '&' + sq : '', rq = t.req = (t.req || 0) + 1;
   const res = await Promise.allSettled([getJson(base), getJson(base + '/roster' + q1), getJson(base + '/schedule' + q1), getJson(base + '/statistics' + (t.stype === 3 ? '?seasontype=3&season=' + (t.sy || seasonYear(t.league)) : q1)),
-    getJson(base + '/schedule?seasontype=1' + q2), getJson(base + '/schedule?seasontype=3' + q2), ensureTeams(t.league), getJson(base + '/schedule?seasontype=1&season=' + (t.sy || seasonYear(t.league))).catch(() => null),
-    t.league === 'nfl' ? getJson(API + LEAGUES.nfl.path + '/scoreboard?seasontype=1&week=1&limit=100&dates=' + (t.sy || seasonYear('nfl'))).then(j => ({ events: ((j && j.events) || []).filter(ev => ((ev.competitions && ev.competitions[0] && ev.competitions[0].competitors) || []).some(c => String((c.team && c.team.id) || c.id) === String(t.id))).map(ev => Object.assign({ seasonType: { name: 'Preseason' } }, ev)) })).catch(() => null) : Promise.resolve(null)]);
+    getJson(base + '/schedule?seasontype=1' + q2), getJson(base + '/schedule?seasontype=3' + q2), ensureTeams(t.league)]);
   if (t.req !== rq || state.team !== t) return;
   const val = r => r.status === 'fulfilled' ? r.value : null;
   const er = r => r.status === 'rejected' ? String((r.reason && r.reason.message) || r.reason) : null;
@@ -1369,7 +1373,7 @@ async function loadTeam() {
   t.sched = val(res[2]); t.schedErr = er(res[2]); t.stats = val(res[3]); t.statsErr = er(res[3]);
   if (t.league === 'nhl') { const c = await coreTeamStats('nhl', t.id, t.sy || seasonYear('nhl')); if (c) { t.stats = t.stats || {}; t.stats._core = c; } }
   const seen = new Set(); t.events = [];
-  [res[2], res[4], res[5], res[7], res[8]].forEach(r => {
+  [res[2], res[4], res[5]].forEach(r => {
     const j = val(r);
     ((j && j.events) || []).forEach(ev => {
       if (!ev || seen.has(ev.id)) return;
@@ -1437,7 +1441,7 @@ function detLock() { const v = topView(); if (window._stAnim) return; const lk =
   if (lk && document.documentElement.scrollHeight - window.innerHeight < 280) { window.scrollTo(0, 0); document.documentElement.classList.add('lock1'); } }
 function listLock() { if (topView() !== 'list' || window._stAnim) return; const m = $app.querySelector(':scope > main'), n = m ? m.querySelectorAll('[data-game]').length : 99; if (n <= 4 && document.documentElement.scrollHeight - window.innerHeight < 220) { window.scrollTo(0, 0); document.documentElement.classList.add('lock1'); } }
 function render() {
-  const key = viewKey(), same = key === state.lastView, y = same ? window.scrollY : 0, v = topView();
+  const key = viewKey(), same = key === state.lastView, back = window._backH === location.hash && Date.now() - (window._backT || 0) < 4000, y = same ? (back && window._backPend && window.scrollY < window._backY ? window._backY : window.scrollY) : (back ? (window._backPend = true, window._backY || 0) : (window._backPend = false, 0)), v = topView();
   const tws = same && !window._twReset ? [...document.querySelectorAll('.tw')].map(x => x.scrollLeft) : null; window._twReset = 0;
   if (v === 'player') renderPlayer(); else if (v === 'game') renderGame(); else if (v === 'team') renderTeam();
   else if (v === 'lv') renderLV(); else if (v === 'cmp') renderCompare(); else if (v === 'search') renderSearch(); else renderList();
@@ -1483,7 +1487,7 @@ function render() {
   addGlossary(v);
   $app.querySelectorAll('img[src*="/teamlogos/"]').forEach(im => { const d = dk(im.getAttribute('src')); if (d !== im.getAttribute('src')) im.setAttribute('src', d); });
   if (tws) document.querySelectorAll('.tw').forEach((x, i) => { if (tws[i]) x.scrollLeft = tws[i]; });
-  window.scrollTo(0, y);
+  window.scrollTo(0, y); if (window._backPend && Math.abs(window.scrollY - (window._backY || 0)) < 2) window._backPend = false;
 }
 const dk = u => String(u || '').replace(/(\/teamlogos\/\w+\/)500\/(?:scoreboard\/)?([\w-]+\.png)/, '$1500-dark/$2');
 const logoImg = src => src ? `<img src="${esc(src)}" alt="" onerror="this.style.visibility='hidden'">` : '<span class="ph"></span>';
@@ -1623,7 +1627,7 @@ function tbl(title, labels, rows) {
 function nflTbl(title, labels, rows, totals) {
   const S = gSort(title, labels, rows); rows = S.rows;
   const w = l => /\//.test(l) ? 62 : String(l).length > 4 ? 58 : 46;
-  const tw = 128 + labels.reduce((a, l) => a + w(l), 0);
+  const tw = 112 + labels.reduce((a, l) => a + w(l), 0);
   const trs = rows.map(r => `<tr data-player="${esc(r.id)}" data-pn="${esc(r.name)}" data-pp="${esc(r.pos)}" data-pj="${esc(r.jersey)}" data-pl="nfl" data-pt="${esc(teamNameOf(r.ti))}">
     <td class="n"><span class="pn">${esc(shortNm(r.name || r.short))}</span><small>${esc(r.pos)}</small></td>${gTd(S, r.vals)}</tr>`).join('') + (totals ? `<tr class="tot"><td class="n">Total</td>${labels.map((l, k) => `<td>${nv(totals[k] != null ? totals[k] : '')}</td>`).join('')}</tr>` : '');
   return `<section class="blk"><div class="tw"><table class="nfx" style="width:max(100%, ${tw}px)"><colgroup><col>${labels.map(l => `<col style="width:${w(l)}px">`).join('')}</colgroup><thead><tr><th class="n">${esc(title)}</th>${gTh(S, labels)}</tr></thead><tbody>${trs}</tbody></table></div></section>`;
@@ -1718,7 +1722,7 @@ function newsHTML(o, lg, kind) {
   if (o.news.loading) return `<div class="nws">${'<div class="nwi nsk"><span class="nwim"></span><div class="nwt"><div class="skl"></div><div class="skl s"></div></div></div>'.repeat(4)}</div>`;
   if (!o.news.items.length) return '<div class="nws"><div class="nwi nmn">No news available</div></div>';
   return `<div class="nws">${o.news.items.map((a, i) => { const im = a.images && a.images.find(x => x && (x.url || x.href)), src = im ? (im.url || im.href) : '';
-    return `<div class="nwi" data-news="${i}" data-nk="${kind}">${src ? `<img class="nwim" src="${esc(src)}" alt="" loading="lazy" onerror="this.style.visibility='hidden'">` : '<span class="nwim"></span>'}<div class="nwt"><div class="nwh">${esc(a.headline)}</div><div class="nwd">${esc(agoTxt(a.published || a.lastModified))}</div></div></div>`; }).join('')}${o.news.items.length < 4 ? `<div class="nwi nmn" style="flex-grow:${4 - o.news.items.length}">No more news</div>` : ''}</div>`;
+    return `<div class="nwi" data-news="${i}" data-nk="${kind}">${src ? `<img class="nwim" src="${esc(src)}" alt="" decoding="sync" onerror="this.style.visibility='hidden'">` : '<span class="nwim"></span>'}<div class="nwt"><div class="nwh">${esc(a.headline)}</div><div class="nwd">${esc(agoTxt(a.published || a.lastModified))}</div></div></div>`; }).join('')}${o.news.items.length < 4 ? `<div class="nwi nmn" style="flex-grow:${4 - o.news.items.length}">No more news</div>` : ''}</div>`;
 }
 const infoSeg = (attr, a, b, cur) => `<div class="seg pseg iseg" style="max-width:240px"><button data-${attr}="${a[0]}" class="${cur === a[0] ? 'on' : ''}">${a[1]}</button><button data-${attr}="${b[0]}" class="${cur === b[0] ? 'on' : ''}">${b[1]}</button></div>`;
 function playerInfoHTML(p, k) { k = k || p.tab; return infoSeg('ptab', ['ov', 'Overview'], ['news', 'News'], k) + (k === 'news' ? newsHTML(p, p.league, 'player') : overviewHTML(p)); }
@@ -2159,7 +2163,7 @@ function pvLeaders(g, gm) {
   if (useSl) { names.length = 0; ord.forEach(x => names.push(x)); }
   else if (gm && g.league === 'nfl') { const pool = names.slice(); names.length = 0; SL_CATS.nfl.forEach(([re, title]) => { names.push(pool.find(x => re.test(x)) || title); }); }
   const side = (top, right, tm) => {
-    if (!top || !top.athlete) return `<div class="ld sil ${right ? 'r' : ''}"><img class="hs" src="${SIL}" alt=""><div class="lt"><div class="lv">–</div></div></div>`;
+    if (!top || !top.athlete) return `<div class="ld sil ${right ? 'r' : ''}"><img class="hs" src="${SIL}" alt=""><div class="lt"><div class="ls nd">No data</div></div></div>`;
     const a = top.athlete, ms = top.mainStat; let val = ms ? `${ms.value} ${ms.label || ''}` : (top.displayValue || ''), sub = ms ? (top.summary || '') : '';
     if (!ms && /,/.test(val)) { const ps = val.split(/,\s*/), mi = Math.max(0, ps.findIndex(x => /\b(YDS|PTS)\b/i.test(x))); sub = ps.filter((_, k) => k !== mi).join(', '); val = ps[mi]; }
     const pos = (a.position && a.position.abbreviation) || '';
@@ -3032,7 +3036,7 @@ function scheduleHTML(t) {
       <td class="opp"><small>${mine === e.home ? 'vs' : '@'}</small>${logoImg(opp.logo || teamLogoOf(t.league, opp))}<b>${esc(teamShortOf(t.league, opp))}</b></td><td class="rs">${res}</td></tr>`;
   };
   let html = '', cur = null, rows = '';
-  const flush = () => { if (cur !== null && rows) html += `<section class="blk"><div class="schw"><table class="sch"><colgroup><col style="width:74px"><col><col style="width:134px"></colgroup><thead><tr><th class="n">${esc(cur || 'Games')}</th><th></th><th></th></tr></thead><tbody>${rows}</tbody></table></div></section>`; rows = ''; };
+  const flush = () => { if (cur !== null && rows) html += `<section class="blk"><div class="schw"><table class="sch sch-${t.league}"><colgroup><col style="width:74px"><col><col style="width:134px"></colgroup><thead><tr><th class="n">${esc(cur || 'Games')}</th><th></th><th></th></tr></thead><tbody>${rows}</tbody></table></div></section>`; rows = ''; };
   if (t.league === 'nfl') {
     const rk = n => /pre/i.test(n) ? 0 : /post|playoff/i.test(n) ? 2 : 1;
     [...sorted].sort((a, b) => rk(a.stype || '') - rk(b.stype || '') || new Date(a.date) - new Date(b.date)).forEach(e => { const st = e.stype || ''; if (st !== cur) { flush(); cur = st; } rows += row(e); });
@@ -3046,7 +3050,7 @@ function scheduleHTML(t) {
 const catName = (title, labels, league) => { const L = labels || []; if (league === 'nhl') { if (L.includes('GAA') || L.includes('SV%')) return 'Goalies'; if (L.includes('PTS') && L.includes('PIM')) return 'Skaters'; } return CAT_NAME[String(title).toLowerCase()] || (/regular season/i.test(title) ? 'Season' : title); };
 const CAT_NAME = { skating: 'Skaters', goaltending: 'Goalies', general: 'General' };
 const PREF = { nhl: ['GP','G','A','PTS','+/-','PIM','S','GS','W','L','OTL','GAA','SV%'], nba: ['GP','MIN','PTS','REB','AST','STL','BLK','FG%','3P%','FT%'] };
-const shortNm = n => { const p = String(n || '').trim().split(/\s+/); return p.length > 1 ? p[0][0] + '. ' + p.slice(1).join(' ') : n; };
+const shortNm = n => { const p = String(n || '').trim().split(/\s+/); if (p.length < 2) return n; let rest = p.slice(1).join(' '); if (/-/.test(rest) && rest.length > 12) rest = rest.replace(/^[^\s-]+-/, ''); return p[0][0] + '. ' + rest; };
 const lsGet = (k, ttl) => { try { const o = JSON.parse(localStorage.getItem(k) || 'null'); return o && Date.now() - o.t < ttl ? o.d : null; } catch (e) { return null; } };
 const lsSet = (k, d, listKey, max) => {
   try {
@@ -4099,6 +4103,10 @@ function route() {
   state.search = false; state.lsY = {}; state.lsTm = {};
   render(); loadList(true);
 }
+try { history.scrollRestoration = 'manual'; } catch (e) {}
+window._scrollMem = {}; window._hstack = [location.hash];
+window.addEventListener('scroll', () => { if (!window._stAnim) window._scrollMem[location.hash] = window.scrollY; }, { passive: true });
+window.addEventListener('hashchange', () => { const h = location.hash, st = window._hstack; if (st.length > 1 && st[st.length - 2] === h) { st.pop(); window._backY = window._scrollMem[h] || 0; window._backT = Date.now(); window._backH = h; } else { st.push(h); window._backY = 0; window._backH = null; } });
 window.addEventListener('hashchange', route);
 
 const $app = document.getElementById('app');
