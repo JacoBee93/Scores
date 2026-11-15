@@ -784,6 +784,7 @@ td.n .slg{width:20px;height:20px;object-fit:contain;vertical-align:-6px;margin-l
 .play.g .ast.nx{display:inline-block}
 .play.g .ast.nh{display:block}
 .sch .sc2.tmc b{font-weight:600;color:#fff}
+.sch .rg.rgw .sc2.tmc{grid-template-columns:22px 8px 22px !important}
 .sch .rg.lvr .sf{color:var(--live) !important;font-weight:700}
 .sch .rg.lvr .sc2 b{color:var(--live)}
 .sch .rg.lvr .sc2 i{color:var(--live)}
@@ -842,7 +843,7 @@ input[type=search]::-webkit-search-cancel-button{display:none;-webkit-appearance
 .favb{margin-bottom:14px;padding-bottom:4px;border-bottom:1px solid #2c2c2e}
 .ssv.lng{font-size:23px;font-weight:600;line-height:1;height:34.5px;display:flex;align-items:center;justify-content:center;white-space:nowrap}
 .ssg > div{display:flex;flex-direction:column;align-items:center;justify-content:flex-start}
-.pma{display:inline-grid;grid-template-columns:.6em 2ch;text-align:right}
+.pma{align-items:baseline;vertical-align:baseline;display:inline-grid;grid-template-columns:.6em 2ch;text-align:right}
 .pma i{font-style:normal;text-align:right}
 .gst td,.gst th{padding-left:6px !important;padding-right:6px !important}
 .stkw + main > .sec.dh:first-child,.stkw + main > .favh:first-child,.ghost > .sec.dh:first-child,.ghost > .favh:first-child{margin-top:-4px !important}
@@ -984,7 +985,7 @@ function tblAlign(root) {
 function pmAlign(root) {
   (root || $app).querySelectorAll('table').forEach(tb => { const hr = tb.tHead && tb.tHead.rows[tb.tHead.rows.length - 1]; if (!hr) return; let ci = -1, c = 0; [...hr.cells].forEach(x => { if (x.textContent.trim() === '+/-') ci = c; c += x.colSpan || 1; }); if (ci < 0 || !tb.tBodies[0]) return;
     const L = Math.max(1, ...[...tb.tBodies[0].rows].map(r => { const m = r.cells[ci] && r.cells[ci].textContent.trim().match(/^([+-]?)(\d+)$/); return m ? m[2].length : 0; }));
-    [...tb.tBodies[0].rows].forEach(r => { const cell = r.cells[ci]; if (!cell) return; const t = cell.textContent.trim(), m = t.match(/^([+-]?)(\d+)$/); if (!m) return; cell.innerHTML = `<span class="pma" style="grid-template-columns:.6em ${L}ch .6em"><i>${m[1] || ''}</i>${m[2]}<i></i></span>`; }); });
+    [...tb.tBodies[0].rows].forEach(r => { const cell = r.cells[ci]; if (!cell) return; const t = cell.textContent.trim(), m = t.match(/^([+-]?)(\d+)$/); if (!m) return; cell.innerHTML = `<span class="pma" style="grid-template-columns:.6em ${L}ch .6em"><i>${m[1] || '\u200b'}</i>${m[2]}<i>\u200b</i></span>`; }); });
 }
 function zebra(root) {
   (root || $app).querySelectorAll('table.nfx, table.fx, table.lbt, table.gst, table.ros, table.sch').forEach(tb => { const bd = tb.tBodies[0]; if (!bd) return; let z = false, last = false;
@@ -1350,6 +1351,9 @@ async function loadPlayer() {
   const err = r => r.status === 'rejected' ? String((r.reason && r.reason.message) || r.reason) : null;
   p.gl = res[0].status === 'fulfilled' ? res[0].value : null; p.glErr = err(res[0]);
   p.st = res[1].status === 'fulfilled' ? res[1].value : null; p.stErr = err(res[1]);
+  if (p.league === 'nhl' && p.gl && p.st) try { const N = p.gl.names || [], k = N.findIndex(n => /^shotsTotal$|^shots$/i.test(n)); if (k >= 0) { let sum = 0, any = false, last = 0;
+    (p.gl.seasonTypes || []).filter(st => /regular/i.test(st.displayName || '')).forEach(st => (st.categories || []).forEach(c => (c.events || []).forEach(ev => { const v = parseFloat((ev.stats || [])[k]); if (!isNaN(v)) { sum += v; any = true; } const d = p.gl.events && p.gl.events[ev.eventId] && new Date(p.gl.events[ev.eventId].gameDate); if (d && d > last) last = d; })));
+    if (any && last) { const y = last.getMonth() >= 6 ? last.getFullYear() + 1 : last.getFullYear(); p.st._glShots = { [y]: String(sum) }; } } } catch (e) {}
   p.done = true;
   if (state.player === p) render();
   if (p.st) loadPost(p);
@@ -1455,6 +1459,8 @@ function detLock() { const v = topView(); if (window._stAnim) return; const lk =
   if (lk && document.documentElement.scrollHeight - window.innerHeight < 280) { window.scrollTo(0, 0); document.documentElement.classList.add('lock1'); } }
 function listLock() { if (topView() !== 'list' || window._stAnim) return; const m = $app.querySelector(':scope > main'), n = m ? m.querySelectorAll('[data-game]').length : 99; if (n <= 4 && document.documentElement.scrollHeight - window.innerHeight < 220) { window.scrollTo(0, 0); document.documentElement.classList.add('lock1'); } }
 function render() {
+  if (window._restoreKey && (window._restoreKey !== location.hash || window._restoreVK !== snapVK())) window._restoreKey = null;
+  if (window._restoreKey && window._restoreKey === location.hash && window._restoreVK === snapVK()) { window._restoreKey = null; state.lastView = viewKey(); window.scrollTo(0, window._restoreY || 0); window._backPend = false; requestAnimationFrame(() => { try { detLock(); listLock(); } catch (e) {} }); return; }
   const key = viewKey(), same = key === state.lastView, back = window._backH === location.hash && Date.now() - (window._backT || 0) < 4000, y = same ? (back && window._backPend && window.scrollY < window._backY ? window._backY : window.scrollY) : (back ? (window._backPend = true, window._backY || 0) : (window._backPend = false, 0)), v = topView();
   const tws = same && !window._twReset ? [...document.querySelectorAll('.tw')].map(x => x.scrollLeft) : null; window._twReset = 0;
   if (v === 'player') renderPlayer(); else if (v === 'game') renderGame(); else if (v === 'team') renderTeam();
@@ -1502,8 +1508,6 @@ function render() {
   addGlossary(v);
   $app.querySelectorAll('img[src*="/teamlogos/"]').forEach(im => { const d = dk(im.getAttribute('src')); if (d !== im.getAttribute('src')) im.setAttribute('src', d); });
   if (tws) document.querySelectorAll('.tw').forEach((x, i) => { if (tws[i]) x.scrollLeft = tws[i]; });
-  if (!same) document.body.style.minHeight = '';
-  if (window._backPend && y > 0) document.body.style.minHeight = (y + window.innerHeight) + 'px';
   window.scrollTo(0, y); if (window._backPend && Math.abs(window.scrollY - (window._backY || 0)) < 2) window._backPend = false;
 }
 const dk = u => String(u || '').replace(/(\/teamlogos\/\w+\/)500\/(?:scoreboard\/)?([\w-]+\.png)/, '$1500-dark/$2');
@@ -1643,7 +1647,7 @@ function tbl(title, labels, rows) {
 }
 function nflTbl(title, labels, rows, totals) {
   const S = gSort(title, labels, rows); rows = S.rows;
-  const w = l => /\//.test(l) ? 62 : String(l).length > 4 ? 58 : 46;
+  const w = l => /\//.test(l) ? 62 : String(l).length > 5 ? 58 : 46;
   const tw = 112 + labels.reduce((a, l) => a + w(l), 0);
   const trs = rows.map(r => `<tr data-player="${esc(r.id)}" data-pn="${esc(r.name)}" data-pp="${esc(r.pos)}" data-pj="${esc(r.jersey)}" data-pl="nfl" data-pt="${esc(teamNameOf(r.ti))}">
     <td class="n"><span class="pn">${esc(shortNm(r.name || r.short))}</span><small>${esc(r.pos)}</small></td>${gTd(S, r.vals)}</tr>`).join('') + (totals ? `<tr class="tot"><td class="n">Total</td>${labels.map((l, k) => `<td>${nv(totals[k] != null ? totals[k] : '')}</td>`).join('')}</tr>` : '');
@@ -1775,7 +1779,7 @@ function showArt(a, names0, web) {
     const ps = [...d.querySelectorAll('p, h2, h3')]; paras = (ps.length ? ps.map(p => [p.tagName, p.textContent.trim()]) : d.body.textContent.split(/\n{2,}/).map(t => ['P', t.trim()])).filter(x => x[1]); }
   else if (a.description) paras = [['P', a.description]];
   let ov = document.getElementById('artpop'); const keep = ov ? ov.querySelector('.artbox').scrollTop : 0;
-  if (!ov) { ov = document.createElement('div'); ov.id = 'artpop'; document.body.appendChild(ov); document.body.style.overflow = 'hidden'; }
+  if (!ov) { ov = document.createElement('div'); ov.id = 'artpop'; document.body.appendChild(ov); }
   ov.innerHTML = `<div class="artbox"><button class="artx" data-artclose="1" aria-label="Close">×</button><h2>${esc(a.headline || '')}</h2>${a.byline ? `<div class="artby">${esc(a.byline)}</div>` : ''}${paras.map(([tg, t]) => /^H/.test(tg) ? `<h3>${hl(t)}</h3>` : `<p>${hl(t)}</p>`).join('')}${web ? `<p><a class="rcm" href="${esc(web)}" target="_blank" rel="noopener">Read on ESPN ›</a></p>` : ''}</div>`;
   { const bx = ov.querySelector('.artbox'), pn = $app.querySelector(':scope > main > .pane'); if (pn) { const r = pn.getBoundingClientRect(), top = Math.max(60, r.top), bot = Math.min(window.innerHeight - 8, r.bottom); Object.assign(bx.style, { position: 'fixed', top: top + 'px', left: r.left + 'px', width: r.width + 'px', height: Math.max(220, bot - top) + 'px', maxHeight: 'none', maxWidth: 'none', borderRadius: '22px', paddingBottom: '18px' }); } bx.scrollTop = keep; }
 }
@@ -2709,18 +2713,18 @@ function overviewHTML(p) {
   const gl = p.gl ? gamelogHTML(p, { limit: 5, title: 'Recent games', big: 1 }) : '';
   return (sum + gl) || msg('Overview not available.');
 }
-function nhlAddShots(c) {
+function nhlAddShots(c, gs) {
   const L = c.labels, N = c.names || [], gi = L.indexOf('G'), pi = L.indexOf('SPCT');
   if (gi < 0 || pi < 0 || L.includes('S') || N.some(n => /^shots(Total)?$/i.test(n))) return c;
   const calc = vals => { const g = parseFloat(String(vals[gi]).replace(/,/g, '')), q = parseFloat(vals[pi]); return g > 0 && q > 0 ? String(Math.round(g * 100 / q)) : g === 0 ? '' : ''; };
   const ins = (arr, v) => { const a2 = [...arr]; a2.splice(pi, 0, v); return a2; };
   c.labels = ins(L, 'S'); if (c.names && c.names.length) c.names = ins(N, 'shotsTotal');
-  c.rows.forEach(r => { r.vals = ins(r.vals, calc(r.vals)); });
+  c.rows.forEach(r => { let v = calc(r.vals); if (!v && gs && r.year != null && gs[r.year] != null) v = gs[r.year]; if (!v && parseFloat(String(r.vals[gi])) === 0 && parseFloat(r.vals[pi]) === 0 && gs && gs[r.year] == null) v = ''; r.vals = ins(r.vals, v); });
   if (c.totals) { const sv = c.rows.map(r => parseFloat(r.vals[pi])); c.totals = ins(c.totals, sv.length && sv.every(x => !isNaN(x)) ? String(sv.reduce((x, y) => x + y, 0)) : calc(c.totals)); }
   return c;
 }
 function statCats(j, league) {
-  return ((j && j.categories) || []).filter(c => c.statistics && c.statistics.length).map(c => league === 'nhl' ? nhlAddShots(statCat0(c, league)) : statCat0(c, league));
+  return ((j && j.categories) || []).filter(c => c.statistics && c.statistics.length).map(c => league === 'nhl' ? nhlAddShots(statCat0(c, league), j && j._glShots) : statCat0(c, league));
 }
 function statCat0(c, league) {
   return ({
@@ -3053,7 +3057,7 @@ function scheduleHTML(t) {
     if (e.state === 'pre') res = `<span class="rg rgw${lgc}"><i></i>${e.tbd ? '<span class="tm">TBD</span>' : tsc(fmtTime(e.date))}<i></i></span>`;
     else if (e.state === 'in') { const lv = liveOf(t, e); if (lv) { e = Object.assign({}, e, { short: lv.short || e.short, home: Object.assign({}, e.home, { score: lv.home.score }), away: Object.assign({}, e.away, { score: lv.away.score }) }); }
       const mine = e.home.id === t.id ? e.home : e.away, opp = mine === e.home ? e.away : e.home;
-      const per = (String(e.short).split(/\s*-\s*/)[1] || String(e.short)).replace(/^(End|Start) of /i, '').replace(/ (Quarter|Period)$/i, ''), hs = mine.score != null && mine.score !== '' && opp.score != null && opp.score !== '';
+      const per = (String(e.short).split(/\s*-\s*/)[1] || String(e.short)).replace(/^(End|Start) of /i, '').replace(/ (Quarter|Period)$/i, '').replace(/^half ?time$/i, 'HT'), hs = mine.score != null && mine.score !== '' && opp.score != null && opp.score !== '';
       const clk = String(e.short).split(/\s*-\s*/)[0];
       res = !hs && /\d/.test(clk) ? `<span class="rg rgw lvr${lgc}"><small class="sf">${esc(per)}</small>${tsc(clk)}<span class="ldot"></span></span>` : hs ? `<span class="rg rgw lvr${lgc}"><small class="sf">${esc(per)}</small><span class="sc2"><b>${esc(mine.score)}</b><i>:</i><b>${esc(opp.score)}</b></span><span class="ldot"></span></span>` : `<span class="live">${esc(e.short)}</span>`; }
     else {
@@ -3064,7 +3068,7 @@ function scheduleHTML(t) {
       <td class="opp"><small>${mine === e.home ? 'vs' : '@'}</small>${logoImg(opp.logo || teamLogoOf(t.league, opp))}<b>${esc(teamShortOf(t.league, opp))}</b></td><td class="rs">${res}</td></tr>`;
   };
   let html = '', cur = null, rows = '';
-  const flush = () => { if (cur !== null && rows) html += `<section class="blk"><div class="schw"><table class="sch sch-${t.league}"><colgroup><col style="width:100px"><col><col style="width:134px"></colgroup><thead><tr><th class="n">${esc(cur || 'Games')}</th><th></th><th></th></tr></thead><tbody>${rows}</tbody></table></div></section>`; rows = ''; };
+  const flush = () => { if (cur !== null && rows) html += `<section class="blk"><div class="schw"><table class="sch sch-${t.league}"><colgroup><col style="width:92px"><col><col style="width:134px"></colgroup><thead><tr><th class="n">${esc(cur || 'Games')}</th><th></th><th></th></tr></thead><tbody>${rows}</tbody></table></div></section>`; rows = ''; };
   if (t.league === 'nfl') {
     const rk = n => /pre/i.test(n) ? 0 : /post|playoff/i.test(n) ? 2 : 1;
     [...sorted].sort((a, b) => rk(a.stype || '') - rk(b.stype || '') || new Date(a.date) - new Date(b.date)).forEach(e => { const st = e.stype || ''; if (st !== cur) { flush(); cur = st; } rows += row(e); });
@@ -3956,7 +3960,7 @@ async function loadLeaders() {
       nba: ['gamesPlayed', 'avgMinutes', 'avgPoints', 'avgFieldGoalsMade', 'avgFieldGoalsAttempted', 'fieldGoalPct', 'avgThreePointFieldGoalsMade', 'avgThreePointFieldGoalsAttempted', 'threePointFieldGoalPct', 'avgFreeThrowsMade', 'avgFreeThrowsAttempted', 'freeThrowPct', 'avgRebounds', 'avgAssists', 'avgSteals', 'avgBlocks', 'avgTurnovers', 'doubleDouble', 'tripleDouble'],
       nhl: cg === 'goaltending' ? ['gamesPlayed', 'games', 'wins', 'losses', 'overtimeLosses', 'otLosses', 'goalsAgainstAverage', 'avgGoalsAgainst', 'shotsAgainst', 'goalsAgainst', 'saves', 'savePct', 'shutouts', 'timeOnIcePerGame'] : ['gamesPlayed', 'goals', 'assists', 'points', 'plusMinus', 'penaltyMinutes', 'shotsTotal', 'shootingPct', 'powerPlayGoals', 'powerPlayAssists', 'shortHandedGoals', 'shortHandedAssists', 'gameWinningGoals', 'timeOnIcePerGame']
     };
-    if (WANT[v.league]) { const LB = { powerPlayGoals: 'PPG', powerPlayAssists: 'PPA', shortHandedGoals: 'SHG', shortHandedAssists: 'SHA', gameWinningGoals: 'GWG' }; const f = [...new Set(WANT[v.league].map(n => cols.find(c => c.name === n) || cols.find(c => String(c.name).toLowerCase() === n.toLowerCase()) || (LB[n] && cols.find(c => String(c.label).toUpperCase() === LB[n]))).filter(Boolean))]; if (f.length >= 3) cols = f; else { const seen = new Set(); cols = cols.filter(c => !seen.has(c.label) && seen.add(c.label)); } }
+    if (WANT[v.league]) { const LB = { powerPlayGoals: 'PPG', powerPlayAssists: 'PPA', shortHandedGoals: 'SHG', shortHandedAssists: 'SHA', gameWinningGoals: 'GWG' }; const f = [...new Set(WANT[v.league].map(n => cols.find(c => c.name === n) || cols.find(c => String(c.name).toLowerCase() === n.toLowerCase()) || (LB[n] && cols.find(c => String(c.label).toUpperCase() === LB[n])) || (/^shortHanded/.test(n) && cols.find(c => new RegExp('^short.?handed' + (/Goals$/.test(n) ? 'Goals' : 'Assists') + '$', 'i').test(c.name)))).filter(Boolean))]; if (f.length >= 3) cols = f; else { const seen = new Set(); cols = cols.filter(c => !seen.has(c.label) && seen.add(c.label)); } }
     else if (v.league === 'nfl' && cg) { const grp = cg.split(':').pop().replace(/e$/, '').toLowerCase(); let gpDone = false; const f = cols.filter(c => c.ci === 'general' ? (/gamesPlayed/i.test(c.name) && !gpDone && (gpDone = true)) : String(c.ci).toLowerCase().indexOf(grp) === 0 || (grp === 'defens' && /defensive/i.test(c.ci))); const seen = new Set(); cols = (f.length >= 3 ? f : cols).filter(c => { const k = c.label + '|' + (f.length >= 3 ? c.ci : ''); return !seen.has(k) && seen.add(k); }); }
     else { const seen = new Set(); cols = cols.filter(c => !seen.has(c.label) && seen.add(c.label)); }
     const rows = (j.athletes || []).map(a => {
@@ -4134,7 +4138,17 @@ function route() {
 try { history.scrollRestoration = 'manual'; } catch (e) {}
 window._scrollMem = {}; window._hstack = [location.hash];
 window.addEventListener('scroll', () => { if (!window._stAnim) window._scrollMem[location.hash] = window.scrollY; }, { passive: true });
-window.addEventListener('hashchange', () => { const h = location.hash, st = window._hstack; if (st.length > 1 && st[st.length - 2] === h) { st.pop(); window._backY = window._scrollMem[h] || 0; window._backT = Date.now(); window._backH = h; } else { st.push(h); window._backY = 0; window._backH = null; } });
+window._snap = {}; window._curH = location.hash;
+const snapVK = () => { try { return viewKey() + '|' + (state.lv ? lvKey(state.lv) + (state.lv.tm || '') : '') + '|' + (state.team ? (state.team.sy || '') + (state.team.stype || '') + state.team.tab : '') + '|' + (state.player ? state.player.tab : '') + '|' + (state.game ? state.game.tab : '') + '|' + (state.league || ''); } catch (e) { return ''; } };
+const snapBg = () => ({ h: document.documentElement.style.background, b: document.body.style.background, p: document.documentElement.style.getPropertyValue('--pbg'), t: (document.querySelector('meta[name="theme-color"]') || {}).content });
+window.addEventListener('hashchange', () => { const h = location.hash, st = window._hstack, prev = window._curH; window._curH = h; window._restoreKey = null;
+  const ap = document.getElementById('artpop'); if (ap) ap.remove();
+  if (st.length > 1 && st[st.length - 2] === h) { st.pop(); delete window._snap[prev]; window._backY = window._scrollMem[h] || 0; window._backT = Date.now(); window._backH = h;
+    const sn = window._snap[h]; delete window._snap[h];
+    if (sn && Date.now() - sn.t < 30 * 60e3) { $app.innerHTML = ''; $app.appendChild(sn.f); $app.className = sn.cls; const bg = sn.bg; document.documentElement.style.background = bg.h; document.body.style.background = bg.b; document.documentElement.style.setProperty('--pbg', bg.p); const tm = document.querySelector('meta[name="theme-color"]'); if (tm && bg.t) tm.setAttribute('content', bg.t); document.documentElement.classList.remove('lock1'); window.scrollTo(0, sn.y); window._restoreKey = h; window._restoreY = sn.y; window._restoreVK = sn.vk; }
+  } else { st.push(h); window._backY = 0; window._backH = null;
+    if (prev != null && $app.firstChild) { const f = document.createDocumentFragment(); while ($app.firstChild) f.appendChild($app.firstChild); window._snap[prev] = { vk: snapVK(), f, y: window._scrollMem[prev] || 0, cls: $app.className, bg: snapBg(), t: Date.now() };
+      const ks = Object.keys(window._snap); if (ks.length > 6) delete window._snap[ks[0]]; } } });
 window.addEventListener('hashchange', route);
 
 const $app = document.getElementById('app');
