@@ -233,10 +233,11 @@ tr[data-player]:active td,tr[data-topen]:active td{background:#2a2a2e}
 details{border-bottom:1px solid #3a3a3c}
 summary{list-style:none;display:flex;justify-content:space-between;align-items:center;padding:14px 0;font-family:var(--wide);font-stretch:112%;font-weight:800;font-size:12px;letter-spacing:.5px;cursor:pointer}
 summary::-webkit-details-marker{display:none}
-summary::after{content:'⌄';font-size:18px;font-weight:400}
-details[open] summary::after{content:'⌃'}
+summary::after{content:'';width:7px;height:7px;border-right:2px solid currentColor;border-bottom:2px solid currentColor;transform:translateY(-2px) rotate(45deg);margin-right:4px;flex:none;transition:transform .15s}
+details[open] summary::after{transform:translateY(2px) rotate(-135deg)}
 .pane > details:first-child > summary{padding-top:4px}
 .pane > details:last-child{border-bottom:0}
+.pane > details:last-child:not([open]) > summary{padding-bottom:0;margin-bottom:-2px}
 .play{display:flex;gap:12px;align-items:center;padding:8px 0}
 .play .pl{width:26px;flex:none}
 .play .pl img{width:24px;height:24px;object-fit:contain}
@@ -847,7 +848,7 @@ html.one #app.lst,html.one body{min-height:0}
 .hero.hu .t{position:relative;gap:0 !important}
 .hero.hu .t .rc{position:absolute;top:100%;left:50%;transform:translateX(-50%);margin-top:4px !important;max-height:none !important;opacity:1 !important;line-height:14px}
 .hero.hu .s,.hero.hu .m{line-height:1}
-.hero.hu .m{top:0}
+.hero.hu .m{top:1.5px}
 .hero.hu{grid-template-rows:auto 42px}
 .hero.hu .m .pd{line-height:1.02}
 .hero.hu.hw{padding-bottom:25px !important}
@@ -1365,6 +1366,11 @@ function addGlossary(v, pane0) {
   const onK = new Set([...pane.querySelectorAll('th.on')].map(x => x.textContent.trim().toUpperCase()));
   pane.insertAdjacentHTML('beforeend', `<section class="gloss"><h4>Glossary</h4><div class="gg">${items.map(([k, d]) => `<div class="${onK.has(String(k).toUpperCase()) ? 'gon' : ''}"><b>${esc(k)}:</b> ${esc(d)}</div>`).join('')}</div></section>`);
 }
+let _stA = 0;
+function smoothTop(ms) { ms = ms || 380; const y0 = window.scrollY; cancelAnimationFrame(_stA); if (y0 < 2) { window.scrollTo(0, 0); return; }
+  document.body.style.minHeight = (y0 + window.innerHeight) + 'px'; window._stAnim = 1; const t0 = performance.now();
+  const f = now => { const u = Math.min(1, (now - t0) / ms), e = 1 - Math.pow(1 - u, 3); window.scrollTo(0, Math.round(y0 * (1 - e))); if (u < 1) _stA = requestAnimationFrame(f); else { document.body.style.minHeight = ''; window._stAnim = 0; try { listLock(); } catch (er) {} } }; _stA = requestAnimationFrame(f); }
+function listLock() { if (topView() !== 'list' || window._stAnim) return; const m = $app.querySelector(':scope > main'), n = m ? m.querySelectorAll('[data-game]').length : 99; if (n <= 4 && document.documentElement.scrollHeight - window.innerHeight < 220) { window.scrollTo(0, 0); document.documentElement.classList.add('lock1'); } }
 function render() {
   const key = viewKey(), same = key === state.lastView, y = same ? window.scrollY : 0, v = topView();
   const tws = same && !window._twReset ? [...document.querySelectorAll('.tw')].map(x => x.scrollLeft) : null; window._twReset = 0;
@@ -1398,7 +1404,7 @@ function render() {
   try { dashAlign(); } catch (e) {}
   try { pmAlign(); } catch (e) {}
   try { stickTop(v); } catch (e) {}
-  { const ov = v === 'player' && state.player && state.player.tab === 'ov'; document.documentElement.classList.remove('lock1'); if (v === 'player' && state.player && /^(ov|bio)$/.test(state.player.tab)) requestAnimationFrame(() => { if (state.player && /^(ov|bio)$/.test(state.player.tab) && document.documentElement.scrollHeight - window.innerHeight < 160) { window.scrollTo(0, 0); document.documentElement.classList.add('lock1'); } }); if (v === 'list') requestAnimationFrame(() => { if (topView() !== 'list') return; const m = $app.querySelector(':scope > main'), n = m ? m.querySelectorAll('[data-game]').length : 99; if (n <= 4 && document.documentElement.scrollHeight - window.innerHeight < 220) { window.scrollTo(0, 0); document.documentElement.classList.add('lock1'); } }); if (false) requestAnimationFrame(() => { const extra = document.documentElement.scrollHeight - window.innerHeight; if (extra < 140) { document.documentElement.classList.add('one'); window.scrollTo(0, 0); } }); }
+  { const ov = v === 'player' && state.player && state.player.tab === 'ov'; document.documentElement.classList.remove('lock1'); if (v === 'player' && state.player && /^(ov|bio)$/.test(state.player.tab)) requestAnimationFrame(() => { if (state.player && /^(ov|bio)$/.test(state.player.tab) && document.documentElement.scrollHeight - window.innerHeight < 160) { window.scrollTo(0, 0); document.documentElement.classList.add('lock1'); } }); if (v === 'list') requestAnimationFrame(listLock); if (false) requestAnimationFrame(() => { const extra = document.documentElement.scrollHeight - window.innerHeight; if (extra < 140) { document.documentElement.classList.add('one'); window.scrollTo(0, 0); } }); }
   if (window._noSlide) window._noSlide = 0;
   if (window._slide) { const p = window._slideSel ? $app.querySelector('main') : $app.querySelector('.pane'), d = window._slide; window._slide = 0; window._slideSel = null; if (p && p.animate) p.animate([{ transform: `translateX(${d * 70}px)`, opacity: .3 }, { transform: 'none', opacity: 1 }], { duration: 230, easing: 'cubic-bezier(.2,.7,.3,1)' }); }
   const fh = document.getElementById('fhome'); if (fh) fh.hidden = true;
@@ -3266,6 +3272,10 @@ async function loadLV() {
         const picked = ORD.map(re => cats.find(c => re.test(String(c.name)))).filter(Boolean);
         if (picked.length >= 4) { cats.length = 0; picked.forEach(c => cats.push(c)); }
       }
+      if (v.league === 'nba') { const avg = n => /pergame|^avg/i.test(n);
+        const ORD = [n => /^(avg)?points(PerGame)?$/i.test(n), n => /^(avg)?assists(PerGame)?$/i.test(n), n => /three|3p/i.test(n) && /made/i.test(n), n => /^(avg)?rebounds(PerGame)?$/i.test(n), n => /^(avg)?blocks(PerGame)?$/i.test(n), n => /^(avg)?steals(PerGame)?$/i.test(n), n => /tripleDouble/i.test(n)];
+        const picked = ORD.map(f => { const m = cats.filter(c => f(String(c.name))); return m.find(c => avg(String(c.name))) || m.find(c => /tripleDouble/i.test(String(c.name))) || m[0]; }).filter(Boolean);
+        if (picked.length >= 4) { cats.length = 0; picked.forEach(c => cats.push(c)); } }
       if (v.league === 'nhl') { const pri = n => /^points$/i.test(n) ? 0 : /^goals$/i.test(n) ? 1 : /^assists$/i.test(n) ? 2 : /plus.?minus/i.test(n) ? 3 : /penaltyMinutes/i.test(n) ? 4 : 5; cats.sort((a, b) => pri(String(a.name)) - pri(String(b.name))); }
       const all = cats.flatMap(c => c.rows).filter(r => r.ref);
       state.lvC[key] = { cats, loading: true };
@@ -3273,6 +3283,11 @@ async function loadLV() {
       const worker = async () => { while (i < all.length) { const r = all[i++]; const id = (r.ref.match(/athletes\/(\d+)/) || [])[1]; try { r.a = state.athC[id] || (state.athC[id] = await getJson(String(r.ref).replace(/^http:/, 'https:'))); } catch (e) { r.a = { id, displayName: '' }; } } };
       await Promise.all(Array.from({ length: 8 }, worker));
       saveAth();
+      if (v.league === 'nba') { const tc = cats.find(c => /three|3p/i.test(String(c.name)) && /made/i.test(String(c.name)) && !/pergame|^avg/i.test(String(c.name)));
+        if (tc) try { const j3 = await getJson('https://site.web.api.espn.com/apis/common/v3/sports/basketball/nba/statistics/byathlete?region=us&lang=en&contentorigin=espn&isqualified=true&page=1&limit=5&sort=offensive.avgThreePointFieldGoalsMade:desc' + (v.sy ? '&seasontype=2&season=' + v.sy : ''));
+          let f = null; (j3.categories || []).forEach(c => { const k = (c.names || []).indexOf('avgThreePointFieldGoalsMade'); if (k >= 0 && !f) f = [c.name, k]; });
+          const rr = f ? (j3.athletes || []).map(x => { const ac = (x.categories || []).find(q => q.name === f[0]), arr = (ac && (ac.totals || ac.values)) || [], a = x.athlete || {}; let tid = a.teamId || (a.team && a.team.id); if (!tid && a.teamShortName) { const tm = (state.teamList.nba || []).find(z => z.abbr === a.teamShortName); if (tm) tid = tm.id; } return { val: arr[f[1]] != null ? String(arr[f[1]]) : '', a, tid: tid ? [0, String(tid)] : null }; }).filter(r => r.val !== '') : [];
+          if (rr.length) { tc.rows = rr.slice(0, 5); tc.name = 'avgThreePointFieldGoalsMade'; tc.title = '3-Pointers Made Per Game'; tc.abbr = '3PM'; } } catch (e) {} }
       if (v.league === 'nhl') { const gc = cats.filter(c => /savePct|savePercentage|goalsAgainstAverage|avgGoalsAgainst/i.test(String(c.name))); if (gc.length) try { const G = await nhlGoalieQual(v.sy);
         gc.forEach(c => { const sv = /save/i.test(String(c.name)), list = G.rows.filter(r => r.gp >= r.min && (sv ? r.sv > 0 : r.gaa > 0)).sort((x, y) => sv ? y.sv - x.sv : x.gaa - y.gaa).slice(0, 5);
           if (list.length) c.rows = list.map(r => ({ val: sv ? r.sv.toFixed(3).replace(/^0\./, '.') : r.gaa.toFixed(2), a: r.a, tid: r.tid ? [0, r.tid] : null })); }); } catch (e) {} }
@@ -3976,9 +3991,11 @@ $app.addEventListener('click', ev => {
   } else if (d.f1) {
     let t = document.getElementById('toast'); if (t) t.remove(); t = document.createElement('div'); t.id = 'toast'; t.textContent = 'Formula 1 – coming soon'; document.body.appendChild(t); setTimeout(() => t.remove(), 1600);
   } else if (d.league) {
+    if (d.league === state.league && topView() === 'list') { const nw = state.nflw, onCur = d.league === 'nfl' ? !!(nw && nw.cur && nw.sel && nw.cur.t === nw.sel.t && nw.cur.w === nw.sel.w) : ymd(state.date) === ymd(todayLoc()); if (onCur || d.league === 'fav') { window.scrollTo({ top: 0, behavior: 'smooth' }); return; } }
+    const same = d.league === state.league;
     if (d.league === 'nfl' && state.nflw && state.nflw.cur) state.nflw.sel = Object.assign({}, state.nflw.cur);
     state.league = d.league; if (d.league !== 'fav') store.set('league', d.league);
-    state.favScrolled = false; window.scrollTo(0, 0);
+    state.favScrolled = false; if (same) smoothTop(); else window.scrollTo(0, 0);
     setDate(todayLoc()); loadList();
   } else if (d.player) {
     playerNav(d);
@@ -4047,9 +4064,9 @@ $app.addEventListener('click', ev => {
   } else if (d.pm) {
     state.game.pmode = d.pm; render();
   } else if (d.wk) {
-    const [t, w] = d.wk.split('-').map(Number); if (state.nflw.sel && state.nflw.sel.t === t && state.nflw.sel.w === w) return; state.nflw.sel = { t, w }; window.scrollTo({ top: 0, behavior: 'smooth' }); loadList();
+    const [t, w] = d.wk.split('-').map(Number); if (state.nflw.sel && state.nflw.sel.t === t && state.nflw.sel.w === w) { window.scrollTo({ top: 0, behavior: 'smooth' }); return; } state.nflw.sel = { t, w }; smoothTop(); loadList();
   } else if (d.date) {
-    if (d.date === ymd(state.date)) return; window.scrollTo({ top: 0, behavior: 'smooth' });
+    if (d.date === ymd(state.date)) { window.scrollTo({ top: 0, behavior: 'smooth' }); return; } smoothTop();
     setDate(new Date(+d.date.slice(0, 4), +d.date.slice(4, 6) - 1, +d.date.slice(6, 8), 12));
     loadList();
   } else if (d.tab) {
