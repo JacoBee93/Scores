@@ -401,10 +401,17 @@ body{min-height:100vh}
 .rcd{font-size:13.5px;color:var(--mut);margin-top:5px;line-height:1.35}
 .rcm{font-size:13px;font-weight:600;color:#8ab4ff;margin-top:8px}
 .iseg{margin:2px auto 10px !important}
-.nws{display:flex;flex-direction:column;gap:6px;margin:2px 0 0}
-.nwi{display:flex;gap:10px;align-items:center;background:#2c2c2e;border-radius:18px;padding:6px 10px 6px 6px;cursor:pointer}
+.nws{display:flex;flex-direction:column;gap:2px;margin:2px 0 0}
+.nwi{display:flex;gap:12px;align-items:center;background:#2c2c2e;border-radius:0;padding:10px 12px 10px 10px;cursor:pointer}
+.nwi:first-child{border-radius:22px 22px 0 0}
+.nwi:last-child{border-radius:0 0 22px 22px}
+.nwi:only-child{border-radius:22px}
+.pane.nwp{display:flex;flex-direction:column}
+.pane.nwp > .nws{flex:1}
+.pane.nwp > .iseg{width:100%;flex:none}
+.pane.nwp .nwi{flex:1}
 .nwi:active{opacity:.7}
-.nwim{flex:none;width:92px;height:60px;border-radius:13px;object-fit:cover;background:#3a3a3c;display:block}
+.nwim{flex:none;width:100px;height:66px;border-radius:12px;object-fit:cover;background:#3a3a3c;display:block}
 .nwt{min-width:0;flex:1}
 .nwh{font-weight:700;font-size:14px;line-height:1.25;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
 .nwd{font-size:11.5px;color:var(--mut);margin-top:2px}
@@ -851,7 +858,7 @@ html.one #app.lst,html.one body{min-height:0}
 .stkw.det .hero .wk{margin-bottom:3px}
 .stkw.det .hero .m .dt1,.stkw.det .hero .m .fin{font-size:17px}
 .stkw.det .dtabs{margin-left:-6px;margin-right:-6px;padding-left:12px;padding-right:12px}
-.stkw.det .phero{margin-top:0;margin-bottom:8px}
+.stkw.det .phero{margin-top:-5px;margin-bottom:0;height:108px;min-height:108px}
 .hero.hu,.stkw.det .hero.hu{height:auto;padding:7px 0 23px;align-items:center}
 .hero.hu .wk{min-height:15px;line-height:15px;font-size:12.5px;margin:0 0 5px !important;max-height:none !important;opacity:1 !important}
 .hero.hu .t{position:relative;gap:0 !important}
@@ -1414,7 +1421,7 @@ function render() {
   try { pmAlign(); } catch (e) {}
   try { stickTop(v); } catch (e) {}
   try { const pn = $app.querySelector('.pane'); if (pn && v === 'player' && state.player && state.player.tab === 'ov' && state.player.done && pn.querySelector('.ssum, .glsec')) { const h = pn.offsetHeight; if (h > 200) { window._ovH = h; try { localStorage.setItem('ovH', String(h)); } catch (e) {} } }
-    const nwOn = (v === 'player' && state.player && state.player.tab === 'news') || (v === 'team' && state.team && state.team.tab === 'news'); if (pn && nwOn) { const h = window._ovH || +(localStorage.getItem('ovH') || 0); if (h > 200) pn.style.minHeight = h + 'px'; } } catch (e) {}
+    const nwOn = (v === 'player' && state.player && state.player.tab === 'news') || (v === 'team' && state.team && state.team.tab === 'news'); if (pn && nwOn) { const h = window._ovH || +(localStorage.getItem('ovH') || 0) || 415; if (h > 200) pn.style.minHeight = h + 'px'; pn.classList.add('nwp'); } } catch (e) {}
   { const ov = v === 'player' && state.player && state.player.tab === 'ov'; document.documentElement.classList.remove('lock1'); const lk = () => (v === 'player' && state.player && /^(ov|bio|news)$/.test(state.player.tab)) || (v === 'team' && state.team && state.team.tab === 'news'); if (lk()) requestAnimationFrame(() => { if (lk() && topView() === v && document.documentElement.scrollHeight - window.innerHeight < 160) { window.scrollTo(0, 0); document.documentElement.classList.add('lock1'); } }); if (v === 'list') requestAnimationFrame(listLock); if (false) requestAnimationFrame(() => { const extra = document.documentElement.scrollHeight - window.innerHeight; if (extra < 140) { document.documentElement.classList.add('one'); window.scrollTo(0, 0); } }); }
   if (window._noSlide) window._noSlide = 0;
   if (window._slide) { const p = window._slideSel ? $app.querySelector('main') : $app.querySelector('.pane'), d = window._slide; window._slide = 0; window._slideSel = null; if (p && p.animate) p.animate([{ transform: `translateX(${d * 70}px)`, opacity: .3 }, { transform: 'none', opacity: 1 }], { duration: 230, easing: 'cubic-bezier(.2,.7,.3,1)' }); }
