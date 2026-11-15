@@ -804,7 +804,8 @@ input[type=search]::-webkit-search-cancel-button{display:none;-webkit-appearance
 .favh small{color:var(--mut);font-weight:600}
 .favh .chev{margin-left:auto}
 .favb{margin-bottom:14px;padding-bottom:4px;border-bottom:1px solid #2c2c2e}
-.ssv.lng{font-size:23px;font-weight:600;line-height:1.5}
+.ssv.lng{font-size:23px;font-weight:600;line-height:1.5;white-space:nowrap}
+.ssg > div{display:flex;flex-direction:column;align-items:center;justify-content:flex-start}
 </style>
 </head>
 <body>
@@ -1339,7 +1340,7 @@ const logoImg = src => src ? `<img src="${esc(src)}" alt="" onerror="this.style.
 
 function listBody(evs, lg) {
   const fv = e => isFav(e.league || lg, e.home.id) || isFav(e.league || lg, e.away.id), favs = evs.filter(fv);
-  if (!/_$/.test(lg) && favs.length) {
+  if (false) {
     const dl = e => { const d = new Date(e.date); return DAYS[d.getDay()] + ' ' + d.getDate() + '.' + (d.getMonth() + 1) + '.'; };
     return `<button class="favh" data-favh="1">★ Favorites <small>${favs.length}</small><i class="chev ${state.favOpen ? 'up' : ''}"></i></button>` + (state.favOpen ? `<div class="favb">${favs.sort((a, b) => new Date(a.date) - new Date(b.date)).map(e => (lg === 'nfl' ? `<div class="fdl">${esc(dl(e))}</div>` : '') + cardHTML(e)).join('')}</div>` : '') + listBody(evs, lg + '_'); }
   lg = String(lg).replace(/_$/, '');
@@ -1828,7 +1829,7 @@ function teamColor(c, fb) {
 const SL_CATS = {
   nfl: [[/^passingYards$/i, 'Passing Yards', 'YDS'], [/^rushingYards$/i, 'Rushing Yards', 'YDS'], [/^receivingYards$/i, 'Receiving Yards', 'YDS'], [/^sacks$/i, 'Sacks', 'SACKS']],
   nba: [[/^pointsPerGame$|^avgPoints$/i, 'Points', 'PPG'], [/^reboundsPerGame$|^avgRebounds$/i, 'Rebounds', 'RPG'], [/^assistsPerGame$|^avgAssists$/i, 'Assists', 'APG'], [/^stealsPerGame$|^avgSteals$/i, 'Steals', 'SPG']],
-  nhl: [[/^goals$/i, 'Goals', 'G'], [/^assists$/i, 'Assists', 'A'], [/^points$/i, 'Points', 'PTS'], [/^plusMinus$|^plusminus$|^plusMinusRating$/i, 'Plus/Minus', '']]
+  nhl: [[/^goals$/i, 'Goals', 'G'], [/^assists$/i, 'Assists', 'A'], [/^points$/i, 'Points', 'PTS'], [/^plusMinus$|^plusminus$|^plusMinusRating$/i, 'Plus/Minus', ''], [/^savePct$|^savePercentage$|^savepercentage$/i, 'Save Percentage', 'SV%']]
 };
 async function loadSeasonLeaders(g) {
   const e = g.ev, parts = LEAGUES[g.league].path.split('/'), hs = g.sum && g.sum.header && g.sum.header.season;
@@ -1845,7 +1846,7 @@ async function loadSeasonLeaders(g) {
       if (!l || !l.athlete || !l.athlete.$ref) return null;
       try {
         const a = await getJson(https(l.athlete.$ref));
-        const dv = String(l.displayValue != null ? l.displayValue : l.value);
+        let dv = String(l.displayValue != null ? l.displayValue : l.value); if (title === 'Save Percentage') dv = (parseFloat(l.value != null ? l.value : dv) > 1 ? (parseFloat(l.value) / 100).toFixed(3) : parseFloat(l.value != null ? l.value : dv).toFixed(3)).replace(/^0\./, '.');
         let sub = '';
         if (g.league === 'nfl' && l.statistics && l.statistics.$ref && /Yards/.test(title)) {
           try {
@@ -1868,7 +1869,7 @@ async function loadSeasonLeaders(g) {
   const r = await Promise.all([one(e.away), one(e.home)]);
   g.sl = r; g.slLoading = false;
   if (g.league === 'nhl') [e.away, e.home].forEach(async (tm, i) => {
-    if (!r[i] || r[i].some(c => c.name === 'Plus/Minus' || c.name === 'Save Percentage')) return;
+    if (!r[i]) return; const hasPM = r[i].some(c => /plus.?minus/i.test(c.name + ' ' + (c.displayName || ''))), hasSV = r[i].some(c => /save/i.test(c.name + ' ' + (c.displayName || ''))); if (hasPM && hasSV) return;
     try {
       const t = { league: 'nhl', id: tm.id, roster: await getJson(API + LEAGUES.nhl.path + '/teams/' + tm.id + '/roster') };
       await loadTeamPlayers(t);
@@ -1876,8 +1877,8 @@ async function loadSeasonLeaders(g) {
       (t.ps && t.ps.cats ? [...t.ps.cats.values()] : []).forEach(c => { const k = c.labels.indexOf('+/-'); if (k < 0) return; c.rows.forEach(rw => { const n = parseFloat(rw.vals[k]); if (!isNaN(n) && (!best || n > best.n)) best = { n, a: rw.a, v: rw.vals[k] }; }); });
       let gb = null; (t.ps && t.ps.cats ? [...t.ps.cats.values()] : []).forEach(c => { const k = c.labels.indexOf('SV%'), gp = c.labels.indexOf('GP'); if (k < 0) return; const mx = Math.max(0, ...c.rows.map(rw => parseFloat(rw.vals[gp]) || 0));
         c.rows.forEach(rw => { const n = parseFloat(rw.vals[k]), g0 = parseFloat(rw.vals[gp]) || 0; if (!isNaN(n) && g0 >= Math.max(1, mx * .3) && (!gb || n > gb.n)) gb = { n, a: rw.a, v: rw.vals[k] }; }); });
-      if (gb) setTimeout(() => { r[i].push({ name: 'Save Percentage', displayName: 'Save Percentage', leaders: [{ athlete: { id: gb.a.id, displayName: gb.a.displayName, shortName: shortNm(gb.a.displayName || gb.a.fullName), position: gb.a.position || { abbreviation: 'G' }, jersey: gb.a.jersey }, mainStat: { value: String(gb.v).replace(/^0\./, '.'), label: '' } }] }); if (state.game === g && topView() === 'game' && g.tab === 'preview') render(); }, 0);
-      if (best) { r[i].push({ name: 'Plus/Minus', displayName: 'Plus/Minus', leaders: [{ athlete: { id: best.a.id, displayName: best.a.displayName, shortName: shortNm(best.a.displayName || best.a.fullName), position: best.a.position, jersey: best.a.jersey }, mainStat: { value: String(best.v), label: '' } }] }); if (state.game === g && topView() === 'game' && g.tab === 'preview') render(); }
+      if (gb && !hasSV) setTimeout(() => { r[i].push({ name: 'Save Percentage', displayName: 'Save Percentage', leaders: [{ athlete: { id: gb.a.id, displayName: gb.a.displayName, shortName: shortNm(gb.a.displayName || gb.a.fullName), position: gb.a.position || { abbreviation: 'G' }, jersey: gb.a.jersey }, mainStat: { value: String(gb.v).replace(/^0\./, '.'), label: '' } }] }); if (state.game === g && topView() === 'game' && g.tab === 'preview') render(); }, 0);
+      if (best && !hasPM) { r[i].push({ name: 'Plus/Minus', displayName: 'Plus/Minus', leaders: [{ athlete: { id: best.a.id, displayName: best.a.displayName, shortName: shortNm(best.a.displayName || best.a.fullName), position: best.a.position, jersey: best.a.jersey }, mainStat: { value: String(best.v), label: '' } }] }); if (state.game === g && topView() === 'game' && g.tab === 'preview') render(); }
     } catch (err) {}
   });
   if (state.game === g && topView() === 'game' && g.tab === 'preview') render();
@@ -2308,8 +2309,8 @@ function pickStatCols(labels, league, n, names) {
   return cols.slice(0, n || 7);
 }
 const dl = (l, league) => league === 'nhl' && l === 'S' ? 'SOG' : l;
-const GOALIE_ALL = [['GP', ['GP']], ['W', ['W', 'WINS']], ['L', ['L', 'LOSSES']], ['OTL', ['OTL', 'OT', 'OTLOSSES']], ['GA/G', ['GAA', 'GA/G']], ['SA', ['SA']], ['GA', ['GA']], ['SV', ['SV', 'SAVES']], ['SV%', ['SV%', 'SVPCT']], ['SO', ['SO', 'SHO']], ['TOI', ['TOI', 'TOI/G']], ['PIM', ['PIM']]];
-const GOALIE_GL = [['SV%', ['SV%', 'SVPCT']], ['GA/G', ['GAA', 'GA/G']], ['SA', ['SA']], ['GA', ['GA']], ['SV', ['SV', 'SAVES']], ['TOI', ['TOI', 'TOI/G']], ['PIM', ['PIM']]];
+const GOALIE_ALL = [['GP', ['GP']], ['W', ['W', 'WINS']], ['L', ['L', 'LOSSES']], ['OTL', ['OTL', 'OT', 'OTLOSSES']], ['GA/G', ['GAA', 'GA/G']], ['SA', ['SA']], ['GA', ['GA']], ['SV', ['SV', 'SAVES']], ['SV%', ['SV%', 'SVPCT']], ['SO', ['SO', 'SHO']], ['TOI', ['TOI', 'TOI/G']]];
+const GOALIE_GL = [['SV%', ['SV%', 'SVPCT']], ['GA/G', ['GAA', 'GA/G']], ['SA', ['SA']], ['GA', ['GA']], ['SV', ['SV', 'SAVES']], ['TOI', ['TOI', 'TOI/G']]];
 const isGoalieCat = labels => (labels || []).some(l => /^(SV%|GAA|GA\/G)$/i.test(l));
 const goalieCols = (labels, spec, names) => { const U = (labels || []).map(x => String(x).toUpperCase()), out = [];
   spec.forEach(([d, al]) => { let k = U.findIndex(x => al.includes(x)); if (d === 'SO' && names) { const j = names.findIndex(n => /^shutouts$/i.test(n)); if (j >= 0) k = j; } if (k >= 0 && !out.some(o => o[0] === k)) out.push([k, d]); }); return out; };
@@ -2456,7 +2457,7 @@ function summaryHTML(p) {
   const a = p.bio || {}, ss = a.statsSummary, st = ((ss && ss.statistics) || []).filter(x => x && x.displayValue != null).slice(0, 4);
   if (!st.length) return '';
   const col = a.team && a.team.color ? '#' + String(a.team.color).replace('#', '') : 'var(--acc)';
-  return `<section class="ssum"><div class="ssh">${esc(ss.displayName || 'Season stats')}</div><div class="ssg">${st.map(x => `<div ${a.active === false ? 'data-x' : 'data-sstat'}="${esc(ssCat(p, x))}" data-sstl="${esc(x.displayName || x.abbreviation || '')}" data-sslab="${esc(x.abbreviation || x.shortDisplayName || '')}"><div class="ssl">${esc(x.abbreviation || x.shortDisplayName || x.displayName || '')}</div><div class="ssv${String(x.displayValue).length > 5 ? ' lng' : ''}">${esc(x.displayValue)}</div><div class="ssr">${esc(x.rankDisplayValue || '')}</div></div>`).join('')}</div></section>`;
+  return `<section class="ssum"><div class="ssh">${esc(ss.displayName || 'Season stats')}</div><div class="ssg">${st.map(x => `<div ${a.active === false ? 'data-x' : 'data-sstat'}="${esc(ssCat(p, x))}" data-sstl="${esc(x.displayName || x.abbreviation || '')}" data-sslab="${esc(x.abbreviation || x.shortDisplayName || '')}"><div class="ssl">${esc(x.abbreviation || x.shortDisplayName || x.displayName || '')}</div><div class="ssv${String(x.displayValue).length > 5 || (p.league === 'nhl' && /^G$/i.test(p.pos || '')) ? ' lng' : ''}">${esc(x.displayValue)}</div><div class="ssr">${esc(x.rankDisplayValue || '')}</div></div>`).join('')}</div></section>`;
 }
 function overviewHTML(p) {
   const sum = summaryHTML(p);
@@ -3426,7 +3427,7 @@ const TSPEC = {
     return [g('Team', 'team', false), g('Opponent', 'opp', true), g('Differential', 'diff', false)]; })(),
   nhl: [
     { name: 'Skating', sections: [{ t: '', cols: [['GP', NM('games(Played)?')], ['GF/G', NM('avgGoals')], ['A', NM('assists')], ['PTS', NM('points')], ['PPG', NM('powerPlayGoals')], ['PP%', NM('powerPlayPct')], ['SHG', NM('shortHandedGoals')], ['S', NM('shotsTotal')], ['S%', NM('shootingPct')], ['PIM', NM('penaltyMinutes')], ['PK%', NM('penaltyKillPct')], ['SOA', NM('shootoutAttempts')], ['SOG', NM('shootoutGoals')], ['SO%', NM('shootoutShotPct')]] }], def: 'GF/G' },
-    { name: 'Goaltending', sections: [{ t: '', cols: [['GA/G', NM('avgGoalsAgainst')], ['W', NM('wins')], ['L', NM('losses')], ['OTL', NM('overtimeLosses')], ['SA', NM('shotsAgainst')], ['GA', NM('goalsAgainst')], ['S', NM('saves')], ['SV%', NM('savePct')], ['SO', NM('shutouts')], ['SOSA', NM('shootoutShotsAgainst')], ['SOS', NM('shootoutSaves')], ['SOS%', NM('shootoutSavePct')]] }], def: 'GA/G', low: true }],
+    { name: 'Goaltending', sections: [{ t: '', cols: [['GP', NM('games(Played)?')], ['GA/G', NM('avgGoalsAgainst')], ['W', NM('wins')], ['L', NM('losses')], ['OTL', NM('overtimeLosses')], ['SA', NM('shotsAgainst')], ['GA', NM('goalsAgainst')], ['S', NM('saves')], ['SV%', NM('savePct')], ['SO', NM('shutouts')], ['SOSA', NM('shootoutShotsAgainst')], ['SOS', NM('shootoutSaves')], ['SOS%', NM('shootoutSavePct')]] }], def: 'GA/G', low: true }],
   nfl: (() => { const GP = { t: '', cols: [['GP', NM('(gamesPlayed|games|teamGamesPlayed)', { side: 'team' })]] };
     const off = side => [GP,
       { t: 'Total', cols: [['YDS', NM('(totalYards|netTotalYards|totalOffensiveYards)', { side })], ['YDS/G', NM('(yardsPerGame|totalYardsPerGame|netYardsPerGame|totalOffensiveYardsPerGame)', { side })]] },
@@ -3440,7 +3441,7 @@ const TSPEC = {
         { t: 'Kickoffs', cols: [['ATT', NM('kickReturns')], ['YDS', NM('kickReturnYards')], ['AVG', NM('(yardsPerKickReturn|avgKickReturnYards|kickReturnAverage)')], ['LNG', NM('longKickReturn')], ['TD', NM('kickReturnTouchdowns')]] },
         { t: 'Punts', cols: [['ATT', NM('puntReturns')], ['YDS', NM('puntReturnYards')], ['AVG', NM('(yardsPerPuntReturn|avgPuntReturnYards|puntReturnAverage)')], ['LNG', NM('longPuntReturn')], ['TD', NM('puntReturnTouchdowns')], ['FC', NM('(puntReturnFairCatches|fairCatches)')]] }], def: 'AVG', defSec: 'Kickoffs' },
       { name: 'Turnovers', sections: [GP,
-        { t: '', cols: [['DIFF', NM('(turnOverDifferential|turnoverDifferential)')]] },
+        { t: '', cols: [['DIFF', NM('__never__')]] },
         { t: 'Takeaways', cols: [['INT', NM('interceptions', { g: /defensiveinterceptions/i })], ['FUM', NM('(fumblesRecovered|fumbleRecoveries)')], ['TOTAL', { calc: ['Takeaways.INT', 'Takeaways.FUM'] }]] },
         { t: 'Giveaways', cols: [['INT', NM('interceptions', { g: /passing/i })], ['FUM', NM('fumblesLost')], ['TOTAL', { calc: ['Giveaways.INT', 'Giveaways.FUM'] }]] }], def: 'DIFF', plus: 'DIFF' }]; })()
 };
@@ -3634,7 +3635,7 @@ async function loadLeaders() {
     if (q) { v._qbrAll = {}; (jq.athletes || []).forEach(a => { const ac = a.categories || [], x = ac.find(z => z.name === q.ci) || ac[0], arr = (x && (x.totals || x.values)) || []; if (a.athlete && a.athlete.id && arr[q.k] != null) v._qbrAll[String(a.athlete.id)] = arr[q.k]; }); } } catch (e) {} }
   const u = 'https://site.web.api.espn.com/apis/common/v3/sports/' + L.path + '/statistics/byathlete?region=us&lang=en&contentorigin=espn&isqualified=true&page=1&limit=100' + (v.sy ? '&seasontype=2&season=' + v.sy : '') + (cg ? '&category=' + cg : '') + (sort ? '&sort=' + sort + ':desc' : '');
   try {
-    const gq = cg === 'goaltending', uu = gq ? u.replace('&category=goaltending', '').replace(/&sort=[^&]*/, '') + '&sort=' + sort + (/avgGoalsAgainst/.test(sort) ? ':asc' : ':desc') : u;
+    const gq = cg === 'goaltending', uu = gq ? u.replace('&category=goaltending', '').replace(/&sort=[^&]*/, '') + '&sort=defensive.savePct:desc' : u;
     let j = await getJson(uu);
     if (gq) { const rc0 = j.categories || [], dc = rc0.find(c => (c.names || []).includes('savePct')); if (dc) { const k = dc.names.indexOf('savePct'); j.athletes = (j.athletes || []).filter(a => { const x = (a.categories || []).find(q => q.name === dc.name), arr = (x && (x.totals || x.values)) || []; const n = parseFloat(arr[k]); return !isNaN(n) && n > 0; }); } }
     if (cg === 'goaltending') { const has = x => /savePct|savePercentage|goalsAgainstAverage|avgGoalsAgainst|"SV%"/.test(JSON.stringify((x && x.categories) || []));
@@ -3644,7 +3645,7 @@ async function loadLeaders() {
     rc.forEach((c, ci) => (c.labels || []).forEach((l, k) => { cols.push({ label: l, name: (c.names || [])[k] || l, ci: c.name, k }); }));
     const WANT = {
       nba: ['gamesPlayed', 'avgMinutes', 'avgPoints', 'avgFieldGoalsMade', 'avgFieldGoalsAttempted', 'fieldGoalPct', 'avgThreePointFieldGoalsMade', 'avgThreePointFieldGoalsAttempted', 'threePointFieldGoalPct', 'avgFreeThrowsMade', 'avgFreeThrowsAttempted', 'freeThrowPct', 'avgRebounds', 'avgAssists', 'avgSteals', 'avgBlocks', 'avgTurnovers', 'doubleDouble', 'tripleDouble'],
-      nhl: cg === 'goaltending' ? ['wins', 'losses', 'overtimeLosses', 'otLosses', 'goalsAgainstAverage', 'avgGoalsAgainst', 'shotsAgainst', 'goalsAgainst', 'saves', 'savePct', 'shutouts', 'timeOnIce', 'timeOnIcePerGame', 'avgTimeOnIce', 'penaltyMinutes'] : ['gamesPlayed', 'goals', 'assists', 'points', 'plusMinus', 'penaltyMinutes', 'shotsTotal', 'shootingPct', 'powerPlayGoals', 'shortHandedGoals', 'gameWinningGoals', 'timeOnIcePerGame']
+      nhl: cg === 'goaltending' ? ['gamesPlayed', 'wins', 'losses', 'overtimeLosses', 'otLosses', 'goalsAgainstAverage', 'avgGoalsAgainst', 'shotsAgainst', 'goalsAgainst', 'saves', 'savePct', 'shutouts', 'timeOnIcePerGame'] : ['gamesPlayed', 'goals', 'assists', 'points', 'plusMinus', 'penaltyMinutes', 'shotsTotal', 'shootingPct', 'powerPlayGoals', 'shortHandedGoals', 'gameWinningGoals', 'timeOnIcePerGame']
     };
     if (WANT[v.league]) { const f = WANT[v.league].map(n => cols.find(c => c.name === n)).filter(Boolean); if (f.length >= 3) cols = f; else { const seen = new Set(); cols = cols.filter(c => !seen.has(c.label) && seen.add(c.label)); } }
     else if (v.league === 'nfl' && cg) { const grp = cg.split(':').pop().replace(/e$/, '').toLowerCase(); let gpDone = false; const f = cols.filter(c => c.ci === 'general' ? (/gamesPlayed/i.test(c.name) && !gpDone && (gpDone = true)) : String(c.ci).toLowerCase().indexOf(grp) === 0 || (grp === 'defens' && /defensive/i.test(c.ci))); const seen = new Set(); cols = (f.length >= 3 ? f : cols).filter(c => { const k = c.label + '|' + (f.length >= 3 ? c.ci : ''); return !seen.has(k) && seen.add(k); }); }
@@ -3656,6 +3657,7 @@ async function loadLeaders() {
       return { a: at, vals };
     });
     if (!rows.length || !cols.length) throw new Error('empty');
+    if (cg === 'goaltending') { const gi = cols.findIndex(c => c.name === 'gamesPlayed'); if (gi >= 0) { const gp = r => parseFloat(rows[r] ? rows[r].vals[gi] : 0) || 0, mx = Math.max(0, ...rows.map((_, r) => gp(r))), lim = Math.max(1, Math.round(mx * .3)); for (let r = rows.length - 1; r >= 0; r--) if (gp(r) < lim) rows.splice(r, 1); } }
     const QM = v._qbr || v._qbrAll;
     if (QM) { let qi = cols.findIndex(c => /^QBR$/i.test(c.label) || /QBR/i.test(c.name));
       if (qi >= 0) rows.forEach(r => { const q = QM[String(r.a.id)]; r.vals[qi] = q != null ? q : ''; });
