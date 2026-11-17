@@ -921,9 +921,9 @@ html.one #app.lst,html.one body{min-height:0}
 .f1list{padding-bottom:40vh}
 .f1card{display:flex;align-items:stretch;gap:10px;height:112px;box-sizing:border-box;padding:12px 16px;overflow:hidden}
 .f1cl1{flex:1 1 55%;min-width:0;display:flex;flex-direction:column;justify-content:center;gap:2px}
-.f1fl{display:inline-block;width:38px;text-align:center;font-size:23px;line-height:1;flex:none;font-family:'Apple Color Emoji','Segoe UI Emoji','Noto Color Emoji',sans-serif!important;font-size-adjust:none}
+.f1fl{display:inline-block;width:38px;text-align:center;font-size:26px;line-height:1;flex:none;font-family:'Apple Color Emoji','Segoe UI Emoji','Noto Color Emoji',sans-serif!important;font-size-adjust:none}
 .f1tt{display:flex;align-items:center;gap:8px;min-width:0;margin-bottom:0}
-.f1tt .f1fl{display:flex;align-items:center;justify-content:center;height:24px}
+.f1tt .f1fl{display:flex;align-items:center;justify-content:center;height:28px}
 .f1tt .f1nm{position:relative;top:-2px}
 .f1nm{font-family:var(--num);font-weight:700;font-size:19px;line-height:1.1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .f1big{font-family:var(--num);font-weight:700;font-size:23px;line-height:1;letter-spacing:.2px;padding-left:var(--fo,5px);margin:3px 0 2px}
@@ -4295,7 +4295,7 @@ function playerNav(d) {
 }
 /* ===================== F1 ===================== */
 const F1A = 'https://site.api.espn.com/apis/site/v2/sports/racing/f1/', F1S = 'https://site.api.espn.com/apis/v2/sports/racing/f1/standings', F1C = 'https://sports.core.api.espn.com/v2/sports/racing/leagues/f1/';
-const F1 = { sb: {}, st: {}, cl: {}, rd: {}, circ: {}, busy: {}, ev: {}, agg: {}, rdv: {}, rdp: {} };
+const F1 = { sb: {}, st: {}, cl: {}, rd: {}, circ: {}, busy: {}, ev: {}, agg: {}, rdv: {}, rdp: {}, team: {} };
 const f1Year = () => new Date().getFullYear();
 const F1CC = { australia: 'AU', china: 'CN', japan: 'JP', bahrain: 'BH', 'saudi arabia': 'SA', usa: 'US', 'united states': 'US', canada: 'CA', monaco: 'MC', spain: 'ES', austria: 'AT', britain: 'GB', 'great britain': 'GB', uk: 'GB', 'united kingdom': 'GB', england: 'GB', belgium: 'BE', hungary: 'HU', netherlands: 'NL', italy: 'IT', azerbaijan: 'AZ', malaysia: 'MY', singapore: 'SG', mexico: 'MX', brazil: 'BR', qatar: 'QA', uae: 'AE', 'united arab emirates': 'AE', 'abu dhabi': 'AE', germany: 'DE', france: 'FR', russia: 'RU', turkey: 'TR', portugal: 'PT', korea: 'KR', 'south korea': 'KR', india: 'IN', vietnam: 'VN', argentina: 'AR', 'south africa': 'ZA', sweden: 'SE', switzerland: 'CH', europe: 'EU', thailand: 'TH', madrid: 'ES' };
 const F1NM = [[/austral/i, 'AU'], [/chin/i, 'CN'], [/japan/i, 'JP'], [/bahrain(?! grand prix in)/i, 'BH'], [/saudi/i, 'SA'], [/miami|las vegas|united states|\bus grand|usa/i, 'US'], [/canad/i, 'CA'], [/monaco/i, 'MC'], [/spanish|barcelona|madrid|spain/i, 'ES'], [/austria|styria/i, 'AT'], [/british|70th anniv/i, 'GB'], [/belgi/i, 'BE'], [/hungar/i, 'HU'], [/dutch/i, 'NL'], [/italian|emilia|tuscan|monza|san marino/i, 'IT'], [/azerbai/i, 'AZ'], [/malaysia/i, 'MY'], [/singapore/i, 'SG'], [/mexic/i, 'MX'], [/s[ãa]o paulo|brazil/i, 'BR'], [/qatar/i, 'QA'], [/abu dhabi/i, 'AE'], [/german|eifel/i, 'DE'], [/french/i, 'FR'], [/russia/i, 'RU'], [/turk/i, 'TR'], [/portug/i, 'PT'], [/korea/i, 'KR'], [/india/i, 'IN'], [/europe/i, 'EU']];
@@ -4316,6 +4316,8 @@ async function f1Detail(eid, c, withStatus) {
   const cid = c.id, k = cid + (withStatus ? 's' : ''); if (F1.rd[k]) return F1.rd[k];
   const p = (async () => { const base = F1C + 'events/' + eid + '/competitions/' + cid + '/competitors';
     const L = await getJson(base + '?limit=40'), items = L.items || [];
+    /* teams are known from the entry list right away – show them before the per-driver stats arrive */
+    let nt = 0; items.forEach(it => { const t = it.vehicle && it.vehicle.manufacturer; if (t && F1.team[String(it.id)] !== t) { F1.team[String(it.id)] = t; nt++; } }); if (nt && topView() === 'lv' && state.lv && state.lv.kind === 'f1race') render();
     const rows = await Promise.all(items.map(async it => { const id = String(it.id); let st = {}, status = null;
       try { st = f1StMap(await getJson(base + '/' + id + '/statistics')); } catch (e) {}
       if (withStatus) try { status = await getJson(base + '/' + id + '/status'); } catch (e) {}
@@ -4324,7 +4326,7 @@ async function f1Detail(eid, c, withStatus) {
   F1.rd[k] = p; p.catch(() => { delete F1.rd[k]; }); return p;
 }
 async function f1Teams(evs) { const done = evs.filter(e => f1Done(f1Comp(e, 'Race'))); const last = done[done.length - 1]; if (!last) return {}; if (F1.tm && F1.tm[last.id]) return F1.tm[last.id];
-  const rc = f1Comp(last, 'Race'), m = {}; try { const L = await getJson(F1C + 'events/' + last.id + '/competitions/' + rc.id + '/competitors?limit=40'); (L.items || []).forEach(it => { m[String(it.id)] = { team: (it.vehicle && it.vehicle.manufacturer) || '', color: (it.vehicle && it.vehicle.teamColor) || '' }; }); } catch (e) {}
+  const rc = f1Comp(last, 'Race'), m = {}; try { const L = await getJson(F1C + 'events/' + last.id + '/competitions/' + rc.id + '/competitors?limit=40'); (L.items || []).forEach(it => { if (it.vehicle && it.vehicle.manufacturer && !F1.team[String(it.id)]) F1.team[String(it.id)] = it.vehicle.manufacturer; m[String(it.id)] = { team: (it.vehicle && it.vehicle.manufacturer) || '', color: (it.vehicle && it.vehicle.teamColor) || '' }; }); } catch (e) {}
   F1.tm = F1.tm || {}; F1.tm[last.id] = m; return m; }
 async function f1Circ(ev) { const id = ev && ev.circuit && ev.circuit.id; if (!id) return null; if (F1.circ[id] !== undefined) return F1.circ[id] === 'p' ? null : F1.circ[id]; F1.circ[id] = 'p';
   try { const j = await getJson(F1C + 'circuits/' + id); const hs = []; const walk = o => { if (!o || typeof o !== 'object') return; if (Array.isArray(o)) return o.forEach(walk); Object.entries(o).forEach(([k, v]) => { if (typeof v === 'string' && /^https?:.*\.(png|svg|jpe?g)/i.test(v)) hs.push([k, v]); else walk(v); }); }; walk(j);
@@ -4419,7 +4421,7 @@ async function loadF1List() {
     const ex = []; if (!cur.some(f1RaceDone)) ex.push(Y - 1); if (!cur.length || cur.every(f1RaceDone)) ex.push(Y + 1);
     if (ex.length) { await Promise.all(ex.map(y => f1Season(y).catch(() => null))); F1.scrolled = 0; }
     /* warm Statistics/Standings in the background so they open instantly */
-    setTimeout(() => { f1ResolveY().then(y => Promise.all([f1Season(y), f1Stand(y)]).then(() => f1Agg(y))).catch(() => {}); }, 1200);
+    setTimeout(() => { f1ResolveY().then(y => Promise.all([f1Season(y), f1Stand(y)]).then(() => { f1Teams(F1.sb[y]).catch(() => {}); f1Agg(y); })).catch(() => {}); }, 1200);
   } catch (e) { F1.err = 'Failed to load F1 (' + (e.message || e) + ').'; }
   if (topView() === 'list' && state.league === 'f1') render();
 }
@@ -4508,7 +4510,7 @@ function f1StatsHTML(v, y) {
 /* race page */
 const F1SES = { FP1: 'Free Practice 1', FP2: 'Free Practice 2', FP3: 'Free Practice 3', SS: 'Sprint Qualifying', SR: 'Sprint Race', Qual: 'Qualifying', Race: 'Race' };
 function f1Groups(ev) { const has = ab => !!f1Comp(ev, ab), G = []; const fp = ['FP1', 'FP2', 'FP3'].filter(has); if (fp.length) G.push(['fp', 'Free Practice', fp]); if (has('SS')) G.push(['ss', 'Sprint Qualifying', ['SS']]); if (has('SR')) G.push(['sr', 'Sprint Race', ['SR']]); if (has('Qual')) G.push(['q', 'Qualifying', ['Qual']]); if (has('Race') && has('Qual')) G.push(['g', 'Starting Grid', ['Race']]); if (has('Race')) G.push(['r', 'Race', ['Race']]); return G; }
-function f1GridMap(ev, v) { const c = f1Comp(ev, 'Race'); if (!c) return 0; const gk = 'g' + c.id; F1.grid = F1.grid || {}; if (F1.grid[gk] === undefined) { F1.grid[gk] = null; getJson(F1C + 'events/' + ev.id + '/competitions/' + c.id + '/competitors?limit=40').then(L => { const m = {}; (L.items || []).forEach(it => { if (it.startOrder > 0) m[String(it.id)] = it.startOrder; }); F1.grid[gk] = Object.keys(m).length >= 10 ? m : 0; if (F1.grid[gk] && v && v.gAuto && v.g === 'q' && !f1Done(c)) v.g = 'g'; if (state.lv === v) render(); }).catch(() => { F1.grid[gk] = 0; }); } return F1.grid[gk]; }
+function f1GridMap(ev, v) { const c = f1Comp(ev, 'Race'); if (!c) return 0; const gk = 'g' + c.id; F1.grid = F1.grid || {}; if (F1.grid[gk] === undefined) { F1.grid[gk] = null; getJson(F1C + 'events/' + ev.id + '/competitions/' + c.id + '/competitors?limit=40').then(L => { const m = {}; (L.items || []).forEach(it => { if (it.vehicle && it.vehicle.manufacturer) F1.team[String(it.id)] = it.vehicle.manufacturer; if (it.startOrder > 0) m[String(it.id)] = it.startOrder; }); F1.grid[gk] = Object.keys(m).length >= 10 ? m : 0; if (F1.grid[gk] && v && v.gAuto && v.g === 'q' && !f1Done(c)) v.g = 'g'; if (state.lv === v) render(); }).catch(() => { F1.grid[gk] = 0; }); } return F1.grid[gk]; }
 function f1DefGroup(ev, G, v) { const D = ab => f1Done(f1Comp(ev, ab)), H = k => G.find(x => x[0] === k);
   if (H('r') && D('Race')) return H('r');
   if (H('q') && D('Qual')) return f1GridMap(ev, v) && H('g') ? H('g') : H('q');
@@ -4546,7 +4548,7 @@ function f1RaceHTML(v) {
 const f1Ms = ms => { if (!(ms > 0)) return ''; const t = ms / 1000, m = Math.floor(t / 60), s = (t - m * 60).toFixed(3); return (m ? m + ':' + s.padStart(6, '0') : s); };
 function f1Table(rows, det, mode, y) {
   const dm = {}; (det || []).forEach(r => { dm[r.id] = r; });
-  let R = rows.map(r => Object.assign({}, r, dm[r.id] ? { team: dm[r.id].team, st: dm[r.id].st, status: dm[r.id].status } : {}));
+  let R = rows.map(r => Object.assign({}, r, dm[r.id] ? { team: dm[r.id].team, st: dm[r.id].st, status: dm[r.id].status } : {})); R.forEach(r => { if (!r.team) r.team = F1.team[r.id] || ''; });
   const S = (r, n) => r.st && r.st[n] ? r.st[n] : null, V = (r, n) => { const x = S(r, n); return x && x.v > 0 ? x.v : 0; };
   let timeOf = () => '', ptsOf = () => '', fl = null;
   const pc = mode === 'race' || mode === 'sprint';
@@ -4567,7 +4569,7 @@ function f1Table(rows, det, mode, y) {
     else { const has = R.filter(r => qt(r, k) > 0).sort((a, b) => qt(a, k) - qt(b, k)), no = k === '1' ? R.filter(r => !(qt(r, k) > 0)).sort((a, b) => (a.order || 99) - (b.order || 99)) : [];
       if (!has.length) return msg('No results availible');
       R = has.concat(no); R.forEach((r, i) => { r.order = i + 1; }); const P0 = qt(has[0], k); timeOf = r => { const t = qt(r, k); return !t ? 'DNF' : r.order === 1 ? f1Ms(t) : '+' + ((t - P0) / 1000).toFixed(3); }; } }
-  return `<section class="blk"><table class="nfx sep f1t f1res ${pc ? 'f1pc' : ''}"><colgroup><col style="width:34px"><col><col style="width:${pc ? 104 : 88}px">${pc ? '<col style="width:30px">' : ''}</colgroup><thead><tr><th class="n">#</th><th class="l ph">Driver</th><th class="tl">${mode === 'grid' ? '' : 'Time'}</th>${pc ? '<th>Pts</th>' : ''}</tr></thead><tbody>${R.sort((a, b) => (a.order || 99) - (b.order || 99)).map(r => `<tr data-f1drv="${esc(r.id)}"><td class="n f1rk ${pc && r.order <= 3 ? 'p' + r.order : ''}">${esc(String(r.order || ''))}</td><td class="l">${f1Drv(r.id, r.name || '', r.team).replace(/<\/div><\/div>$/, fl && fl.id === r.id ? '</div><i class="f1fast" title="Fastest lap">⚡</i></div>' : '</div></div>')}</td><td class="f1tm">${mode === 'grid' && r.q && r.order > r.q ? `<small class="f1pen">Grid penalty<br>Qualified P${r.q}</small>` : esc(det ? timeOf(r) : '')}</td>${pc ? `<td>${esc(det ? ptsOf(r) : '')}</td>` : ''}</tr>`).join('')}</tbody></table></section>`;
+  return `<section class="blk"><table class="nfx sep f1t f1res ${pc ? 'f1pc' : ''}"><colgroup><col style="width:34px"><col><col style="width:${pc ? 104 : 88}px">${pc ? '<col style="width:30px">' : ''}</colgroup><thead><tr><th class="n">#</th><th class="l ph">Driver</th><th class="tl">${mode === 'grid' ? '' : 'Time'}</th>${pc ? '<th>Pts</th>' : ''}</tr></thead><tbody>${R.sort((a, b) => (a.order || 99) - (b.order || 99)).map(r => `<tr data-f1drv="${esc(r.id)}"><td class="n f1rk ${pc && r.order <= 3 ? 'p' + r.order : ''}">${esc(String(r.order || ''))}</td><td class="l">${f1Drv(r.id, r.name || '', r.team).replace(/<\/div><\/div>$/, fl && fl.id === r.id ? '</div><i class="f1fast" title="Fastest lap">⚡</i></div>' : '</div></div>')}</td><td class="f1tm">${mode === 'grid' && r.q && r.order > r.q ? `<small class="f1pen">Grid penalty<br><span style="white-space:nowrap">Qualified P${r.q}</span></small>` : esc(det ? timeOf(r) : '')}</td>${pc ? `<td>${esc(det ? ptsOf(r) : '')}</td>` : ''}</tr>`).join('')}</tbody></table></section>`;
 }
 
 function route() {
