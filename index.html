@@ -914,6 +914,57 @@ html.one #app.lst,html.one body{min-height:0}
 html.glass :is(.pane,.hero,.ssum,.card,.rcp,.hpill,header .back,header .home[data-home],.ybtn,.qb button,.pill,.dy,.seg,.mo,.brm,.nwi:first-child,.cmpi):not([style*='position']){position:relative}
 html.glass :is(.pane,.hero,.ssum,.card,.rcp,.hpill,header .back,header .home[data-home],.ybtn,.qb button,.pill,.dy,.seg,.artbox,.mo,.brm,.lpm,.nwi:first-child,.cmpi)::after{content:'';position:absolute;inset:0;border-radius:inherit;padding:1.2px;background:linear-gradient(180deg,rgba(255,255,255,.34) 0%,rgba(255,255,255,.14) 22%,rgba(255,255,255,.04) 48%,rgba(255,255,255,0) 72%);-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude;pointer-events:none;z-index:3}
 html.glass .pill.on::after,html.glass .dy.on::after{background:linear-gradient(180deg,rgba(255,255,255,.55),rgba(255,255,255,0) 70%)}
+
+.f1list{padding-bottom:40vh}
+.f1card{display:flex;align-items:stretch;gap:8px;height:112px;box-sizing:border-box;padding:12px 14px 12px 16px;overflow:hidden}
+.f1card.cur{box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.22)}
+.f1cl1{flex:1 1 55%;min-width:0;display:flex;flex-direction:column;justify-content:center;gap:3px}
+.f1fl{display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:50%;overflow:hidden;background:#2c2c2e;font-size:26px;line-height:1;flex:none}
+.f1cl1 .f1fl{margin-bottom:1px}
+.f1nm{font-family:var(--num);font-weight:700;font-size:16px;line-height:1.15;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.f1big{font-family:var(--num);font-weight:700;font-size:26px;line-height:1.05;letter-spacing:.2px}
+.f1ct{color:var(--mut);font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.f1won{display:flex;align-items:center;gap:6px;color:var(--mut);font-size:13px}
+.f1chk{font-size:14px}
+.f1w{display:flex;align-items:center;gap:7px;font-size:14px;font-weight:600}
+.f1w .hs{width:24px;height:24px;border-radius:50%;object-fit:cover;background:#2c2c2e}
+.f1map{flex:0 0 42%;display:flex;align-items:center;justify-content:center}
+.f1map img{max-width:100%;max-height:88px;object-fit:contain;filter:invert(1) brightness(1.6);opacity:.85;-webkit-user-drag:none}
+.f1d{display:flex;align-items:center;gap:10px;min-width:0}
+.f1d .hs{width:36px;height:36px;border-radius:50%;object-fit:cover;background:#2c2c2e;flex:none}
+.f1dn{display:flex;flex-direction:column;align-items:flex-start;text-align:left;min-width:0}
+.f1dn b{font-family:var(--num);font-weight:700;font-size:16px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.f1dn small{color:var(--mut);font-size:12.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.f1cl{display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:50%;color:#fff;font-weight:800;font-size:15px;flex:none;text-shadow:0 0 3px rgba(0,0,0,.6)}
+.f1cl.big{width:38px;height:38px}
+.f1t td{vertical-align:middle}
+.f1t tbody tr{cursor:pointer}
+.f1rk{font-family:var(--num);font-weight:700;font-size:16px}
+.f1rk.p1{color:#ffd60a}.f1rk.p2{color:#d1d1d6}.f1rk.p3{color:#d0894a}
+.f1t td.f1tm{font-family:var(--num);font-size:14px;white-space:nowrap;text-align:right;padding-right:6px}
+.f1t td.l{text-align:left;overflow:hidden;max-width:0}
+.f1t{table-layout:fixed;width:100%}
+.f1fast{font-style:normal;font-size:13px;flex:none;margin-left:-4px}
+.f1ph{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:4px 2px 12px}
+.f1ph .f1d .hs,.f1ph .f1cl{width:54px;height:54px}
+.f1ph .f1dn b{font-size:20px}
+.f1pp{text-align:right}.f1pp b{font-family:var(--num);font-size:26px;display:block;line-height:1}.f1pp small{color:var(--mut);font-size:12px}
+.f1rcs{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.f1rc{display:flex;align-items:center;gap:8px;background:#1c1c1e;border-radius:14px;padding:10px;min-height:52px;cursor:pointer}
+.f1rn{flex:1;min-width:0;font-size:13px;font-weight:600;line-height:1.2;overflow:hidden}
+.f1rn small{display:block;color:var(--mut);font-weight:500;font-size:11.5px;margin-top:2px}
+.f1rp{font-family:var(--num);font-weight:700;font-size:18px}
+.f1rp.p1{color:#ffd60a}.f1rp.p2{color:#d1d1d6}.f1rp.p3{color:#d0894a}
+.f1rh{display:flex;align-items:center;gap:10px;margin:2px 0 10px}
+.f1rh .f1fl{width:30px;height:30px;font-size:36px}
+.f1rh .lvt{margin:0}
+.f1rsub{color:var(--mut);font-size:12.5px}
+.f1sh{margin:2px 0 8px}
+.f1grid{color:var(--mut);font-size:12.5px;margin:4px 2px 6px}
+.f1st .ldr .ln small{display:block;color:var(--mut);font-size:12.5px;margin-top:1px}
+.f1st .ldr .pn{font-family:var(--num);font-weight:700;font-size:17px}
+.f1prog{color:var(--mut);font-size:12px;margin:0 2px 8px}
+.f1ys{margin-left:6px}
 </style>
 </head>
 <body>
@@ -1058,7 +1109,7 @@ function tabHTML(k) {
   document.addEventListener('touchstart', e => { if (S && S.hz) { try { cleanup(S); } catch (er) {} } S = null; $app.querySelectorAll('.ghost').forEach(g => g.remove()); if (e.touches.length !== 1 || pop()) return; const t = e.target; if (!t.closest) return;
     if (window.isSAm && isSAm() && e.touches[0].clientX <= 24 && topView() !== 'list') return;
     const v = topView(), x = e.touches[0].clientX, y = e.touches[0].clientY, base = { x0: x, y0: y, t0: Date.now(), x: 0, hz: false, gh: [] };
-    if (v === 'list') { if (state.league === 'fav' || t.closest('header, #fhome, #ptr')) return; const items = [...$app.querySelectorAll('.dy')], cur = items.findIndex(b => b.classList.contains('on')); if (cur < 0) return;
+    if (v === 'list') { if (state.league === 'fav' || state.league === 'f1' || t.closest('header, #fhome, #ptr')) return; const items = [...$app.querySelectorAll('.dy')], cur = items.findIndex(b => b.classList.contains('on')); if (cur < 0) return;
       S = Object.assign(base, { mode: 'day', el: $app.querySelector('main'), cls: '', items, cur }); return; }
     const pe = t.closest('.pane') || (!t.closest('.stkw, header, .hpill, input') ? $app.querySelector(':scope > main > .pane') : null);
     if (!pe || t.closest('.brsw, .mstrip, .wpw, .rkw, .ysel, .ylist, .scf, .cmpr, input, .ghost')) return;
@@ -1159,7 +1210,7 @@ async function getJson(url, fresh) {
 }
 
 const state = {
-  league: LEAGUES[store.get('league')] ? store.get('league') : 'nba',
+  league: (LEAGUES[store.get('league')] || store.get('league') === 'f1') ? store.get('league') : 'nba',
   date: todayLoc(), isToday: true, events: [], loading: false, error: null,
   game: null, player: null, pmeta: null, teams: {}, teamList: {}, search: false, sq: '', sleague: null, sp: null, team: null, lastView: '', teamErrs: {}, teamErrText: '', tmeta: null, open: new Set(), closed: new Set()
 };
@@ -1255,6 +1306,7 @@ function prefetchNeighbors() {
     fetchDay(lg, n.d, n.w, state.nflw && state.nflw.year).then(r => { state.dayC[n.key] = r.evs; }).catch(() => { delete state.dayC[n.key]; }); });
 }
 async function loadList(silent) {
+  if (state.league === 'f1') return loadF1List();
   prefetchLeague(state.league);
   if (state.league === 'fav') return loadFavs(silent);
   const lg = state.league, my = ++reqId, W = state.nflw, key = dayKey(lg, state.date, W && W.sel);
@@ -1569,8 +1621,9 @@ function renderList() {
   const fav = state.league === 'fav';
   const tabs = Object.entries(LEAGUES).map(([k, v]) =>
     `<button class="pill ${k === state.league ? 'on' : ''}" data-league="${k}">${v.name}</button>`).join('') +
-    `<button class="pill f1" data-f1="1">F1</button>` +
+    `<button class="pill f1 ${state.league === 'f1' ? 'on' : ''}" data-f1="1">F1</button>` +
     `<button class="pill star ${fav ? 'on' : ''}" data-league="fav" aria-label="Favorites">${STAR_SVG}</button>`;
+  if (state.league === 'f1') return renderF1List(tabs);
   let body;
   if (state.loading && !state.events.length) body = msg('Loading…');
   else if (state.error && !state.events.length) body = `<div class="msg">${esc(state.error)}<br><button data-refresh>Try again</button></div>`;
@@ -3469,6 +3522,7 @@ async function nhlGoalieQual(sy) {
 }
 async function loadLV() {
   const v = state.lv; if (!v) return;
+  if (/^f1/.test(v.kind)) return f1Load(v, true);
   if (v.kind === 'draft') { v.dd = null; return loadDraft(v); }
   if (v.kind === 'tleaders') { delete state.lvC['lteams' + v.league + (v.sy || seasonYear(v.league))]; return loadLTeams(v); }
   const key = lvKey(v);
@@ -3790,6 +3844,7 @@ function paintCompare() {
   addGlossary('cmp');
 }
 function renderLV() {
+  if (/^f1/.test(state.lv.kind)) return renderF1();
   if (state.lv.kind === 'leaders') return renderLeaders();
   if (state.lv.kind === 'tleaders') return renderTLeaders();
   if (state.lv.kind === 'draft') return renderDraft();
@@ -4194,6 +4249,197 @@ function playerNav(d) {
   window._fromList = true;
   location.hash = '#/player/' + d.pl + '/' + d.player;
 }
+/* ===================== F1 ===================== */
+const F1A = 'https://site.api.espn.com/apis/site/v2/sports/racing/f1/', F1S = 'https://site.api.espn.com/apis/v2/sports/racing/f1/standings', F1C = 'https://sports.core.api.espn.com/v2/sports/racing/leagues/f1/';
+const F1 = { sb: {}, st: {}, cl: {}, rd: {}, circ: {}, busy: {} };
+const f1Year = () => new Date().getFullYear();
+const f1Years = () => { const L = []; for (let y = f1Year(); y >= 2004; y--) L.push(y); return L; };
+const F1CC = { australia: 'AU', china: 'CN', japan: 'JP', bahrain: 'BH', 'saudi arabia': 'SA', usa: 'US', 'united states': 'US', canada: 'CA', monaco: 'MC', spain: 'ES', austria: 'AT', britain: 'GB', 'great britain': 'GB', uk: 'GB', 'united kingdom': 'GB', england: 'GB', belgium: 'BE', hungary: 'HU', netherlands: 'NL', italy: 'IT', azerbaijan: 'AZ', malaysia: 'MY', singapore: 'SG', mexico: 'MX', brazil: 'BR', qatar: 'QA', uae: 'AE', 'united arab emirates': 'AE', 'abu dhabi': 'AE', germany: 'DE', france: 'FR', russia: 'RU', turkey: 'TR', portugal: 'PT', korea: 'KR', 'south korea': 'KR', india: 'IN', vietnam: 'VN', argentina: 'AR', 'south africa': 'ZA', sweden: 'SE', switzerland: 'CH', europe: 'EU', thailand: 'TH', madrid: 'ES' };
+const F1NM = [[/austral/i, 'AU'], [/chin/i, 'CN'], [/japan/i, 'JP'], [/bahrain(?! grand prix in)/i, 'BH'], [/saudi/i, 'SA'], [/miami|las vegas|united states|\bus grand|usa/i, 'US'], [/canad/i, 'CA'], [/monaco/i, 'MC'], [/spanish|barcelona|madrid|spain/i, 'ES'], [/austria|styria/i, 'AT'], [/british|70th anniv/i, 'GB'], [/belgi/i, 'BE'], [/hungar/i, 'HU'], [/dutch/i, 'NL'], [/italian|emilia|tuscan|monza|san marino/i, 'IT'], [/azerbai/i, 'AZ'], [/malaysia/i, 'MY'], [/singapore/i, 'SG'], [/mexic/i, 'MX'], [/s[ãa]o paulo|brazil/i, 'BR'], [/qatar/i, 'QA'], [/abu dhabi/i, 'AE'], [/german|eifel/i, 'DE'], [/french/i, 'FR'], [/russia/i, 'RU'], [/turk/i, 'TR'], [/portug/i, 'PT'], [/korea/i, 'KR'], [/india/i, 'IN'], [/europe/i, 'EU']];
+const f1Iso = ev => { const nm = String((ev && ev.name) || ''); for (const [re, c] of F1NM) if (re.test(nm)) return c; const co = String((ev && ev.circuit && ev.circuit.address && ev.circuit.address.country) || '').toLowerCase(); return F1CC[co] || ''; };
+const f1Flag = ev => { const c = f1Iso(ev); return c ? `<span class="f1fl">${c === 'EU' ? '🇪🇺' : String.fromCodePoint(...[...c].map(x => 127397 + x.charCodeAt(0)))}</span>` : '<span class="f1fl">🏁</span>'; };
+const f1GP = ev => String((ev && (ev.name || ev.displayName)) || '').replace(/^.*?(?=\b(?:[A-ZÀ-Ý][\wÀ-ÿ'.-]*\s)*(?:Grand Prix|GP)\b)/, m => { const w = String(ev.name || '').match(/((?:[A-ZÀ-Ýa-zà-ÿ'.-]+\s)?(?:[A-ZÀ-Ýa-zà-ÿ'.-]+\s)?Grand Prix.*)$/); return ''; }).trim();
+const f1Short = ev => { const n = String((ev && ev.name) || ''); const m = n.match(/([A-ZÀ-Ý][A-Za-zÀ-ÿ'.-]+(?:\s(?:[A-ZÀ-Ý][A-Za-zÀ-ÿ'.-]+|de|in))*\sGrand Prix(?:\sin\s\w+)?)$/); let s = m ? m[1] : n; const sp = ['Qatar Airways', 'Heineken', 'Aramco', 'Gulf Air', 'STC', 'Crypto.com', 'Lenovo', 'MSC Cruises', 'Pirelli', 'Moët & Chandon', 'AWS', 'Tag Heuer', 'Singapore Airlines', 'Etihad Airways', 'Rolex', 'Formula 1', 'FORMULA 1']; sp.forEach(x => { s = s.replace(new RegExp('^' + x.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '\\s+', 'i'), ''); }); return s; };
+const f1Hs = id => `https://a.espncdn.com/i/headshots/rpm/players/full/${id}.png`;
+const f1Dates = ev => { const a = new Date(ev.date), b = new Date(ev.endDate || ev.date); return a.getMonth() === b.getMonth() ? `${a.getDate()}–${b.getDate()}.${b.getMonth() + 1}.` : `${a.getDate()}.${a.getMonth() + 1}.–${b.getDate()}.${b.getMonth() + 1}.`; };
+const f1Comp = (ev, ab) => (ev.competitions || []).find(c => c.type && c.type.abbreviation === ab);
+const f1Done = c => !!(c && c.status && c.status.type && c.status.type.completed);
+const f1Pos = (c, aid) => { const x = c && (c.competitors || []).find(z => String(z.id) === String(aid)); return x ? x.order : null; };
+async function f1Season(y) { y = y || f1Year(); if (F1.sb[y]) return F1.sb[y]; const j = await getJson(F1A + 'scoreboard?dates=' + y); const evs = (j.events || []).slice().sort((a, b) => new Date(a.date) - new Date(b.date)); F1.sb[y] = evs; evs.forEach(e => { F1.ev = F1.ev || {}; F1.ev[e.id] = Object.assign(e, { _y: y }); }); return evs; }
+async function f1Stand(y) { y = y || f1Year(); if (F1.st[y]) return F1.st[y]; const j = await getJson(F1S + (y !== f1Year() ? '?season=' + y : '')); const ch = j.children || []; const r = { drv: (ch.find(c => /driver/i.test(c.name)) || ch[0] || {}).standings, con: (ch.find(c => /constructor/i.test(c.name)) || ch[1] || {}).standings }; F1.st[y] = r; return r; }
+const f1SV = (en, n) => { const s = (en.stats || []).find(x => x.name === n); return s ? s.value : null; };
+const f1StMap = j => { const m = {}; ((((j || {}).splits || {}).categories) || []).forEach(c => (c.stats || []).forEach(s => { m[s.name] = { v: s.value, d: s.displayValue }; })); return m; };
+async function f1Detail(eid, c, withStatus) {
+  const cid = c.id, k = cid + (withStatus ? 's' : ''); if (F1.rd[k]) return F1.rd[k];
+  const p = (async () => { const base = F1C + 'events/' + eid + '/competitions/' + cid + '/competitors';
+    const L = await getJson(base + '?limit=40'), items = L.items || [];
+    const rows = await Promise.all(items.map(async it => { const id = String(it.id); let st = {}, status = null;
+      try { st = f1StMap(await getJson(base + '/' + id + '/statistics')); } catch (e) {}
+      if (withStatus) try { status = await getJson(base + '/' + id + '/status'); } catch (e) {}
+      return { id, order: it.order, start: it.startOrder, team: (it.vehicle && it.vehicle.manufacturer) || '', color: (it.vehicle && it.vehicle.teamColor) || '', num: (it.vehicle && it.vehicle.number) || '', st, status }; }));
+    rows.sort((a, b) => (a.order || 99) - (b.order || 99)); return rows; })();
+  F1.rd[k] = p; p.catch(() => { delete F1.rd[k]; }); return p;
+}
+async function f1Teams(evs) { const done = evs.filter(e => f1Done(f1Comp(e, 'Race'))); const last = done[done.length - 1]; if (!last) return {}; if (F1.tm && F1.tm[last.id]) return F1.tm[last.id];
+  const rc = f1Comp(last, 'Race'), m = {}; try { const L = await getJson(F1C + 'events/' + last.id + '/competitions/' + rc.id + '/competitors?limit=40'); (L.items || []).forEach(it => { m[String(it.id)] = { team: (it.vehicle && it.vehicle.manufacturer) || '', color: (it.vehicle && it.vehicle.teamColor) || '' }; }); } catch (e) {}
+  F1.tm = F1.tm || {}; F1.tm[last.id] = m; return m; }
+async function f1Circ(ev) { const id = ev && ev.circuit && ev.circuit.id; if (!id) return null; if (F1.circ[id] !== undefined) return F1.circ[id]; F1.circ[id] = null;
+  try { const j = await getJson(F1C + 'circuits/' + id); const hs = []; const walk = o => { if (!o || typeof o !== 'object') return; if (Array.isArray(o)) return o.forEach(walk); Object.entries(o).forEach(([k, v]) => { if (typeof v === 'string' && /^https?:.*\.(png|svg|jpe?g)/i.test(v)) hs.push([k, v]); else walk(v); }); }; walk(j);
+    const pick = hs.find(([k, v]) => /diagram|map|track|layout|circuit/i.test(k + v) && !/logo|flag/i.test(v)) || hs.find(([k, v]) => !/logo|flag/i.test(v)); F1.circ[id] = pick ? pick[1].replace(/^http:/, 'https:') : null; } catch (e) {}
+  return F1.circ[id]; }
+const f1Hdr = (extra) => `<header class="d"><div class="tabs"><button class="back" data-back aria-label="Back"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></button><button class="home" data-home aria-label="Home"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"><path d="M3 10.5 12 3l9 7.5"/><path d="M5.5 9v11h13V9"/><path d="M10 20v-6h4v6"/></svg></button><button class="home" data-refresh aria-label="Refresh"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12a8 8 0 1 1-2.34-5.66"/><path d="M20 4v5h-5"/></svg></button><span class="grow"></span>${extra || ''}</div></header>`;
+const f1YSel = (v, cur, list, lab) => `<div class="ysel tys"><button class="ybtn" data-f1yo="1">${esc(lab ? lab(cur) : String(cur))}<i class="chev ${v.yOpen ? 'up' : ''}"></i></button>${v.yOpen ? `<div class="ylist">${list.map(x => `<button data-f1y="${x}" class="${String(x) === String(cur) ? 'on' : ''}">${esc(lab ? lab(x) : String(x))}</button>`).join('')}</div>` : ''}</div>`;
+const f1Drv = (id, name, team, sub) => `<div class="f1d"><img class="hs" src="${esc(f1Hs(id))}" alt="" onerror="this.onerror=null;this.src=SIL"><div class="f1dn"><b>${esc(name)}</b>${team || sub ? `<small>${esc(team || sub)}</small>` : ''}</div></div>`;
+const f1Con = (name, color) => `<div class="f1d"><span class="f1cl" style="background:#${esc(String(color || '666').replace('#', ''))}">${esc(String(name || '?').slice(0, 1))}</span><div class="f1dn"><b>${esc(name)}</b></div></div>`;
+
+/* --- main list --- */
+function renderF1List(tabs) {
+  const y = f1Year(), evs = F1.sb[y];
+  let body = '', strip = '';
+  if (!evs) body = msg(F1.err || 'Loading…');
+  else if (!evs.length) body = msg('No races.');
+  else {
+    const now = Date.now(), dayEnd = e => { const d = new Date(e.endDate || e.date); d.setHours(23, 59, 59, 999); return d.getTime() + 864e5; }, cur = evs.find(e => dayEnd(e) > now) || evs[evs.length - 1];
+    F1.curId = cur.id;
+    strip = evs.map(e => { const d = new Date(e.endDate || e.date); return `<button class="dy ${e.id === cur.id ? 'on' : ''}" data-f1go="${esc(e.id)}"><small>${esc(f1Iso(e) || 'GP')}</small>${d.getDate()}.${d.getMonth() + 1}.</button>`; }).join('');
+    body = evs.map(e => {
+      const rc = f1Comp(e, 'Race'), done = f1Done(rc), w = done && rc && (rc.competitors || []).find(c => c.order === 1), cm = F1.circ[e.circuit && e.circuit.id];
+      if (cm === undefined) f1Circ(e).then(u => { if (u && topView() === 'list' && state.league === 'f1') render(); });
+      return `<div class="card f1card ${e.id === cur.id ? 'cur' : ''}" data-f1race="${esc(e.id)}" id="f1c${esc(e.id)}"><div class="f1cl1">${f1Flag(e)}<div class="f1nm">${esc(f1Short(e))}</div>
+        ${done ? `<div class="f1won"><span class="f1chk">🏁</span><span class="f1sd">${esc(f1Dates(e))}</span></div>${w ? `<div class="f1w"><img class="hs" src="${esc(f1Hs(w.id))}" alt="" onerror="this.onerror=null;this.src=SIL"><span>${esc(w.athlete && (w.athlete.displayName || w.athlete.shortName) || '')}</span></div>` : ''}` : `<div class="f1big">${esc(f1Dates(e))}</div><div class="f1ct">${esc((e.circuit && e.circuit.fullName) || '')}</div>`}</div>
+        <div class="f1map">${cm ? `<img src="${esc(cm)}" alt="" onerror="this.remove()">` : ''}</div></div>`; }).join('');
+  }
+  const os = document.getElementById('strip'), prev = os && state.stripKey === 'f1' ? os.scrollLeft : null; state.stripKey = 'f1';
+  $app.innerHTML = `
+    <header><div class="tabs htabs">${tabs}<button class="icon" data-search aria-label="Search">${SEARCH_SVG}</button></div>
+    ${strip ? `<div class="strip" id="strip">${strip}</div>` : ''}<div class="qb"><button data-f1v="stats">Statistics</button><button data-f1v="std">Standings</button></div></header>
+    <main class="f1list">${body}</main>`;
+  const s = document.getElementById('strip'), on = s && s.querySelector('.on'); if (on) { const tgt = Math.max(0, on.offsetLeft - (s.clientWidth - on.offsetWidth) / 2); s.scrollLeft = prev != null ? prev : tgt; }
+  if (evs && evs.length && !F1.scrolled) { F1.scrolled = 1; requestAnimationFrame(() => f1ScrollTo(F1.curId, false)); }
+}
+function f1ScrollTo(id, smooth) { const c = document.getElementById('f1c' + id), w = $app.querySelector(':scope > .stkw'); if (!c) return; const top = c.getBoundingClientRect().top + window.scrollY - (w ? w.offsetHeight : 0) - 10; window.scrollTo({ top: Math.max(0, top), behavior: smooth ? 'smooth' : 'auto' }); }
+async function loadF1List() { try { await f1Season(f1Year()); F1.err = null; } catch (e) { F1.err = 'Failed to load F1 (' + (e.message || e) + ').'; } if (topView() === 'list' && state.league === 'f1') render(); }
+
+/* --- views (state.lv kinds: f1stats, f1std, f1race, f1drv, f1con) --- */
+function renderF1() {
+  const v = state.lv; let top = '', body = '', ysel = '';
+  if (v.kind === 'f1stats' || v.kind === 'f1std') {
+    const y = v.y || f1Year(); ysel = f1YSel(v, y, f1Years());
+    top = `<div class="seg pseg lvseg"><button data-f1m="drv" class="${v.m !== 'con' ? 'on' : ''}">Drivers</button><button data-f1m="con" class="${v.m === 'con' ? 'on' : ''}">Constructors</button></div>`;
+    body = v.kind === 'f1std' ? f1StdHTML(v, y) : f1StatsHTML(v, y);
+  } else if (v.kind === 'f1drv' || v.kind === 'f1con') { const y = v.y || f1Year(); ysel = f1YSel(v, y, f1Years()); body = f1PartHTML(v, y); }
+  else if (v.kind === 'f1race') { const r = f1RaceHTML(v); ysel = r.ysel; top = r.top; body = r.body; }
+  $app.innerHTML = `${f1Hdr(ysel)}<main class="${v.kind === 'f1stats' ? 'f1st' : ''}">${top}<div class="pane t">${body}</div></main>`;
+}
+function f1Load(v, force) {
+  if (force) { F1.sb = {}; F1.st = {}; F1.rd = {}; F1.agg = {}; }
+  const y = v.y || f1Year(), rr = () => { if (state.lv === v && topView() === 'lv') render(); };
+  if (v.kind === 'f1race') { const ev = F1.ev && F1.ev[v.cat]; (ev ? Promise.resolve() : f1Season(v.y || f1Year()).catch(() => {}).then(() => (!F1.ev || !F1.ev[v.cat]) ? f1Season(f1Year()) : null)).then(rr).catch(e => { v.err = String(e.message || e); rr(); }); return; }
+  Promise.all([f1Season(y), f1Stand(y)]).then(rr).catch(e => { v.err = 'Failed to load (' + (e.message || e) + ').'; rr(); });
+}
+
+/* standings */
+function f1StdHTML(v, y) {
+  const S = F1.st[y]; if (!S) return msg(v.err || 'Loading…');
+  const con = v.m === 'con', st = con ? S.con : S.drv; if (!st || !(st.entries || []).length) return msg('Standings not available.');
+  const tm = F1.tmY && F1.tmY[y]; if (!con && !tm && F1.sb[y]) { F1.tmY = F1.tmY || {}; F1.tmY[y] = {}; f1Teams(F1.sb[y]).then(m => { F1.tmY[y] = m; if (state.lv === v) render(); }); }
+  const ents = [...st.entries].sort((a, b) => (f1SV(a, 'rank') || 99) - (f1SV(b, 'rank') || 99));
+  const pts = en => { const p = f1SV(en, 'championshipPts'); return p != null ? p : f1SV(en, 'points'); };
+  return `<section class="blk"><table class="nfx sep f1t"><colgroup><col style="width:40px"><col><col style="width:62px"></colgroup><thead><tr><th class="n">#</th><th class="l">${con ? 'Constructor' : 'Driver'}</th><th>PTS</th></tr></thead><tbody>${ents.map(en => { const a = en.athlete || {}, t = en.team || {}, tt = !con && tm && tm[String(a.id)];
+    return `<tr ${con ? `data-f1con="${esc(t.id)}"` : `data-f1drv="${esc(a.id)}"`}><td class="n f1rk">${esc(String(f1SV(en, 'rank') || ''))}</td><td class="l">${con ? f1Con(t.displayName || t.name, t.color) : f1Drv(a.id, a.displayName || a.name, tt && tt.team)}</td><td><b>${esc(String(pts(en) ?? '-'))}</b></td></tr>`; }).join('')}</tbody></table></section>`;
+}
+/* participant (driver / constructor) card */
+function f1PartHTML(v, y) {
+  const S = F1.st[y], evs = F1.sb[y]; if (!S || !evs) return msg(v.err || 'Loading…');
+  const con = v.kind === 'f1con', st = con ? S.con : S.drv, en = ((st && st.entries) || []).find(e => String(con ? (e.team || {}).id : (e.athlete || {}).id) === String(v.cat));
+  if (!en) return msg('Not available.');
+  const a = en.athlete || {}, t = en.team || {}, tm = F1.tmY && F1.tmY[y] && F1.tmY[y][String(a.id)];
+  const head = `<div class="f1ph">${con ? f1Con(t.displayName || t.name, t.color) : f1Drv(a.id, a.displayName || a.name, tm && tm.team)}<div class="f1pp"><b>${esc(String(f1SV(en, 'championshipPts') ?? f1SV(en, 'points') ?? '-'))}</b><small>PTS · P${esc(String(f1SV(en, 'rank') || '-'))}</small></div></div>`;
+  const races = (en.stats || []).filter(s => s.id);
+  const cards = races.map(s => { const ev = (F1.ev || {})[s.id] || evs.find(e => e.id === s.id) || { name: s.displayName, id: s.id };
+    let main = '-', sub = '';
+    if (con) { main = s.played ? String(s.displayValue).trim() || '0' : '-'; sub = s.played ? 'PTS' : ''; }
+    else { const rc = ev.competitions && f1Comp(ev, 'Race'), sr = ev.competitions && f1Comp(ev, 'SR'), p = f1Done(rc) ? f1Pos(rc, v.cat) : null, sp = f1Done(sr) ? f1Pos(sr, v.cat) : null; main = p ? 'P' + p : (f1Done(rc) ? 'DNS' : '-'); if (sp) sub = 'Sprint P' + sp; }
+    return `<div class="f1rc" data-f1race="${esc(s.id)}" data-f1ry="${y}">${f1Flag(ev)}<div class="f1rn">${esc(f1Short(ev))}${sub ? `<small>${esc(sub)}</small>` : ''}</div><div class="f1rp ${/^P[123]$/.test(main) ? 'p' + main[1] : ''}">${esc(main)}</div></div>`; }).join('');
+  return head + `<div class="f1rcs">${cards}</div>`;
+}
+/* statistics */
+const F1CATS = [['wins', 'Wins'], ['podiums', 'Podiums'], ['fl', 'Fastest Laps'], ['poles', 'Poles'], ['dnf', "DNF's"]];
+function f1Agg(v, y) {
+  const evs = F1.sb[y], S = F1.st[y]; if (!evs || !S) return null; F1.agg = F1.agg || {};
+  let A = F1.agg[y]; if (!A) {
+    A = F1.agg[y] = { drv: {}, con: {}, pend: 0, done: 0, tot: 0 };
+    const D = id => A.drv[id] = A.drv[id] || { wins: 0, podiums: 0, fl: 0, poles: 0, dnf: 0 };
+    ((S.drv && S.drv.entries) || []).forEach(en => D(String((en.athlete || {}).id)));
+    const races = evs.filter(e => f1Done(f1Comp(e, 'Race')));
+    races.forEach(e => { const rc = f1Comp(e, 'Race'), q = f1Comp(e, 'Qual'); (rc.competitors || []).forEach(c => { const d = D(String(c.id)); if (c.order === 1) d.wins++; if (c.order <= 3) d.podiums++; }); const p = q && f1Done(q) && (q.competitors || []).find(c => c.order === 1); if (p) D(String(p.id)).poles++; });
+    A.tot = races.length; A.teamOf = {}; A.raceTeam = {};
+    let i = 0; const work = async () => { while (i < races.length) { const e = races[i++]; try { const rows = await f1Detail(e.id, f1Comp(e, 'Race'), true); const lead = rows.find(r => r.order === 1), LL = lead && lead.st.lapsCompleted ? lead.st.lapsCompleted.v : 0;
+          let best = null; rows.forEach(r => { A.teamOf[r.id] = { team: r.team, color: r.color }; (A.raceTeam[e.id] = A.raceTeam[e.id] || {})[r.id] = r.team; const fl = r.st.fastestLap && r.st.fastestLap.v; if (fl > 0 && (!best || fl < best.fl)) best = { fl, id: r.id }; if (f1IsDnf(r, LL)) D(r.id).dnf++; });
+          if (best) D(best.id).fl++; } catch (er) {} A.done++; if (state.lv === v && topView() === 'lv') render(); } };
+    Promise.all(Array.from({ length: 3 }, work)).then(() => { A.fin = 1; if (state.lv === v && topView() === 'lv') render(); });
+  }
+  return A;
+}
+function f1IsDnf(r, LL) { const s = JSON.stringify(r.status || {}); if (/retir|accident|collision|disqual|\bdsq\b|did not|\bdns\b|\bdnf\b|withdr|mechanical|engine|gearbox|hydraul|brakes?\b|spun|damage|power unit|electrical|puncture/i.test(s) && !/"finished"|lap\(s\) behind|\+\d+ laps?/i.test(s)) return true; const l = r.st.lapsCompleted ? r.st.lapsCompleted.v : null; if (!r.status && l != null && LL && l < LL - 4) return true; return false; }
+function f1StatsHTML(v, y) {
+  const A = f1Agg(v, y), S = F1.st[y]; if (!A) return msg(v.err || 'Loading…');
+  const con = v.m === 'con';
+  let list;
+  if (!con) list = ((S.drv && S.drv.entries) || []).map(en => { const a = en.athlete || {}, id = String(a.id); return { id, name: a.displayName || a.name, team: (A.teamOf[id] || {}).team || '', s: A.drv[id] || {} }; });
+  else { const C = {}; ((S.con && S.con.entries) || []).forEach(en => { const t = en.team || {}; C[t.displayName || t.name] = { id: t.id, name: t.displayName || t.name, color: t.color, s: { wins: 0, podiums: 0, fl: 0, poles: 0, dnf: 0 } }; });
+    Object.entries(A.drv).forEach(([id, s]) => { const tn = (A.teamOf[id] || {}).team; const c = tn && (C[tn] || Object.values(C).find(x => x.name && tn && (x.name.toLowerCase().includes(tn.toLowerCase()) || tn.toLowerCase().includes(x.name.toLowerCase())))); if (!c) return; Object.keys(c.s).forEach(k => { c.s[k] += s[k] || 0; }); }); list = Object.values(C); }
+  const prog = !A.fin && A.tot ? `<div class="f1prog">Fastest laps &amp; DNFs: ${A.done}/${A.tot} races…</div>` : '';
+  v.exp = v.exp || {};
+  return prog + F1CATS.map(([k, t]) => { const rows = [...list].sort((a, b) => (b.s[k] || 0) - (a.s[k] || 0) || String(a.name).localeCompare(String(b.name))), ex = v.exp[k], show = ex ? rows : rows.slice(0, 5);
+    const ld = (k === 'fl' || k === 'dnf') && !A.fin && con;
+    return `<section class="lcat"><div class="lh2">${esc(t)}</div>${show.map((r, i) => `<div class="ldr ${i === 0 ? 'top' : ''}" ${con ? `data-f1con="${esc(r.id)}"` : `data-f1drv="${esc(r.id)}"`}><span class="rk">${i + 1}</span>${con ? `<span class="hsw"><span class="f1cl big" style="background:#${esc(String(r.color || '666'))}">${esc(String(r.name || '?')[0])}</span></span>` : `<span class="hsw"><img class="hs" src="${esc(f1Hs(r.id))}" alt="" onerror="this.onerror=null;this.src=SIL"></span>`}<div class="ln"><span class="pn">${esc(r.name)}</span>${!con && r.team ? `<small>${esc(r.team)}</small>` : ''}</div><span class="lv2">${(k === 'fl' || k === 'dnf') && !A.fin ? '…' : esc(String(r.s[k] || 0))}</span></div>`).join('')}<button class="cl" data-f1exp="${k}">${ex ? 'Close' : 'Complete leaders'}</button></section>`; }).join('');
+}
+/* race page */
+const F1SES = { FP1: 'Free Practice 1', FP2: 'Free Practice 2', FP3: 'Free Practice 3', SS: 'Sprint Qualifying', SR: 'Sprint Race', Qual: 'Qualifying', Race: 'Race' };
+function f1Groups(ev) { const has = ab => !!f1Comp(ev, ab), G = []; const fp = ['FP1', 'FP2', 'FP3'].filter(has); if (fp.length) G.push(['fp', 'Free Practice', fp]); if (has('SS')) G.push(['ss', 'Sprint Qualifying', ['SS']]); if (has('SR')) G.push(['sr', 'Sprint Race', ['SR']]); if (has('Qual')) G.push(['q', 'Qualifying', ['Qual']]); if (has('Race')) G.push(['r', 'Race', ['Race']]); return G; }
+function f1DefGroup(ev, G) { const done = G.filter(g => g[2].some(ab => f1Done(f1Comp(ev, ab)))); let g = done[done.length - 1] || G[0]; if (g && g[0] === 'q' && G.find(x => x[0] === 'r') && !f1Done(f1Comp(ev, 'Race'))) g = G.find(x => x[0] === 'r'); if (g && g[0] === 'ss' && G.find(x => x[0] === 'sr') && !f1Done(f1Comp(ev, 'SR'))) g = G.find(x => x[0] === 'sr'); return g; }
+function f1RaceHTML(v) {
+  const ev = F1.ev && F1.ev[v.cat]; if (!ev) return { ysel: '', top: '', body: msg(v.err || 'Loading…') };
+  const G = f1Groups(ev); if (!v.g || !G.find(g => g[0] === v.g)) { const d = f1DefGroup(ev, G); v.g = d ? d[0] : 'r'; }
+  const grp = G.find(g => g[0] === v.g) || G[0];
+  const ysel = `<div class="ysel tys"><button class="ybtn" data-f1so="1">Session<i class="chev ${v.sOpen ? 'up' : ''}"></i></button>${v.sOpen ? `<div class="ylist">${G.map(g => `<button data-f1s="${g[0]}" class="${g[0] === v.g ? 'on' : ''}">${esc(g[1])}</button>`).join('')}</div>` : ''}</div>` + `<div class="ysel tys f1ys"><button class="ybtn" data-f1yo="1">${esc(String(ev._y || f1Year()))}<i class="chev ${v.yOpen ? 'up' : ''}"></i></button>${v.yOpen ? `<div class="ylist">${f1Years().map(x => `<button data-f1ry2="${x}" class="${x === ev._y ? 'on' : ''}">${x}</button>`).join('')}</div>` : ''}</div>`;
+  const top = `<div class="f1rh">${f1Flag(ev)}<div><div class="lvt">${esc(f1Short(ev))}</div><div class="f1rsub">${esc(f1Dates(ev) + (ev.circuit && ev.circuit.fullName ? ' · ' + ev.circuit.fullName : ''))}</div></div></div>`;
+  if (!grp) return { ysel, top, body: msg('No results available') };
+  let sub = '', ab = grp[2][0];
+  if (grp[0] === 'fp') { v.fp = grp[2].includes(v.fp) ? v.fp : (grp[2].filter(x => f1Done(f1Comp(ev, x))).pop() || grp[2][0]); ab = v.fp; if (grp[2].length > 1) sub = `<div class="seg pseg">${grp[2].map(x => `<button data-f1sub="${x}" class="${x === v.fp ? 'on' : ''}">${x}</button>`).join('')}</div>`; }
+  const isQ = grp[0] === 'q' || grp[0] === 'ss'; if (isQ) { v.q = v.q || 'T'; sub = `<div class="seg pseg">${[['T', 'Total'], ['1', grp[0] === 'ss' ? 'SQ1' : 'Q1'], ['2', grp[0] === 'ss' ? 'SQ2' : 'Q2'], ['3', grp[0] === 'ss' ? 'SQ3' : 'Q3']].map(([k, l]) => `<button data-f1q="${k}" class="${v.q === k ? 'on' : ''}">${l}</button>`).join('')}</div>`; }
+  const c = f1Comp(ev, ab), race = ab === 'Race' || ab === 'SR';
+  let body = `<div class="sec f1sh">${esc(grp[0] === 'fp' ? F1SES[ab] : grp[1])}</div>` + sub;
+  if (!c) return { ysel, top, body: body + msg('No results available') };
+  if (!f1Done(c)) { const qa = ab === 'Race' ? 'Qual' : ab === 'SR' ? 'SS' : null, qc = qa && f1Comp(ev, qa);
+    if (qc && f1Done(qc) && (qc.competitors || []).length) { const k = 'g' + qc.id; if (!F1.rd[qc.id]) f1Detail(ev.id, qc, false).then(() => { F1.rdOk = 1; if (state.lv === v) render(); }).catch(() => {});
+      return { ysel, top, body: body + `<div class="f1grid">Starting grid</div>` + f1Table((qc.competitors || []).map(x => ({ id: String(x.id), order: x.order, name: (x.athlete || {}).displayName, team: '' })), F1.rdv && F1.rdv[qc.id], 'grid') }; }
+    return { ysel, top, body: body + msg('No results available') }; }
+  const rk = c.id + (race ? 's' : ''); if (!F1.rdv || !F1.rdv[c.id]) { if (!F1.rdp || !F1.rdp[rk]) { F1.rdp = F1.rdp || {}; F1.rdp[rk] = 1; f1Detail(ev.id, c, race).then(rows => { F1.rdv = F1.rdv || {}; F1.rdv[c.id] = rows; if (state.lv === v) render(); }).catch(() => { F1.rdp[rk] = 0; }); }
+    return { ysel, top, body: body + f1Table((c.competitors || []).map(x => ({ id: String(x.id), order: x.order, name: (x.athlete || {}).displayName, team: '' })), null, race ? 'race' : isQ ? 'q' + v.q : 'fp') }; }
+  const base = (c.competitors || []).length ? (c.competitors || []).map(x => ({ id: String(x.id), order: x.order, name: (x.athlete || {}).displayName, team: '' })) : F1.rdv[c.id].map(r => ({ id: r.id, order: r.order, name: '', team: r.team }));
+  return { ysel, top, body: body + f1Table(base, F1.rdv[c.id], race ? 'race' : isQ ? 'q' + v.q : 'fp') };
+}
+const f1Ms = ms => { if (!(ms > 0)) return ''; const t = ms / 1000, m = Math.floor(t / 60), s = (t - m * 60).toFixed(3); return (m ? m + ':' + s.padStart(6, '0') : s); };
+function f1Table(rows, det, mode) {
+  const dm = {}; (det || []).forEach(r => { dm[r.id] = r; });
+  let R = rows.map(r => Object.assign({}, r, dm[r.id] ? { team: dm[r.id].team, st: dm[r.id].st, status: dm[r.id].status } : {}));
+  const S = (r, n) => r.st && r.st[n] ? r.st[n] : null;
+  let timeOf = () => '', ptsOf = () => '', fl = null;
+  if (mode === 'race' && det) { const lead = R.find(r => r.order === 1), LL = lead && S(lead, 'lapsCompleted') ? S(lead, 'lapsCompleted').v : 0;
+    R.forEach(r => { const x = S(r, 'fastestLap'); if (x && x.v > 0 && (!fl || x.v < fl.v)) fl = { v: x.v, id: r.id }; });
+    timeOf = r => { if (r.order === 1) return (S(r, 'totalTime') || {}).d || ''; if (f1IsDnf(r, LL)) return 'DNF'; const l = S(r, 'lapsCompleted'); if (l && LL && l.v < LL) { const n = LL - l.v; return '+' + n + ' Lap' + (n > 1 ? 's' : ''); } const b = S(r, 'behindTime'); return b ? b.d : ''; };
+    ptsOf = r => { const p = S(r, 'championshipPts'); return p && p.v > 0 ? String(p.v) : ''; }; }
+  else if (mode === 'fp' && det) { const lead = R.find(r => r.order === 1), L0 = lead && S(lead, 'fastestLap') ? S(lead, 'fastestLap').v : 0;
+    timeOf = r => { const x = S(r, 'fastestLap'); if (!x || !(x.v > 0)) return ''; if (r.order === 1) return x.d; return L0 ? '+' + ((x.v - L0) / 1000).toFixed(3) : x.d; }; }
+  else if (/^q/.test(mode) && det) { const k = mode.slice(1), qt = (r, n) => { const x = S(r, 'qual' + n + 'TimeMS'); return x && x.v > 0 ? x.v : 0; };
+    if (k === 'T') { const best = r => qt(r, 3) || qt(r, 2) || qt(r, 1); const p = R.find(r => r.order === 1), P0 = p ? best(p) : 0; timeOf = r => { const b = best(r); if (!b) return ''; return r.order === 1 ? f1Ms(b) : (P0 ? '+' + ((b - P0) / 1000).toFixed(3) : f1Ms(b)); }; }
+    else { R = R.filter(r => qt(r, k) > 0).sort((a, b) => qt(a, k) - qt(b, k)); R.forEach((r, i) => { r.order = i + 1; }); const P0 = R[0] ? qt(R[0], k) : 0; timeOf = r => r.order === 1 ? f1Ms(qt(r, k)) : '+' + ((qt(r, k) - P0) / 1000).toFixed(3); if (!R.length) return msg('No results available'); } }
+  const pc = mode === 'race';
+  return `<section class="blk"><table class="nfx sep f1t f1res"><colgroup><col style="width:34px"><col><col style="width:${mode === 'race' ? 100 : 84}px">${pc ? '<col style="width:34px">' : ''}</colgroup><thead><tr><th class="n">#</th><th class="l">Driver</th><th>${mode === 'grid' ? '' : 'Time'}</th>${pc ? '<th>Pts</th>' : ''}</tr></thead><tbody>${R.sort((a, b) => (a.order || 99) - (b.order || 99)).map(r => `<tr data-f1drv="${esc(r.id)}"><td class="n f1rk ${pc && r.order <= 3 ? 'p' + r.order : ''}">${esc(String(r.order || ''))}</td><td class="l">${f1Drv(r.id, (r.name || ''), r.team).replace(/<\/div><\/div>$/, fl && fl.id === r.id ? '</div><i class="f1fast" title="Fastest lap">⚡</i></div>' : '</div></div>')}</td><td class="f1tm">${esc(det ? timeOf(r) : '')}</td>${pc ? `<td>${esc(ptsOf(r))}</td>` : ''}</tr>`).join('')}</tbody></table></section>`;
+}
+
 function route() {
   const h = location.hash;
   let m = h.match(/^#\/player\/(\w+)\/(\d+)/);
@@ -4220,6 +4466,8 @@ function route() {
   if (m && LEAGUES[m[1]]) { const sy = window._ldY || null, tk = window._tlk || null; window._ldY = null; window._tlk = null; if (!state.lv || state.lv.kind !== 'tleaders' || state.lv.league !== m[1] || (tk && state.lv.tk !== tk)) { const pv = state.lvC['lteams' + m[1] + (sy || seasonYear(m[1]))], col = pv && pv.cols && pv.cols.find(x => x.key === tk); const pp = String(tk || '').split('|'); state.lv = { kind: 'tleaders', league: m[1], sy, tk: pp[1] || null, grp: pp[1] ? pp[0] : null }; } render(); return; }
   m = h.match(/^#\/leaders\/(\w+)\/(\w+)/);
   if (m && LEAGUES[m[1]]) { const sy = window._ldY || null, ll = window._ldL || {}; window._ldY = null; window._ldL = null; if (!state.lv || state.lv.kind !== 'leaders' || state.lv.cat !== m[2] || (sy || null) !== (state.lv.sy || null)) state.lv = { kind: 'leaders', league: m[1], cat: m[2], sk: null, asc: false, sy, lab: ll.lab || '', title: ll.title || '' }; render(); loadLeaders(); return; }
+  m = h.match(/^#\/f1\/(stats|std|race|drv|con)(?:\/(\w+))?/);
+  if (m) { const k = 'f1' + m[1], y = window._f1y || null; window._f1y = null; if (!state.lv || state.lv.kind !== k || (state.lv.cat || null) !== (m[2] || null)) state.lv = { kind: k, league: 'f1', cat: m[2] || null, y: y ? +y : null, m: window._f1m || 'drv' }; render(); f1Load(state.lv); return; }
   m = h.match(/^#\/(standings|lstats)\/(\w+)/);
   if (m && LEAGUES[m[2]]) { if (!state.lv || state.lv.kind !== m[1] || state.lv.league !== m[2]) state.lv = { kind: m[1], league: m[2], mode: m[2] === 'nba' ? 'conf' : 'div', sy: m[1] === 'lstats' ? (state.lsY || {})[m[2]] || null : null, tm: m[1] === 'lstats' ? (state.lsTm || {})[m[2]] || null : null }; render(); loadLV(); return; }
   state.lv = null;
@@ -4254,6 +4502,29 @@ window.addEventListener('hashchange', () => { const h = location.hash, st = wind
 window.addEventListener('hashchange', route);
 
 const $app = document.getElementById('app');
+
+$app.addEventListener('click', ev => {
+  const b = ev.target.closest('[data-f1go],[data-f1race],[data-f1v],[data-f1m],[data-f1yo],[data-f1y],[data-f1drv],[data-f1con],[data-f1exp],[data-f1so],[data-f1s],[data-f1sub],[data-f1q],[data-f1ry2]'); if (!b) return;
+  ev.stopPropagation(); const d = b.dataset, v = state.lv;
+  if (d.f1go) { $app.querySelectorAll('.strip .dy').forEach(x => x.classList.toggle('on', x === b)); f1ScrollTo(d.f1go, true); return; }
+  if (d.f1v) { window._fromList = true; location.hash = '#/f1/' + d.f1v; return; }
+  if (d.f1race) { window._f1y = d.f1ry || (v && v.y) || null; location.hash = '#/f1/race/' + d.f1race; return; }
+  if (d.f1drv || d.f1con) { const ry = v && v.kind === 'f1race' ? ((F1.ev || {})[v.cat] || {})._y : v && v.y; window._f1y = ry || null; location.hash = '#/f1/' + (d.f1drv ? 'drv/' + d.f1drv : 'con/' + d.f1con); return; }
+  if (!v) return;
+  if (d.f1m) { v.m = d.f1m; window._f1m = d.f1m; render(); return; }
+  if (d.f1yo) { v.yOpen = !v.yOpen; v.sOpen = false; render(); return; }
+  if (d.f1so) { v.sOpen = !v.sOpen; v.yOpen = false; render(); return; }
+  if (d.f1y) { v.y = +d.f1y; v.yOpen = false; v.exp = {}; v.err = null; render(); f1Load(v); return; }
+  if (d.f1exp) { v.exp = v.exp || {}; v.exp[d.f1exp] = !v.exp[d.f1exp]; render(); return; }
+  if (d.f1s) { v.g = d.f1s; v.sOpen = false; v.q = 'T'; render(); return; }
+  if (d.f1sub) { v.fp = d.f1sub; render(); return; }
+  if (d.f1q) { v.q = d.f1q; render(); return; }
+  if (d.f1ry2) { const y = +d.f1ry2, ev0 = (F1.ev || {})[v.cat]; v.yOpen = false; if (!ev0 || y === ev0._y) { render(); return; }
+    const iso = f1Iso(ev0), sn = f1Short(ev0), cid = ev0.circuit && ev0.circuit.id; v.err = null; render();
+    f1Season(y).then(evs => { const t = evs.find(e => f1Short(e) === sn) || (cid && evs.find(e => e.circuit && e.circuit.id === cid)) || (iso && iso !== 'US' && evs.find(e => f1Iso(e) === iso));
+      if (t) { window._f1y = y; window._repl = 1; location.replace('#/f1/race/' + t.id); } else { const t2 = document.createElement('div'); t2.id = 'toast'; t2.textContent = 'No results availible for ' + y; document.body.appendChild(t2); setTimeout(() => t2.remove(), 1800); } }).catch(() => {});
+    return; }
+}, true);
 $app.addEventListener('click', ev => {
   if (window._lpAt && Date.now() - window._lpAt < 900) { const lb = ev.target.closest('[data-league]'); if (lb) { ev.preventDefault(); return; } }
   const b = ev.target.closest('[data-ssort],[data-rclear],[data-go2],[data-home],[data-csort],[data-glm],[data-glyo],[data-cexp],[data-glsort],[data-cmpcar],[data-brpg],[data-cmpclr],[data-spm],[data-cmpyo],[data-cmpy],[data-scf],[data-bryo],[data-lsyo],[data-lsy],[data-favh],[data-draft],[data-drr],[data-drp],[data-f1],[data-sqx],[data-lvtm],[data-ltx],[data-lyo],[data-ly],[data-tlc],[data-tgrp],[data-tlsort],[data-tyo],[data-ty],[data-bry],[data-cmpgo],[data-cmpl],[data-cmpp],[data-cmpx],[data-gsort],[data-glsrc],[data-ncy],[data-sstat],[data-gly],[data-league],[data-game],[data-date],[data-wk],[data-pst],[data-smode],[data-cl],[data-lsort],[data-drv],[data-pm],[data-tab],[data-ptab],[data-xp],[data-ttab],[data-pvt],[data-sort],[data-fav],[data-team],[data-player],[data-topen],[data-search],[data-month],[data-refresh],[data-back]');
@@ -4269,7 +4540,8 @@ $app.addEventListener('click', ev => {
   } else if (d.favh) {
     state.favOpen = !state.favOpen; render();
   } else if (d.f1) {
-    let t = document.getElementById('toast'); if (t) t.remove(); t = document.createElement('div'); t.id = 'toast'; t.textContent = 'Formula 1 – coming soon'; document.body.appendChild(t); setTimeout(() => t.remove(), 1600);
+    if (state.league === 'f1' && topView() === 'list') { f1ScrollTo(F1.curId, true); return; }
+    state.league = 'f1'; store.set('league', 'f1'); F1.scrolled = 0; window.scrollTo(0, 0); loadList();
   } else if (d.league) {
     if (d.league === state.league && topView() === 'list') { const nw = state.nflw, onCur = d.league === 'nfl' ? !!(nw && nw.cur && nw.sel && nw.cur.t === nw.sel.t && nw.cur.w === nw.sel.w) : ymd(state.date) === ymd(todayLoc()); if (onCur || d.league === 'fav') { window.scrollTo({ top: 0, behavior: 'smooth' }); return; } }
     const same = d.league === state.league;
@@ -4459,7 +4731,7 @@ document.addEventListener('visibilitychange', () => {
   if (v === 'game') loadGame(); else if (v === 'list') loadList(true);
 });
 
-if (/^#\/(game|team|search|player|compare|standings|lstats|leaders|tleaders|draft)/.test(location.hash)) route(); else loadList();
+if (/^#\/(game|team|search|player|compare|standings|lstats|leaders|tleaders|draft|f1)/.test(location.hash)) route(); else loadList();
 
 ['gesturestart', 'gesturechange', 'gestureend'].forEach(t => document.addEventListener(t, e => e.preventDefault(), { passive: false }));
 document.addEventListener('touchmove', e => { if (e.touches.length > 1) e.preventDefault(); }, { passive: false });
