@@ -1352,7 +1352,7 @@ async function loadPlayer() {
     const aj = res[3].status === 'fulfilled' ? res[3].value : null, at = aj && (aj.athlete || aj);
     if (at) {
       p.bio = at;
-      p.name = p.name || at.displayName || at.fullName || '';
+      p.name = at.displayName || at.fullName || p.name || '';
       p.pos = p.pos || (at.position && at.position.abbreviation) || '';
       p.jersey = p.jersey || at.jersey || '';
       p.team = p.team || (at.team && (at.team.displayName || at.team.name)) || '';
@@ -2061,7 +2061,11 @@ function gameCols(g) {
   const dist = (x, y) => { const p = rgb(x), q = rgb(y); return Math.hypot(p[0] - q[0], p[1] - q[1], p[2] - q[2]); };
   if (!ok(a0)) a0 = '4aa3ff'; if (!ok(h0)) h0 = 'd9c27a';
   let ca = bgOf(a0), ch = bgOf(h0);
-  if (dist(ca.slice(1), ch.slice(1)) < 90) { const alt = pick(e.away, 1); if (ok(alt)) { const ca2 = bgOf(alt); if (dist(ca2.slice(1), ch.slice(1)) >= 90) ca = ca2; else ca = '#8e8e93'; } else ca = '#8e8e93'; }
+  const vivid = c => { const [r, g2, b] = rgb(c.slice(1)).map(v => v / 255), mx = Math.max(r, g2, b), mn = Math.min(r, g2, b), l = (mx + mn) / 2, sa = mx === mn ? 0 : (mx - mn) / (1 - Math.abs(2 * l - 1)); return (sa > .25 && l > .18 && l < .85) || (l > .55 && l < .9); };
+  const A = [ca], Hh = [ch]; { const a1 = pick(e.away, 1), h1 = pick(e.home, 1); if (ok(a1)) A.push(bgOf(a1)); if (ok(h1)) Hh.push(bgOf(h1)); }
+  if (dist(ca.slice(1), ch.slice(1)) < 90 || !vivid(ca) || !vivid(ch)) { let best = null;
+    [[0, 0], [1, 0], [0, 1], [1, 1]].forEach(([i, j]) => { const x = A[i], y = Hh[j]; if (!x || !y || best) return; if (dist(x.slice(1), y.slice(1)) >= 90 && vivid(x) && vivid(y)) best = [x, y]; });
+    if (best) [ca, ch] = best; else { if (!vivid(ch)) ch = Hh.find(vivid) || '#c4ced4'; const fb = ['#3d8bff', '#f5a623', '#2ecc71', '#e74c3c', '#b45cff']; const pool = [ca].concat(A.slice(1), fb).filter(x => vivid(x) && dist(x.slice(1), ch.slice(1)) >= 110); ca = pool[0] || '#3d8bff'; } }
   return [ca, ch];
 }
 const TCOL = {
@@ -3053,7 +3057,7 @@ function rosterHTML(t) {
     const pos = a._gpos || (a.position && a.position.abbreviation) || '', nm = fitNm(a.displayName || a.fullName || '');
     const ey = a.experience && a.experience.years != null ? a.experience.years : '', exp = ey === 0 || ey === '0' ? 'R' : ey === '' ? '–' : ey;
     const ht = String(a.displayHeight || '').replace(/\s/g, ''), wt = String(a.displayWeight || '').replace(/\s*lbs?\.?/i, '');
-    return `<tr data-player="${esc(a.id)}" data-pl="${t.league}" data-pn="${esc(nm)}" data-pp="${esc(pos)}" data-pj="${esc(a.jersey || '')}" data-pt="${esc(tn)}">
+    return `<tr data-player="${esc(a.id)}" data-pl="${t.league}" data-pn="${esc(a.displayName || a.fullName || nm)}" data-pp="${esc(pos)}" data-pj="${esc(a.jersey || '')}" data-pt="${esc(tn)}">
       <td class="n"><span class="pn">${esc(nm)}</span></td><td>${esc(pos)}</td><td>${esc(a.jersey || '–')}</td><td>${esc(exp)}</td><td>${esc(ht)}</td><td>${esc(wt)}</td><td>${esc(a.age)}</td></tr>`;
   };
   const tbl = (title, list) => `<section class="blk"><div class="tw"><table class="ros"><thead><tr><th class="n">${esc(title)}</th><th>POS</th><th>#</th><th>EXP</th><th>HT</th><th>WT</th><th>AGE</th></tr></thead><tbody>${list.map(tr).join('')}</tbody></table></div></section>`;
