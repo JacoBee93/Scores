@@ -921,42 +921,45 @@ html.one #app.lst,html.one body{min-height:0}
 .f1list{padding-bottom:40vh}
 .f1card{display:flex;align-items:stretch;gap:8px;height:112px;box-sizing:border-box;padding:12px 14px 12px 16px;overflow:hidden}
 .f1cl1{flex:1 1 55%;min-width:0;display:flex;flex-direction:column;justify-content:center;gap:3px}
-.f1fl{display:inline-block;font-size:19px;line-height:1;flex:none;font-family:'Apple Color Emoji','Segoe UI Emoji','Noto Color Emoji',sans-serif!important;font-size-adjust:none}
+.f1fl{display:inline-block;font-size:23px;line-height:1;flex:none;font-family:'Apple Color Emoji','Segoe UI Emoji','Noto Color Emoji',sans-serif!important;font-size-adjust:none}
 .f1tt{display:flex;align-items:center;gap:8px;min-width:0;margin-bottom:2px}
-.f1nm{font-family:var(--num);font-weight:700;font-size:16px;line-height:1.15;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.f1nm{font-family:var(--num);font-weight:700;font-size:19px;line-height:1.15;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .f1big{font-family:var(--num);font-weight:700;font-size:26px;line-height:1.05;letter-spacing:.2px}
 .f1ct{color:var(--mut);font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .f1won{display:flex;align-items:center;gap:6px;color:var(--mut);font-size:13px}
 .f1chk{font-size:14px}
-.f1w{display:flex;align-items:center;gap:7px;font-size:14px;font-weight:600}
-.f1w .hs{width:24px;height:24px;border-radius:50%;object-fit:cover;background:#2c2c2e}
+.f1w{display:flex;align-items:center;gap:8px;font-family:var(--num);font-size:17px;font-weight:700;line-height:1}
+.f1w .hs{width:34px;height:34px;border-radius:50%;object-fit:cover;background:#2c2c2e}
 .f1map{flex:0 0 42%;display:flex;align-items:center;justify-content:center}
-.f1map img{max-width:100%;max-height:88px;object-fit:contain;-webkit-user-drag:none}
-.f1map img.wf{filter:brightness(0) invert(1)}
+.f1map img{max-width:100%;max-height:88px;object-fit:contain;filter:invert(1) brightness(1.6);opacity:.85;-webkit-user-drag:none}
 .f1d{display:flex;align-items:center;gap:10px;min-width:0}
 .f1d .hs{width:36px;height:36px;border-radius:50%;object-fit:cover;background:#2c2c2e;flex:none}
 .f1dn{display:flex;flex-direction:column;align-items:flex-start;text-align:left;min-width:0;overflow:hidden;flex:0 1 auto}
 .f1dn b,.f1dn small{max-width:100%}
-.f1dn b{font-family:var(--num);font-weight:700;font-size:16px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.f1dn small{color:var(--mut);font-size:12.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.f1res .f1dn b{font-size:17px}
+.f1dn b{font-family:var(--num);font-weight:700;font-size:18px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.f1dn small{color:var(--mut);font-size:13.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .f1cl{display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:50%;color:#fff;font-weight:800;font-size:15px;flex:none;text-shadow:0 0 3px rgba(0,0,0,.6)}
 .f1cl.big{width:38px;height:38px}
 .f1t td{vertical-align:middle}
+.f1t th{font-family:var(--wide);font-stretch:112%;font-weight:800;font-size:12.5px;letter-spacing:.5px;text-transform:uppercase}
 .f1t th.l{text-align:left}
 .f1t th.l.ph{padding-left:calc(5.6px + 46px)}
 .f1t th.tl,.f1t td.f1tm{text-align:left!important}
 .f1gp{display:flex;align-items:center;gap:9px;min-width:0}
-.f1gp span{font-family:var(--num);font-weight:700;font-size:16px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.f1gp span{font-family:var(--num);font-weight:700;font-size:18px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .f1gpl td{padding-top:9px;padding-bottom:9px}
-.f1gpl td.f1sp{color:var(--mut);font-size:12px;text-align:right}
+.f1gpl td.f1sp{color:var(--mut);font-size:13.5px;text-align:right}
 .f1gpl tbody tr:not([data-f1race]){cursor:default}
 .f1t tbody tr{cursor:pointer}
-.f1rk{font-family:var(--num);font-weight:700;font-size:16px}
+.f1rk{font-family:var(--num);font-weight:700;font-size:18px}
+.f1t td{font-family:var(--num);font-weight:700;font-size:17px}
 .f1rk.p1{color:#ffd60a}.f1rk.p2{color:#d1d1d6}.f1rk.p3{color:#d0894a}
-.f1t td.f1tm{font-family:var(--num);font-size:14px;white-space:nowrap}
+.f1t td.f1tm{font-family:var(--num);font-weight:600;font-size:16px;white-space:nowrap}
 .f1t td.l{text-align:left;overflow:hidden;max-width:0}
 .f1t{table-layout:fixed;width:100%}
-.f1fast{font-style:normal;font-size:13px;flex:none;margin-left:-4px}
+.f1d{position:relative}
+.f1fast{font-style:normal;font-size:13px;position:absolute;left:25px;bottom:-3px;filter:drop-shadow(0 0 2px #000)}
 .f1ph{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:4px 2px 12px}
 .f1ph .f1d .hs{width:54px;height:54px}
 .f1ph .f1dn b{font-size:20px}
@@ -965,16 +968,17 @@ html.one #app.lst,html.one body{min-height:0}
 .f1rc{display:flex;align-items:center;gap:8px;background:#1c1c1e;border-radius:14px;padding:10px;min-height:52px;cursor:pointer}
 .f1rn{flex:1;min-width:0;font-size:13px;font-weight:600;line-height:1.2;overflow:hidden}
 .f1rn small{display:block;color:var(--mut);font-weight:500;font-size:11.5px;margin-top:2px}
-.f1rp{font-family:var(--num);font-weight:700;font-size:18px}
+.f1rp{font-family:var(--num);font-weight:700;font-size:19px}
 .f1rp.p1{color:#ffd60a}.f1rp.p2{color:#d1d1d6}.f1rp.p3{color:#d0894a}
 .f1rh{display:flex;align-items:center;gap:10px;margin:2px 0 10px}
 .f1rh .f1fl{font-size:28px}
-.f1rh .lvt{margin:0}
-.f1rsub{color:var(--mut);font-size:12.5px}
+.f1rh .lvt{margin:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.f1rh > div{min-width:0}
+.f1rsub{color:var(--mut);font-size:13.5px}
 .f1sh{margin:2px 0 8px}
-.f1grid{color:var(--mut);font-size:12.5px;margin:4px 2px 6px}
-.f1st .ldr .ln small{display:block;color:var(--mut);font-size:12.5px;margin-top:1px}
-.f1st .ldr .pn{font-family:var(--num);font-weight:700;font-size:17px}
+.f1grid{color:var(--mut);font-size:13.5px;margin:4px 2px 6px}
+.f1st .ldr .ln small{display:block;color:var(--mut);font-size:13.5px;margin:1px 0 0;font-family:-apple-system,sans-serif;font-weight:500}
+.f1st .ldr .pn{font-family:var(--num);font-weight:700;font-size:18px}
 .f1prog{color:var(--mut);font-size:12px;margin:0 2px 8px}
 .f1ys{margin-left:6px}
 </style>
@@ -4278,7 +4282,7 @@ const F1NM = [[/austral/i, 'AU'], [/chin/i, 'CN'], [/japan/i, 'JP'], [/bahrain(?
 const f1Iso = ev => { const nm = String((ev && ev.name) || ''); for (const [re, c] of F1NM) if (re.test(nm)) return c; const co = String((ev && ev.circuit && ev.circuit.address && ev.circuit.address.country) || '').toLowerCase(); return F1CC[co] || ''; };
 const f1Flag = ev => { const c = f1Iso(ev); return c ? `<span class="f1fl">${c === 'EU' ? '🇪🇺' : String.fromCodePoint(...[...c].map(x => 127397 + x.charCodeAt(0)))}</span>` : '<span class="f1fl">🏁</span>'; };
 const f1GP = ev => String((ev && (ev.name || ev.displayName)) || '').replace(/^.*?(?=\b(?:[A-ZÀ-Ý][\wÀ-ÿ'.-]*\s)*(?:Grand Prix|GP)\b)/, m => { const w = String(ev.name || '').match(/((?:[A-ZÀ-Ýa-zà-ÿ'.-]+\s)?(?:[A-ZÀ-Ýa-zà-ÿ'.-]+\s)?Grand Prix.*)$/); return ''; }).trim();
-const f1Short = ev => { const n = String((ev && ev.name) || ''); const m = n.match(/([A-ZÀ-Ý][A-Za-zÀ-ÿ'.-]+(?:\s(?:[A-ZÀ-Ý][A-Za-zÀ-ÿ'.-]+|de|in))*\sGrand Prix(?:\sin\s\w+)?)$/); let s = m ? m[1] : n; const sp = ['Qatar Airways', 'Heineken', 'Aramco', 'Gulf Air', 'STC', 'Crypto.com', 'Lenovo', 'MSC Cruises', 'Pirelli', 'Moët & Chandon', 'AWS', 'Tag Heuer', 'Singapore Airlines', 'Etihad Airways', 'Rolex', 'Formula 1', 'FORMULA 1']; sp.forEach(x => { s = s.replace(new RegExp('^' + x.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '\\s+', 'i'), ''); }); return s; };
+const f1Short = ev => { const n = String((ev && ev.name) || ''); const m = n.match(/([A-ZÀ-Ý][A-Za-zÀ-ÿ'.-]+(?:\s(?:[A-ZÀ-Ý][A-Za-zÀ-ÿ'.-]+|de|in))*\sGrand Prix(?:\sin\s\w+)?)$/); let s = m ? m[1] : n; const sp = ['Qatar Airways', 'Heineken', 'Aramco', 'Gulf Air', 'STC', 'Crypto.com', 'Lenovo', 'MSC Cruises', 'Pirelli', 'Moët & Chandon', 'Chandon', 'AWS', 'Tag Heuer', 'Singapore Airlines', 'Etihad Airways', 'Rolex', 'Formula 1', 'FORMULA 1']; sp.forEach(x => { s = s.replace(new RegExp('^' + x.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '\\s+', 'i'), ''); }); return s; };
 const f1Hs = id => `https://a.espncdn.com/i/headshots/rpm/players/full/${id}.png`;
 const f1Dates = ev => { const a = new Date(ev.date), b = new Date(ev.endDate || ev.date); return a.getMonth() === b.getMonth() ? `${a.getDate()}–${b.getDate()}.${b.getMonth() + 1}.` : `${a.getDate()}.${a.getMonth() + 1}.–${b.getDate()}.${b.getMonth() + 1}.`; };
 const f1Comp = (ev, ab) => (ev.competitions || []).find(c => c.type && c.type.abbreviation === ab);
@@ -4334,7 +4338,7 @@ function f1MapSrc(url) {
   im.onerror = () => { F1.map[url] = 'css'; if (topView() === 'list' && state.league === 'f1') render(); };
   im.src = url; return 'p';
 }
-const f1MapHTML = url => { const m = f1MapSrc(url); if (!m || m === 'p') return ''; return m === 'css' ? `<img class="wf" src="${esc(url)}" alt="" onerror="this.remove()">` : `<img src="${m}" alt="">`; };
+const f1MapHTML = url => url ? `<img src="${esc(url)}" alt="" onerror="this.remove()">` : '';
 
 /* --- main list --- */
 function f1ListEvs() { const Y = f1Year(), cur = F1.sb[Y]; if (!cur) return null; let L = cur.slice();
@@ -4363,8 +4367,11 @@ function renderF1List(tabs) {
     ${strip ? `<div class="strip" id="strip">${strip}</div>` : ''}<div class="qb"><button data-f1v="stats">Statistics</button><button data-f1v="std">Standings</button></div></header>
     <main class="f1list">${body}</main>`;
   const s = document.getElementById('strip'); if (s) { if (prev != null) s.scrollLeft = prev; else f1CenterStrip(false); }
+  f1Fit();
   if (evs && evs.length && !F1.scrolled) { F1.scrolled = 1; requestAnimationFrame(() => f1ScrollTo(F1.curId, false)); }
 }
+function f1Fit() { requestAnimationFrame(() => { $app.querySelectorAll('.f1nm,.f1gp span,.f1rh .lvt').forEach(el => { if (el.scrollWidth > el.clientWidth + 1 && /Grand Prix/.test(el.textContent)) el.textContent = el.textContent.replace(/Grand Prix/, 'GP'); });
+  $app.querySelectorAll('.f1dn b').forEach(el => { if (el.scrollWidth > el.clientWidth + 1) { const w = el.textContent.trim().split(/\s+/); if (w.length > 1 && !/\.$/.test(w[0])) el.textContent = w[0][0] + '. ' + w.slice(1).join(' '); } }); }); }
 function f1CenterStrip(smooth) { const s = document.getElementById('strip'), on = s && s.querySelector('.on'); if (!on) return; const tgt = Math.max(0, on.offsetLeft - (s.clientWidth - on.offsetWidth) / 2); if (smooth) s.scrollTo({ left: tgt, behavior: 'smooth' }); else s.scrollLeft = tgt; }
 F1.tok = 0;
 function f1CancelAnim() { F1.tok++; window._stAnim = false; }
@@ -4395,6 +4402,7 @@ function renderF1() {
   } else if (v.kind === 'f1drv' || v.kind === 'f1con') { const y = v.y || f1CurY(); ysel = f1YSel(v, y, f1Years()); body = f1PartHTML(v, y); }
   else if (v.kind === 'f1race') { const r = f1RaceHTML(v); ysel = r.ysel; top = r.top; body = r.body; }
   $app.innerHTML = `${f1Hdr(ysel)}<main class="f1v ${v.kind === 'f1stats' ? 'f1st' : ''}">${top}<div class="pane t">${body}</div></main>`;
+  f1Fit();
   if (v._scrollSec) { const k = v._scrollSec; v._scrollSec = null; requestAnimationFrame(() => { const sec = $app.querySelector(`[data-f1sec="${k}"]`), w = $app.querySelector(':scope > .stkw'); if (sec) window.scrollTo(0, Math.max(0, sec.getBoundingClientRect().top + window.scrollY - (w ? w.offsetHeight : 0) - 8)); }); }
 }
 function f1Load(v, force) {
@@ -4514,7 +4522,7 @@ function f1Table(rows, det, mode, y) {
     else { const has = R.filter(r => qt(r, k) > 0).sort((a, b) => qt(a, k) - qt(b, k)), no = k === '1' ? R.filter(r => !(qt(r, k) > 0)).sort((a, b) => (a.order || 99) - (b.order || 99)) : [];
       if (!has.length) return msg('No results availible');
       R = has.concat(no); R.forEach((r, i) => { r.order = i + 1; }); const P0 = qt(has[0], k); timeOf = r => { const t = qt(r, k); return !t ? 'DNF' : r.order === 1 ? f1Ms(t) : '+' + ((t - P0) / 1000).toFixed(3); }; } }
-  return `<section class="blk"><table class="nfx sep f1t f1res"><colgroup><col style="width:34px"><col><col style="width:${pc ? 94 : 86}px">${pc ? '<col style="width:32px">' : ''}</colgroup><thead><tr><th class="n">#</th><th class="l ph">Driver</th><th class="tl">${mode === 'grid' ? '' : 'Time'}</th>${pc ? '<th>Pts</th>' : ''}</tr></thead><tbody>${R.sort((a, b) => (a.order || 99) - (b.order || 99)).map(r => `<tr data-f1drv="${esc(r.id)}"><td class="n f1rk ${pc && r.order <= 3 ? 'p' + r.order : ''}">${esc(String(r.order || ''))}</td><td class="l">${f1Drv(r.id, r.name || '', r.team).replace(/<\/div><\/div>$/, fl && fl.id === r.id ? '</div><i class="f1fast" title="Fastest lap">⚡</i></div>' : '</div></div>')}</td><td class="f1tm">${esc(det ? timeOf(r) : '')}</td>${pc ? `<td>${esc(det ? ptsOf(r) : '')}</td>` : ''}</tr>`).join('')}</tbody></table></section>`;
+  return `<section class="blk"><table class="nfx sep f1t f1res"><colgroup><col style="width:34px"><col><col style="width:${pc ? 104 : 88}px">${pc ? '<col style="width:30px">' : ''}</colgroup><thead><tr><th class="n">#</th><th class="l ph">Driver</th><th class="tl">${mode === 'grid' ? '' : 'Time'}</th>${pc ? '<th>Pts</th>' : ''}</tr></thead><tbody>${R.sort((a, b) => (a.order || 99) - (b.order || 99)).map(r => `<tr data-f1drv="${esc(r.id)}"><td class="n f1rk ${pc && r.order <= 3 ? 'p' + r.order : ''}">${esc(String(r.order || ''))}</td><td class="l">${f1Drv(r.id, r.name || '', r.team).replace(/<\/div><\/div>$/, fl && fl.id === r.id ? '</div><i class="f1fast" title="Fastest lap">⚡</i></div>' : '</div></div>')}</td><td class="f1tm">${esc(det ? timeOf(r) : '')}</td>${pc ? `<td>${esc(det ? ptsOf(r) : '')}</td>` : ''}</tr>`).join('')}</tbody></table></section>`;
 }
 
 function route() {
@@ -4588,7 +4596,7 @@ $app.addEventListener('click', ev => {
   if (d.f1race) { f1CancelAnim(); window._f1y = d.f1ry || (v && v.y) || null; location.hash = '#/f1/race/' + d.f1race; return; }
   if (d.f1drv || d.f1con) { const ry = v && v.kind === 'f1race' ? ((F1.ev || {})[v.cat] || {})._y : v && v.y; window._f1y = ry || null; location.hash = '#/f1/' + (d.f1drv ? 'drv/' + d.f1drv : 'con/' + d.f1con); return; }
   if (!v) return;
-  if (d.f1m) { v.m = d.f1m; window._f1m = d.f1m; render(); return; }
+  if (d.f1m) { const ch = v.m !== d.f1m; v.m = d.f1m; window._f1m = d.f1m; render(); if (ch && window.scrollY > 0) smoothTop(); return; }
   if (d.f1yo) { v.yOpen = !v.yOpen; v.sOpen = false; render(); return; }
   if (d.f1so) { v.sOpen = !v.sOpen; v.yOpen = false; render(); return; }
   if (d.f1y) { v.y = +d.f1y; v.yOpen = false; v.exp = {}; v.err = null; render(); f1Load(v); return; }
