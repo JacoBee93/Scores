@@ -31,6 +31,26 @@ html.fbar body{font-weight:500}
 /* alt fonts change only the letters: keep classic line boxes (classic uses the fonts' 'normal' ≈ 1.2), so cards, pills and switches keep their size */
 html.fsg body,html.fbar body{line-height:1.2}
 html.fbar .tnud{position:relative;top:-.055em}
+html.fbar .gl2 .glr b,html.fbar .sch .rs b,html.fbar .sch .sc2 b,html.fbar .sch .tm{font-weight:500}
+/* ===== Design 2.0: black→purple gradient + glass cards ===== */
+html.d2 body{background:transparent}
+html.d2 body::before{content:'';position:fixed;inset:0;z-index:-1;pointer-events:none;background:linear-gradient(180deg,#000 0%,#07040d 22%,#1a0d33 55%,#3a1a6e 100%)}
+html.d2{--card:rgba(44,38,64,.5)}
+html.d2 .pane{background:rgba(30,26,44,.72)}
+html.d2 td.n,html.d2 th.n{background:transparent}
+html.d2 .pane .tw td.n,html.d2 .pane .tw th.n{background:#211d30;box-shadow:-12px 0 0 #211d30}
+html.d2 tr.zb > td{background:rgba(255,255,255,.055) !important}
+html.d2 .pane .tw tr.zb > td.n{background:#2a2639 !important}
+html.d2 .gl2 tbody tr:nth-child(even) td{background:rgba(255,255,255,.055)}
+html.d2 :is(.card,.pane,.hero,.pill,.dy,.qb button,header .back,header .home[data-home],.ybtn,.hpill,.icon,.favh,.cmpclr,.msg button):not([style*='position']){position:relative}
+html.d2 :is(.card,.pane,.hero,.pill,.dy,.qb button,header .back,header .home[data-home],.ybtn,.hpill,.icon,.favh,.cmpclr,.msg button,.lpm,.artbox)::after{content:'';position:absolute;inset:0;border-radius:inherit;padding:1px;background:linear-gradient(180deg,rgba(255,255,255,.36),rgba(255,255,255,.10) 30%,rgba(255,255,255,.02) 60%,rgba(255,255,255,.12));-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude;pointer-events:none;z-index:3}
+html.d2 :is(.card,.hero){box-shadow:0 10px 28px rgba(0,0,0,.35),inset 0 1px 0 rgba(255,255,255,.06)}
+html.d2 .stkw{background:rgba(0,0,0,.72);-webkit-backdrop-filter:blur(22px) saturate(170%);backdrop-filter:blur(22px) saturate(170%)}
+html.d2 .stkw.fx0{border-top-color:transparent;box-shadow:none}
+html.d2 :is(.hpill,.lpm,.ylist,#lptip){background:rgba(44,38,64,.55);-webkit-backdrop-filter:blur(24px) saturate(180%);backdrop-filter:blur(24px) saturate(180%)}
+html.d2 .artbox{background:rgba(30,26,44,.78);-webkit-backdrop-filter:blur(24px) saturate(160%);backdrop-filter:blur(24px) saturate(160%)}
+html.d2 .pill.on,html.d2 .seg button.on{background:#fff}
+html.d2 .dy.on{background:var(--acc)}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
 html,body,button,input,td,th{font-variant-numeric:tabular-nums lining-nums}
@@ -692,8 +712,9 @@ td.n .slg{width:20px;height:20px;object-fit:contain;vertical-align:-6px;margin-l
 .lpm{position:fixed;z-index:61;background:#2c2c2e;border-radius:12px;min-width:200px;overflow:hidden;box-shadow:0 10px 30px rgba(0,0,0,.5)}
 .lpm button{display:block;width:100%;text-align:left;padding:14px 16px;font-size:16px;font-weight:600;color:#fff;background:none;border:0;border-bottom:1px solid #3a3a3c;font-family:inherit}
 .lpm button:last-child{border-bottom:0}
-.lpm button[data-fsw]{display:flex;justify-content:space-between;align-items:center}
-.lpm button[data-fsw]:not(.on){color:var(--mut)}
+.lpm button[data-fsw],.lpm button[data-d2sw]{display:flex;justify-content:space-between;align-items:center}
+.lpm button[data-fsw]:not(.on),.lpm button[data-d2sw]:not(.on){color:var(--mut)}
+.lpm button[data-d2sw]{border-top:6px solid #1c1c1e}
 .lpck{color:#fff;font-size:15px}
 .lpm button[data-cc]{border-bottom:6px solid #1c1c1e}
 .lvt{font-family:var(--num);font-weight:700;font-size:26px;margin:4px 4px 12px}
@@ -1031,7 +1052,7 @@ html.fsg .f1fl,html.fsg .f1fl *,html.fbar .f1fl,html.fbar .f1fl *{font-family:'A
 <div id="app"></div>
 
 <script>
-try { localStorage.removeItem('design'); const f = localStorage.getItem('font'); if (f === 'sg') document.documentElement.classList.add('fsg'); else if (f === 'bar') document.documentElement.classList.add('fbar'); } catch (e) {}
+try { localStorage.removeItem('design'); const f = localStorage.getItem('font'); document.documentElement.classList.add(f === 'sg' ? 'fsg' : 'fbar'); if (localStorage.getItem('d2') === '1') document.documentElement.classList.add('d2'); } catch (e) { document.documentElement.classList.add('fbar'); }
 const API = 'https://site.api.espn.com/apis/site/v2/sports/';
 const WEB = 'https://site.web.api.espn.com/apis/common/v3/sports/';
 const LEAGUES = {
@@ -4289,10 +4310,11 @@ function renderLeaders() {
     const o = document.createElement('div'); o.className = 'lpo';
     const m = document.createElement('div'); m.className = 'lpm';
     m.style.top = (r.bottom + 8) + 'px'; m.style.left = Math.min(r.left, window.innerWidth - 216) + 'px';
-    m.innerHTML = `<button data-cc>Clear cache</button>${(() => { const de = document.documentElement, cur = de.classList.contains('fsg') ? 'sg' : de.classList.contains('fbar') ? 'bar' : 'classic'; return [['classic', 'Classic 1.0'], ['bar', 'Bleacher'], ['sg', 'Mercedes']].map(([k, t]) => `<button data-fsw="${k}" class="${k === cur ? 'on' : ''}">${t}${k === cur ? '<span class="lpck">✓</span>' : ''}</button>`).join(''); })()}`;
+    m.innerHTML = `<button data-cc>Clear cache</button>${(() => { const de = document.documentElement, cur = de.classList.contains('fsg') ? 'sg' : 'bar'; return [['bar', 'Bleacher'], ['sg', 'Mercedes']].map(([k, t]) => `<button data-fsw="${k}" class="${k === cur ? 'on' : ''}">${t}${k === cur ? '<span class="lpck">✓</span>' : ''}</button>`).join(''); })()}<button data-d2sw class="d2b ${document.documentElement.classList.contains('d2') ? 'on' : ''}">Design 2.0${document.documentElement.classList.contains('d2') ? '<span class="lpck">✓</span>' : ''}</button>`;
     o.addEventListener('click', close);
     m.addEventListener('click', ev => {
-      if (ev.target.closest('[data-fsw]')) { const de = document.documentElement, nx = ev.target.closest('[data-fsw]').dataset.fsw; de.classList.toggle('fbar', nx === 'bar'); de.classList.toggle('fsg', nx === 'sg'); try { localStorage.setItem('font', nx); } catch (er) {} close(); render(); return; }
+      if (ev.target.closest('[data-d2sw]')) { const on = document.documentElement.classList.toggle('d2'); try { localStorage.setItem('d2', on ? '1' : '0'); } catch (er) {} close(); render(); return; }
+      if (ev.target.closest('[data-fsw]')) { const de = document.documentElement, nx = ev.target.closest('[data-fsw]').dataset.fsw; de.classList.toggle('fbar', nx !== 'sg'); de.classList.toggle('fsg', nx === 'sg'); try { localStorage.setItem('font', nx); } catch (er) {} close(); render(); return; }
       if (!ev.target.closest('[data-cc]')) return;
       try { Object.keys(localStorage).forEach(k => { if (/^(lgs\d*_|tps_|athc$)/.test(k)) localStorage.removeItem(k); }); } catch (e) {}
       state.lgs = {}; state.athC = {}; state.lvC = {}; state.std = {}; _prefetched = {};
