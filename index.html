@@ -919,7 +919,14 @@ html.one #app.lst,html.one body{min-height:0}
 .sch .rg.rgw .sf{position:relative;top:1px}
 .gl2 .glr small{position:relative;top:1px}
 
-.f1list{padding-bottom:40vh}
+.f1list{padding-bottom:calc(100vh - 290px)}
+.f1card.f1hist{height:auto;min-height:112px;flex-direction:column;justify-content:center;align-items:stretch}
+.f1hh{display:flex;align-items:center;justify-content:space-between;gap:10px;min-height:86px}
+.f1hh .f1ct{padding-left:0;margin-top:3px;font-size:13px}
+.f1hy{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;padding:4px 0 6px}
+.f1hy button{background:#2c2c2e;color:#fff;border:0;border-radius:10px;padding:10px 0;font-family:var(--num);font-weight:700;font-size:16px}
+.f1hy button.on{background:var(--acc)}
+.f1hy button[data-f1ly="0"]{grid-column:1/-1;font-family:inherit;font-size:14px}
 .f1card{display:flex;align-items:stretch;gap:10px;height:112px;box-sizing:border-box;padding:12px 16px;overflow:hidden}
 .f1cl1{flex:1 1 55%;min-width:0;display:flex;flex-direction:column;justify-content:center;gap:2px}
 .f1fl{display:inline-block;width:38px;text-align:center;font-size:26px;line-height:1;flex:none;font-family:'Apple Color Emoji','Segoe UI Emoji','Noto Color Emoji',sans-serif!important;font-size-adjust:none}
@@ -1211,6 +1218,7 @@ function ttlFor(u, j) {
   if (/\/summary\?event=/.test(u)) { const c = j && j.header && j.header.competitions && j.header.competitions[0], t = c && c.status && c.status.type; return t && t.completed ? 7 * 24 * HR : t && t.state === 'pre' ? 2 * MIN : 15e3; }
   if (/\/scoreboard/.test(u)) { const ev = (j && j.events) || [], st = ev.map(stOf); if (st.includes('in')) return 15e3; if (st.includes('pre')) return 2 * MIN; return ev.length ? 12 * HR : 30 * MIN; }
   if (/\/plays\?|\/competitions\/\d+\?/.test(u)) return 30e3;
+  { const fm = u.match(/racing\/f1\/scoreboard\?dates=(\d{4})/); if (fm && +fm[1] < new Date().getFullYear() - 1) return 30 * 24 * HR; }
   if (/racing\/leagues\/f1\/circuits/.test(u)) return /\.(png|svg|jpe?g)/i.test(JSON.stringify(j || {})) ? 30 * 24 * HR : 12 * HR;
   if (/racing\/leagues\/f1\/events\/\d+\/competitions\/\d+\/competitors\?/.test(u)) return 10 * MIN;
   if (/racing\/leagues\/f1\/events\/\d+\/competitions\/\d+\/competitors/.test(u)) return 2 * 24 * HR;
@@ -2779,9 +2787,12 @@ function glSeasons(p, J) {
   const f = ((G && G.filters) || []).find(x => x && /season$/i.test(x.name || '') && Array.isArray(x.options));
   let L = f ? f.options.map(x => ({ y: String(x.value), t: p.league === 'nfl' ? seasonLbl(p, x.value) : (x.displayValue || seasonLbl(p, x.value)) })).filter(x => /^\d{4}$/.test(x.y)) : [];
   if (!L.length && J === undefined) L = [...new Set(statCats(p.st, p.league).flatMap(c => c.rows.map(r => r.year)).filter(Boolean))].map(y => ({ y: String(y), t: seasonLbl(p, y) }));
-  const cur = f && f.value ? String(f.value) : (L[0] && L[0].y);
+  let cur = f && f.value ? String(f.value) : (L[0] && L[0].y); const real = cur;
+  /* NBA/NHL: list only seasons the player actually played (injuries, gaps) – based on his career stats */
+  if ((p.league === 'nba' || p.league === 'nhl') && J === undefined && p.st) { const yrs = new Set(statCats(p.st, p.league).flatMap(c => c.rows.map(r => String(r.year))).filter(Boolean)); if (yrs.size) { const F = L.filter(x => yrs.has(x.y)); if (F.length) { L = F; if (!L.some(x => x.y === cur)) cur = null; } } }
   L.sort((a, b) => b.y - a.y);
-  return { L, cur };
+  if (!cur && L[0]) cur = L[0].y;
+  return { L, cur, real };
 }
 async function loadGlSeason(p, y) {
   p.glBy = p.glBy || {};
@@ -2830,10 +2841,10 @@ function ncaaGamelog(p, seg) {
 function gamelogFull(p) {
   const seg = p.league === 'nfl' ? `<div class="seg pseg"><button data-glsrc="nfl" class="${p.glSrc !== 'ncaa' ? 'on' : ''}">NFL</button><button data-glsrc="ncaa" class="${p.glSrc === 'ncaa' ? 'on' : ''}">NCAA</button></div>` : '';
   if (p.glSrc === 'ncaa') return ncaaGamelog(p, seg);
-  const { L, cur } = glSeasons(p), sel = p.glY || cur;
+  const { L, cur, real } = glSeasons(p), sel = p.glY || cur;
   const lbl = (L.find(x => x.y === sel) || {}).t || (sel ? seasonLbl(p, sel) : '');
   const head = seg + (L.length ? `<div class="ysel"><button class="ybtn" data-glyo="1">${esc(lbl)}<i class="chev ${p.glYOpen ? 'up' : ''}"></i></button>${p.glYOpen ? `<div class="ylist">${L.map(x => `<button data-gly="${x.y}" class="${x.y === sel ? 'on' : ''}">${esc(x.t)}</button>`).join('')}</div>` : ''}</div>` : '');
-  if (!sel || sel === cur) return gamelogHTML(p, { head });
+  if (!sel || sel === real) return gamelogHTML(p, { head });
   const g = (p.glBy || {})[sel];
   if (!g) { loadGlSeason(p, sel); return head + msg('Loading…'); }
   if (g.loading) return head + msg('Loading…');
@@ -4303,7 +4314,7 @@ const f1Comp = (ev, ab) => (ev.competitions || []).find(c => c.type && c.type.ab
 const f1Done = c => !!(c && c.status && c.status.type && c.status.type.completed);
 const f1Pos = (c, aid) => { const x = c && (c.competitors || []).find(z => String(z.id) === String(aid)); return x ? x.order : null; };
 async function f1Season(y) { y = y || f1Year(); if (F1.sb[y]) return F1.sb[y]; const j = await getJson(F1A + 'scoreboard?dates=' + y); const evs = (j.events || []).slice().sort((a, b) => new Date(a.date) - new Date(b.date)); F1.sb[y] = evs; evs.forEach(e => { F1.ev = F1.ev || {}; F1.ev[e.id] = Object.assign(e, { _y: y }); }); return evs; }
-async function f1Stand(y) { y = y || f1Year(); if (F1.st[y]) return F1.st[y]; const j = await getJson(F1S + '?season=' + y); const ch = j.children || []; const r = { drv: (ch.find(c => /driver/i.test(c.name)) || ch[0] || {}).standings, con: (ch.find(c => /constructor/i.test(c.name)) || ch[1] || {}).standings }; F1.st[y] = r; return r; }
+async function f1Stand(y) { y = y || f1Year(); if (F1.st[y]) return F1.st[y]; const j = await getJson(F1S + '?season=' + y); if (Array.isArray(j.seasons) && j.seasons.length) F1.seasons = j.seasons.map(x => +x.year).filter(Boolean); const ch = j.children || []; const r = { drv: (ch.find(c => /driver/i.test(c.name)) || ch[0] || {}).standings, con: (ch.find(c => /constructor/i.test(c.name)) || ch[1] || {}).standings }; F1.st[y] = r; return r; }
 const f1SV = (en, n) => { const s = (en.stats || []).find(x => x.name === n); return s ? s.value : null; };
 const f1StMap = j => { const m = {}; ((((j || {}).splits || {}).categories) || []).forEach(c => (c.stats || []).forEach(s => { m[s.name] = { v: s.value, d: s.displayValue }; })); return m; };
 async function f1Detail(eid, c, withStatus) {
@@ -4345,7 +4356,21 @@ async function f1Refresh(now, force) {
 /* season helpers: current season = latest year with a completed race */
 const f1RaceDone = e => f1Done(f1Comp(e, 'Race'));
 const f1CurY = () => F1.curY || f1Year();
-const f1Years = () => { const L = []; for (let y = f1CurY(); y >= 2004; y--) L.push(y); return L; };
+const f1Years = () => { const L = []; for (let y = f1CurY(); y >= 2002; y--) L.push(y); return L; };
+/* which seasons actually have data: league, each driver, each constructor and each Grand Prix (built from the standings of all seasons, cached) */
+function f1Idx() { if (F1.idx) return F1.idx.ready ? F1.idx : null; F1.idx = { ready: false };
+  (async () => { await f1ResolveY().catch(() => {}); try { await f1Stand(f1CurY()); } catch (e) {} const ys = (F1.seasons && F1.seasons.length ? F1.seasons : f1Years()).filter(y => y <= f1CurY());
+    const I = { ready: true, years: [], drv: {}, con: {}, gp: {}, evc: {} }, add = (o, k, y) => { (o[k] = o[k] || new Set()).add(y); };
+    let i = 0; const work = async () => { while (i < ys.length) { const y = ys[i++]; let S = null; try { S = await f1Stand(y); } catch (e) {} const de = (S && S.drv && S.drv.entries) || [], ce = (S && S.con && S.con.entries) || []; if (!de.length) continue; I.years.push(y);
+      de.forEach(en => add(I.drv, String((en.athlete || {}).id), y)); ce.forEach(en => add(I.con, String((en.team || {}).id), y));
+      const gps = (de[0].stats || []).filter(st => st.id && !/overall|total/i.test(String(st.displayName || st.name || ''))); gps.forEach(st => { const code = f1GpKey(st.displayName || st.name); I.evc[String(st.id)] = code; (I.gp[code] = I.gp[code] || []).push({ y, id: String(st.id) }); }); } };
+    await Promise.all(Array.from({ length: 5 }, work)); I.years.sort((a, b) => b - a); Object.values(I.gp).forEach(L => L.sort((a, b) => b.y - a.y)); F1.idx = I;
+    if (topView() === 'lv' && state.lv && /^f1/.test(state.lv.kind)) render(); else if (topView() === 'list' && state.league === 'f1') render(); })();
+  return null; }
+/* same Grand Prix across seasons: name without sponsor and "Grand Prix" (+ a few renames) */
+function f1GpKey(n) { let k = f1Short({ name: String(n || '') }).toLowerCase().replace(/grand prix|\bgp\b/g, '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/\s+/g, ' ').trim();
+  const A = { 'sao paulo': 'brazilian', 'mexico city': 'mexican' }; return A[k] || k; }
+function f1YearsFor(v, cur) { const I = f1Idx(); let L; if (!I) L = f1Years(); else if (v.kind === 'f1drv') L = [...(I.drv[String(v.cat)] || [])]; else if (v.kind === 'f1con') L = [...(I.con[String(v.cat)] || [])]; else L = I.years.slice(); if (cur && !L.includes(+cur)) L.push(+cur); return L.sort((a, b) => b - a); }
 async function f1ResolveY() { if (F1.curY) return F1.curY; const Y = f1Year(); let evs = []; try { evs = await f1Season(Y); } catch (e) {} F1.curY = evs.some(f1RaceDone) ? Y : Y - 1; return F1.curY; }
 /* points */
 function f1PtsTable(y, sprint) { if (sprint) return y === 2021 ? [3, 2, 1] : y >= 2022 ? [8, 7, 6, 5, 4, 3, 2, 1] : []; return y >= 2010 ? [25, 18, 15, 12, 10, 8, 6, 4, 2, 1] : y >= 2003 ? [10, 8, 6, 5, 4, 3, 2, 1] : [10, 6, 4, 3, 2, 1]; }
@@ -4367,20 +4392,25 @@ function f1MapSrc(url) {
 const f1MapHTML = url => { const m = f1MapSrc(url); return m === 'p' ? '' : m && m !== 'none' ? `<img src="${m}" alt="">` : '<span class="f1nomap">No map data</span>'; };
 
 /* --- main list --- */
-function f1ListEvs() { const Y = f1Year(), cur = F1.sb[Y]; if (!cur) return null; let L = cur.slice();
-  if (!cur.some(f1RaceDone) && F1.sb[Y - 1]) L = F1.sb[Y - 1].concat(L);
-  if ((!cur.length || cur.every(f1RaceDone)) && F1.sb[Y + 1]) L = L.concat(F1.sb[Y + 1]);
-  return L; }
-function f1CurEv(evs) { const now = Date.now(), dayEnd = e => { const d = new Date(e.endDate || e.date); d.setHours(23, 59, 59, 999); return d.getTime() + 864e5; }; return evs.find(e => dayEnd(e) > now) || evs[evs.length - 1]; }
+const f1DayEnd = e => { const d = new Date(e.endDate || e.date); d.setHours(23, 59, 59, 999); return d.getTime() + 864e5; };
+/* season on the home screen: the current one; 24 h after its last race the next season takes over (the old one moves to Historic results) */
+function f1ShowY() { const Y = f1Year(), c = F1.sb[Y]; if (!c) return null; const nx = F1.sb[Y + 1];
+  if (c.length && c.every(f1RaceDone) && Date.now() > f1DayEnd(c[c.length - 1]) && nx && nx.length) return Y + 1;
+  if (!c.length && F1.sb[Y - 1] && F1.sb[Y - 1].length) return Y - 1; return Y; }
+function f1ListEvs() { const y = F1.listY || f1ShowY(); return y && F1.sb[y] ? F1.sb[y] : null; }
+function f1CurEv(evs) { if (F1.listY) return evs[0]; const now = Date.now(); return evs.find(e => f1DayEnd(e) > now) || evs[evs.length - 1]; }
+function f1HistHTML() { const sy = f1ShowY(), I = F1.idx && F1.idx.ready ? F1.idx : null, ys = (I ? I.years : (F1.seasons || f1Years())).filter(y => y !== sy && y <= f1Year()).sort((a, b) => b - a);
+  return `<div class="card f1card f1hist ${F1.hOpen ? 'open' : ''}" data-f1hist="1"><div class="f1hh"><div><div class="f1nm">Historic results</div><div class="f1ct">${F1.listY ? 'Season ' + F1.listY : 'Choose a season'}</div></div><i class="chev ${F1.hOpen ? 'up' : ''}"></i></div>
+    ${F1.hOpen ? `<div class="f1hy">${F1.listY ? `<button data-f1ly="0">Current season</button>` : ''}${ys.map(y => `<button data-f1ly="${y}" class="${F1.listY === y ? 'on' : ''}">${y}</button>`).join('')}</div>` : ''}</div>`; }
 function renderF1List(tabs) {
   const evs = f1ListEvs();
   let body = '', strip = '';
-  if (!evs) body = msg(F1.err || 'Loading…');
-  else if (!evs.length) body = msg('No races.');
+  if (!evs) body = F1.listY ? f1HistHTML() + msg('Loading…') : msg(F1.err || 'Loading…');
+  else if (!evs.length) body = F1.listY ? f1HistHTML() + msg('No races in ' + F1.listY + '.') : msg('No races.');
   else {
     const cur = f1CurEv(evs); F1.curId = cur.id; if (!F1.selId || !evs.some(e => e.id === F1.selId)) F1.selId = cur.id;
     strip = evs.map(e => { const d = new Date(e.endDate || e.date); return `<button class="dy ${e.id === F1.selId ? 'on' : ''}" data-f1go="${esc(e.id)}"><small>${esc(f1Iso(e) || 'GP')}</small>${d.getDate()}.${d.getMonth() + 1}.</button>`; }).join('');
-    body = evs.map(e => {
+    body = f1HistHTML() + evs.map(e => {
       const rc = f1Comp(e, 'Race'), done = f1Done(rc), w = done && rc && (rc.competitors || []).find(c => c.order === 1), cid = e.circuit && e.circuit.id, cu = F1.circ[cid];
       if (cid && cu === undefined) f1Circ(e).then(() => { if (topView() === 'list' && state.league === 'f1') render(); });
       return `<div class="card f1card" data-f1race="${esc(e.id)}" data-f1ry="${esc(e._y || '')}" id="f1c${esc(e.id)}"><div class="f1cl1"><div class="f1tt">${f1Flag(e)}<div class="f1nm">${esc(f1Short(e))}</div></div>
@@ -4413,7 +4443,7 @@ async function loadF1List() {
   if (forceNow() && Object.keys(F1.sb).length) return f1Refresh(true, true);
   const Y = f1Year();
   try { const cur = await f1Season(Y); F1.err = null; if (topView() === 'list' && state.league === 'f1') render();
-    const ex = []; if (!cur.some(f1RaceDone)) ex.push(Y - 1); if (!cur.length || cur.every(f1RaceDone)) ex.push(Y + 1);
+    const ex = []; if (!cur.length) ex.push(Y - 1); if (!cur.length || cur.every(f1RaceDone)) ex.push(Y + 1);
     if (ex.length) { await Promise.all(ex.map(y => f1Season(y).catch(() => null))); F1.scrolled = 0; }
     /* warm Statistics/Standings in the background so they open instantly */
     setTimeout(() => { f1ResolveY().then(y => Promise.all([f1Season(y), f1Stand(y)]).then(() => { f1Teams(F1.sb[y]).catch(() => {}); f1Agg(y); })).catch(() => {}); }, 1200);
@@ -4425,16 +4455,17 @@ async function loadF1List() {
 function renderF1() {
   const v = state.lv; let top = '', body = '', ysel = '';
   if (v.kind === 'f1stats' || v.kind === 'f1std') {
-    const y = v.y || f1CurY(); ysel = f1YSel(v, y, f1Years());
+    const y = v.y || f1CurY(); ysel = f1YSel(v, y, f1YearsFor(v, y));
     top = `<div class="seg pseg lvseg"><button data-f1m="drv" class="${v.m !== 'con' ? 'on' : ''}">Drivers</button><button data-f1m="con" class="${v.m === 'con' ? 'on' : ''}">Constructors</button></div>`;
     body = v.kind === 'f1std' ? f1StdHTML(v, y) : f1StatsHTML(v, y);
-  } else if (v.kind === 'f1drv' || v.kind === 'f1con') { const y = v.y || f1CurY(); ysel = f1YSel(v, y, f1Years()); body = f1PartHTML(v, y); }
+  } else if (v.kind === 'f1drv' || v.kind === 'f1con') { const y = v.y || f1CurY(); ysel = f1YSel(v, y, f1YearsFor(v, y)); body = f1PartHTML(v, y); }
   else if (v.kind === 'f1race') { const r = f1RaceHTML(v); ysel = r.ysel; top = r.top; body = r.body; }
   $app.innerHTML = `${f1Hdr(ysel)}<main class="f1v ${v.kind === 'f1stats' ? 'f1st' : v.kind === 'f1std' ? 'f1std' : ''}">${top}<div class="pane t">${body}</div></main>`;
   f1Fit();
   if (v._scrollSec) { const k = v._scrollSec; v._scrollSec = null; requestAnimationFrame(() => { const sec = $app.querySelector(`[data-f1sec="${k}"]`), w = $app.querySelector(':scope > .stkw'); if (sec) window.scrollTo(0, Math.max(0, sec.getBoundingClientRect().top + window.scrollY - (w ? w.offsetHeight : 0) - 8)); }); }
 }
 function f1Load(v, force) {
+  setTimeout(f1Idx, 300);
   if (force) { F1.sb = {}; F1.st = {}; F1.rd = {}; F1.rdv = {}; F1.rdp = {}; F1.agg = {}; F1.curY = 0; F1.lastRef = Date.now(); }
   const rr = () => { if (state.lv === v && topView() === 'lv') render(); };
   if (v.kind === 'f1race') { const ev = F1.ev && F1.ev[v.cat]; (ev ? Promise.resolve() : f1Season(v.y || f1Year()).catch(() => {}).then(() => (!F1.ev || !F1.ev[v.cat]) ? f1Season(f1Year()) : null)).then(rr).catch(e => { v.err = String(e.message || e); rr(); }); return; }
@@ -4464,7 +4495,7 @@ function f1PartHTML(v, y) {
   const rows = races.map(s => { const ev = (F1.ev || {})[s.id] || evs.find(e => e.id === s.id) || { name: s.displayName, id: s.id };
     let main = '-', sub = '';
     if (con) { main = s.played ? (String(s.displayValue).trim() || '0') : '-'; }
-    else { const rc = ev.competitions && f1Comp(ev, 'Race'), sr = ev.competitions && f1Comp(ev, 'SR'), p = f1Done(rc) ? f1Pos(rc, v.cat) : null, sp = f1Done(sr) ? f1Pos(sr, v.cat) : null; main = p ? 'P' + p : (f1Done(rc) ? 'DNS' : '-'); if (sp) sub = 'Sprint P' + sp; }
+    else { const rc = ev.competitions && f1Comp(ev, 'Race'), sr = ev.competitions && f1Comp(ev, 'SR'), p = f1Done(rc) ? f1Pos(rc, v.cat) : null, sp = f1Done(sr) ? f1Pos(sr, v.cat) : null; main = p ? 'P' + p : (f1Done(rc) ? 'DNF' : '-'); if (sp) sub = 'Sprint P' + sp; }
     const lnk = ev.competitions && f1RaceDone(ev);
     return `<tr ${lnk ? `data-f1race="${esc(s.id)}" data-f1ry="${y}"` : ''}><td class="l"><div class="f1gp">${f1Flag(ev)}<span>${esc(f1Short(ev))}</span></div></td><td class="f1sp">${esc(sub)}</td><td class="f1rp ${/^P[123]$/.test(main) ? 'p' + main[1] : ''}">${esc(main)}</td></tr>`; }).join('');
   return head + `<section class="blk"><table class="nfx sep f1t f1gpl"><colgroup><col><col style="width:78px"><col style="width:58px"></colgroup><thead><tr><th class="l">Grand Prix</th><th></th><th>${con ? 'PTS' : 'POS'}</th></tr></thead><tbody>${rows}</tbody></table></section>`;
@@ -4516,7 +4547,7 @@ function f1RaceHTML(v) {
   const ev = F1.ev && F1.ev[v.cat]; if (!ev) return { ysel: '', top: '', body: msg(v.err || 'Loading…') };
   const G = f1Groups(ev); if (!v.g || !G.find(g => g[0] === v.g)) { const d = f1DefGroup(ev, G, v); v.g = d ? d[0] : 'r'; v.gAuto = true; }
   const grp = G.find(g => g[0] === v.g) || G[0], ey = ev._y || f1Year();
-  const ylist = []; for (let y = Math.max(f1CurY(), ey); y >= 2004; y--) ylist.push(y);
+  const I = f1Idx(), code = I && I.evc[String(ev.id)], gpl = code && I.gp[code]; let ylist = []; if (gpl) ylist = [...new Set(gpl.map(x => x.y))]; else for (let y = Math.max(f1CurY(), ey); y >= 2002; y--) ylist.push(y); if (!ylist.includes(ey)) ylist.unshift(ey); ylist.sort((a, b) => b - a);
   const ysel = `<div class="ysel tys"><button class="ybtn" data-f1so="1">${esc(grp ? grp[1] : 'Session')}<i class="chev ${v.sOpen ? 'up' : ''}"></i></button>${v.sOpen ? `<div class="ylist">${G.map(g => `<button data-f1s="${g[0]}" class="${g[0] === v.g ? 'on' : ''}">${esc(g[1])}</button>`).join('')}</div>` : ''}</div>` + `<div class="ysel tys f1ys"><button class="ybtn" data-f1yo="1">${esc(String(ey))}<i class="chev ${v.yOpen ? 'up' : ''}"></i></button>${v.yOpen ? `<div class="ylist">${ylist.map(x => `<button data-f1ry2="${x}" class="${x === ey ? 'on' : ''}">${x}</button>`).join('')}</div>` : ''}</div>`;
   const top = `<div class="f1rh">${f1Flag(ev)}<div><div class="lvt">${esc(f1Short(ev))}</div><div class="f1rsub">${esc(f1Dates(ev) + (ev.circuit && ev.circuit.fullName ? ' · ' + ev.circuit.fullName : ''))}</div></div></div>`;
   if (!grp) return { ysel, top, body: msg('No results availible') };
@@ -4550,7 +4581,7 @@ function f1Table(rows, det, mode, y) {
   if (pc && det) { const lead = R.find(r => r.order === 1), LL = lead ? V(lead, 'lapsCompleted') : 0;
     R.forEach(r => { const x = V(r, 'fastestLap'); if (x && (!fl || x < fl.v)) fl = { v: x, id: r.id }; });
     const dnf = r => f1IsDnf(r, LL);
-    timeOf = r => { if (r.order === 1) return (S(r, 'totalTime') || {}).d || ''; if (dnf(r)) return f1Out(r) || 'DNF'; const l = V(r, 'lapsCompleted'); if (l && LL && l < LL) { const n = LL - l; return '+' + n + ' Lap' + (n > 1 ? 's' : ''); } const b = S(r, 'behindTime'); return b && b.v > 0 ? b.d : ''; };
+    timeOf = r => { if (r.order === 1) return (S(r, 'totalTime') || {}).d || ''; if (dnf(r)) return 'DNF'; const l = V(r, 'lapsCompleted'); if (l && LL && l < LL) { const n = LL - l; return '+' + n + ' Lap' + (n > 1 ? 's' : ''); } const b = S(r, 'behindTime'); return b && b.v > 0 ? b.d : ''; };
     const T = f1PtsTable(y, mode === 'sprint');
     ptsOf = r => { if (dnf(r)) return ''; let p = T[(r.order || 99) - 1] || 0; if (mode === 'race' && y >= 2019 && y <= 2024 && fl && fl.id === r.id && r.order <= 10) p++; return p ? String(p) : ''; }; }
   else if (mode === 'fp' && det) { const lead = R.find(r => r.order === 1), L0 = lead ? V(lead, 'fastestLap') : 0;
@@ -4594,14 +4625,16 @@ function route() {
   m = h.match(/^#\/leaders\/(\w+)\/(\w+)/);
   if (m && LEAGUES[m[1]]) { const sy = window._ldY || null, ll = window._ldL || {}; window._ldY = null; window._ldL = null; if (!state.lv || state.lv.kind !== 'leaders' || state.lv.cat !== m[2] || (sy || null) !== (state.lv.sy || null)) state.lv = { kind: 'leaders', league: m[1], cat: m[2], sk: null, asc: false, sy, lab: ll.lab || '', title: ll.title || '' }; render(); loadLeaders(); return; }
   m = h.match(/^#\/f1\/(stats|std|race|drv|con)(?:\/(\w+))?/);
-  if (m) { const k = 'f1' + m[1], y = window._f1y || null; window._f1y = null; if (!state.lv || state.lv.kind !== k || (state.lv.cat || null) !== (m[2] || null)) state.lv = { kind: k, league: 'f1', cat: m[2] || null, y: y ? +y : null, m: window._f1m || 'drv' }; render(); if (F1.goTop) { F1.goTop = 0; window.scrollTo(0, 0); } f1Load(state.lv); return; }
+  if (m) { const k = 'f1' + m[1], y = window._f1y || null, fwd = !!F1.goTop; window._f1y = null; F1.mem = F1.mem || {}; const mem = F1.mem[location.hash];
+    if (!fwd && mem) state.lv = mem; else if (!state.lv || state.lv.kind !== k || (state.lv.cat || null) !== (m[2] || null) || fwd) state.lv = { kind: k, league: 'f1', cat: m[2] || null, y: y ? +y : null, m: window._f1m || 'drv' };
+    F1.mem[location.hash] = state.lv; render(); if (F1.goTop) { F1.goTop = 0; window.scrollTo(0, 0); } f1Load(state.lv); return; }
   m = h.match(/^#\/(standings|lstats)\/(\w+)/);
   if (m && LEAGUES[m[2]]) { if (!state.lv || state.lv.kind !== m[1] || state.lv.league !== m[2]) state.lv = { kind: m[1], league: m[2], mode: m[2] === 'nba' ? 'conf' : 'div', sy: m[1] === 'lstats' ? (state.lsY || {})[m[2]] || null : null, tm: m[1] === 'lstats' ? (state.lsTm || {})[m[2]] || null : null }; render(); loadLV(); return; }
   state.lv = null;
   if (h.startsWith('#/compare')) { state.cmpOn = true; state.cmp = state.cmp || { league: curLeague(), q: ['', ''], res: [[], []], sel: [null, null], data: [null, null] }; render(); return; }
   state.cmpOn = false;
   if (h.startsWith('#/search')) { state.search = true; render(); return; }
-  state.search = false; state.lsY = {}; state.lsTm = {};
+  state.search = false; state.lsY = {}; state.lsTm = {}; if (typeof F1 !== 'undefined') F1.mem = {};
   render(); loadList(true);
 }
 try { history.scrollRestoration = 'manual'; } catch (e) {}
@@ -4642,8 +4675,10 @@ window._hearts = new Set();
 })();
 
 $app.addEventListener('click', ev => {
-  const b = ev.target.closest('[data-f1go],[data-f1race],[data-f1v],[data-f1m],[data-f1yo],[data-f1y],[data-f1drv],[data-f1con],[data-f1exp],[data-f1so],[data-f1s],[data-f1sub],[data-f1q],[data-f1ry2]'); if (!b) return;
+  const b = ev.target.closest('[data-f1ly],[data-f1hist],[data-f1go],[data-f1race],[data-f1v],[data-f1m],[data-f1yo],[data-f1y],[data-f1drv],[data-f1con],[data-f1exp],[data-f1so],[data-f1s],[data-f1sub],[data-f1q],[data-f1ry2]'); if (!b) return;
   ev.stopPropagation(); const d = b.dataset, v = state.lv;
+  if (d.f1ly !== undefined) { const y = +d.f1ly || null; F1.hOpen = false; F1.listY = y; F1.selId = null; F1.scrolled = 0; render(); if (y) f1Season(y).then(() => { F1.scrolled = 0; if (topView() === 'list' && state.league === 'f1') render(); }).catch(() => { F1.err = 'Failed to load ' + y; render(); }); return; }
+  if (d.f1hist) { F1.hOpen = !F1.hOpen; f1Idx(); render(); return; }
   if (d.f1go) { F1.selId = d.f1go; $app.querySelectorAll('.strip .dy').forEach(x => x.classList.toggle('on', x === b)); f1ScrollTo(d.f1go, true); return; }
   if (d.f1v) { window._fromList = true; F1.goTop = 1; location.hash = '#/f1/' + d.f1v; return; }
   if (d.f1race) { f1CancelAnim(); F1.goTop = 1; window._f1y = d.f1ry || (v && v.y) || null; location.hash = '#/f1/race/' + d.f1race; return; }
@@ -4658,6 +4693,7 @@ $app.addEventListener('click', ev => {
   if (d.f1sub) { v.fp = d.f1sub; render(); return; }
   if (d.f1q) { v.q = d.f1q; render(); return; }
   if (d.f1ry2) { const y = +d.f1ry2, ev0 = (F1.ev || {})[v.cat]; v.yOpen = false; if (!ev0 || y === ev0._y) { render(); return; }
+    { const I = F1.idx && F1.idx.ready ? F1.idx : null, code = I && I.evc[String(ev0.id)], hit = code && (I.gp[code] || []).find(x => x.y === y); if (hit) { window._f1y = y; window._repl = 1; f1Season(y).catch(() => {}).then(() => location.replace('#/f1/race/' + hit.id)); return; } }
     const iso = f1Iso(ev0), sn = f1Short(ev0), cid = ev0.circuit && ev0.circuit.id; v.err = null; render();
     f1Season(y).then(evs => { const t = evs.find(e => f1Short(e) === sn) || (cid && evs.find(e => e.circuit && e.circuit.id === cid)) || (iso && iso !== 'US' && evs.find(e => f1Iso(e) === iso));
       if (t) { window._f1y = y; window._repl = 1; location.replace('#/f1/race/' + t.id); } else { const t2 = document.createElement('div'); t2.id = 'toast'; t2.textContent = 'No results availible for ' + y; document.body.appendChild(t2); setTimeout(() => t2.remove(), 1800); } }).catch(() => {});
@@ -4678,11 +4714,12 @@ $app.addEventListener('click', ev => {
   } else if (d.favh) {
     state.favOpen = !state.favOpen; render();
   } else if (d.f1) {
+    if (state.league === 'f1' && topView() === 'list' && F1.listY) { F1.listY = null; F1.hOpen = false; F1.selId = null; F1.scrolled = 0; render(); return; }
     if (state.league === 'f1' && topView() === 'list') { F1.selId = F1.curId; $app.querySelectorAll('.strip .dy').forEach(x => x.classList.toggle('on', x.dataset.f1go === F1.curId)); f1CenterStrip(true); f1ScrollTo(F1.curId, true); return; }
     state.league = 'f1'; store.set('league', 'f1'); F1.scrolled = 0; window.scrollTo(0, 0); loadList();
   } else if (d.league) {
     if (d.league === state.league && topView() === 'list') { const nw = state.nflw, onCur = d.league === 'nfl' ? !!(nw && nw.cur && nw.sel && nw.cur.t === nw.sel.t && nw.cur.w === nw.sel.w) : ymd(state.date) === ymd(todayLoc()); if (onCur || d.league === 'fav') { window.scrollTo({ top: 0, behavior: 'smooth' }); return; } }
-    const same = d.league === state.league; if (state.league === 'f1') { f1CancelAnim(); F1.selId = null; }
+    const same = d.league === state.league; if (state.league === 'f1') { f1CancelAnim(); F1.selId = null; F1.listY = null; F1.hOpen = false; }
     if (d.league === 'nfl' && state.nflw && state.nflw.cur) state.nflw.sel = Object.assign({}, state.nflw.cur);
     state.league = d.league; if (d.league !== 'fav') store.set('league', d.league);
     state.favScrolled = false; if (same) smoothTop(); else window.scrollTo(0, 0);
