@@ -1589,7 +1589,7 @@ window.isSAm = () => navigator.standalone === true || (window.matchMedia && matc
 })();
 function smoothTop(ms) { ms = ms || 380; const y0 = window.scrollY; cancelAnimationFrame(_stA); if (y0 < 2) { window.scrollTo(0, 0); return; }
   document.body.style.minHeight = (y0 + window.innerHeight) + 'px'; window._stAnim = 1; const t0 = performance.now();
-  const f = now => { const u = Math.min(1, (now - t0) / ms), e = 1 - Math.pow(1 - u, 3); window.scrollTo(0, Math.round(y0 * (1 - e))); if (u < 1) _stA = requestAnimationFrame(f); else { document.body.style.minHeight = ''; window._stAnim = 0; try { listLock(); detLock(); } catch (er) {} } }; _stA = requestAnimationFrame(f); }
+  const f = now => { const u = Math.min(1, (now - t0) / ms), e = 1 - Math.pow(1 - u, 3); window.scrollTo(0, Math.round(y0 * (1 - e))); if (u < 1) _stA = requestAnimationFrame(f); else { document.body.style.minHeight = ''; window._stAnim = 0; window._scrollMem[location.hash] = window.scrollY; try { listLock(); detLock(); } catch (er) {} } }; _stA = requestAnimationFrame(f); }
 function detLock() { const v = topView(); if (window._stAnim) return; const lk = (v === 'player' && state.player && /^(ov|bio|news)$/.test(state.player.tab)) || (v === 'team' && state.team && state.team.tab === 'news');
   if (lk && document.documentElement.scrollHeight - window.innerHeight < (state.player && state.player.tab === 'bio' ? 40 : 120)) { window.scrollTo(0, 0); document.documentElement.classList.add('lock1'); } }
 function listLock() { if (topView() !== 'list' || window._stAnim) return; const m = $app.querySelector(':scope > main'), n = m ? m.querySelectorAll('[data-game]').length : 99; if (n <= 4 && document.documentElement.scrollHeight - window.innerHeight < 220) { window.scrollTo(0, 0); document.documentElement.classList.add('lock1'); } }
@@ -4310,8 +4310,10 @@ const f1Iso = ev => { const nm = String((ev && ev.name) || ''); for (const [re, 
 const f1Flag = ev => { const c = f1Iso(ev); return c ? `<span class="f1fl">${c === 'EU' ? '🇪🇺' : String.fromCodePoint(...[...c].map(x => 127397 + x.charCodeAt(0)))}</span>` : '<span class="f1fl">🏁</span>'; };
 const f1Short = ev => { const n = String((ev && ev.name) || ''); const m = n.match(/([A-ZÀ-Ý][A-Za-zÀ-ÿ'.-]+(?:\s(?:[A-ZÀ-Ý][A-Za-zÀ-ÿ'.-]+|de|in))*\sGrand Prix(?:\sin\s\w+)?)$/); let s = m ? m[1] : n; const sp = ['Qatar Airways', 'Heineken', 'Aramco', 'Gulf Air', 'STC', 'Crypto.com', 'Lenovo', 'MSC Cruises', 'Pirelli', 'Moët & Chandon', 'Chandon', 'AWS', 'Tag Heuer', 'Singapore Airlines', 'Etihad Airways', 'Rolex', 'Formula 1', 'FORMULA 1']; sp.forEach(x => { s = s.replace(new RegExp('^' + x.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '\\s+', 'i'), ''); }); return s; };
 const f1Hs = id => `https://a.espncdn.com/i/headshots/rpm/players/full/${id}.png`;
+const f1DatesY = ev => f1Dates(ev) + (ev && ev._y && +ev._y !== (f1ShowY() || f1Year()) ? ev._y : '');
 const f1Dates = ev => { const a = new Date(ev.date), b = new Date(ev.endDate || ev.date); return a.getMonth() === b.getMonth() ? `${a.getDate()}–${b.getDate()}.${b.getMonth() + 1}.` : `${a.getDate()}.${a.getMonth() + 1}.–${b.getDate()}.${b.getMonth() + 1}.`; };
-const f1Comp = (ev, ab) => (ev.competitions || []).find(c => c.type && c.type.abbreviation === ab);
+const f1TM = y => (F1.team[y || 0] = F1.team[y || 0] || {});
+const f1Comp = (ev, ab) => (ev.competitions || []).find(c => c.type && (c.type.abbreviation === ab || (ab === 'SR' && c.type.abbreviation === 'Sprint')));
 const f1Done = c => !!(c && c.status && c.status.type && c.status.type.completed);
 const f1Pos = (c, aid) => { const x = c && (c.competitors || []).find(z => String(z.id) === String(aid)); return x ? x.order : null; };
 async function f1Season(y) { y = y || f1Year(); if (F1.sb[y]) return F1.sb[y]; const j = await getJson(F1A + 'scoreboard?dates=' + y); const evs = (j.events || []).slice().sort((a, b) => new Date(a.date) - new Date(b.date)); F1.sb[y] = evs; evs.forEach(e => { F1.ev = F1.ev || {}; F1.ev[e.id] = Object.assign(e, { _y: y }); }); return evs; }
@@ -4323,7 +4325,7 @@ async function f1Detail(eid, c, withStatus) {
   const p = (async () => { const base = F1C + 'events/' + eid + '/competitions/' + cid + '/competitors';
     const L = await getJson(base + '?limit=40'), items = L.items || [];
     /* teams are known from the entry list right away – show them before the per-driver stats arrive */
-    let nt = 0; items.forEach(it => { const t = it.vehicle && it.vehicle.manufacturer; if (t && F1.team[String(it.id)] !== t) { F1.team[String(it.id)] = t; nt++; } }); if (nt && topView() === 'lv' && state.lv && state.lv.kind === 'f1race') render();
+    let nt = 0; const TM = f1TM((F1.ev[eid] || {})._y); items.forEach(it => { const t = it.vehicle && it.vehicle.manufacturer; if (t && TM[String(it.id)] !== t) { TM[String(it.id)] = t; nt++; } }); if (nt && topView() === 'lv' && state.lv && state.lv.kind === 'f1race') render();
     const rows = await Promise.all(items.map(async it => { const id = String(it.id); let st = {}, status = null;
       try { st = f1StMap(await getJson(base + '/' + id + '/statistics')); } catch (e) {}
       if (withStatus) try { status = await getJson(base + '/' + id + '/status'); } catch (e) {}
@@ -4332,7 +4334,7 @@ async function f1Detail(eid, c, withStatus) {
   F1.rd[k] = p; p.catch(() => { delete F1.rd[k]; }); return p;
 }
 async function f1Teams(evs) { const done = evs.filter(e => f1Done(f1Comp(e, 'Race'))); const last = done[done.length - 1]; if (!last) return {}; if (F1.tm && F1.tm[last.id]) return F1.tm[last.id];
-  const rc = f1Comp(last, 'Race'), m = {}; try { const L = await getJson(F1C + 'events/' + last.id + '/competitions/' + rc.id + '/competitors?limit=40'); (L.items || []).forEach(it => { if (it.vehicle && it.vehicle.manufacturer && !F1.team[String(it.id)]) F1.team[String(it.id)] = it.vehicle.manufacturer; m[String(it.id)] = { team: (it.vehicle && it.vehicle.manufacturer) || '', color: (it.vehicle && it.vehicle.teamColor) || '' }; }); } catch (e) {}
+  const rc = f1Comp(last, 'Race'), m = {}; try { const L = await getJson(F1C + 'events/' + last.id + '/competitions/' + rc.id + '/competitors?limit=40'); (L.items || []).forEach(it => { const TM = f1TM(last._y); if (it.vehicle && it.vehicle.manufacturer && !TM[String(it.id)]) TM[String(it.id)] = it.vehicle.manufacturer; m[String(it.id)] = { team: (it.vehicle && it.vehicle.manufacturer) || '', color: (it.vehicle && it.vehicle.teamColor) || '' }; }); } catch (e) {}
   F1.tm = F1.tm || {}; F1.tm[last.id] = m; return m; }
 async function f1Circ(ev) { const id = ev && ev.circuit && ev.circuit.id; if (!id) return null; if (F1.circ[id] !== undefined) return F1.circ[id] === 'p' ? null : F1.circ[id]; F1.circ[id] = 'p';
   try { const j = await getJson(F1C + 'circuits/' + id); const hs = []; const walk = o => { if (!o || typeof o !== 'object') return; if (Array.isArray(o)) return o.forEach(walk); Object.entries(o).forEach(([k, v]) => { if (typeof v === 'string' && /^https?:.*\.(png|svg|jpe?g)/i.test(v)) hs.push([k, v]); else walk(v); }); }; walk(j);
@@ -4415,7 +4417,7 @@ function renderF1List(tabs) {
       const rc = f1Comp(e, 'Race'), done = f1Done(rc), w = done && rc && (rc.competitors || []).find(c => c.order === 1), cid = e.circuit && e.circuit.id, cu = F1.circ[cid];
       if (cid && cu === undefined) f1Circ(e).then(() => { if (topView() === 'list' && state.league === 'f1') render(); });
       return `<div class="card f1card" data-f1race="${esc(e.id)}" data-f1ry="${esc(e._y || '')}" id="f1c${esc(e.id)}"><div class="f1cl1"><div class="f1tt">${f1Flag(e)}<div class="f1nm">${esc(f1Short(e))}</div></div>
-        ${done ? `<div class="f1won"><span class="f1sd">${esc(f1Dates(e))}</span></div>${w ? `<div class="f1w"><img class="hs" src="${esc(f1Hs(w.id))}" alt="" onerror="this.onerror=null;this.src=SIL"><span>${esc(w.athlete && (w.athlete.displayName || w.athlete.shortName) || '')}</span></div>` : ''}` : `<div class="f1big">${esc(f1Dates(e))}</div><div class="f1ct">${esc((e.circuit && e.circuit.fullName) || '')}</div>`}</div>
+        ${done ? `<div class="f1won"><span class="f1sd">${esc(f1DatesY(e))}</span></div>${w ? `<div class="f1w"><img class="hs" src="${esc(f1Hs(w.id))}" alt="" onerror="this.onerror=null;this.src=SIL"><span>${esc(w.athlete && (w.athlete.displayName || w.athlete.shortName) || '')}</span></div>` : ''}` : `<div class="f1big">${esc(f1DatesY(e))}</div><div class="f1ct">${esc((e.circuit && e.circuit.fullName) || '')}</div>`}</div>
         <div class="f1map">${cu && cu !== 'p' ? f1MapHTML(cu) : cu === null || !cid ? '<span class="f1nomap">No map data</span>' : ''}</div></div>`; }).join('');
   }
   const os = document.getElementById('strip'), prev = os && state.stripKey === 'f1' ? os.scrollLeft : null; state.stripKey = 'f1';
@@ -4431,13 +4433,13 @@ function f1Fit() { requestAnimationFrame(() => { { const fl = $app.querySelector
   $app.querySelectorAll('.f1dn b').forEach(el => { if (el.scrollWidth > el.clientWidth + 1) { const w = el.textContent.trim().split(/\s+/); if (w.length > 1 && !/\.$/.test(w[0])) el.textContent = w[0][0] + '. ' + w.slice(1).join(' '); } }); }); }
 function f1CenterStrip(smooth) { const s = document.getElementById('strip'), on = s && s.querySelector('.on'); if (!on) return; const tgt = Math.max(0, on.offsetLeft - (s.clientWidth - on.offsetWidth) / 2); if (smooth) s.scrollTo({ left: tgt, behavior: 'smooth' }); else s.scrollLeft = tgt; }
 F1.tok = 0;
-function f1CancelAnim() { F1.tok++; window._stAnim = false; }
+function f1CancelAnim() { F1.tok++; if (window._stAnim) { window._stAnim = false; window._scrollMem[location.hash] = window.scrollY; } }
 function f1ScrollTo(id, smooth) {
   const c = document.getElementById('f1c' + id), f = $app.querySelector('.f1list > .f1card'); if (!c || !f) return;
   const target = Math.max(0, Math.round(c.offsetTop - f.offsetTop));
-  if (!smooth) { window.scrollTo(0, target); return; }
+  if (!smooth) { window.scrollTo(0, target); window._scrollMem[location.hash] = window.scrollY; return; }
   const tok = ++F1.tok, y0 = window.scrollY, dy = target - y0, T = Math.min(650, 260 + Math.abs(dy) / 6), t0 = performance.now(); window._stAnim = true;
-  const step = now => { if (tok !== F1.tok || topView() !== 'list' || state.league !== 'f1') { if (tok === F1.tok) window._stAnim = false; return; } const k = Math.min(1, (now - t0) / T), e = 1 - Math.pow(1 - k, 3); window.scrollTo(0, Math.round(y0 + dy * e)); if (k < 1) requestAnimationFrame(step); else window._stAnim = false; };
+  const step = now => { if (tok !== F1.tok || topView() !== 'list' || state.league !== 'f1') { if (tok === F1.tok) window._stAnim = false; return; } const k = Math.min(1, (now - t0) / T), e = 1 - Math.pow(1 - k, 3); window.scrollTo(0, Math.round(y0 + dy * e)); if (k < 1) requestAnimationFrame(step); else { window._stAnim = false; window._scrollMem[location.hash] = window.scrollY; } };
   requestAnimationFrame(step);
 }
 async function loadF1List() {
@@ -4536,8 +4538,11 @@ function f1StatsHTML(v, y) {
 }
 /* race page */
 const F1SES = { FP1: 'Free Practice 1', FP2: 'Free Practice 2', FP3: 'Free Practice 3', SS: 'Sprint Qualifying', SR: 'Sprint Race', Qual: 'Qualifying', Race: 'Race' };
-function f1Groups(ev) { const has = ab => !!f1Comp(ev, ab), G = []; const fp = ['FP1', 'FP2', 'FP3'].filter(has); if (fp.length) G.push(['fp', 'Free Practice', fp]); if (has('SS')) G.push(['ss', 'Sprint Qualifying', ['SS']]); if (has('SR')) G.push(['sr', 'Sprint Race', ['SR']]); if (has('Qual')) G.push(['q', 'Qualifying', ['Qual']]); if (has('Race') && has('Qual')) G.push(['g', 'Starting Grid', ['Race']]); if (has('Race')) G.push(['r', 'Race', ['Race']]); return G; }
-function f1GridMap(ev, v) { const c = f1Comp(ev, 'Race'); if (!c) return 0; const gk = 'g' + c.id; F1.grid = F1.grid || {}; if (F1.grid[gk] === undefined) { F1.grid[gk] = null; getJson(F1C + 'events/' + ev.id + '/competitions/' + c.id + '/competitors?limit=40').then(L => { const m = {}; (L.items || []).forEach(it => { if (it.vehicle && it.vehicle.manufacturer) F1.team[String(it.id)] = it.vehicle.manufacturer; if (it.startOrder > 0) m[String(it.id)] = it.startOrder; }); F1.grid[gk] = Object.keys(m).length >= 10 ? m : 0; if (F1.grid[gk] && v && v.gAuto && v.g === 'q' && !f1Done(c)) v.g = 'g'; if (state.lv === v) render(); }).catch(() => { F1.grid[gk] = 0; }); } return F1.grid[gk]; }
+function f1Groups(ev) { const has = ab => !!f1Comp(ev, ab), G = []; const fp = ['FP1', 'FP2', 'FP3'].filter(has); if (fp.length) G.push(['fp', 'Free Practice', fp]); if (has('SS')) G.push(['ss', 'Sprint Qualifying', ['SS']]); if (has('SR')) G.push(['sr', 'Sprint Race', ['SR']]); if (has('Qual')) G.push(['q', 'Qualifying', ['Qual']]); if (has('Race') && has('Qual')) G.push(['g', 'Starting Grid', ['Race']]); if (has('Race')) G.push(['r', 'Race', ['Race']]);
+  const known = new Set(['FP1', 'FP2', 'FP3', 'SS', 'SR', 'Sprint', 'Qual', 'Race']), dt = g => { const c = f1Comp(ev, g[2][0]); return (c && c.date ? new Date(c.date).getTime() : 0) - (g[0] === 'g' ? 1 : 0); };
+  (ev.competitions || []).forEach(c => { const ab = c.type && c.type.abbreviation; if (!ab || known.has(ab) || G.some(g => g[2].includes(ab))) return; const tx = String((c.type && (c.type.text || c.type.name)) || ab); G.push(['x' + ab, tx, [ab], /sprint/i.test(tx) && (!/qual|shoot/i.test(tx) || +ev._y === 2021) ? 'sprint' : /qual|shoot/i.test(tx) ? 'qT' : 'fp']); });
+  if (G.some(g => g[0][0] === 'x')) G.sort((a, b) => dt(a) - dt(b)); return G; }
+function f1GridMap(ev, v) { const c = f1Comp(ev, 'Race'); if (!c) return 0; const gk = 'g' + c.id; F1.grid = F1.grid || {}; if (F1.grid[gk] === undefined) { F1.grid[gk] = null; getJson(F1C + 'events/' + ev.id + '/competitions/' + c.id + '/competitors?limit=40').then(L => { const m = {}; (L.items || []).forEach(it => { if (it.vehicle && it.vehicle.manufacturer) f1TM(ev._y)[String(it.id)] = it.vehicle.manufacturer; if (it.startOrder > 0) m[String(it.id)] = it.startOrder; }); F1.grid[gk] = Object.keys(m).length >= 10 ? m : 0; if (F1.grid[gk] && v && v.gAuto && v.g === 'q' && !f1Done(c)) v.g = 'g'; if (state.lv === v) render(); }).catch(() => { F1.grid[gk] = 0; }); } return F1.grid[gk]; }
 function f1DefGroup(ev, G, v) { const D = ab => f1Done(f1Comp(ev, ab)), H = k => G.find(x => x[0] === k);
   if (H('r') && D('Race')) return H('r');
   if (H('q') && D('Qual')) return f1GridMap(ev, v) && H('g') ? H('g') : H('q');
@@ -4550,14 +4555,14 @@ function f1RaceHTML(v) {
   const grp = G.find(g => g[0] === v.g) || G[0], ey = ev._y || f1Year();
   const I = f1Idx(), code = I && I.evc[String(ev.id)], gpl = code && I.gp[code]; let ylist = []; if (gpl) ylist = [...new Set(gpl.map(x => x.y))]; else for (let y = Math.max(f1CurY(), ey); y >= 2002; y--) ylist.push(y); if (!ylist.includes(ey)) ylist.unshift(ey); ylist.sort((a, b) => b - a);
   const ysel = `<div class="ysel tys"><button class="ybtn" data-f1so="1">${esc(grp ? grp[1] : 'Session')}<i class="chev ${v.sOpen ? 'up' : ''}"></i></button>${v.sOpen ? `<div class="ylist">${G.map(g => `<button data-f1s="${g[0]}" class="${g[0] === v.g ? 'on' : ''}">${esc(g[1])}</button>`).join('')}</div>` : ''}</div>` + `<div class="ysel tys f1ys"><button class="ybtn" data-f1yo="1">${esc(String(ey))}<i class="chev ${v.yOpen ? 'up' : ''}"></i></button>${v.yOpen ? `<div class="ylist">${ylist.map(x => `<button data-f1ry2="${x}" class="${x === ey ? 'on' : ''}">${x}</button>`).join('')}</div>` : ''}</div>`;
-  const top = `<div class="f1rh">${f1Flag(ev)}<div><div class="lvt">${esc(f1Short(ev))}</div><div class="f1rsub">${esc(f1Dates(ev) + (ev.circuit && ev.circuit.fullName ? ' · ' + ev.circuit.fullName : ''))}</div></div></div>`;
+  const top = `<div class="f1rh">${f1Flag(ev)}<div><div class="lvt">${esc(f1Short(ev))}</div><div class="f1rsub">${esc(f1DatesY(ev) + (ev.circuit && ev.circuit.fullName ? ' · ' + ev.circuit.fullName : ''))}</div></div></div>`;
   if (!grp) return { ysel, top, body: msg('No results availible') };
   let sub = '', ab = grp[2][0];
   if (grp[0] === 'fp') { v.fp = grp[2].includes(v.fp) ? v.fp : (grp[2].filter(x => f1Done(f1Comp(ev, x))).pop() || grp[2][0]); ab = v.fp; if (grp[2].length > 1) sub = `<div class="seg pseg">${grp[2].map(x => `<button data-f1sub="${x}" class="${x === v.fp ? 'on' : ''}">${x}</button>`).join('')}</div>`; }
   const isQ = grp[0] === 'q' || grp[0] === 'ss'; if (isQ) { v.q = v.q || 'T'; const p = grp[0] === 'ss' ? 'SQ' : 'Q'; sub = `<div class="seg pseg">${[['T', 'Total'], ['1', p + '1'], ['2', p + '2'], ['3', p + '3']].map(([k, l]) => `<button data-f1q="${k}" class="${v.q === k ? 'on' : ''}">${l}</button>`).join('')}</div>`; }
-  const c = f1Comp(ev, ab), race = ab === 'Race' || ab === 'SR', mode = race ? (ab === 'SR' ? 'sprint' : 'race') : isQ ? 'q' + v.q : 'fp';
+  const c = f1Comp(ev, ab), race = ab === 'Race' || ab === 'SR' || grp[3] === 'sprint', mode = grp[3] || (race ? (ab === 'SR' ? 'sprint' : 'race') : isQ ? 'q' + v.q : 'fp');
   const cd = c && c.date ? new Date(c.date) : null, when = cd && !isNaN(cd) ? `${DAYS[cd.getDay()]} ${cd.getDate()}.${cd.getMonth() + 1}. - ${String(cd.getHours()).padStart(2, '0')}:${String(cd.getMinutes()).padStart(2, '0')}` : '';
-  let body = `<div class="sec f1sh">${esc(grp[0] === 'fp' ? F1SES[ab] : grp[1])}${when ? `<span class="f1when">${esc(when)}</span>` : ''}</div>` + sub;
+  let body = `<div class="sec f1sh">${esc(grp[0] === 'fp' ? (F1SES[ab] || ab) : grp[1])}${when ? `<span class="f1when">${esc(when)}</span>` : ''}</div>` + sub;
   if (!c) return { ysel, top, body: body + msg('No results availible') };
   const need0 = (cc, st) => { const k = cc.id + (st ? 's' : ''); F1.rdv = F1.rdv || {}; F1.rdp = F1.rdp || {}; if (F1.rdv[k] || F1.rdp[k]) return F1.rdv[k] || null; F1.rdp[k] = 1; f1Detail(ev.id, cc, st).then(rows => { F1.rdv[k] = rows; if (state.lv === v) render(); }).catch(() => { F1.rdp[k] = 0; }); return null; };
   if (grp[0] === 'g') { /* official grid (startOrder, incl. grid penalties); falls back to the qualifying order */
@@ -4575,7 +4580,7 @@ function f1RaceHTML(v) {
 const f1Ms = ms => { if (!(ms > 0)) return ''; const t = ms / 1000, m = Math.floor(t / 60), s = (t - m * 60).toFixed(3); return (m ? m + ':' + s.padStart(6, '0') : s); };
 function f1Table(rows, det, mode, y) {
   const dm = {}; (det || []).forEach(r => { dm[r.id] = r; });
-  let R = rows.map(r => Object.assign({}, r, dm[r.id] ? { team: dm[r.id].team, st: dm[r.id].st, status: dm[r.id].status } : {})); R.forEach(r => { if (!r.team) r.team = F1.team[r.id] || ''; });
+  let R = rows.map(r => Object.assign({}, r, dm[r.id] ? { team: dm[r.id].team, st: dm[r.id].st, status: dm[r.id].status } : {})); R.forEach(r => { if (!r.team) r.team = f1TM(y)[r.id] || ''; });
   const S = (r, n) => r.st && r.st[n] ? r.st[n] : null, V = (r, n) => { const x = S(r, n); return x && x.v > 0 ? x.v : 0; };
   let timeOf = () => '', ptsOf = () => '', fl = null;
   const pc = mode === 'race' || mode === 'sprint';
@@ -4625,7 +4630,7 @@ function route() {
   m = h.match(/^#\/f1\/(stats|std|race|drv|con)(?:\/(\w+))?/);
   if (m) { const k = 'f1' + m[1], y = window._f1y || null, fwd = !!F1.goTop; window._f1y = null; F1.mem = F1.mem || {}; const mem = F1.mem[location.hash];
     if (!fwd && mem) state.lv = mem; else if (!state.lv || state.lv.kind !== k || (state.lv.cat || null) !== (m[2] || null) || fwd) state.lv = { kind: k, league: 'f1', cat: m[2] || null, y: y ? +y : null, m: window._f1m || 'drv' };
-    F1.mem[location.hash] = state.lv; render(); if (F1.goTop) { F1.goTop = 0; window.scrollTo(0, 0); } f1Load(state.lv); return; }
+    F1.mem[location.hash] = state.lv; render(); if (F1.goTop) { F1.goTop = 0; window._forceY(0); } f1Load(state.lv); return; }
   m = h.match(/^#\/(standings|lstats)\/(\w+)/);
   if (m && LEAGUES[m[2]]) { if (!state.lv || state.lv.kind !== m[1] || state.lv.league !== m[2]) state.lv = { kind: m[1], league: m[2], mode: m[2] === 'nba' ? 'conf' : 'div', sy: m[1] === 'lstats' ? (state.lsY || {})[m[2]] || null : null, tm: m[1] === 'lstats' ? (state.lsTm || {})[m[2]] || null : null }; render(); loadLV(); return; }
   state.lv = null;
@@ -4636,6 +4641,9 @@ function route() {
   render(); loadList(true);
 }
 try { history.scrollRestoration = 'manual'; } catch (e) {}
+window._touchT = 0; document.addEventListener('touchstart', () => { window._touchT = Date.now(); }, { passive: true, capture: true });
+window._forceY = y => { const t0 = Date.now(), de = document.documentElement, go = () => { if (window._touchT > t0) return; if (Math.abs(window.scrollY - y) > 1) window.scrollTo(0, y); };
+  de.style.overflow = 'hidden'; window.scrollTo(0, y); requestAnimationFrame(() => { de.style.overflow = ''; go(); }); setTimeout(go, 60); setTimeout(go, 200); setTimeout(go, 450); };
 window._scrollMem = {}; window._hstack = [location.hash];
 window.addEventListener('scroll', () => { if (!window._stAnim) window._scrollMem[location.hash] = window.scrollY; }, { passive: true });
 window._snap = {}; window._curH = location.hash;
@@ -4654,7 +4662,7 @@ window.addEventListener('hashchange', () => { const h = location.hash, st = wind
     const sn = noR ? null : window._snap[h]; delete window._snap[h]; if (noR) window._backY = 0;
     { const u = document.getElementById('under'); if (u) { if (sn && sn.f) [...u.childNodes].forEach(n => { if (!(n.classList && n.classList.contains('undim'))) sn.f.appendChild(n); }); u.remove(); } }
     if (sn && Date.now() - sn.t < 30 * 60e3) { $app.style.transition = ''; $app.style.transform = ''; $app.innerHTML = ''; $app.appendChild(sn.f); (sn.sl || []).forEach(([x, l, tp]) => { x.scrollLeft = l; x.scrollTop = tp; }); $app.className = sn.cls; const bg = sn.bg; document.documentElement.style.background = bg.h; document.body.style.background = bg.b; document.documentElement.style.setProperty('--pbg', bg.p); const tm = document.querySelector('meta[name="theme-color"]'); if (tm && bg.t) tm.setAttribute('content', bg.t); document.documentElement.classList.remove('lock1'); window.scrollTo(0, sn.y); window._restoreKey = h; window._restoreY = sn.y; window._restoreVK = sn.vk;
-      const chk = () => { if (location.hash !== h) return; const mx = document.documentElement.scrollHeight - window.innerHeight; if (!$app.firstElementChild || !$app.querySelector('main')) { window._restoreKey = null; state.lastView = null; render(); return; } if (window.scrollY > mx + 1) window.scrollTo(0, Math.max(0, mx)); }; requestAnimationFrame(chk); setTimeout(chk, 250); }
+      const chk = () => { if (location.hash !== h) return; const mx = document.documentElement.scrollHeight - window.innerHeight; if (!$app.firstElementChild || !$app.querySelector('main')) { window._restoreKey = null; state.lastView = null; render(); return; } if (window.scrollY > mx + 1) window.scrollTo(0, Math.max(0, mx)); else if (Math.abs(window.scrollY - sn.y) > 2 && window._touchT < sn.t0) window.scrollTo(0, Math.min(sn.y, Math.max(0, mx))); }; sn.t0 = Date.now(); requestAnimationFrame(chk); setTimeout(chk, 80); setTimeout(chk, 250); setTimeout(chk, 500); }
   } else { st.push(h); window._backY = 0; window._backH = null;
     if (window._noSnap) window._noSnap = 0; else if (prev != null && $app.firstChild) { const sl = [...$app.querySelectorAll('.strip, .mstrip, .tw, .dtabs, .brsw, .tgs, .ysel .ylist')].filter(x => x.scrollLeft > 0 || x.scrollTop > 0).map(x => [x, x.scrollLeft, x.scrollTop]); const f = document.createDocumentFragment(); while ($app.firstChild) f.appendChild($app.firstChild); window._snap[prev] = { sl, vk: snapVK(), f, y: window._scrollMem[prev] || 0, cls: $app.className, bg: snapBg(), t: Date.now() };
       const ks = Object.keys(window._snap); if (ks.length > 6) delete window._snap[ks[0]]; } } });
