@@ -9,7 +9,8 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Score">
-<link rel="apple-touch-icon" href="icon.png">
+<link rel="apple-touch-icon" href="icon.png?v=2">
+<link rel="icon" type="image/png" href="icon.png?v=2">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="preconnect" href="https://site.api.espn.com" crossorigin>
 <link rel="preconnect" href="https://site.web.api.espn.com" crossorigin>
@@ -944,8 +945,6 @@ html.fsg .f1fl,html.fsg .f1fl *{font-family:'Apple Color Emoji','Segoe UI Emoji'
 .f1res .f1dn b{font-size:17px}
 .f1dn b{font-family:var(--num);font-weight:700;font-size:18px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .f1dn small{color:var(--mut);font-size:13.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.f1cl{display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:50%;color:#fff;font-weight:800;font-size:15px;flex:none;text-shadow:0 0 3px rgba(0,0,0,.6)}
-.f1cl.big{width:38px;height:38px}
 .f1t td{vertical-align:middle}
 .f1t th{font-family:var(--wide);font-stretch:112%;font-weight:800;font-size:12.5px;letter-spacing:.5px;text-transform:uppercase}
 .f1t th.l{text-align:left}
@@ -973,10 +972,6 @@ html.fsg .f1fl,html.fsg .f1fl *{font-family:'Apple Color Emoji','Segoe UI Emoji'
 .f1ph.con .f1dn b{font-size:30px;line-height:1}
 .f1ph.con .f1pp b{font-size:30px}
 .f1pp{width:58px;flex:none;text-align:center;margin-right:-2px}.f1pp b{font-family:var(--num);font-size:26px;display:block;line-height:1}.f1pp small{color:var(--mut);font-size:12px}
-.f1rcs{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-.f1rc{display:flex;align-items:center;gap:8px;background:#1c1c1e;border-radius:14px;padding:10px;min-height:52px;cursor:pointer}
-.f1rn{flex:1;min-width:0;font-size:13px;font-weight:600;line-height:1.2;overflow:hidden}
-.f1rn small{display:block;color:var(--mut);font-weight:500;font-size:11.5px;margin-top:2px}
 .f1rp{font-family:var(--num);font-weight:700;font-size:19px}
 .f1rp.p1{color:#ffd60a}.f1rp.p2{color:#d1d1d6}.f1rp.p3{color:#d0894a}
 .f1rh{display:flex;align-items:center;gap:10px;margin:2px 0 10px}
@@ -991,7 +986,6 @@ html.fsg .f1fl,html.fsg .f1fl *{font-family:'Apple Color Emoji','Segoe UI Emoji'
 .f1std .f1t th{font-family:var(--wide);font-stretch:105%;font-weight:800;font-size:15px;letter-spacing:0;text-transform:none}
 .f1st .ldr .ln small{display:block;color:var(--mut);font-size:13.5px;margin:1px 0 0;font-family:-apple-system,sans-serif;font-weight:500}
 .f1st .ldr .pn{font-family:var(--num);font-weight:700;font-size:18px}
-.f1prog{color:var(--mut);font-size:12px;margin:0 2px 8px}
 .f1ys{margin-left:6px}
 
 .f1ph .hs.heart{border-radius:0;background:#c8102e;-webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath d='M50 92C18 69 3 52 3 31 3 15 15 4 29 4c9 0 17 5 21 13 4-8 12-13 21-13 14 0 26 11 26 27 0 21-15 38-47 61z'/%3E%3C/svg%3E") center/100% 100% no-repeat;mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath d='M50 92C18 69 3 52 3 31 3 15 15 4 29 4c9 0 17 5 21 13 4-8 12-13 21-13 14 0 26 11 26 27 0 21-15 38-47 61z'/%3E%3C/svg%3E") center/100% 100% no-repeat;width:64px !important;height:60px !important;padding-top:8px;box-sizing:border-box;object-fit:cover;object-position:50% 0}
@@ -4302,7 +4296,6 @@ const F1CC = { australia: 'AU', china: 'CN', japan: 'JP', bahrain: 'BH', 'saudi 
 const F1NM = [[/austral/i, 'AU'], [/chin/i, 'CN'], [/japan/i, 'JP'], [/bahrain(?! grand prix in)/i, 'BH'], [/saudi/i, 'SA'], [/miami|las vegas|united states|\bus grand|usa/i, 'US'], [/canad/i, 'CA'], [/monaco/i, 'MC'], [/spanish|barcelona|madrid|spain/i, 'ES'], [/austria|styria/i, 'AT'], [/british|70th anniv/i, 'GB'], [/belgi/i, 'BE'], [/hungar/i, 'HU'], [/dutch/i, 'NL'], [/italian|emilia|tuscan|monza|san marino/i, 'IT'], [/azerbai/i, 'AZ'], [/malaysia/i, 'MY'], [/singapore/i, 'SG'], [/mexic/i, 'MX'], [/s[ãa]o paulo|brazil/i, 'BR'], [/qatar/i, 'QA'], [/abu dhabi/i, 'AE'], [/german|eifel/i, 'DE'], [/french/i, 'FR'], [/russia/i, 'RU'], [/turk/i, 'TR'], [/portug/i, 'PT'], [/korea/i, 'KR'], [/india/i, 'IN'], [/europe/i, 'EU']];
 const f1Iso = ev => { const nm = String((ev && ev.name) || ''); for (const [re, c] of F1NM) if (re.test(nm)) return c; const co = String((ev && ev.circuit && ev.circuit.address && ev.circuit.address.country) || '').toLowerCase(); return F1CC[co] || ''; };
 const f1Flag = ev => { const c = f1Iso(ev); return c ? `<span class="f1fl">${c === 'EU' ? '🇪🇺' : String.fromCodePoint(...[...c].map(x => 127397 + x.charCodeAt(0)))}</span>` : '<span class="f1fl">🏁</span>'; };
-const f1GP = ev => String((ev && (ev.name || ev.displayName)) || '').replace(/^.*?(?=\b(?:[A-ZÀ-Ý][\wÀ-ÿ'.-]*\s)*(?:Grand Prix|GP)\b)/, m => { const w = String(ev.name || '').match(/((?:[A-ZÀ-Ýa-zà-ÿ'.-]+\s)?(?:[A-ZÀ-Ýa-zà-ÿ'.-]+\s)?Grand Prix.*)$/); return ''; }).trim();
 const f1Short = ev => { const n = String((ev && ev.name) || ''); const m = n.match(/([A-ZÀ-Ý][A-Za-zÀ-ÿ'.-]+(?:\s(?:[A-ZÀ-Ý][A-Za-zÀ-ÿ'.-]+|de|in))*\sGrand Prix(?:\sin\s\w+)?)$/); let s = m ? m[1] : n; const sp = ['Qatar Airways', 'Heineken', 'Aramco', 'Gulf Air', 'STC', 'Crypto.com', 'Lenovo', 'MSC Cruises', 'Pirelli', 'Moët & Chandon', 'Chandon', 'AWS', 'Tag Heuer', 'Singapore Airlines', 'Etihad Airways', 'Rolex', 'Formula 1', 'FORMULA 1']; sp.forEach(x => { s = s.replace(new RegExp('^' + x.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '\\s+', 'i'), ''); }); return s; };
 const f1Hs = id => `https://a.espncdn.com/i/headshots/rpm/players/full/${id}.png`;
 const f1Dates = ev => { const a = new Date(ev.date), b = new Date(ev.endDate || ev.date); return a.getMonth() === b.getMonth() ? `${a.getDate()}–${b.getDate()}.${b.getMonth() + 1}.` : `${a.getDate()}.${a.getMonth() + 1}.–${b.getDate()}.${b.getMonth() + 1}.`; };
@@ -4340,10 +4333,10 @@ const f1Con = name => `<div class="f1d"><div class="f1dn"><b>${esc(name)}</b></d
 /* auto refresh: race weekend every 3 min, otherwise every 30 min (pull-to-refresh / refresh button force it) */
 const f1Sig = evs => (evs || []).map(e => e.id + (e.competitions || []).map(c => f1Done(c) ? 1 : 0).join('')).join('|');
 const f1Weekend = () => { const now = Date.now(); return Object.values(F1.sb).some(evs => (evs || []).some(e => now >= new Date(e.date).getTime() - 864e5 && now <= new Date(e.endDate || e.date).getTime() + 864e5)); };
-async function f1Refresh(now) {
-  const t = Date.now(), iv = f1Weekend() ? 3 * MIN : 30 * MIN; if (!now && t - (F1.lastRef || 0) < iv) return; if (now && t - (F1.lastRef || 0) < MIN) return; F1.lastRef = t;
+async function f1Refresh(now, force) {
+  const t = Date.now(), iv = f1Weekend() ? 3 * MIN : 30 * MIN; if (!force) { if (!now && t - (F1.lastRef || 0) < iv) return; if (now && t - (F1.lastRef || 0) < MIN) return; } F1.lastRef = t;
   let changed = false;
-  await Promise.all(Object.keys(F1.sb).map(async y => { try { const j = await getJson(F1A + 'scoreboard?dates=' + y, true), evs = (j.events || []).slice().sort((a, b) => new Date(a.date) - new Date(b.date));
+  await Promise.all(Object.keys(F1.sb).filter(y => +y >= f1Year() - 1).map(async y => { try { const j = await getJson(F1A + 'scoreboard?dates=' + y, true), evs = (j.events || []).slice().sort((a, b) => new Date(a.date) - new Date(b.date));
     if (f1Sig(evs) === f1Sig(F1.sb[y])) return; changed = true; F1.sb[y] = evs; evs.forEach(e => { F1.ev[e.id] = Object.assign(e, { _y: +y }); });
     delete F1.agg[y]; delete F1.st[y]; if (F1.tmY) delete F1.tmY[y]; F1.rdv = {}; F1.rdp = {}; F1.rd = {}; if (+y === f1Year()) F1.curY = 0; } catch (e) {} }));
   if (!changed) return; await f1ResolveY().catch(() => {});
@@ -4368,7 +4361,7 @@ function f1MapSrc(url) {
       if (cs.every(c => c[3] > 200)) { const bg = cs[0]; for (let i = 0; i < p.length; i += 4) { const dd = Math.abs(p[i] - bg[0]) + Math.abs(p[i + 1] - bg[1]) + Math.abs(p[i + 2] - bg[2]); if (dd < 60) p[i + 3] = 0; } }
       let x0 = W, y0 = H, x1 = -1, y1 = -1; for (let Y = 0; Y < H; Y++) for (let X = 0; X < W; X++) if (p[(Y * W + X) * 4 + 3] > 24) { if (X < x0) x0 = X; if (X > x1) x1 = X; if (Y < y0) y0 = Y; if (Y > y1) y1 = Y; }
       if (x1 < 0) return done('none'); x.putImageData(d, 0, 0); const o = document.createElement('canvas'); o.width = x1 - x0 + 1; o.height = y1 - y0 + 1; o.getContext('2d').drawImage(cv, x0, y0, o.width, o.height, 0, 0, o.width, o.height); done(o.toDataURL()); } catch (e) { done(url); } };
-  im.onerror = () => done('none');
+  im.onerror = () => { const t = new Image(); t.onload = () => done(url); t.onerror = () => done('none'); t.src = url; };
   im.src = url; return 'p';
 }
 const f1MapHTML = url => { const m = f1MapSrc(url); return m === 'p' ? '' : m && m !== 'none' ? `<img src="${m}" alt="">` : '<span class="f1nomap">No map data</span>'; };
@@ -4417,6 +4410,7 @@ function f1ScrollTo(id, smooth) {
   requestAnimationFrame(step);
 }
 async function loadF1List() {
+  if (forceNow() && Object.keys(F1.sb).length) return f1Refresh(true, true);
   const Y = f1Year();
   try { const cur = await f1Season(Y); F1.err = null; if (topView() === 'list' && state.league === 'f1') render();
     const ex = []; if (!cur.some(f1RaceDone)) ex.push(Y - 1); if (!cur.length || cur.every(f1RaceDone)) ex.push(Y + 1);
