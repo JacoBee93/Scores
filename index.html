@@ -787,7 +787,10 @@ td.n .slg{width:20px;height:20px;object-fit:contain;vertical-align:-6px;margin-l
 .phw .ptl{position:absolute;right:-8px;bottom:-4px;width:44px;height:44px;object-fit:contain;filter:drop-shadow(0 2px 4px rgba(0,0,0,.55)) drop-shadow(0 0 1px rgba(0,0,0,.6))}
 .gloss .gg .gon{background:#26314a;border-radius:999px;padding:5px 10px;margin:-5px -10px}
 .htabs{gap:7px}
-.htabs .pill{flex:1 1 0;min-width:0;display:flex;align-items:center;justify-content:center;padding:7px 0}
+.htabs .pill{flex:1 1 0;min-width:0;display:flex;align-items:center;justify-content:center;padding:0;height:calc(10px + 25.5px * 1.15);font-size:20px;line-height:1}
+.htabs .pill:not(.on){color:var(--mut)}
+.htabs .icon{height:calc(10px + 25.5px * 1.15);width:calc(10px + 25.5px * 1.15)}
+header:has(> .htabs){padding-top:calc(env(safe-area-inset-top) + 36.7px)}
 .htabs .icon{flex:none}
 .pill.f1{font-style:italic;letter-spacing:0}
 #toast{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom) + 30px);transform:translateX(-50%);background:#2c2c2e;color:#fff;padding:10px 16px;border-radius:12px;font-weight:600;font-size:14px;z-index:200;box-shadow:0 10px 30px rgba(0,0,0,.5);animation:ldin .2s}
@@ -1357,7 +1360,7 @@ async function loadList(silent) {
     if (lg === 'nfl' && !(W && W.cal)) {
       const cal = [];
       (((j.leagues || [])[0] || {}).calendar || []).forEach(sec => { const t = +sec.value; if (t !== 2 && t !== 3) return; (sec.entries || []).forEach(en => { if (/pro bowl/i.test(en.label || '')) return; cal.push({ t, w: +en.value, label: en.label || '', alt: en.alternateLabel || '' }); }); });
-      state.nflw = { cal, year: (j.season && j.season.year) || new Date().getFullYear(), sel: { t: (j.season && j.season.type) || 2, w: (j.week && j.week.number) || 1 } }; state.nflw.cur = Object.assign({}, state.nflw.sel);
+      state.nflw = { cal, year: (j.season && j.season.year) || new Date().getFullYear(), sel: { t: (j.season && j.season.type) || 2, w: (j.week && j.week.number) || 1 } }; state.nflw.cur = Object.assign({}, state.nflw.sel); state.nflw.t = Date.now();
       /* offseason: keep showing the last postseason week (Super Bowl) until the new season's schedule starts */
       if (![1, 2, 3].includes(state.nflw.sel.t)) { const post = cal.filter(c => c.t === 3), last = post[post.length - 1] || cal[cal.length - 1]; if (last) { state.nflw.sel = { t: last.t, w: last.w }; state.nflw.cur = Object.assign({}, state.nflw.sel); return loadList(silent); } }
     }
@@ -4911,6 +4914,8 @@ setInterval(() => {
 document.addEventListener('visibilitychange', () => {
   if (document.hidden) return;
   const v = topView();
+  /* NFL: after returning to the app re-ask ESPN which week is current (the app may sit in the background for days) */
+  { const W = state.nflw; if (W && W.cur && Date.now() - (W.t || 0) > 30 * MIN) { const onCur = W.sel && W.sel.t === W.cur.t && W.sel.w === W.cur.w; if (onCur) state.nflw = null; else W.t = Date.now(); } }
   if (v === 'game') loadGame(); else if (v === 'list' && state.league !== 'f1') loadList(true);
   if ((v === 'list' && state.league === 'f1') || (v === 'lv' && state.lv && /^f1/.test(state.lv.kind))) f1Refresh(true);
 });
