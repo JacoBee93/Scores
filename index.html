@@ -25,6 +25,9 @@
   --wide:'Archivo',-apple-system,sans-serif}
 html.fsg{--num:'Space Grotesk',-apple-system,sans-serif;--wide:'Space Grotesk',-apple-system,sans-serif}
 html.fsg *{font-family:'Space Grotesk',-apple-system,sans-serif!important;font-stretch:100%!important;font-size-adjust:.46}
+html.fbar{--wide:'Barlow Condensed',-apple-system,sans-serif}
+html.fbar *{font-family:'Barlow Condensed','Arial Narrow',-apple-system,sans-serif!important;font-stretch:100%!important}
+html.fbar body{font-weight:500}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
 html,body,button,input,td,th{font-variant-numeric:tabular-nums lining-nums}
@@ -937,7 +940,7 @@ html.one #app.lst,html.one body{min-height:0}
 .f1tt{display:flex;align-items:center;gap:8px;min-width:0;margin-bottom:0}
 .f1tt .f1fl{display:flex;align-items:center;justify-content:center;height:28px}
 .f1tt .f1nm{position:relative;top:-2px}
-html.fsg .f1fl,html.fsg .f1fl *{font-family:'Apple Color Emoji','Segoe UI Emoji','Noto Color Emoji',sans-serif!important;font-size-adjust:none!important}
+html.fsg .f1fl,html.fsg .f1fl *,html.fbar .f1fl,html.fbar .f1fl *{font-family:'Apple Color Emoji','Segoe UI Emoji','Noto Color Emoji',sans-serif!important;font-size-adjust:none!important}
 .f1nm{font-family:var(--num);font-weight:700;font-size:19px;line-height:1.1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .f1big{font-family:var(--num);font-weight:700;font-size:23px;line-height:1;letter-spacing:.2px;padding-left:var(--fo,5px);margin:3px 0 2px}
 .f1ct{padding-left:var(--fo,5px);color:var(--mut);font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -1008,7 +1011,7 @@ html.fsg .f1fl,html.fsg .f1fl *{font-family:'Apple Color Emoji','Segoe UI Emoji'
 <div id="app"></div>
 
 <script>
-try { localStorage.removeItem('design'); if (localStorage.getItem('font') === 'sg') document.documentElement.classList.add('fsg'); } catch (e) {}
+try { localStorage.removeItem('design'); const f = localStorage.getItem('font'); if (f === 'sg') document.documentElement.classList.add('fsg'); else if (f === 'bar') document.documentElement.classList.add('fbar'); } catch (e) {}
 const API = 'https://site.api.espn.com/apis/site/v2/sports/';
 const WEB = 'https://site.web.api.espn.com/apis/common/v3/sports/';
 const LEAGUES = {
@@ -4259,10 +4262,10 @@ function renderLeaders() {
     const o = document.createElement('div'); o.className = 'lpo';
     const m = document.createElement('div'); m.className = 'lpm';
     m.style.top = (r.bottom + 8) + 'px'; m.style.left = Math.min(r.left, window.innerWidth - 216) + 'px';
-    m.innerHTML = `<button data-cc>Clear cache</button><button data-fsw>Switch font${document.documentElement.classList.contains('fsg') ? ' (Space Grotesk)' : ' (Classic)'}</button>`;
+    m.innerHTML = `<button data-cc>Clear cache</button><button data-fsw>Switch font (${({ classic: 'Classic', bar: 'Barlow', sg: 'Space Grotesk' })[document.documentElement.classList.contains('fsg') ? 'sg' : document.documentElement.classList.contains('fbar') ? 'bar' : 'classic']})</button>`;
     o.addEventListener('click', close);
     m.addEventListener('click', ev => {
-      if (ev.target.closest('[data-fsw]')) { const on = document.documentElement.classList.toggle('fsg'); try { localStorage.setItem('font', on ? 'sg' : 'classic'); } catch (er) {} ev.target.closest('[data-fsw]').textContent = 'Switch font' + (on ? ' (Space Grotesk)' : ' (Classic)'); close(); render(); return; }
+      if (ev.target.closest('[data-fsw]')) { const de = document.documentElement, cur = de.classList.contains('fsg') ? 'sg' : de.classList.contains('fbar') ? 'bar' : 'classic', nx = { classic: 'bar', bar: 'sg', sg: 'classic' }[cur]; de.classList.toggle('fbar', nx === 'bar'); de.classList.toggle('fsg', nx === 'sg'); try { localStorage.setItem('font', nx); } catch (er) {} close(); render(); return; }
       if (!ev.target.closest('[data-cc]')) return;
       try { Object.keys(localStorage).forEach(k => { if (/^(lgs\d*_|tps_|athc$)/.test(k)) localStorage.removeItem(k); }); } catch (e) {}
       state.lgs = {}; state.athC = {}; state.lvC = {}; state.std = {}; _prefetched = {};
