@@ -2065,7 +2065,7 @@ function gameCols(g) {
   const A = [ca], Hh = [ch]; { const a1 = pick(e.away, 1), h1 = pick(e.home, 1); if (ok(a1)) A.push(bgOf(a1)); if (ok(h1)) Hh.push(bgOf(h1)); }
   if (dist(ca.slice(1), ch.slice(1)) < 90 || !vivid(ca) || !vivid(ch)) { let best = null;
     [[0, 0], [1, 0], [0, 1], [1, 1]].forEach(([i, j]) => { const x = A[i], y = Hh[j]; if (!x || !y || best) return; if (dist(x.slice(1), y.slice(1)) >= 90 && vivid(x) && vivid(y)) best = [x, y]; });
-    if (best) [ca, ch] = best; else { if (!vivid(ch)) ch = Hh.find(vivid) || '#c4ced4'; const fb = ['#3d8bff', '#f5a623', '#2ecc71', '#e74c3c', '#b45cff']; const pool = [ca].concat(A.slice(1), fb).filter(x => vivid(x) && dist(x.slice(1), ch.slice(1)) >= 110); ca = pool[0] || '#3d8bff'; } }
+    if (best) [ca, ch] = best; else { if (!vivid(ch)) ch = Hh.find(vivid) || '#8e8e93'; ca = '#e5e5ea'; } }
   return [ca, ch];
 }
 const TCOL = {
