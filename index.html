@@ -16,14 +16,14 @@
 <link rel="preconnect" href="https://sports.core.api.espn.com" crossorigin>
 <link rel="preconnect" href="https://a.espncdn.com">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@100..125,600..800&family=Barlow+Condensed:wght@600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@100..125,600..800&family=Barlow+Condensed:wght@500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
 <title>Scores</title>
 <style>
 :root{--bg:#000;--card:#1c1c1e;--mut:#8e8e93;--line:#2c2c2e;--acc:#6b2cf5;--live:#ff453a;
   --num:'Barlow Condensed','Arial Narrow',-apple-system,sans-serif;
   --wide:'Archivo',-apple-system,sans-serif}
 html.fsg{--num:'Space Grotesk',-apple-system,sans-serif;--wide:'Space Grotesk',-apple-system,sans-serif}
-html.fsg :is(.sec,.lh2,.lvt,.pill){font-stretch:100%}
+html.fsg *{font-family:'Space Grotesk',-apple-system,sans-serif!important;font-stretch:100%!important;font-size-adjust:.46}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
 html,body,button,input,td,th{font-variant-numeric:tabular-nums lining-nums}
@@ -78,7 +78,8 @@ header.d + main{padding-top:0}
 .strip{display:flex;gap:6px;overflow-x:auto;margin:10px 0 -3px;padding:0 0 3px;scrollbar-width:none;-webkit-overflow-scrolling:touch;scroll-snap-type:x mandatory}
 .strip .snap{scroll-snap-align:start;scroll-snap-stop:always}
 .strip::-webkit-scrollbar{display:none}
-.dy{flex:none;width:calc((100vw - 56px) / 5);background:var(--card);border-radius:12px;padding:5px 0;font-family:var(--num);font-weight:700;font-size:15px;display:flex;flex-direction:column;align-items:center;line-height:1.15;color:var(--mut)}
+.dy{flex:none;width:calc((100vw - 56px) / 5);background:var(--card);border-radius:12px;padding:5px 0;font-family:var(--num);font-weight:700;font-size:15px;display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1.15;color:var(--mut);height:calc(10px + 25.5px * 1.15);overflow:hidden}
+.dy > *{line-height:1.15}
 .dy small{font-family:-apple-system,sans-serif;font-size:10.5px;font-weight:600}
 .dy.on{background:var(--acc);color:#fff}
 /* karty zápasů */
@@ -432,10 +433,11 @@ body{min-height:100vh}
 .gl2 tr.nomore td{text-align:center !important;color:var(--mut);font-size:13px;padding:14px 0 4px !important;background:none !important}
 #artpop{position:fixed;top:0;left:0;width:0;height:0;overflow:visible;z-index:160;background:transparent;pointer-events:none;display:flex;align-items:flex-end;justify-content:center}
 .artbox{touch-action:pan-y;overscroll-behavior:contain;pointer-events:auto;box-shadow:0 18px 26px -10px rgba(0,0,0,.6),0 4px 6px -2px rgba(0,0,0,.35),inset 0 1px 0 rgba(255,255,255,.07);position:relative;width:calc(100% - 20px);max-width:620px;max-height:88vh;overflow-y:auto;background:#1c1c1e;border-radius:22px 22px 0 0;padding:18px 18px calc(28px + env(safe-area-inset-bottom));box-sizing:border-box;-webkit-overflow-scrolling:touch}
-.artbox h2{font-size:21px;line-height:1.25;margin:4px 40px 6px 0}
-.artbox h3{font-size:16px;margin:16px 0 4px}
-.artbox p{font-size:15.5px;line-height:1.5;color:#e5e5ea;margin:10px 0}
-.artby{font-size:12.5px;color:var(--mut)}
+.artbox{font-family:var(--num)}
+.artbox h2{font-family:var(--wide);font-stretch:105%;font-weight:800;font-size:21px;line-height:1.25;margin:4px 40px 6px 0}
+.artbox h3{font-family:var(--num);font-weight:700;font-size:18px;margin:16px 0 4px}
+.artbox p{font-family:var(--num);font-weight:500;font-size:18px;line-height:1.4;color:#e5e5ea;margin:10px 0}
+.artby{font-family:var(--num);font-weight:600;font-size:14px;color:var(--mut)}
 .artimg{width:100%;border-radius:12px;margin:26px 0 8px;display:block}
 .artx{position:sticky;top:0;float:right;width:36px;height:36px;border-radius:50%;background:#3a3a3c;font-size:22px;z-index:2;margin:-4px -4px 0 0}
 .hl{color:#fff;font-weight:700;background:rgba(138,180,255,.18);border-radius:4px;padding:0 2px}
@@ -1633,7 +1635,7 @@ function renderList() {
     body = state.events.map(e => {
       const d = new Date(e.date), day = DAYS[d.getDay()] + ' ' + d.getDate() + '.' + (d.getMonth() + 1) + '.';
       let h = '';
-      if (day !== last) { h += `<div class="sec">${day}</div>`; last = day; }
+      if (day !== last) { h += `<div class="sec dh">${day}</div>`; last = day; }
       const mark = firstUp && e.state !== 'post' ? (firstUp = false, ' data-first="1"') : '';
       return h + `<div class="fwrap"${mark}>${cardHTML(e)}</div>`;
     }).join('');
