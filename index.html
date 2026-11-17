@@ -985,7 +985,7 @@ html.one #app.lst,html.one body{min-height:0}
 .f1tt .f1nm{position:relative;top:-2px}
 html.fsg .f1fl,html.fsg .f1fl *,html.fbar .f1fl,html.fbar .f1fl *{font-family:'Apple Color Emoji','Segoe UI Emoji','Noto Color Emoji',sans-serif!important;font-size-adjust:none!important}
 .f1nm{font-family:var(--num);font-weight:700;font-size:19px;line-height:1.1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.f1big{font-family:var(--num);font-weight:700;font-size:23px;line-height:1;letter-spacing:.2px;padding-left:var(--fo,5px);margin:3px 0 2px}
+.f1big{font-family:var(--num);font-weight:700;font-size:22px;line-height:1;letter-spacing:.2px;padding-left:var(--fo,5px);margin:3px 0 2px}
 .f1ct{padding-left:var(--fo,5px);color:var(--mut);font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .f1won{color:var(--mut);font-size:14px;padding-left:46px;line-height:1.1;margin-bottom:3px}
 .f1w{display:flex;align-items:center;gap:8px;font-family:var(--num);font-size:17px;font-weight:700;line-height:1.25;min-width:0}
@@ -1557,6 +1557,7 @@ async function loadPlayer() {
   } catch (e) {}
   const err = r => r.status === 'rejected' ? String((r.reason && r.reason.message) || r.reason) : null;
   p.gl = res[0].status === 'fulfilled' ? res[0].value : null; p.glErr = err(res[0]);
+  if (p.league === 'nfl' && p.gl) try { await nflFixGl(p.gl); } catch (e) {}
   p.st = res[1].status === 'fulfilled' ? res[1].value : null; p.stErr = err(res[1]);
   if (p.league === 'nhl' && p.gl && p.st) try { const N = p.gl.names || [], k = N.findIndex(n => /^shotsTotal$|^shots$/i.test(n)); if (k >= 0) { let sum = 0, any = false, last = 0;
     (p.gl.seasonTypes || []).filter(st => /regular/i.test(st.displayName || '')).forEach(st => (st.categories || []).forEach(c => (c.events || []).forEach(ev => { const v = parseFloat((ev.stats || [])[k]); if (!isNaN(v)) { sum += v; any = true; } const d = p.gl.events && p.gl.events[ev.eventId] && new Date(p.gl.events[ev.eventId].gameDate); if (d && d > last) last = d; })));
@@ -1566,6 +1567,22 @@ async function loadPlayer() {
   if (p.st) loadPost(p);
   loadInj(p);
 }
+/* ESPN sometimes sends NFL games with a placeholder date (e.g. 1993-01-31). Repair them from the weekly scoreboard (cached). */
+const nflBad = d => { const t = new Date(d); return !d || isNaN(t) || t.getFullYear() < 2000; };
+const nflDM = (() => { let m = {}; try { m = JSON.parse(localStorage.getItem('nflDates') || '{}'); } catch (e) {} return m; })();
+const nflDMsave = () => { try { const k = Object.keys(nflDM); if (k.length > 3000) k.slice(0, k.length - 3000).forEach(x => delete nflDM[x]); localStorage.setItem('nflDates', JSON.stringify(nflDM)); } catch (e) {} };
+async function nflFixDates(items) { let mem = false;
+  /* remember every good date we see; repair bad ones from that memory first, then from the weekly scoreboard */
+  items.forEach(x => { const d = x.get(); if (!nflBad(d)) { if (nflDM[x.id] !== d) { nflDM[x.id] = d; mem = true; } } else if (nflDM[x.id]) x.set(nflDM[x.id]); }); if (mem) nflDMsave();
+  const bad = items.filter(x => nflBad(x.get()) && +x.week); if (!bad.length) return mem; const by = {};
+  bad.forEach(x => { const k = x.year + '|' + (x.type || 2) + '|' + x.week; (by[k] = by[k] || []).push(x); }); let ch = false;
+  await Promise.all(Object.entries(by).map(async ([k, xs]) => { const [y, t, w] = k.split('|'); try { const j = await getJson(API + 'football/nfl/scoreboard?seasontype=' + t + '&week=' + w + '&dates=' + y); (j.events || []).forEach(ev => xs.forEach(x => { if (String(ev.id) === String(x.id) && !nflBad(ev.date)) { x.set(ev.date); nflDM[x.id] = ev.date; ch = true; } })); } catch (e) {} }));
+  if (ch) nflDMsave(); return ch; }
+function nflFixSched(j) { if (!j || !Array.isArray(j.events)) return Promise.resolve(false); const y = (j.requestedSeason && j.requestedSeason.year) || (j.season && j.season.year);
+  return nflFixDates(j.events.map(ev => ({ id: ev.id, week: ev.week && ev.week.number, type: (ev.seasonType && ev.seasonType.type) || (j.requestedSeason && j.requestedSeason.type), year: (ev.season && ev.season.year) || y, get: () => ev.date, set: d => { ev.date = d; ((ev.competitions || [])[0] || {}).date = d; } }))); }
+function nflFixGl(j) { if (!j || !j.events) return Promise.resolve(false); const sf = (j.filters || []).find(f => /season$/i.test(f.name || '')), y = sf && sf.value, tp = {};
+  (j.seasonTypes || []).forEach(st => { const t = /post/i.test(st.displayName || '') ? 3 : /pre/i.test(st.displayName || '') ? 1 : 2; (st.categories || []).forEach(c => (c.events || []).forEach(e => { tp[e.eventId] = t; })); });
+  return nflFixDates(Object.entries(j.events).map(([id, ev]) => ({ id, week: ev.week, type: tp[id] || 2, year: y, get: () => ev.gameDate, set: d => { ev.gameDate = d; } }))); }
 async function loadInj(p) {
   const a = p.bio; if (!a) return;
   const has = x => Array.isArray(x) && x.some(i => i && (i.status || i.type));
@@ -1597,6 +1614,7 @@ async function loadTeam() {
   t.info = val(res[0]); t.roster = val(res[1]); t.rosterErr = er(res[1]);
   t.sched = val(res[2]); t.schedErr = er(res[2]); t.stats = val(res[3]); t.statsErr = er(res[3]);
   if (t.league === 'nhl') { const c = await coreTeamStats('nhl', t.id, t.sy || seasonYear('nhl')); if (c) { t.stats = t.stats || {}; t.stats._core = c; } }
+  if (t.league === 'nfl') try { await Promise.all([res[2], res[4], res[5]].map(r => nflFixSched(val(r)))); } catch (e) {}
   const seen = new Set(); t.events = [];
   [res[2], res[4], res[5]].forEach(r => {
     const j = val(r);
@@ -2888,7 +2906,7 @@ async function loadGlSeason(p, y) {
   p.glBy = p.glBy || {};
   if (p.glBy[y]) return;
   p.glBy[y] = { loading: true };
-  try { p.glBy[y] = { j: await getJson(WEB + LEAGUES[p.league].path + '/athletes/' + p.id + '/gamelog?season=' + y) }; }
+  try { const gj = await getJson(WEB + LEAGUES[p.league].path + '/athletes/' + p.id + '/gamelog?season=' + y); if (p.league === 'nfl') try { await nflFixGl(gj); } catch (e) {} p.glBy[y] = { j: gj }; }
   catch (e) { p.glBy[y] = { err: String((e && e.message) || e) }; }
   if (state.player === p && topView() === 'player') render();
 }
