@@ -507,8 +507,8 @@ tr.zb > td{background:#26262a !important}
 .wpw{position:relative;height:150px;cursor:pointer}
 .wpexp{position:absolute;right:8px;top:4px;color:var(--mut);font-size:16px;pointer-events:none}
 .wph{font-size:11.5px;color:var(--mut);text-align:center;margin-top:5px}
-#wpov{position:fixed;inset:0;z-index:200;background:var(--card);display:flex;align-items:center;justify-content:center}
-#wpov .wpbox{width:100vw;height:100vh;padding:14px 18px calc(14px + env(safe-area-inset-bottom));box-sizing:border-box;display:flex;flex-direction:column;background:var(--card)}
+#wpov{position:fixed;inset:0;z-index:200;background:#000;display:flex;align-items:center;justify-content:center}
+#wpov .wpbox{width:100vw;height:100vh;padding:14px 18px calc(14px + env(safe-area-inset-bottom));box-sizing:border-box;display:flex;flex-direction:column;background:#000}
 #wpov.rot .wpbox{position:absolute;left:50%;top:50%;flex:none;width:100vh;height:100vw;transform:translate(-50%,-50%) rotate(90deg);padding:14px max(28px, env(safe-area-inset-top)) 14px}
 #wpov .wptop{display:flex;align-items:flex-start;gap:10px}
 #wpov .wpi{flex:1;min-height:62px}
@@ -1461,7 +1461,7 @@ window.isSAm = () => navigator.standalone === true || (window.matchMedia && matc
     el.style.cssText = `position:fixed;inset:0;overflow:hidden;z-index:0;pointer-events:none;background:${(sn && sn.bg && sn.bg.p) || '#000'}`; document.body.insertBefore(el, $app);
     if (sn && sn.f && sn.f.firstChild) { el.appendChild(sn.f); (sn.sl || []).forEach(([x, l, tp]) => { x.scrollLeft = l; x.scrollTop = tp; }); el.scrollTop = sn.y || 0; }
     const dim = document.createElement('div'); dim.className = 'undim'; dim.style.cssText = 'position:fixed;inset:0;background:#000;opacity:.35;pointer-events:none;z-index:60'; el.appendChild(dim); U = { el, sn, dim }; };
-  document.addEventListener('touchstart', e => { E = null; if (!isSAm() || e.touches.length !== 1 || topView() === 'list' || document.getElementById('wpov')) return; const x = e.touches[0].clientX; if (x > 24) return; E = { x0: x, y0: e.touches[0].clientY, dx: 0, on: false, h: location.hash }; }, { passive: true });
+  document.addEventListener('touchstart', e => { E = null; if (true || !isSAm() || e.touches.length !== 1 || topView() === 'list' || document.getElementById('wpov')) return; const x = e.touches[0].clientX; if (x > 24) return; E = { x0: x, y0: e.touches[0].clientY, dx: 0, on: false, h: location.hash }; }, { passive: true });
   window.addEventListener('hashchange', () => { if (E && E.on) { E = null; reset(); unUnder(); } });
   document.addEventListener('touchmove', e => { if (!E) return; const t = e.touches[0], dx = t.clientX - E.x0, dy = t.clientY - E.y0;
     if (!E.on) { if (Math.abs(dy) > 12 && Math.abs(dy) > dx) { E = null; return; } if (dx < 10) return; E.on = true; const ap = document.getElementById('artpop'); if (ap) ap.style.visibility = 'hidden';
@@ -1935,7 +1935,7 @@ function openWp() {
   closeWp();
   const ov = document.createElement('div'); ov.id = 'wpov';
   ov.innerHTML = `<div class="wpbox"><div class="wptop"><div class="wpi" id="wpi">${wpInfo(W.pts.length - 1)}</div><button class="wpclose" data-wpclose="1">×</button></div><div class="wpw big">${src.outerHTML.replace('id="wpsvg"', 'id="wpsvg2"')}<div class="wpl t">${esc(W.e.h)}</div><div class="wpl b">${esc(W.e.a)}</div></div></div>`;
-  document.body.appendChild(ov); document.body.style.overflow = 'hidden'; window._wpBg = [document.documentElement.style.background, (document.querySelector('meta[name="theme-color"]') || {}).content]; { const cc = getComputedStyle(document.documentElement).getPropertyValue('--card').trim() || '#1c1c1e'; document.documentElement.style.background = cc; const tm = document.querySelector('meta[name="theme-color"]'); if (tm) tm.setAttribute('content', cc); }
+  document.body.appendChild(ov); document.body.style.overflow = 'hidden'; window._wpBg = [document.documentElement.style.background, (document.querySelector('meta[name="theme-color"]') || {}).content]; { const cc = '#000000'; document.documentElement.style.background = cc; const tm = document.querySelector('meta[name="theme-color"]'); if (tm) tm.setAttribute('content', cc); }
   const c = ov.querySelector('.wpcur'); if (c) c.setAttribute('opacity', '.8');
   fitWp();
 }
@@ -2374,7 +2374,7 @@ function pvInjuries(g) {
   const rows = mine.length ? mine.slice(0, 12).map(i => {
     const a = i.athlete || {}, st = String(i.status || (i.type && i.type.description) || ''), det = (i.details && (i.details.type || i.details.detail)) || i.shortComment || '';
     const red = /out|^ir|injured reserve|suspen/i.test(st), pos = (a.position && a.position.abbreviation) || '';
- return `<div class="ir" data-player="${esc(a.id)}" data-pl="${g.league}" data-pn="${esc(a.displayName || '')}" data-pp="${esc(pos)}" data-pj="${esc(a.jersey || '')}" data-pt="${esc(t.name || '')}"><img class="hs" src="${esc(hsOf(a, g.league))}" alt="" onerror="this.onerror=null;this.src=SIL"><div class="grow"><div class="ln">${esc(fitNm(a.displayName || a.shortName || ''))}</div><div class="ls">${esc([pos, a.jersey ? '#' + a.jersey : ''].filter(Boolean).join(' · '))}</div></div><div class="is"><span class="chip ${red ? 'red' : ''}">${esc(st)}</span><div class="ls">${esc(det)}</div></div></div>`;
+ return `<div class="ir" data-player="${esc(a.id)}" data-pl="${g.league}" data-pn="${esc(a.displayName || '')}" data-pp="${esc(pos)}" data-pj="${esc(a.jersey || '')}" data-pt="${esc(t.name || '')}"><img class="hs" src="${esc(hsOf(a, g.league))}" alt="" onerror="this.onerror=null;this.src=SIL"><div class="grow"><div class="ln">${esc(a.displayName || a.shortName || '')}</div><div class="ls">${esc([pos, a.jersey ? '#' + a.jersey : ''].filter(Boolean).join(' · '))}</div></div><div class="is"><span class="chip ${red ? 'red' : ''}">${esc(st)}</span><div class="ls">${esc(det)}</div></div></div>`;
   }).join('') : msg('No reported injuries.');
   return `<section class="pv"><div class="sec">Injury report</div>${seg}${rows}</section>`;
 }
@@ -2841,10 +2841,12 @@ function bioHTML(p) {
   const teams = [];
   { const E = [], sk = new Set(); (statCats(p.st, p.league)[0] ? [statCats(p.st, p.league)[0]] : []).forEach(c => c.rows.forEach((r, i) => { if (!r.year || !r.sub || !/^[A-Z]{2,4}$/.test(r.sub)) return; const k = r.year + r.sub; if (sk.has(k)) return; sk.add(k); E.push({ y: +r.year, ab: r.sub, tid: r.tid, i }); }));
     if (!E.length) statCats(p.st, p.league).forEach(c => c.rows.forEach((r, i) => { if (!r.year || !r.sub || !/^[A-Z]{2,4}$/.test(r.sub)) return; const k = r.year + r.sub; if (sk.has(k)) return; sk.add(k); E.push({ y: +r.year, ab: r.sub, tid: r.tid, i }); }));
-    const YS = [...new Set(E.map(e => e.y))].sort((a, b) => a - b), by = y => E.filter(e => e.y === y), seq = []; let last = null;
-    YS.forEach((y, k) => { const g = by(y), nx = YS[k + 1] != null ? by(YS[k + 1]).map(e => e.ab) : [];
-      g.sort((p, q) => ((p.ab === last ? -1 : 0) - (q.ab === last ? -1 : 0)) || ((nx.includes(p.ab) ? 1 : 0) - (nx.includes(q.ab) ? 1 : 0)) || p.i - q.i); g.forEach(e => { e.trd = g.length > 1 && e !== g[0]; seq.push(e); }); last = g[g.length - 1].ab; });
-    let cur = null; seq.forEach(e => { if (cur && cur.ab === e.ab) { cur.y1 = e.y; return; } cur = { ab: e.ab, tid: e.tid, y0: e.y, y1: e.y, trd: e.trd }; teams.push(cur); }); }
+    const byT = {}; E.forEach(e => { if (e.ab === 'TOT') return; (byT[e.ab] = byT[e.ab] || { tid: e.tid, ys: new Set() }).ys.add(e.y); });
+    const playedFor = y => Object.keys(byT).filter(ab => byT[ab].ys.has(y));
+    Object.entries(byT).forEach(([ab, o]) => { const ys = [...o.ys].sort((a, b) => a - b); let cur = null;
+      ys.forEach(y => { if (cur) { let brk = false; for (let q = cur.y1 + 1; q < y; q++) { const pf = playedFor(q); if (pf.length && !pf.includes(ab)) { brk = true; break; } } if (!brk) { cur.y1 = y; return; } }
+        const others = playedFor(y).filter(x => x !== ab), trd = others.some(x => byT[x].ys.has(y - 1)) && !o.ys.has(y - 1);
+        cur = { ab, tid: o.tid, y0: y, y1: y, trd }; teams.push(cur); }); }); }
   teams.sort((x, y) => y.y1 - x.y1);
   const tname = t => { const x = (state.teamList[p.league] || []).find(z => z.abbr === t.ab || z.id === String(t.tid)); return x ? x.name : t.ab; };
   const yr = y => p.league === 'nfl' ? String(y) : (y - 1) + '-' + String(y).slice(2);
@@ -3002,7 +3004,7 @@ function teamInjHTML(t) {
     .sort((x, y) => rk(x.st) - rk(y.st));
   const tn = teamHead(t).name;
   return `<section class="pv">${rows.map(({ a, st, det, ret }) => { const pos = (a.position && a.position.abbreviation) || '', red = /out|^ir|injured|suspen/i.test(st);
-    return `<div class="ir" data-player="${esc(a.id)}" data-pl="${t.league}" data-pn="${esc(a.displayName || '')}" data-pp="${esc(pos)}" data-pj="${esc(a.jersey || '')}" data-pt="${esc(tn)}"><img class="hs" src="${esc(hsOf(a, t.league))}" alt="" onerror="this.onerror=null;this.src=SIL"><div class="grow"><div class="ln">${esc(fitNm(a.displayName || a.shortName || ''))}</div><div class="ls">${esc([pos, a.jersey ? '#' + a.jersey : ''].filter(Boolean).join(' · '))}</div></div><div class="is"><span class="chip ${red ? 'red' : ''}">${esc(st)}</span><div class="ls">${esc([det, ret ? 'Return ' + fmtShort(ret) : ''].filter(Boolean).join(' · '))}</div></div></div>`; }).join('')}</section>`;
+    return `<div class="ir" data-player="${esc(a.id)}" data-pl="${t.league}" data-pn="${esc(a.displayName || '')}" data-pp="${esc(pos)}" data-pj="${esc(a.jersey || '')}" data-pt="${esc(tn)}"><img class="hs" src="${esc(hsOf(a, t.league))}" alt="" onerror="this.onerror=null;this.src=SIL"><div class="grow"><div class="ln">${esc(a.displayName || a.shortName || '')}</div><div class="ls">${esc([pos, a.jersey ? '#' + a.jersey : ''].filter(Boolean).join(' · '))}</div></div><div class="is"><span class="chip ${red ? 'red' : ''}">${esc(st)}</span><div class="ls">${esc([det, ret ? 'Return ' + fmtShort(ret) : ''].filter(Boolean).join(' · '))}</div></div></div>`; }).join('')}</section>`;
 }
 function renderTeam() {
   const t = state.team, h = teamHead(t);
@@ -3112,7 +3114,7 @@ function scheduleHTML(t) {
 const catName = (title, labels, league) => { const L = labels || []; if (league === 'nhl') { if (L.includes('GAA') || L.includes('SV%')) return 'Goalies'; if (L.includes('PTS') && L.includes('PIM')) return 'Skaters'; } return CAT_NAME[String(title).toLowerCase()] || (/regular season/i.test(title) ? 'Season' : title); };
 const CAT_NAME = { skating: 'Skaters', goaltending: 'Goalies', general: 'General' };
 const PREF = { nhl: ['GP','G','A','PTS','+/-','PIM','S','GS','W','L','OTL','GAA','SV%'], nba: ['GP','MIN','PTS','REB','AST','STL','BLK','FG%','3P%','FT%'] };
-const fitNm = n => String(n || '').length >= 20 ? shortNm(n) : n;
+const fitNm = n => { const t = String(n || '').trim(), p = t.split(/\s+/); return t.length >= 20 && p.length > 1 ? p[0][0] + '. ' + p.slice(1).join(' ') : t; };
 const shortNm = n => { const p = String(n || '').trim().split(/\s+/); if (p.length < 2) return n; let rest = p.slice(1).join(' '); if (/-/.test(rest) && rest.length > 12) rest = rest.replace(/^[^\s-]+-/, ''); return p[0][0] + '. ' + rest; };
 const lsGet = (k, ttl) => { try { const o = JSON.parse(localStorage.getItem(k) || 'null'); return o && Date.now() - o.t < ttl ? o.d : null; } catch (e) { return null; } };
 const lsSet = (k, d, listKey, max) => {
