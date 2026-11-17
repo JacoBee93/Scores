@@ -726,10 +726,10 @@ td.n .slg{width:20px;height:20px;object-fit:contain;vertical-align:-6px;margin-l
 .lvt.lvy{position:relative;z-index:50}
 .stn tr{cursor:pointer}
 .stn tr.cut td{border-bottom:2px solid #e5484d !important}
-.stn td.n .tc{display:flex;align-items:center;gap:8px;min-width:0}
+.stn td.n .tc{display:flex;align-items:center;gap:6px;min-width:0}
 .stn td.n .rk{color:#aeaeb2;width:18px !important;font-family:-apple-system,sans-serif;font-size:12px;font-weight:600;width:16px;text-align:right;flex:none}
 .stn td.n img{width:22px;height:22px;object-fit:contain;flex:none}
-.stn td.n .pn{overflow:hidden;text-overflow:ellipsis}
+.stn td.n .pn{overflow:hidden;text-overflow:ellipsis;padding:2px 0 4px;margin:-2px 0 -4px;line-height:1.2}
 .ldr{display:flex;align-items:center;gap:10px;padding:8px 0;cursor:pointer}
 .ldr + .ldr{border-top:1px solid #2c2c2e}
 .ldr .rk{width:16px;color:#aeaeb2;font-size:13px;font-weight:600;text-align:right;flex:none}
@@ -1055,7 +1055,9 @@ html.fsg{--capc:.331em}
 /* logos sit on the centre of the capitals next to them */
 .gl2 td.go img{vertical-align:calc(var(--capc) - 10px) !important}
 .sch .opp img{vertical-align:calc(var(--capc) - 12px) !important}
-td.n .slg{vertical-align:calc(var(--capc) - 10px)}
+td.n .slg{vertical-align:calc(var(--capc) - 10px);position:relative;top:1.5px}
+html.fsg td.n .slg{top:.75px}
+.tw td.n,.tw th.n{z-index:3}
 /* schedule = gamelog typography */
 .sch td.n .pn{font-size:14.5px;font-weight:500}
 .sch td.n .pn .sdw{color:var(--mut);font-size:12px;align-self:center}
@@ -1169,6 +1171,8 @@ function pmAlign(root) {
     [...tb.tBodies[0].rows].forEach(r => { const cell = r.cells[ci]; if (!cell || cell.querySelector('*')) return; const m = cell.textContent.trim().match(/^([+\-−]?)(\d+)$/); if (!m) return; cell.innerHTML = `<span class="pmh">${m[1] ? `<i>${m[1]}</i>` : ''}${m[2]}</span>`; }); });
 }
 /* gamelog: put the score dash exactly halfway between the opponent name and the first stat column */
+/* standings: show the whole team name – shrink a long one a little (down to 84 %) before falling back to the ellipsis */
+function stnFit(root) { (root || $app).querySelectorAll('table.stn td.n .pn').forEach(p => { p.style.fontSize = ''; const w = p.clientWidth, sw = p.scrollWidth; if (sw <= w + .5) return; const fs = parseFloat(getComputedStyle(p).fontSize); p.style.fontSize = Math.max(fs * .84, Math.floor(fs * w / sw * 10) / 10) + 'px'; }); }
 function glDash(root) { (root || $app).querySelectorAll('table.gl2').forEach(tb => { const rows = [...tb.tBodies[0] ? tb.tBodies[0].rows : []].filter(r => r.querySelector('.glr')); if (!rows.length) return;
   const rg = document.createRange(), tx = el => { rg.selectNodeContents(el); return rg.getBoundingClientRect(); };
   let x1 = -1e9, x2 = 1e9; rows.forEach(r => { const o = r.querySelector('td.go span'); if (o) x1 = Math.max(x1, tx(o).right); const c = r.cells[3]; if (c && c.textContent.trim()) x2 = Math.min(x2, tx(c).left); });
@@ -1734,6 +1738,7 @@ function render() {
   try { pmAlign(); } catch (e) {}
   try { tNudge(); } catch (e) {}
   try { glDash(); } catch (e) {}
+  try { stnFit(); } catch (e) {}
   try { tblAlign(); } catch (e) {}
   try { stickTop(v); } catch (e) {}
   try { const pn = $app.querySelector('.pane'); if (pn && v === 'player' && state.player && state.player.tab === 'ov' && state.player.done && pn.querySelector('.ssum') && pn.querySelector('.glsec') && !pn.querySelector('tr.nomore')) { const h = pn.offsetHeight; if (h > 200) { window._ovH = h; try { localStorage.setItem('ovH', String(h)); } catch (e) {} } }
@@ -3158,9 +3163,10 @@ function careerHTML(p, cats) {
     const title = p.league === 'nba' ? (mode === 'reg' ? 'Season' : 'Playoffs') : catName(c.title, c.labels, p.league);
     const sk = mode + '|' + c.title, so = (p.csort || {})[sk];
     if (so) { const num = x => { const n = parseFloat(String(x == null ? '' : x).replace(/,/g, '')); return isNaN(n) ? -1e12 : n; }; rows = [...rows].sort((a, b) => (so.asc ? 1 : -1) * (num(a.v[so.i]) - num(b.v[so.i]))); }
+    if (cols[0]) cols[0][2] = String(cols[0][1]).length > 3 ? 46 : 36; /* same logo→first column gap as NHL */
     cols.forEach((x, i) => { const L = Math.max(0, ...rows.map(r => String(r.v[i] == null ? '' : r.v[i]).length)), T = tot ? String(tot[i] == null ? '' : tot[i]).length : 0; x[2] = Math.max(x[2], Math.ceil(Math.max(L * 9, T * 10) + 10)); });
-    const hasTot = rows.some((r, i) => !r.tid && !/^[A-Z]{2,4}$/.test(String(r.sub || '')) && rows.some((x, k) => k !== i && x.n === r.n)), fc = (p.league === 'nba' ? 104 : 92) + (hasTot && mode !== 'ncaa' ? 22 : 0), tw2 = fc + cols.reduce((a, x) => a + x[2], 0);
-    return `<section class="blk"><div class="tw"><table class="nfx sep crt" style="width:max(100%, ${tw2}px)"><colgroup><col style="width:${fc}px">${cols.map(x => `<col style="width:${x[2]}px">`).join('')}</colgroup><thead><tr><th class="n">${esc(title)}</th>${cols.map((x, i) => `<th data-csort="${i}" data-cs="${esc(sk)}" class="${so && so.i === i ? 'on' : ''}">${esc(x[1])}</th>`).join('')}</tr></thead><tbody>${(() => { const RT = (r, cls, extra, logo) => `<tr class="${cls}" ${extra}><td class="n"><span class="pn">${esc(r.n)}</span>${mode === 'ncaa' ? (r.tid ? `<img class="slg" src="https://a.espncdn.com/i/teamlogos/ncaa/500-dark/${esc(r.tid)}.png" alt="" onerror="if(!this.dataset.f){this.dataset.f=1;this.src=this.src.replace('500-dark','500')}else this.remove()">` : '') : (logo != null ? logo : seasonLogo(p.league, r))}</td>${r.v.map((v, i) => `<td class="${so && so.i === i ? 'on' : ''}">${nv(clean(v))}</td>`).join('')}</tr>`;
+    const hasTot = rows.some((r, i) => !r.tid && !/^[A-Z]{2,4}$/.test(String(r.sub || '')) && rows.some((x, k) => k !== i && x.n === r.n)), fc = 92 + (hasTot && mode !== 'ncaa' ? 22 : 0), tw2 = fc + cols.reduce((a, x) => a + x[2], 0);
+    return `<section class="blk"><div class="tw"><table class="nfx sep crt" style="width:max(100%, ${tw2}px)"><colgroup><col style="width:${fc}px">${cols.map(x => `<col style="width:${x[2]}px">`).join('')}</colgroup><thead><tr><th class="n">${esc(title)}</th>${cols.map((x, i) => `<th data-csort="${i}" data-cs="${esc(sk)}" class="${so && so.i === i ? 'on' : ''}">${esc(x[1])}</th>`).join('')}</tr></thead><tbody>${(() => { const RT = (r, cls, extra, logo) => `<tr class="${cls}" ${extra}><td class="n"><span class="pn">${esc(crtYr(r.n, p.league, mode))}</span>${mode === 'ncaa' ? (r.tid ? `<img class="slg" src="https://a.espncdn.com/i/teamlogos/ncaa/500-dark/${esc(r.tid)}.png" alt="" onerror="if(!this.dataset.f){this.dataset.f=1;this.src=this.src.replace('500-dark','500')}else this.remove()">` : '') : (logo != null ? logo : seasonLogo(p.league, r))}</td>${r.v.map((v, i) => `<td class="${so && so.i === i ? 'on' : ''}">${nv(clean(v))}</td>`).join('')}</tr>`;
       const isTot = r => !r.tid && !/^[A-Z]{2,4}$/.test(String(r.sub || ''));
       if (so || mode === 'ncaa') return rows.map(r => RT(r, '', '', null)).join('');
       const out = []; for (let q = 0; q < rows.length; q++) { let z = q; while (z + 1 < rows.length && rows[z + 1].n === rows[q].n) z++;
@@ -3174,6 +3180,8 @@ function careerHTML(p, cats) {
   if (!out) return seg + msg(mode === 'ncaa' ? 'NCAA stats not available.' : !cats.length ? 'No data' : mode === 'post' ? (p.postDone ? 'No playoff games.' : 'Loading playoffs…') : 'Stats not available.');
   return seg + out;
 }
+/* career season label: always short 'YY-YY' (NFL/NCAA '2026' → '26-27', NBA '2026-27' → '26-27') */
+function crtYr(n, lg, mode) { n = String(n == null ? '' : n).trim(); let m = n.match(/^(\d{4})-(\d{2})$/); if (m) return m[1].slice(2) + '-' + m[2]; m = n.match(/^(\d{4})$/); if (m && (lg === 'nfl' || mode === 'ncaa')) return m[1].slice(2) + '-' + String(+m[1] + 1).slice(2); return n; }
 function nbaCareerHTML(p, cats) {
   const c = cats.find(x => /averag/i.test(x.title) && x.labels.includes('PTS')) || cats.find(x => x.labels.includes('PTS') && x.labels.includes('MIN')) || cats[0];
   const cols = NBA_ALL.map(([l, d, w]) => [c.labels.indexOf(l === '3P%' && !c.labels.includes('3P%') ? '3PT%' : l), d, w]).filter(x => x[0] >= 0);
@@ -3922,8 +3930,8 @@ function standingsHTML(v, c) {
     const sval = x => { const t = String(x == null ? '' : x).trim(); let m = t.match(/^(\d+)-(\d+)(?:-(\d+))?$/); if (m) { const a = +m[1], b = +m[2], c2 = +(m[3] || 0); return a + b + c2 ? a / (a + b + c2) + a * 1e-6 : 0; } m = t.match(/^([WLT])\s*(\d+)$/i); if (m) return (/w/i.test(m[1]) ? 1 : /l/i.test(m[1]) ? -1 : 0) * +m[2]; const n = parseFloat(t.replace(/[+,]/g, '')); return isNaN(n) ? -1e12 : n; };
     if (so) { const cd = use.find(x => x[0] === so.l); ents = [...ents].sort((a, b) => (so.asc ? 1 : -1) * (sval(cellV(a, cd[0], cd[1])) - sval(cellV(b, cd[0], cd[1])))); }
     const cuts = so ? [] : (g.cuts || (g.cut ? [g.cut] : []));
-    const w = l => l === 'OPP PPG' ? 64 : ['HOME', 'AWAY', 'DIV', 'CONF', 'L10'].includes(l) ? 54 : ['PCT', 'DIFF', 'STRK', 'PPG'].includes(l) ? 50 : 40;
-    const tw = 150 + use.reduce((a, x) => a + w(x[0]), 0);
+    const w = l => l === 'OPP PPG' ? 64 : ['HOME', 'AWAY', 'DIV', 'CONF', 'L10'].includes(l) ? 54 : ['PCT', 'DIFF', 'STRK', 'PPG'].includes(l) ? 50 : 33;
+    const tw = 160 + use.reduce((a, x) => a + w(x[0]), 0);
     const clv = (l, x) => l === 'L10' ? String(x).replace(/,\s*\d+\s*PTS?/i, '') : x;
     const trs = ents.map((en, i) => { const tm = en.team || {}, lg = (tm.logos && tm.logos[0] && tm.logos[0].href) || teamLogoOf(v.league, { id: tm.id, abbr: tm.abbreviation }); return `<tr class="${cuts.some(k => i === k - 1 && ents.length > k) ? 'cut' : ''}" data-topen="${esc(tm.id)}" data-tl="${v.league}" data-tn="${esc(tm.displayName || '')}" data-tlogo="${esc(lg)}"><td class="n"><div class="tc"><span class="rk">${i + 1}</span>${logoImg(lg)}<span class="pn">${esc(tm.shortDisplayName || tm.name || tm.abbreviation || '')}</span></div></td>${use.map(([l, cands]) => `<td>${nv(String(clv(l, cellV(en, l, cands) ?? '-')))}</td>`).join('')}</tr>`; }).join('');
     return `<section class="blk"><div class="tw"><table class="nfx sep stn" style="width:max(100%, ${tw}px)"><colgroup><col>${use.map(x => `<col style="width:${w(x[0])}px">`).join('')}</colgroup><thead><tr><th class="n">${esc(g.name)}</th>${use.map(x => `<th data-ssort="${esc(x[0])}" data-ssg="${esc(gk)}" class="${so && so.l === x[0] ? 'on' + (so.asc ? ' asc' : '') : ''}">${esc(x[0])}</th>`).join('')}</tr></thead><tbody>${trs}</tbody></table></div></section>`;
@@ -4755,7 +4763,7 @@ window._forceY = y => { const t0 = Date.now(), de = document.documentElement, go
 window._scrollMem = {}; window._hstack = [location.hash];
 window.addEventListener('scroll', () => { if (!window._stAnim) window._scrollMem[location.hash] = window.scrollY; }, { passive: true });
 window._snap = {}; window._curH = location.hash;
-try { document.fonts.ready.then(() => { try { glDash(); } catch (e) {} }); } catch (e) {}
+try { document.fonts.ready.then(() => { try { glDash(); } catch (e) {} try { stnFit(); } catch (e) {} }); } catch (e) {}
 window.goHome = () => { const st = window._hstack || [], d = st.length - 1; window._fromList = false;
   if (state.league === 'f1' && typeof F1 !== 'undefined') { F1.listY = null; F1.hOpen = false; F1.selId = null; F1.scrolled = 0; state.stripKey = null; }
   if (d > 0 && (st[0] === '' || st[0] === '#')) { window._noRestore = 1; history.go(-d); return; }
