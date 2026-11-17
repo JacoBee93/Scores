@@ -853,14 +853,14 @@ input[type=search]::-webkit-search-cancel-button{display:none;-webkit-appearance
 .gst td,.gst th{padding-left:6px !important;padding-right:6px !important}
 .stkw + main > .sec.dh:first-child,.stkw + main > .favh:first-child,.stksp + main > .sec.dh:first-child,.stksp + main > .favh:first-child,.ghost > .sec.dh:first-child,.ghost > .favh:first-child{margin-top:-4px !important}
 .stkw{position:sticky;top:0;z-index:40;background:var(--pbg,#000)}
-.stkw.fx0{position:fixed;left:0;right:0;top:0}
+.stkw.fx0{position:fixed;left:0;right:0;top:-2px;border-top:2px solid var(--pbg,#000);box-shadow:0 -40px 0 var(--pbg,#000)}
 .stksp{flex:none}
 .stkw.det{padding:0 16px 12px}
 .stkw.det > header{margin:0 -16px}
 .stkw.det > :last-child{margin-bottom:0 !important}
 .stkw.det + main > .pane:first-child,.stkw.det + .stksp + main > .pane:first-child{margin-top:0 !important}
 header.d + main{padding-top:0}
-.play.g.gs{border-radius:12px;margin:5px -10px;padding:11px 10px;background:linear-gradient(90deg,color-mix(in srgb,var(--tc,#555) 62%,transparent),color-mix(in srgb,var(--tc,#555) 16%,transparent) 80%)}
+.play.g.gs{border-radius:12px;margin:5px -7px;padding:11px 7px;background:linear-gradient(90deg,color-mix(in srgb,var(--tc,#555) 62%,transparent),color-mix(in srgb,var(--tc,#555) 16%,transparent) 80%)}
 .play.g.gs .ast{color:rgba(255,255,255,.62)}
 html.one,html.one body{overflow:hidden;height:100%}
 html.lock1 body{touch-action:none}
@@ -895,6 +895,7 @@ html.one #app.lst,html.one body{min-height:0}
 .hero.hu{grid-template-rows:auto 42px}
 .hero.hu .m .pd{line-height:1.02}
 .hero.hu.hw{padding-bottom:25px !important}
+.hero.hu.hw > .t{position:relative;top:-6px}
 .hero.hu.hw .wk{margin-bottom:3px !important}
 .hero.hu:not(.hw) .wk{display:none}
 .hero.hu:not(.hw){grid-template-rows:42px;padding:16px 0 34px !important}
@@ -1460,16 +1461,17 @@ window.isSAm = () => navigator.standalone === true || (window.matchMedia && matc
     el.style.cssText = `position:fixed;inset:0;overflow:hidden;z-index:0;pointer-events:none;background:${(sn && sn.bg && sn.bg.p) || '#000'}`; document.body.insertBefore(el, $app);
     if (sn && sn.f && sn.f.firstChild) { el.appendChild(sn.f); (sn.sl || []).forEach(([x, l, tp]) => { x.scrollLeft = l; x.scrollTop = tp; }); el.scrollTop = sn.y || 0; }
     const dim = document.createElement('div'); dim.className = 'undim'; dim.style.cssText = 'position:fixed;inset:0;background:#000;opacity:.35;pointer-events:none;z-index:60'; el.appendChild(dim); U = { el, sn, dim }; };
-  document.addEventListener('touchstart', e => { E = null; if (!isSAm() || e.touches.length !== 1 || topView() === 'list' || document.getElementById('wpov')) return; const x = e.touches[0].clientX; if (x > 24) return; E = { x0: x, y0: e.touches[0].clientY, dx: 0, on: false }; }, { passive: true });
+  document.addEventListener('touchstart', e => { E = null; if (!isSAm() || e.touches.length !== 1 || topView() === 'list' || document.getElementById('wpov')) return; const x = e.touches[0].clientX; if (x > 24) return; E = { x0: x, y0: e.touches[0].clientY, dx: 0, on: false, h: location.hash }; }, { passive: true });
+  window.addEventListener('hashchange', () => { if (E && E.on) { E = null; reset(); unUnder(); } });
   document.addEventListener('touchmove', e => { if (!E) return; const t = e.touches[0], dx = t.clientX - E.x0, dy = t.clientY - E.y0;
     if (!E.on) { if (Math.abs(dy) > 12 && Math.abs(dy) > dx) { E = null; return; } if (dx < 10) return; E.on = true; const ap = document.getElementById('artpop'); if (ap) ap.style.visibility = 'hidden';
       const sy = window.scrollY, w = $app.querySelector(':scope > .stkw'); Object.assign($app.style, { willChange: 'transform', position: 'relative', zIndex: '1', background: getComputedStyle(document.documentElement).getPropertyValue('--pbg') || '#000', boxShadow: '-10px 0 28px rgba(0,0,0,.55)', minHeight: (sy + window.innerHeight) + 'px' });
       if (w) { w.style.position = 'absolute'; w.style.top = sy + 'px'; } try { mkUnder(); } catch (er) {} }
-    E.dx = Math.max(0, dx); $app.style.transform = `translate3d(${E.dx}px,0,0)`; if (U) U.dim.style.opacity = String(.35 * (1 - E.dx / window.innerWidth)); }, { passive: true });
+    E.dx = Math.max(0, dx); $app.style.transform = `translate3d(${E.dx}px,0,0)`; if (U) U.dim.style.opacity = String(.35 * (1 - E.dx / window.innerWidth)); if (e.cancelable) e.preventDefault(); }, { passive: false });
   const end = () => { const st = E; E = null; if (!st || !st.on) return; const W = window.innerWidth, go = st.dx > W * .28;
     $app.style.transition = 'transform .22s cubic-bezier(.2,.8,.2,1)'; $app.style.transform = `translate3d(${go ? W : 0}px,0,0)`; if (U) { U.dim.style.transition = 'opacity .22s'; U.dim.style.opacity = go ? '0' : '.35'; }
-    setTimeout(() => { const ap = document.getElementById('artpop'); if (ap) { if (go) ap.remove(); else ap.style.visibility = ''; }
-      if (!go) { unUnder(); reset(); return; }
+    const h0 = st.h; setTimeout(() => { const ap = document.getElementById('artpop'); if (ap) { if (go) ap.remove(); else ap.style.visibility = ''; }
+      if (!go || location.hash !== h0) { unUnder(); reset(); return; }
       const bb = $app.querySelector('[data-back]'); $app.style.transition = ''; if (U) U.dim.remove();
       let done = false; const fin = () => { if (done) return; done = true; reset(); unUnder(); }; window.addEventListener('hashchange', () => setTimeout(fin, 0), { once: true }); setTimeout(fin, 400); if (bb) bb.click(); else history.back(); }, 230); };
   document.addEventListener('touchend', end, { passive: true }); document.addEventListener('touchcancel', end, { passive: true });
@@ -1478,7 +1480,7 @@ function smoothTop(ms) { ms = ms || 380; const y0 = window.scrollY; cancelAnimat
   document.body.style.minHeight = (y0 + window.innerHeight) + 'px'; window._stAnim = 1; const t0 = performance.now();
   const f = now => { const u = Math.min(1, (now - t0) / ms), e = 1 - Math.pow(1 - u, 3); window.scrollTo(0, Math.round(y0 * (1 - e))); if (u < 1) _stA = requestAnimationFrame(f); else { document.body.style.minHeight = ''; window._stAnim = 0; try { listLock(); detLock(); } catch (er) {} } }; _stA = requestAnimationFrame(f); }
 function detLock() { const v = topView(); if (window._stAnim) return; const lk = (v === 'player' && state.player && /^(ov|bio|news)$/.test(state.player.tab)) || (v === 'team' && state.team && state.team.tab === 'news');
-  if (lk && document.documentElement.scrollHeight - window.innerHeight < 280) { window.scrollTo(0, 0); document.documentElement.classList.add('lock1'); } }
+  if (lk && document.documentElement.scrollHeight - window.innerHeight < (state.player && state.player.tab === 'bio' ? 40 : 120)) { window.scrollTo(0, 0); document.documentElement.classList.add('lock1'); } }
 function listLock() { if (topView() !== 'list' || window._stAnim) return; const m = $app.querySelector(':scope > main'), n = m ? m.querySelectorAll('[data-game]').length : 99; if (n <= 4 && document.documentElement.scrollHeight - window.innerHeight < 220) { window.scrollTo(0, 0); document.documentElement.classList.add('lock1'); } }
 function render() {
   if (window._restoreKey && (window._restoreKey !== location.hash || window._restoreVK !== snapVK())) window._restoreKey = null;
@@ -1933,13 +1935,13 @@ function openWp() {
   closeWp();
   const ov = document.createElement('div'); ov.id = 'wpov';
   ov.innerHTML = `<div class="wpbox"><div class="wptop"><div class="wpi" id="wpi">${wpInfo(W.pts.length - 1)}</div><button class="wpclose" data-wpclose="1">×</button></div><div class="wpw big">${src.outerHTML.replace('id="wpsvg"', 'id="wpsvg2"')}<div class="wpl t">${esc(W.e.h)}</div><div class="wpl b">${esc(W.e.a)}</div></div></div>`;
-  document.body.appendChild(ov); document.body.style.overflow = 'hidden';
+  document.body.appendChild(ov); document.body.style.overflow = 'hidden'; window._wpBg = [document.documentElement.style.background, (document.querySelector('meta[name="theme-color"]') || {}).content]; { const cc = getComputedStyle(document.documentElement).getPropertyValue('--card').trim() || '#1c1c1e'; document.documentElement.style.background = cc; const tm = document.querySelector('meta[name="theme-color"]'); if (tm) tm.setAttribute('content', cc); }
   const c = ov.querySelector('.wpcur'); if (c) c.setAttribute('opacity', '.8');
   fitWp();
 }
 function fitWp() { const ov = document.getElementById('wpov'); if (!ov) return; const rot = window.innerHeight > window.innerWidth; ov.classList.toggle('rot', rot); const bx = ov.querySelector('.wpbox'); if (bx) { bx.style.width = rot ? window.innerHeight + 'px' : ''; bx.style.height = rot ? window.innerWidth + 'px' : ''; } }
 window.addEventListener('resize', fitWp);
-function closeWp() { const ov = document.getElementById('wpov'); if (ov) ov.remove(); document.body.style.overflow = ''; }
+function closeWp() { const ov = document.getElementById('wpov'); if (ov) ov.remove(); document.body.style.overflow = ''; if (window._wpBg) { document.documentElement.style.background = window._wpBg[0]; const tm = document.querySelector('meta[name="theme-color"]'); if (tm && window._wpBg[1]) tm.setAttribute('content', window._wpBg[1]); window._wpBg = null; } }
 document.addEventListener('click', ev => { if (ev.target.closest('[data-wpclose]')) { closeWp(); return; } if (ev.target.closest('[data-wpopen]')) openWp(); });
 function wpInfo(i) {
   const W = window._wp; if (!W) return ''; const p = W.pts[i]; if (!p) return '';
@@ -1966,13 +1968,13 @@ function teamStatsGameHTML(g) {
   const e = g.ev, A = ts.find(t => String(t.team && t.team.id) === String(e.away.id)) || ts[0], Hm = ts.find(t => t !== A) || ts[1];
   const hv = new Map((Hm.statistics || []).map(x => [x.name || x.label, x]));
   const GC = gameCols(g);
-  const num = v => { const q = String(v == null ? '' : v).replace(/,/g, ''), t = q.match(/^(\d+):(\d+)$/); if (t) return +t[1] * 60 + +t[2]; const m = q.match(/-?\d+(\.\d+)?/); return m ? parseFloat(m[0]) : null; };
+  const num = v => { const q = String(v == null ? '' : v).replace(/,/g, ''), t = q.match(/^(\d+):(\d+)$/); if (t) return +t[1] * 60 + +t[2]; const dm = q.match(/^(\d+)\s*-\s*(\d+)$/); if (dm) return +dm[1]; const m = q.match(/-?\d+(\.\d+)?/); return m ? parseFloat(m[0]) : null; };
   const tseen = new Set();
   const rows = (A.statistics || []).map(x => {
     const y = hv.get(x.name || x.label); if (!y) return ''; const tk = String(x.label || x.name).toLowerCase(); if (tseen.has(tk)) return ''; tseen.add(tk);
     const a = num(x.displayValue), b = num(y.displayValue);
     const sm = (a || 0) + (b || 0), pa = sm > 0 ? a / sm * 100 : 50;
-    const bar = a != null && b != null && a >= 0 && b >= 0 && !/-/.test(String(x.displayValue).replace(/^-/, '')) ? `<div class="tsb"><i style="width:${pa.toFixed(1)}%;background:${GC[0]}"></i><i style="width:${(100 - pa).toFixed(1)}%;background:${GC[1]}"></i></div>` : '';
+    const bar = a != null && b != null && a >= 0 && b >= 0 && (!/-/.test(String(x.displayValue).replace(/^-/, '')) || /^\d+\s*-\s*\d+$/.test(String(x.displayValue).replace(/,/g, ''))) ? `<div class="tsb"><i style="width:${pa.toFixed(1)}%;background:${GC[0]}"></i><i style="width:${(100 - pa).toFixed(1)}%;background:${GC[1]}"></i></div>` : '';
     return `<div class="tsr"><div class="tsv">${esc(x.displayValue)}</div><div class="tsl">${esc(x.label || x.name)}</div><div class="tsv r">${esc(y.displayValue)}</div>${bar}</div>`;
   }).join('');
   return `<section class="pv"><div class="tsh">${logoImg(e.away.logo)}<b>${esc(e.away.abbr)}</b><span class="grow"></span><b>${esc(e.home.abbr)}</b>${logoImg(e.home.logo)}</div>${rows || msg('Team stats not available yet.')}</section>`;
@@ -2372,7 +2374,7 @@ function pvInjuries(g) {
   const rows = mine.length ? mine.slice(0, 12).map(i => {
     const a = i.athlete || {}, st = String(i.status || (i.type && i.type.description) || ''), det = (i.details && (i.details.type || i.details.detail)) || i.shortComment || '';
     const red = /out|^ir|injured reserve|suspen/i.test(st), pos = (a.position && a.position.abbreviation) || '';
- return `<div class="ir" data-player="${esc(a.id)}" data-pl="${g.league}" data-pn="${esc(a.displayName || '')}" data-pp="${esc(pos)}" data-pj="${esc(a.jersey || '')}" data-pt="${esc(t.name || '')}"><img class="hs" src="${esc(hsOf(a, g.league))}" alt="" onerror="this.onerror=null;this.src=SIL"><div class="grow"><div class="ln">${esc(a.displayName || a.shortName || '')}</div><div class="ls">${esc([pos, a.jersey ? '#' + a.jersey : ''].filter(Boolean).join(' · '))}</div></div><div class="is"><span class="chip ${red ? 'red' : ''}">${esc(st)}</span><div class="ls">${esc(det)}</div></div></div>`;
+ return `<div class="ir" data-player="${esc(a.id)}" data-pl="${g.league}" data-pn="${esc(a.displayName || '')}" data-pp="${esc(pos)}" data-pj="${esc(a.jersey || '')}" data-pt="${esc(t.name || '')}"><img class="hs" src="${esc(hsOf(a, g.league))}" alt="" onerror="this.onerror=null;this.src=SIL"><div class="grow"><div class="ln">${esc(fitNm(a.displayName || a.shortName || ''))}</div><div class="ls">${esc([pos, a.jersey ? '#' + a.jersey : ''].filter(Boolean).join(' · '))}</div></div><div class="is"><span class="chip ${red ? 'red' : ''}">${esc(st)}</span><div class="ls">${esc(det)}</div></div></div>`;
   }).join('') : msg('No reported injuries.');
   return `<section class="pv"><div class="sec">Injury report</div>${seg}${rows}</section>`;
 }
@@ -2839,11 +2841,14 @@ function bioHTML(p) {
   const teams = [];
   { const E = [], sk = new Set(); (statCats(p.st, p.league)[0] ? [statCats(p.st, p.league)[0]] : []).forEach(c => c.rows.forEach((r, i) => { if (!r.year || !r.sub || !/^[A-Z]{2,4}$/.test(r.sub)) return; const k = r.year + r.sub; if (sk.has(k)) return; sk.add(k); E.push({ y: +r.year, ab: r.sub, tid: r.tid, i }); }));
     if (!E.length) statCats(p.st, p.league).forEach(c => c.rows.forEach((r, i) => { if (!r.year || !r.sub || !/^[A-Z]{2,4}$/.test(r.sub)) return; const k = r.year + r.sub; if (sk.has(k)) return; sk.add(k); E.push({ y: +r.year, ab: r.sub, tid: r.tid, i }); }));
-    E.sort((x, y) => x.y - y.y || x.i - y.i); let cur = null; E.forEach(e => { if (cur && cur.ab === e.ab) { cur.y1 = e.y; return; } cur = { ab: e.ab, tid: e.tid, y0: e.y, y1: e.y }; teams.push(cur); }); }
+    const YS = [...new Set(E.map(e => e.y))].sort((a, b) => a - b), by = y => E.filter(e => e.y === y), seq = []; let last = null;
+    YS.forEach((y, k) => { const g = by(y), nx = YS[k + 1] != null ? by(YS[k + 1]).map(e => e.ab) : [];
+      g.sort((p, q) => ((p.ab === last ? -1 : 0) - (q.ab === last ? -1 : 0)) || ((nx.includes(p.ab) ? 1 : 0) - (nx.includes(q.ab) ? 1 : 0)) || p.i - q.i); g.forEach(e => { e.trd = g.length > 1 && e !== g[0]; seq.push(e); }); last = g[g.length - 1].ab; });
+    let cur = null; seq.forEach(e => { if (cur && cur.ab === e.ab) { cur.y1 = e.y; return; } cur = { ab: e.ab, tid: e.tid, y0: e.y, y1: e.y, trd: e.trd }; teams.push(cur); }); }
   teams.sort((x, y) => y.y1 - x.y1);
   const tname = t => { const x = (state.teamList[p.league] || []).find(z => z.abbr === t.ab || z.id === String(t.tid)); return x ? x.name : t.ab; };
   const yr = y => p.league === 'nfl' ? String(y) : (y - 1) + '-' + String(y).slice(2);
-  const hist = teams.length ? `<section class="blk"><div class="sec" style="margin-left:0">Career history</div>${teams.map(t => `<div class="bh">${logoImg(teamLogoOf(p.league, { id: t.tid, abbr: t.ab }))}<div><div class="bt">${esc(tname(t))}</div><div class="bs">${esc(p.league === 'nfl' ? (t.y0 === t.y1 ? String(t.y0) : t.y0 + ' – ' + t.y1) : (t.y0 - 1) + ' – ' + t.y1)}</div></div></div>`).join('')}</section>` : '';
+  const hist = teams.length ? `<section class="blk"><div class="sec" style="margin-left:0">Career history</div>${teams.map(t => `<div class="bh">${logoImg(teamLogoOf(p.league, { id: t.tid, abbr: t.ab }))}<div><div class="bt">${esc(tname(t))}</div><div class="bs">${esc(p.league === 'nfl' ? (t.y0 === t.y1 ? String(t.y0) : t.y0 + ' – ' + t.y1) : (t.trd ? t.y0 : t.y0 - 1) + ' – ' + t.y1)}</div></div></div>`).join('')}</section>` : '';
   if (!rows.length && !hist) return msg('Bio not available.');
   const dy = (a.draft && a.draft.year) || ((String(draft).match(/(19|20)\d{2}/) || [])[0]);
   return `<section class="blk"><table class="bio">${rows.map(r => `<tr><td>${esc(r[0])}</td><td>${r[0] === 'Status' ? r[1] : r[0] === 'Draft Info' && dy && p.league !== 'nhl' ? `<a class="dlk" data-draft="${esc(dy)}">${esc(r[1])} ›</a>` : esc(r[1])}</td></tr>`).join('')}</table></section>${hist}`;
@@ -2997,7 +3002,7 @@ function teamInjHTML(t) {
     .sort((x, y) => rk(x.st) - rk(y.st));
   const tn = teamHead(t).name;
   return `<section class="pv">${rows.map(({ a, st, det, ret }) => { const pos = (a.position && a.position.abbreviation) || '', red = /out|^ir|injured|suspen/i.test(st);
-    return `<div class="ir" data-player="${esc(a.id)}" data-pl="${t.league}" data-pn="${esc(a.displayName || '')}" data-pp="${esc(pos)}" data-pj="${esc(a.jersey || '')}" data-pt="${esc(tn)}"><img class="hs" src="${esc(hsOf(a, t.league))}" alt="" onerror="this.onerror=null;this.src=SIL"><div class="grow"><div class="ln">${esc(a.displayName || a.shortName || '')}</div><div class="ls">${esc([pos, a.jersey ? '#' + a.jersey : ''].filter(Boolean).join(' · '))}</div></div><div class="is"><span class="chip ${red ? 'red' : ''}">${esc(st)}</span><div class="ls">${esc([det, ret ? 'Return ' + fmtShort(ret) : ''].filter(Boolean).join(' · '))}</div></div></div>`; }).join('')}</section>`;
+    return `<div class="ir" data-player="${esc(a.id)}" data-pl="${t.league}" data-pn="${esc(a.displayName || '')}" data-pp="${esc(pos)}" data-pj="${esc(a.jersey || '')}" data-pt="${esc(tn)}"><img class="hs" src="${esc(hsOf(a, t.league))}" alt="" onerror="this.onerror=null;this.src=SIL"><div class="grow"><div class="ln">${esc(fitNm(a.displayName || a.shortName || ''))}</div><div class="ls">${esc([pos, a.jersey ? '#' + a.jersey : ''].filter(Boolean).join(' · '))}</div></div><div class="is"><span class="chip ${red ? 'red' : ''}">${esc(st)}</span><div class="ls">${esc([det, ret ? 'Return ' + fmtShort(ret) : ''].filter(Boolean).join(' · '))}</div></div></div>`; }).join('')}</section>`;
 }
 function renderTeam() {
   const t = state.team, h = teamHead(t);
@@ -3043,7 +3048,7 @@ function rosterHTML(t) {
   const oi = a => { const i = ord.indexOf(posOf(a)); return i < 0 ? 99 : i; };
   all.sort((a, b) => oi(a) - oi(b) || String(a.lastName || a.displayName || '').localeCompare(String(b.lastName || b.displayName || '')));
   const tr = a => {
-    const pos = a._gpos || (a.position && a.position.abbreviation) || '', nm = a.displayName || a.fullName || '';
+    const pos = a._gpos || (a.position && a.position.abbreviation) || '', nm = fitNm(a.displayName || a.fullName || '');
     const ey = a.experience && a.experience.years != null ? a.experience.years : '', exp = ey === 0 || ey === '0' ? 'R' : ey === '' ? '–' : ey;
     const ht = String(a.displayHeight || '').replace(/\s/g, ''), wt = String(a.displayWeight || '').replace(/\s*lbs?\.?/i, '');
     return `<tr data-player="${esc(a.id)}" data-pl="${t.league}" data-pn="${esc(nm)}" data-pp="${esc(pos)}" data-pj="${esc(a.jersey || '')}" data-pt="${esc(tn)}">
@@ -3107,6 +3112,7 @@ function scheduleHTML(t) {
 const catName = (title, labels, league) => { const L = labels || []; if (league === 'nhl') { if (L.includes('GAA') || L.includes('SV%')) return 'Goalies'; if (L.includes('PTS') && L.includes('PIM')) return 'Skaters'; } return CAT_NAME[String(title).toLowerCase()] || (/regular season/i.test(title) ? 'Season' : title); };
 const CAT_NAME = { skating: 'Skaters', goaltending: 'Goalies', general: 'General' };
 const PREF = { nhl: ['GP','G','A','PTS','+/-','PIM','S','GS','W','L','OTL','GAA','SV%'], nba: ['GP','MIN','PTS','REB','AST','STL','BLK','FG%','3P%','FT%'] };
+const fitNm = n => String(n || '').length >= 20 ? shortNm(n) : n;
 const shortNm = n => { const p = String(n || '').trim().split(/\s+/); if (p.length < 2) return n; let rest = p.slice(1).join(' '); if (/-/.test(rest) && rest.length > 12) rest = rest.replace(/^[^\s-]+-/, ''); return p[0][0] + '. ' + rest; };
 const lsGet = (k, ttl) => { try { const o = JSON.parse(localStorage.getItem(k) || 'null'); return o && Date.now() - o.t < ttl ? o.d : null; } catch (e) { return null; } };
 const lsSet = (k, d, listKey, max) => {
@@ -4177,7 +4183,8 @@ window.addEventListener('hashchange', () => { const h = location.hash, st = wind
   if (bi >= 0) { st.splice(bi + 1).forEach(x => { if (x !== h) delete window._snap[x]; }); delete window._snap[prev]; window._backY = window._scrollMem[h] || 0; window._backT = Date.now(); window._backH = h;
     const sn = noR ? null : window._snap[h]; delete window._snap[h]; if (noR) window._backY = 0;
     { const u = document.getElementById('under'); if (u) { if (sn && sn.f) [...u.childNodes].forEach(n => { if (!(n.classList && n.classList.contains('undim'))) sn.f.appendChild(n); }); u.remove(); } }
-    if (sn && Date.now() - sn.t < 30 * 60e3) { $app.style.transition = ''; $app.style.transform = ''; $app.innerHTML = ''; $app.appendChild(sn.f); (sn.sl || []).forEach(([x, l, tp]) => { x.scrollLeft = l; x.scrollTop = tp; }); $app.className = sn.cls; const bg = sn.bg; document.documentElement.style.background = bg.h; document.body.style.background = bg.b; document.documentElement.style.setProperty('--pbg', bg.p); const tm = document.querySelector('meta[name="theme-color"]'); if (tm && bg.t) tm.setAttribute('content', bg.t); document.documentElement.classList.remove('lock1'); window.scrollTo(0, sn.y); window._restoreKey = h; window._restoreY = sn.y; window._restoreVK = sn.vk; }
+    if (sn && Date.now() - sn.t < 30 * 60e3) { $app.style.transition = ''; $app.style.transform = ''; $app.innerHTML = ''; $app.appendChild(sn.f); (sn.sl || []).forEach(([x, l, tp]) => { x.scrollLeft = l; x.scrollTop = tp; }); $app.className = sn.cls; const bg = sn.bg; document.documentElement.style.background = bg.h; document.body.style.background = bg.b; document.documentElement.style.setProperty('--pbg', bg.p); const tm = document.querySelector('meta[name="theme-color"]'); if (tm && bg.t) tm.setAttribute('content', bg.t); document.documentElement.classList.remove('lock1'); window.scrollTo(0, sn.y); window._restoreKey = h; window._restoreY = sn.y; window._restoreVK = sn.vk;
+      const chk = () => { if (location.hash !== h) return; const mx = document.documentElement.scrollHeight - window.innerHeight; if (!$app.firstElementChild || !$app.querySelector('main')) { window._restoreKey = null; state.lastView = null; render(); return; } if (window.scrollY > mx + 1) window.scrollTo(0, Math.max(0, mx)); }; requestAnimationFrame(chk); setTimeout(chk, 250); }
   } else { st.push(h); window._backY = 0; window._backH = null;
     if (window._noSnap) window._noSnap = 0; else if (prev != null && $app.firstChild) { const sl = [...$app.querySelectorAll('.strip, .mstrip, .tw, .dtabs, .brsw, .tgs, .ysel .ylist')].filter(x => x.scrollLeft > 0 || x.scrollTop > 0).map(x => [x, x.scrollLeft, x.scrollTop]); const f = document.createDocumentFragment(); while ($app.firstChild) f.appendChild($app.firstChild); window._snap[prev] = { sl, vk: snapVK(), f, y: window._scrollMem[prev] || 0, cls: $app.className, bg: snapBg(), t: Date.now() };
       const ks = Object.keys(window._snap); if (ks.length > 6) delete window._snap[ks[0]]; } } });
@@ -4213,7 +4220,7 @@ $app.addEventListener('click', ev => {
     state.tmeta = { league: d.tl, id: d.topen, name: d.tn || '', logo: d.tlogo || '' };
     window._fromList = true; location.hash = '#/team/' + d.tl + '/' + d.topen;
   } else if (d.search !== undefined) {
-    state.sleague = state.league; window._fromList = true; state.search = true; render(); const sq = document.getElementById('sq'); if (sq) sq.focus(); location.hash = '#/search';
+    state.sleague = state.league; window._fromList = true; state.search = true; render(); const sq = document.getElementById('sq'); if (sq) sq.focus(); window._noSnap = 1; location.hash = '#/search';
   } else if (d.month) {
     state.team.month = d.month; render();
   } else if (d.game !== undefined) {
