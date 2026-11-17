@@ -28,6 +28,8 @@ html.fsg *{font-family:'Space Grotesk',-apple-system,sans-serif!important;font-s
 html.fbar{--wide:'Barlow Condensed',-apple-system,sans-serif}
 html.fbar *{font-family:'Barlow Condensed','Arial Narrow',-apple-system,sans-serif!important;font-stretch:100%!important;font-size-adjust:.56}
 html.fbar body{font-weight:500}
+/* alt fonts change only the letters: keep classic line boxes (classic uses the fonts' 'normal' ≈ 1.2), so cards, pills and switches keep their size */
+html.fsg body,html.fbar body{line-height:1.2}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
 html,body,button,input,td,th{font-variant-numeric:tabular-nums lining-nums}
