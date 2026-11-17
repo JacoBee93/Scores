@@ -498,6 +498,7 @@ tr.zb > td{background:#26262a !important}
 .lsc th,.lsc td{text-align:center;padding:9px 4px;font-size:15px}
 .lsc th{font-size:12px;color:var(--mut)}
 .lsc td.n,.lsc th.n{text-align:left;width:40%}
+.lsc th.n{color:#fff;font-size:12px;padding-left:0}
 .lsc .lst{display:flex;align-items:center;gap:8px}
 .lsc .lst img,.lsc .lst .ph{width:24px;height:24px;object-fit:contain}
 .lsc .lst b{font-family:var(--num);font-size:17px}
@@ -1798,7 +1799,7 @@ function linescoreHTML(g) {
   const n = Math.max(ls(away).length, ls(home).length, g.league === 'nhl' ? 3 : 4);
   const row = c => { const t = c.team || {}, v = ls(c), lg = dk(t.logo || (t.logos && t.logos[0] && t.logos[0].href) || ''); const sc = typeof c.score === 'object' ? c.score.displayValue : c.score;
     return `<tr><td class="n"><span class="lst">${logoImg(lg)}<b>${esc(t.abbreviation || '')}</b></span></td>${Array.from({ length: n }, (_, i) => `<td>${esc(v[i] != null ? v[i] : '-')}</td>`).join('')}<td class="lsT ${c.winner ? '' : 'mut'}">${esc(sc != null ? sc : '')}</td></tr>`; };
-  return `<section class="pv"><div class="sec">Score</div><div class="tw"><table class="lsc"><thead><tr><th class="n"></th>${Array.from({ length: n }, (_, i) => `<th>${perHead(g.league, i)}</th>`).join('')}<th>T</th></tr></thead><tbody>${row(away)}${row(home)}</tbody></table></div></section>`;
+  return `<section class="pv"><div class="tw"><table class="lsc"><thead><tr><th class="n">Score</th>${Array.from({ length: n }, (_, i) => `<th>${perHead(g.league, i)}</th>`).join('')}<th>T</th></tr></thead><tbody>${row(away)}${row(home)}</tbody></table></div></section>`;
 }
 function penaltiesHTML(g) {
   const isPen = p => { const t = String((p.type && (p.type.text || '')) || ''), ab = String((p.type && p.type.abbreviation) || ''), tx = String(p.text || '');
