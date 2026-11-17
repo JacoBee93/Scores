@@ -30,6 +30,7 @@ html.fbar *{font-family:'Barlow Condensed','Arial Narrow',-apple-system,sans-ser
 html.fbar body{font-weight:500}
 /* alt fonts change only the letters: keep classic line boxes (classic uses the fonts' 'normal' ≈ 1.2), so cards, pills and switches keep their size */
 html.fsg body,html.fbar body{line-height:1.2}
+html.fbar .tnud{position:relative;top:-.055em}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
 html,body,button,input,td,th{font-variant-numeric:tabular-nums lining-nums}
@@ -867,6 +868,8 @@ input[type=search]::-webkit-search-cancel-button{display:none;-webkit-appearance
 .favb{margin-bottom:14px;padding-bottom:4px;border-bottom:1px solid #2c2c2e}
 .ssv.lng{font-size:23px;font-weight:600;line-height:1;height:34.5px;display:flex;align-items:center;justify-content:center;white-space:nowrap}
 .ssg > div{display:flex;flex-direction:column;align-items:center;justify-content:flex-start}
+.pmh{position:relative;display:inline-block}
+.pmh i{position:absolute;right:100%;top:0;font-style:normal}
 .pma{align-items:baseline;vertical-align:baseline;display:inline-grid;grid-template-columns:.6em 2ch;text-align:right}
 .pma i{font-style:normal;text-align:right}
 .gst td,.gst th{padding-left:6px !important;padding-right:6px !important}
@@ -1098,11 +1101,13 @@ function tblAlign(root) {
     const F = N.filter(fit), base = F.length ? Math.min(...F.map(nw)) : 0; if (!base) return;
     N.forEach(tb => { const cs = tb.querySelectorAll('colgroup col'); if (!cs.length || fit(tb) || nw(tb) >= base - 1) return; if (!tb.dataset.aw) tb.dataset.aw = tb.style.width; let sum = 0; [...cs].slice(1).forEach(c => { sum += parseFloat(c.style.width) || 0; }); cs[0].style.width = base + 'px'; tb.style.width = (base + sum) + 'px'; }); });
 }
-function pmAlign(root) { return;
-  (root || $app).querySelectorAll('table').forEach(tb => { const hr = tb.tHead && tb.tHead.rows[tb.tHead.rows.length - 1]; if (!hr) return; let ci = -1, c = 0; [...hr.cells].forEach(x => { if (x.textContent.trim() === '+/-') ci = c; c += x.colSpan || 1; }); if (ci < 0 || !tb.tBodies[0]) return;
-    const L = Math.max(1, ...[...tb.tBodies[0].rows].map(r => { const m = r.cells[ci] && r.cells[ci].textContent.trim().match(/^([+-]?)(\d+)$/); return m ? m[2].length : 0; }));
-    [...tb.tBodies[0].rows].forEach(r => { const cell = r.cells[ci]; if (!cell) return; const t = cell.textContent.trim(), m = t.match(/^([+-]?)(\d+)$/); if (!m) return; cell.innerHTML = `<span class="pma" style="grid-template-columns:.6em ${L}ch .6em"><i>${m[1] || '\u200b'}</i>${m[2]}<i>\u200b</i></span>`; }); });
+/* +/- columns: the digits are centred (1-digit numbers sit in the middle of 2-digit ones), the sign hangs to the left – same look in every league */
+function pmAlign(root) {
+  (root || $app).querySelectorAll('table').forEach(tb => { const hr = tb.tHead && tb.tHead.rows[tb.tHead.rows.length - 1]; if (!hr || !tb.tBodies[0]) return; let ci = -1, c = 0; [...hr.cells].forEach(x => { if (x.textContent.trim() === '+/-') ci = c; c += x.colSpan || 1; }); if (ci < 0) return;
+    [...tb.tBodies[0].rows].forEach(r => { const cell = r.cells[ci]; if (!cell || cell.querySelector('*')) return; const m = cell.textContent.trim().match(/^([+\-−]?)(\d+)$/); if (!m) return; cell.innerHTML = `<span class="pmh">${m[1] ? `<i>${m[1]}</i>` : ''}${m[2]}</span>`; }); });
 }
+function tNudge(root) { if (!document.documentElement.classList.contains('fbar')) return;
+  (root || document).querySelectorAll('.seg button, .qb button, .dtabs button, .ybtn, .hpill, .cl, .lpm button, .msg button, .favh, .cmpclr, .ylist button, .f1hy button').forEach(b => { [...b.childNodes].forEach(n => { if (n.nodeType === 3 && n.textContent.trim()) { const sp = document.createElement('span'); sp.className = 'tnud'; n.replaceWith(sp); sp.appendChild(n); } }); }); }
 function zebra(root) {
   (root || $app).querySelectorAll('table.nfx, table.fx, table.lbt, table.gst, table.ros, table.sch').forEach(tb => { const bd = tb.tBodies[0]; if (!bd) return; let z = false, last = false;
     [...bd.rows].forEach(r => { if (r.classList.contains('tot')) { r.classList.remove('zb'); return; } if (r.classList.contains('csub')) { r.classList.toggle('zb', last); return; } if (r.classList.contains('hid')) return; r.classList.toggle('zb', z); last = z; z = !z; }); });
@@ -1639,6 +1644,7 @@ function render() {
   try { zebra(); } catch (e) {}
   try { dashAlign(); } catch (e) {}
   try { pmAlign(); } catch (e) {}
+  try { tNudge(); } catch (e) {}
   try { tblAlign(); } catch (e) {}
   try { stickTop(v); } catch (e) {}
   try { const pn = $app.querySelector('.pane'); if (pn && v === 'player' && state.player && state.player.tab === 'ov' && state.player.done && pn.querySelector('.ssum') && pn.querySelector('.glsec') && !pn.querySelector('tr.nomore')) { const h = pn.offsetHeight; if (h > 200) { window._ovH = h; try { localStorage.setItem('ovH', String(h)); } catch (e) {} } }
@@ -4277,7 +4283,7 @@ function renderLeaders() {
       state.lgs = {}; state.athC = {}; state.lvC = {}; state.std = {}; _prefetched = {};
       m.innerHTML = '<button>Cache cleared ✓</button>'; setTimeout(close, 900);
     });
-    document.body.append(o, m);
+    document.body.append(o, m); try { tNudge(m); } catch (e) {}
   };
   document.addEventListener('touchstart', e => { const p = pill(e); if (!p) return; sx = e.touches[0].clientX; sy = e.touches[0].clientY; clearTimeout(tmr); tmr = p.dataset.league === 'fav' ? setTimeout(() => openCache(p), 2000) : setTimeout(() => open(p), 480); }, { passive: true });
   document.addEventListener('touchmove', e => { if (tmr && (Math.abs(e.touches[0].clientX - sx) > 8 || Math.abs(e.touches[0].clientY - sy) > 8)) { clearTimeout(tmr); tmr = null; } }, { passive: true });
