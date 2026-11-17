@@ -16,12 +16,14 @@
 <link rel="preconnect" href="https://sports.core.api.espn.com" crossorigin>
 <link rel="preconnect" href="https://a.espncdn.com">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@100..125,600..800&family=Barlow+Condensed:wght@600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@100..125,600..800&family=Barlow+Condensed:wght@600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
 <title>Scores</title>
 <style>
 :root{--bg:#000;--card:#1c1c1e;--mut:#8e8e93;--line:#2c2c2e;--acc:#6b2cf5;--live:#ff453a;
   --num:'Barlow Condensed','Arial Narrow',-apple-system,sans-serif;
   --wide:'Archivo',-apple-system,sans-serif}
+html.fsg{--num:'Space Grotesk',-apple-system,sans-serif;--wide:'Space Grotesk',-apple-system,sans-serif}
+html.fsg :is(.sec,.lh2,.lvt,.pill){font-stretch:100%}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
 html,body,button,input,td,th{font-variant-numeric:tabular-nums lining-nums}
@@ -911,9 +913,6 @@ html.one #app.lst,html.one body{min-height:0}
 .sch .rg.rgw.w1{grid-template-columns:22px 36px 16px;margin-right:30px}
 .sch .rg.rgw .sf{position:relative;top:1px}
 .gl2 .glr small{position:relative;top:1px}
-html.glass :is(.pane,.hero,.ssum,.card,.rcp,.hpill,header .back,header .home[data-home],.ybtn,.qb button,.pill,.dy,.seg,.mo,.brm,.nwi:first-child,.cmpi):not([style*='position']){position:relative}
-html.glass :is(.pane,.hero,.ssum,.card,.rcp,.hpill,header .back,header .home[data-home],.ybtn,.qb button,.pill,.dy,.seg,.artbox,.mo,.brm,.lpm,.nwi:first-child,.cmpi)::after{content:'';position:absolute;inset:0;border-radius:inherit;padding:1.2px;background:linear-gradient(180deg,rgba(255,255,255,.34) 0%,rgba(255,255,255,.14) 22%,rgba(255,255,255,.04) 48%,rgba(255,255,255,0) 72%);-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude;pointer-events:none;z-index:3}
-html.glass .pill.on::after,html.glass .dy.on::after{background:linear-gradient(180deg,rgba(255,255,255,.55),rgba(255,255,255,0) 70%)}
 
 .f1list{padding-bottom:40vh}
 .f1card{display:flex;align-items:stretch;gap:8px;height:112px;box-sizing:border-box;padding:12px 14px 12px 16px;overflow:hidden}
@@ -971,7 +970,7 @@ html.glass .pill.on::after,html.glass .dy.on::after{background:linear-gradient(1
 <div id="app"></div>
 
 <script>
-try { if (localStorage.getItem('design') === 'glass') document.documentElement.classList.add('glass'); } catch (e) {}
+try { localStorage.removeItem('design'); if (localStorage.getItem('font') === 'sg') document.documentElement.classList.add('fsg'); } catch (e) {}
 const API = 'https://site.api.espn.com/apis/site/v2/sports/';
 const WEB = 'https://site.web.api.espn.com/apis/common/v3/sports/';
 const LEAGUES = {
@@ -4205,10 +4204,10 @@ function renderLeaders() {
     const o = document.createElement('div'); o.className = 'lpo';
     const m = document.createElement('div'); m.className = 'lpm';
     m.style.top = (r.bottom + 8) + 'px'; m.style.left = Math.min(r.left, window.innerWidth - 216) + 'px';
-    m.innerHTML = `<button data-cc>Clear cache</button><button data-dsw>Switch design${document.documentElement.classList.contains('glass') ? ' (Glass)' : ' (Classic)'}</button>`;
+    m.innerHTML = `<button data-cc>Clear cache</button><button data-fsw>Switch font${document.documentElement.classList.contains('fsg') ? ' (Space Grotesk)' : ' (Classic)'}</button>`;
     o.addEventListener('click', close);
     m.addEventListener('click', ev => {
-      if (ev.target.closest('[data-dsw]')) { const on = document.documentElement.classList.toggle('glass'); try { localStorage.setItem('design', on ? 'glass' : 'classic'); } catch (er) {} ev.target.closest('[data-dsw]').textContent = 'Switch design' + (on ? ' (Glass)' : ' (Classic)'); return; }
+      if (ev.target.closest('[data-fsw]')) { const on = document.documentElement.classList.toggle('fsg'); try { localStorage.setItem('font', on ? 'sg' : 'classic'); } catch (er) {} ev.target.closest('[data-fsw]').textContent = 'Switch font' + (on ? ' (Space Grotesk)' : ' (Classic)'); close(); render(); return; }
       if (!ev.target.closest('[data-cc]')) return;
       try { Object.keys(localStorage).forEach(k => { if (/^(lgs\d*_|tps_|athc$)/.test(k)) localStorage.removeItem(k); }); } catch (e) {}
       state.lgs = {}; state.athC = {}; state.lvC = {}; state.std = {}; _prefetched = {};
