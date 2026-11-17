@@ -32,8 +32,7 @@ html.fbar body{font-weight:500}
 html.fsg body,html.fbar body{line-height:1.2}
 html.fbar .tnud{position:relative;top:-.055em}
 .crt tbody td{vertical-align:baseline}
-.crt td.n .slg{vertical-align:-5px}
-html.fbar .sch .rs .rg{position:relative;top:-2px}
+
 html.fbar .gl2 .glr b,html.fbar .sch .rs b,html.fbar .sch .sc2 b,html.fbar .sch .tm{font-weight:500}
 /* ===== Design 2.0: black→purple gradient + glass cards ===== */
 html.d2 body{background:transparent}
@@ -1049,6 +1048,30 @@ html.fsg .f1fl,html.fsg .f1fl *,html.fbar .f1fl,html.fbar .f1fl *{font-family:'A
 .f1ph .hs.heart{border-radius:0;background:#c8102e;-webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath d='M50 92C18 69 3 52 3 31 3 15 15 4 29 4c9 0 17 5 21 13 4-8 12-13 21-13 14 0 26 11 26 27 0 21-15 38-47 61z'/%3E%3C/svg%3E") center/100% 100% no-repeat;mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath d='M50 92C18 69 3 52 3 31 3 15 15 4 29 4c9 0 17 5 21 13 4-8 12-13 21-13 14 0 26 11 26 27 0 21-15 38-47 61z'/%3E%3C/svg%3E") center/100% 100% no-repeat;width:64px !important;height:60px !important;padding-top:8px;box-sizing:border-box;object-fit:cover;object-position:50% 0}
 .hs.hpop{animation:hpop .45s cubic-bezier(.3,1.6,.5,1)}
 @keyframes hpop{0%{transform:scale(.6)}100%{transform:scale(1)}}
+
+/* ===== alignment pass ===== */
+:root{--capc:.405em}
+html.fsg{--capc:.331em}
+/* logos sit on the centre of the capitals next to them */
+.gl2 td.go img{vertical-align:calc(var(--capc) - 10px) !important}
+.sch .opp img{vertical-align:calc(var(--capc) - 12px) !important}
+td.n .slg{vertical-align:calc(var(--capc) - 10px)}
+/* schedule = gamelog typography */
+.sch td.n .pn{font-size:14.5px;font-weight:500}
+.sch td.n .pn .sdw{color:var(--mut);font-size:12px;align-self:center}
+.sch .opp b,.sch .opp b.lng{font-size:14px !important;font-weight:500;letter-spacing:0 !important}
+.sch .sc2 b,.sch .rs b{font-size:15px}
+.sch .sc2 i{font-size:15px}
+.sch .rs .W,.sch .rs .L,.sch .rs .T{font-size:15px}
+/* W/L/T and OT/SO one pixel closer to the score */
+.gl2 .glr > span:last-child{position:relative;left:-1px}
+.gl2 .glr small{left:1px}
+.sch .rg > .W,.sch .rg > .L,.sch .rg > .T{position:relative;left:-1px}
+.sch .rg .sf{position:relative;left:1px}
+/* scores (inline grids) sat ~1.5px below the names in the same row */
+.gl2 .glr,.sch .rs .rg{position:relative;top:-1.5px}
+/* descenders (g, p, y) in clipped one-line texts */
+.f1nm,.f1dn b,.f1w span{padding-bottom:3px;margin-bottom:-3px}
 </style>
 </head>
 <body>
@@ -1150,7 +1173,9 @@ function glDash(root) { (root || $app).querySelectorAll('table.gl2').forEach(tb 
   const rg = document.createRange(), tx = el => { rg.selectNodeContents(el); return rg.getBoundingClientRect(); };
   let x1 = -1e9, x2 = 1e9; rows.forEach(r => { const o = r.querySelector('td.go span'); if (o) x1 = Math.max(x1, tx(o).right); const c = r.cells[3]; if (c && c.textContent.trim()) x2 = Math.min(x2, tx(c).left); });
   if (x1 < -1e8 || x2 > 1e8) return; const g0 = rows[0].querySelector('.glr'), d = g0.querySelector('i'); if (!d) return; const cur = parseFloat(g0.style.marginLeft) || 0, dr = d.getBoundingClientRect(), sh = Math.round(((x1 + x2) / 2 - (dr.left + dr.width / 2)) * 2) / 2 + cur;
-  rows.forEach(r => { const g = r.querySelector('.glr'); if (g) g.style.marginLeft = sh + 'px'; }); const h = tb.querySelector('th.grh'); if (h) h.style.setProperty('padding-left', (23 + sh) + 'px', 'important'); }); }
+  rows.forEach(r => { const g = r.querySelector('.glr'); if (g) g.style.marginLeft = sh + 'px'; });
+  /* the RESULT header starts exactly where the scores start */
+  const h = tb.querySelector('th.grh'); if (h && h.firstChild) { h.style.setProperty('padding-left', (23 + sh) + 'px', 'important'); const sl = Math.min(...rows.map(r => { const b = r.querySelector('.glr b'); return b && b.textContent.trim() ? tx(b).left : 1e9; })), hl = tx(h).left; if (sl < 1e8) h.style.setProperty('padding-left', Math.max(0, 23 + sh + sl - hl) + 'px', 'important'); } }); }
 function tNudge(root) { if (!document.documentElement.classList.contains('fbar')) return;
   (root || document).querySelectorAll('.seg button, .qb button, .dtabs button, .ybtn, .hpill, .cl, .lpm button, .msg button, .favh, .cmpclr, .ylist button, .f1hy button').forEach(b => { [...b.childNodes].forEach(n => { if (n.nodeType === 3 && n.textContent.trim()) { const sp = document.createElement('span'); sp.className = 'tnud'; n.replaceWith(sp); sp.appendChild(n); } }); }); }
 function zebra(root) {
@@ -3116,7 +3141,7 @@ function careerHTML(p, cats) {
     const sk = mode + '|' + c.title, so = (p.csort || {})[sk];
     if (so) { const num = x => { const n = parseFloat(String(x == null ? '' : x).replace(/,/g, '')); return isNaN(n) ? -1e12 : n; }; rows = [...rows].sort((a, b) => (so.asc ? 1 : -1) * (num(a.v[so.i]) - num(b.v[so.i]))); }
     cols.forEach((x, i) => { const L = Math.max(0, ...rows.map(r => String(r.v[i] == null ? '' : r.v[i]).length)), T = tot ? String(tot[i] == null ? '' : tot[i]).length : 0; x[2] = Math.max(x[2], Math.ceil(Math.max(L * 9, T * 10) + 10)); });
-    const hasTot = rows.some((r, i) => !r.tid && !/^[A-Z]{2,4}$/.test(String(r.sub || '')) && rows.some((x, k) => k !== i && x.n === r.n)), fc = (p.league === 'nba' ? 90 : 82) + (hasTot && mode !== 'ncaa' ? 22 : 0), tw2 = fc + cols.reduce((a, x) => a + x[2], 0);
+    const hasTot = rows.some((r, i) => !r.tid && !/^[A-Z]{2,4}$/.test(String(r.sub || '')) && rows.some((x, k) => k !== i && x.n === r.n)), fc = (p.league === 'nba' ? 104 : 92) + (hasTot && mode !== 'ncaa' ? 22 : 0), tw2 = fc + cols.reduce((a, x) => a + x[2], 0);
     return `<section class="blk"><div class="tw"><table class="nfx sep crt" style="width:max(100%, ${tw2}px)"><colgroup><col style="width:${fc}px">${cols.map(x => `<col style="width:${x[2]}px">`).join('')}</colgroup><thead><tr><th class="n">${esc(title)}</th>${cols.map((x, i) => `<th data-csort="${i}" data-cs="${esc(sk)}" class="${so && so.i === i ? 'on' : ''}">${esc(x[1])}</th>`).join('')}</tr></thead><tbody>${(() => { const RT = (r, cls, extra, logo) => `<tr class="${cls}" ${extra}><td class="n"><span class="pn">${esc(r.n)}</span>${mode === 'ncaa' ? (r.tid ? `<img class="slg" src="https://a.espncdn.com/i/teamlogos/ncaa/500-dark/${esc(r.tid)}.png" alt="" onerror="if(!this.dataset.f){this.dataset.f=1;this.src=this.src.replace('500-dark','500')}else this.remove()">` : '') : (logo != null ? logo : seasonLogo(p.league, r))}</td>${r.v.map((v, i) => `<td class="${so && so.i === i ? 'on' : ''}">${nv(clean(v))}</td>`).join('')}</tr>`;
       const isTot = r => !r.tid && !/^[A-Z]{2,4}$/.test(String(r.sub || ''));
       if (so || mode === 'ncaa') return rows.map(r => RT(r, '', '', null)).join('');
