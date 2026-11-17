@@ -997,6 +997,7 @@ html.one #app.lst,html.one body{min-height:0}
 .f1rh .lvt{padding-bottom:6px;margin-bottom:-6px}
 .f1card:not(.f1up) .f1won{margin:1px 0 1px}
 .f1tt .f1nm{position:relative;top:-2px}
+html.fsg .f1tt .f1nm{top:.5px}
 .f1nm{font-family:var(--num);font-weight:700;font-size:17px;line-height:1.1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .f1big{font-family:var(--num);font-weight:700;font-size:17px;line-height:1;letter-spacing:.2px;padding-left:var(--fo,0px);margin:5.5px 0 4.5px}
 .f1ct{padding-left:var(--fo,0px);color:var(--mut);font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -1089,7 +1090,7 @@ html.fsg td.n .slg{top:.75px}
 /* descenders (g, p, y) in clipped one-line texts */
 .f1nm,.f1dn b,.f1w span{padding-bottom:6px;margin-bottom:-6px}
 .f1card.f1up .f1cl1{justify-content:flex-start}
-.f1card.f1up .f1ct{margin-top:auto}
+.f1card.f1up .f1ct{padding-left:46px}
 </style>
 </head>
 <body>
@@ -4571,12 +4572,15 @@ function renderF1List(tabs) {
 function f1Fit() { requestAnimationFrame(() => { { const fl = $app.querySelector('.f1list .f1tt .f1fl'); if (fl) { const r = document.createRange(); r.selectNodeContents(fl); const g = r.getBoundingClientRect(), b = fl.getBoundingClientRect(); if (g.width) $app.querySelector('.f1list').style.setProperty('--fo', Math.max(0, g.left - b.left).toFixed(1) + 'px'); } } $app.querySelectorAll('.f1nm,.f1gp span,.f1rh .lvt').forEach(el => { if (el.scrollWidth > el.clientWidth + 1 && /Grand Prix/.test(el.textContent)) el.textContent = el.textContent.replace(/Grand Prix/, 'GP'); });
   $app.querySelectorAll('.f1dn b').forEach(el => { if (el.scrollWidth > el.clientWidth + 1) { const w = el.textContent.trim().split(/\s+/); if (w.length > 1 && !/\.$/.test(w[0])) el.textContent = w[0][0] + '. ' + w.slice(1).join(' '); } }); f1UpAlign(); }); }
 /* upcoming GP card: GP name's capitals start as far from the card top as the track map, the circuit name's baseline sits as far from the bottom as the map */
+/* upcoming GP card: GP name / date / circuit evenly spaced (cap-top to baseline), last gap to the card bottom = the name's distance from the top */
 function f1UpAlign() { const capc = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--capc')) || .405;
   const base = el => { const z = document.createElement('i'); z.style.cssText = 'display:inline-block;width:0;height:0;vertical-align:baseline'; el.appendChild(z); const y = z.getBoundingClientRect().bottom; z.remove(); return y; };
-  $app.querySelectorAll('.f1list .f1card.f1up').forEach(c => { const tt = c.querySelector('.f1tt'), nm = c.querySelector('.f1nm'), ct = c.querySelector('.f1ct'); if (!tt || !nm || !ct) return; tt.style.marginTop = ''; ct.style.marginBottom = '';
-    const cr = c.getBoundingClientRect(), im = c.querySelector('.f1map img'); let top = cr.top + 14, bot = cr.bottom - 14;
-    if (im) { if (!im.complete || !im.naturalWidth) { if (!im.dataset.ua) { im.dataset.ua = 1; im.addEventListener('load', () => f1UpAlign(), { once: true }); } return; } const r = im.getBoundingClientRect(); if (r.height > 10) { top = r.top; bot = r.bottom; } }
-    ct.style.marginBottom = Math.round((base(ct) - bot) * 2) / 2 + 'px'; }); }
+  const fs = el => parseFloat(getComputedStyle(el).fontSize);
+  $app.querySelectorAll('.f1list .f1card.f1up').forEach(c => { const nm = c.querySelector('.f1nm'), dt = c.querySelector('.f1big'), ct = c.querySelector('.f1ct'); if (!nm || !dt || !ct) return; dt.style.marginTop = ''; ct.style.marginTop = '';
+    const cr = c.getBoundingClientRect(), nb = base(nm), D = nb - 2 * capc * fs(nm) - cr.top, dcap = 2 * capc * fs(dt), ccap = 2 * capc * fs(ct), cTarget = cr.bottom - D;
+    const g = (cTarget - nb - dcap - ccap) / 2; if (!(g > 0)) return;
+    const dm = parseFloat(getComputedStyle(dt).marginTop) || 0; dt.style.marginTop = Math.round((dm + nb + g + dcap - base(dt)) * 2) / 2 + 'px';
+    const cm = parseFloat(getComputedStyle(ct).marginTop) || 0; ct.style.marginTop = Math.round((cm + cTarget - base(ct)) * 2) / 2 + 'px'; }); }
 function f1CenterStrip(smooth) { const s = document.getElementById('strip'), on = s && s.querySelector('.on'); if (!on) return; const tgt = Math.max(0, on.offsetLeft - (s.clientWidth - on.offsetWidth) / 2); if (smooth) s.scrollTo({ left: tgt, behavior: 'smooth' }); else s.scrollLeft = tgt; }
 F1.tok = 0;
 function f1CancelAnim() { F1.tok++; if (window._stAnim) { window._stAnim = false; window._scrollMem[location.hash] = window.scrollY; } }
