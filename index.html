@@ -924,12 +924,13 @@ html.one #app.lst,html.one body{min-height:0}
 .f1fl{display:inline-block;width:38px;text-align:center;font-size:23px;line-height:1;flex:none;font-family:'Apple Color Emoji','Segoe UI Emoji','Noto Color Emoji',sans-serif!important;font-size-adjust:none}
 .f1tt{display:flex;align-items:center;gap:8px;min-width:0;margin-bottom:0}
 .f1tt .f1fl{display:flex;align-items:center;justify-content:center;height:24px}
+.f1tt .f1nm{position:relative;top:-2px}
 .f1nm{font-family:var(--num);font-weight:700;font-size:19px;line-height:1.1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.f1big{font-family:var(--num);font-weight:700;font-size:26px;line-height:1.05;letter-spacing:.2px;padding-left:var(--fo,5px);margin-top:2px}
+.f1big{font-family:var(--num);font-weight:700;font-size:23px;line-height:1;letter-spacing:.2px;padding-left:var(--fo,5px);margin:3px 0 2px}
 .f1ct{padding-left:var(--fo,5px);color:var(--mut);font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .f1won{color:var(--mut);font-size:14px;padding-left:46px;line-height:1.1;margin-bottom:3px}
-.f1w{display:flex;align-items:center;gap:8px;font-family:var(--num);font-size:19px;font-weight:700;line-height:1;min-width:0}
-.f1w span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.f1w{display:flex;align-items:center;gap:8px;font-family:var(--num);font-size:17px;font-weight:700;line-height:1.25;min-width:0}
+.f1w span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding-bottom:1px}
 .f1w .hs{width:38px;height:38px;border-radius:50%;object-fit:cover;background:#2c2c2e;flex:none}
 .f1map{flex:0 0 40%;display:flex;align-items:center;justify-content:flex-end}
 .f1pen{display:block;color:var(--mut);font-family:-apple-system,sans-serif;font-size:11.5px;font-weight:600;line-height:1.25}
@@ -4490,7 +4491,9 @@ function f1Agg(y) {
   }
   return A;
 }
-function f1IsDnf(r, LL) { const s = JSON.stringify(r.status || {}); if (/retir|accident|collision|disqual|\bdsq\b|did not|\bdns\b|\bdnf\b|withdr|mechanical|engine|gearbox|hydraul|brakes?\b|spun|damage|power unit|electrical|puncture/i.test(s) && !/"finished"|lap\(s\) behind|\+\d+ laps?/i.test(s)) return true; const l = r.st && r.st.lapsCompleted ? r.st.lapsCompleted.v : null; if (!r.status && l != null && LL && l < LL - 4) return true; return false; }
+/* ESPN competitor status: STATUS_CLASSIFIED = finished (incl. lapped); anything else = DNF / DSQ / DNS */
+function f1Out(r) { const t = r.status && r.status.type; if (!t || !t.name) return null; const n = String(t.name + ' ' + (t.description || '')).toLowerCase(); if (/classified|finish/.test(n) && !/not classified|unclassified/.test(n)) return ''; if (/disq|dsq/.test(n)) return 'DSQ'; if (/not start|dns|withdr/.test(n)) return 'DNS'; return 'DNF'; }
+function f1IsDnf(r, LL) { const o = f1Out(r); if (o != null) return !!o; const s = JSON.stringify(r.status || {}); if (/retir|accident|collision|disqual|\bdsq\b|did not|\bdns\b|\bdnf\b|withdr|mechanical|engine|gearbox|hydraul|brakes?\b|spun|damage|power unit|electrical|puncture/i.test(s) && !/"finished"|lap\(s\) behind|\+\d+ laps?/i.test(s)) return true; const l = r.st && r.st.lapsCompleted ? r.st.lapsCompleted.v : null; if (!r.status && l != null && LL && l < LL - 4) return true; return false; }
 function f1StatsHTML(v, y) {
   const A = f1Agg(y), S = F1.st[y]; if (!A) return msg(v.err || 'Loading…');
   const con = v.m === 'con';
@@ -4504,15 +4507,20 @@ function f1StatsHTML(v, y) {
 }
 /* race page */
 const F1SES = { FP1: 'Free Practice 1', FP2: 'Free Practice 2', FP3: 'Free Practice 3', SS: 'Sprint Qualifying', SR: 'Sprint Race', Qual: 'Qualifying', Race: 'Race' };
-function f1Groups(ev) { const has = ab => !!f1Comp(ev, ab), G = []; const fp = ['FP1', 'FP2', 'FP3'].filter(has); if (fp.length) G.push(['fp', 'Free Practice', fp]); if (has('SS')) G.push(['ss', 'Sprint Qualifying', ['SS']]); if (has('SR')) G.push(['sr', 'Sprint Race', ['SR']]); if (has('Qual')) G.push(['q', 'Qualifying', ['Qual']]); if (has('Race')) G.push(['r', 'Race', ['Race']]); return G; }
-function f1DefGroup(ev, G) { const done = G.filter(g => g[2].some(ab => f1Done(f1Comp(ev, ab)))); let g = done[done.length - 1] || G[0]; if (g && g[0] === 'q' && G.find(x => x[0] === 'r') && !f1Done(f1Comp(ev, 'Race'))) g = G.find(x => x[0] === 'r'); if (g && g[0] === 'ss' && G.find(x => x[0] === 'sr') && !f1Done(f1Comp(ev, 'SR'))) g = G.find(x => x[0] === 'sr'); return g; }
+function f1Groups(ev) { const has = ab => !!f1Comp(ev, ab), G = []; const fp = ['FP1', 'FP2', 'FP3'].filter(has); if (fp.length) G.push(['fp', 'Free Practice', fp]); if (has('SS')) G.push(['ss', 'Sprint Qualifying', ['SS']]); if (has('SR')) G.push(['sr', 'Sprint Race', ['SR']]); if (has('Qual')) G.push(['q', 'Qualifying', ['Qual']]); if (has('Race') && has('Qual')) G.push(['g', 'Starting Grid', ['Race']]); if (has('Race')) G.push(['r', 'Race', ['Race']]); return G; }
+function f1GridMap(ev, v) { const c = f1Comp(ev, 'Race'); if (!c) return 0; const gk = 'g' + c.id; F1.grid = F1.grid || {}; if (F1.grid[gk] === undefined) { F1.grid[gk] = null; getJson(F1C + 'events/' + ev.id + '/competitions/' + c.id + '/competitors?limit=40').then(L => { const m = {}; (L.items || []).forEach(it => { if (it.startOrder > 0) m[String(it.id)] = it.startOrder; }); F1.grid[gk] = Object.keys(m).length >= 10 ? m : 0; if (F1.grid[gk] && v && v.gAuto && v.g === 'q' && !f1Done(c)) v.g = 'g'; if (state.lv === v) render(); }).catch(() => { F1.grid[gk] = 0; }); } return F1.grid[gk]; }
+function f1DefGroup(ev, G, v) { const D = ab => f1Done(f1Comp(ev, ab)), H = k => G.find(x => x[0] === k);
+  if (H('r') && D('Race')) return H('r');
+  if (H('q') && D('Qual')) return f1GridMap(ev, v) && H('g') ? H('g') : H('q');
+  if (H('sr') && D('SS') && !D('SR')) return H('sr');
+  const done = G.filter(g => g[0] !== 'g' && g[2].some(ab => D(ab))); return done[done.length - 1] || G[0]; }
 const f1Base = c => (c.competitors || []).map(x => ({ id: String(x.id), order: x.order, name: (x.athlete || {}).displayName, team: '' }));
 function f1RaceHTML(v) {
   const ev = F1.ev && F1.ev[v.cat]; if (!ev) return { ysel: '', top: '', body: msg(v.err || 'Loading…') };
-  const G = f1Groups(ev); if (!v.g || !G.find(g => g[0] === v.g)) { const d = f1DefGroup(ev, G); v.g = d ? d[0] : 'r'; }
+  const G = f1Groups(ev); if (!v.g || !G.find(g => g[0] === v.g)) { const d = f1DefGroup(ev, G, v); v.g = d ? d[0] : 'r'; v.gAuto = true; }
   const grp = G.find(g => g[0] === v.g) || G[0], ey = ev._y || f1Year();
   const ylist = []; for (let y = Math.max(f1CurY(), ey); y >= 2004; y--) ylist.push(y);
-  const ysel = `<div class="ysel tys"><button class="ybtn" data-f1so="1">Session<i class="chev ${v.sOpen ? 'up' : ''}"></i></button>${v.sOpen ? `<div class="ylist">${G.map(g => `<button data-f1s="${g[0]}" class="${g[0] === v.g ? 'on' : ''}">${esc(g[1])}</button>`).join('')}</div>` : ''}</div>` + `<div class="ysel tys f1ys"><button class="ybtn" data-f1yo="1">${esc(String(ey))}<i class="chev ${v.yOpen ? 'up' : ''}"></i></button>${v.yOpen ? `<div class="ylist">${ylist.map(x => `<button data-f1ry2="${x}" class="${x === ey ? 'on' : ''}">${x}</button>`).join('')}</div>` : ''}</div>`;
+  const ysel = `<div class="ysel tys"><button class="ybtn" data-f1so="1">${esc(grp ? grp[1] : 'Session')}<i class="chev ${v.sOpen ? 'up' : ''}"></i></button>${v.sOpen ? `<div class="ylist">${G.map(g => `<button data-f1s="${g[0]}" class="${g[0] === v.g ? 'on' : ''}">${esc(g[1])}</button>`).join('')}</div>` : ''}</div>` + `<div class="ysel tys f1ys"><button class="ybtn" data-f1yo="1">${esc(String(ey))}<i class="chev ${v.yOpen ? 'up' : ''}"></i></button>${v.yOpen ? `<div class="ylist">${ylist.map(x => `<button data-f1ry2="${x}" class="${x === ey ? 'on' : ''}">${x}</button>`).join('')}</div>` : ''}</div>`;
   const top = `<div class="f1rh">${f1Flag(ev)}<div><div class="lvt">${esc(f1Short(ev))}</div><div class="f1rsub">${esc(f1Dates(ev) + (ev.circuit && ev.circuit.fullName ? ' · ' + ev.circuit.fullName : ''))}</div></div></div>`;
   if (!grp) return { ysel, top, body: msg('No results availible') };
   let sub = '', ab = grp[2][0];
@@ -4522,15 +4530,16 @@ function f1RaceHTML(v) {
   const cd = c && c.date ? new Date(c.date) : null, when = cd && !isNaN(cd) ? `${DAYS[cd.getDay()]} ${cd.getDate()}.${cd.getMonth() + 1}. - ${String(cd.getHours()).padStart(2, '0')}:${String(cd.getMinutes()).padStart(2, '0')}` : '';
   let body = `<div class="sec f1sh">${esc(grp[0] === 'fp' ? F1SES[ab] : grp[1])}${when ? `<span class="f1when">${esc(when)}</span>` : ''}</div>` + sub;
   if (!c) return { ysel, top, body: body + msg('No results availible') };
-  const need = (cc, st) => { const k = cc.id + (st ? 's' : ''); F1.rdv = F1.rdv || {}; F1.rdp = F1.rdp || {}; if (F1.rdv[k] || F1.rdp[k]) return F1.rdv[k] || null; F1.rdp[k] = 1; f1Detail(ev.id, cc, st).then(rows => { F1.rdv[k] = rows; if (state.lv === v) render(); }).catch(() => { F1.rdp[k] = 0; }); return null; };
-  if (!f1Done(c)) { const qa = ab === 'Race' ? 'Qual' : ab === 'SR' ? 'SS' : null, qc = qa && f1Comp(ev, qa);
-    if (qc && f1Done(qc) && (qc.competitors || []).length) { const det = need(qc, false);
-      /* official grid (startOrder, incl. grid penalties) from the race entry list; falls back to the qualifying order */
-      const gk = 'g' + c.id; F1.grid = F1.grid || {}; if (F1.grid[gk] === undefined) { F1.grid[gk] = null; getJson(F1C + 'events/' + ev.id + '/competitions/' + c.id + '/competitors?limit=40').then(L => { const m = {}; (L.items || []).forEach(it => { if (it.startOrder > 0) m[String(it.id)] = it.startOrder; }); F1.grid[gk] = Object.keys(m).length >= 10 ? m : 0; if (state.lv === v) render(); }).catch(() => { F1.grid[gk] = 0; }); }
-      const gm = F1.grid[gk], rows = f1Base(qc).map(r => gm && gm[r.id] ? Object.assign(r, { q: r.order, order: gm[r.id] }) : r);
-      return { ysel, top, body: body + `<div class="f1grid">${gm ? 'Starting grid' : 'Starting grid (qualifying order)'}</div>` + f1Table(rows, det, 'grid', ey) }; }
+  const need0 = (cc, st) => { const k = cc.id + (st ? 's' : ''); F1.rdv = F1.rdv || {}; F1.rdp = F1.rdp || {}; if (F1.rdv[k] || F1.rdp[k]) return F1.rdv[k] || null; F1.rdp[k] = 1; f1Detail(ev.id, cc, st).then(rows => { F1.rdv[k] = rows; if (state.lv === v) render(); }).catch(() => { F1.rdp[k] = 0; }); return null; };
+  if (grp[0] === 'g') { /* official grid (startOrder, incl. grid penalties); falls back to the qualifying order */
+    const qc = f1Comp(ev, 'Qual'); if (!qc || !f1Done(qc) || !(qc.competitors || []).length) return { ysel, top, body: body + msg('No results availible') };
+    const det = need0(qc, false), gm = f1GridMap(ev, v), rows = f1Base(qc).map(r => gm && gm[r.id] ? Object.assign(r, { q: r.order, order: gm[r.id] }) : r);
+    return { ysel, top, body: body + (gm ? '' : `<div class="f1grid">Qualifying order – official grid not published yet</div>`) + f1Table(rows, det, 'grid', ey) }; }
+  if (!f1Done(c)) { const qc = ab === 'SR' ? f1Comp(ev, 'SS') : null;
+    if (qc && f1Done(qc) && (qc.competitors || []).length) { const det = need0(qc, false);
+      return { ysel, top, body: body + `<div class="f1grid">Starting grid (sprint qualifying order)</div>` + f1Table(f1Base(qc), det, 'grid', ey) }; }
     return { ysel, top, body: body + msg('No results availible') }; }
-  const det = need(c, race), base = (c.competitors || []).length ? f1Base(c) : (det || []).map(r => ({ id: r.id, order: r.order, name: '', team: r.team }));
+  const det = need0(c, race), base = (c.competitors || []).length ? f1Base(c) : (det || []).map(r => ({ id: r.id, order: r.order, name: '', team: r.team }));
   if (!base.length) return { ysel, top, body: body + msg('No results availible') };
   return { ysel, top, body: body + f1Table(base, det, mode, ey) };
 }
@@ -4544,7 +4553,7 @@ function f1Table(rows, det, mode, y) {
   if (pc && det) { const lead = R.find(r => r.order === 1), LL = lead ? V(lead, 'lapsCompleted') : 0;
     R.forEach(r => { const x = V(r, 'fastestLap'); if (x && (!fl || x < fl.v)) fl = { v: x, id: r.id }; });
     const dnf = r => f1IsDnf(r, LL);
-    timeOf = r => { if (r.order === 1) return (S(r, 'totalTime') || {}).d || ''; if (dnf(r)) return 'DNF'; const l = V(r, 'lapsCompleted'); if (l && LL && l < LL) { const n = LL - l; return '+' + n + ' Lap' + (n > 1 ? 's' : ''); } const b = S(r, 'behindTime'); return b && b.v > 0 ? b.d : ''; };
+    timeOf = r => { if (r.order === 1) return (S(r, 'totalTime') || {}).d || ''; if (dnf(r)) return f1Out(r) || 'DNF'; const l = V(r, 'lapsCompleted'); if (l && LL && l < LL) { const n = LL - l; return '+' + n + ' Lap' + (n > 1 ? 's' : ''); } const b = S(r, 'behindTime'); return b && b.v > 0 ? b.d : ''; };
     const T = f1PtsTable(y, mode === 'sprint');
     ptsOf = r => { if (dnf(r)) return ''; let p = T[(r.order || 99) - 1] || 0; if (mode === 'race' && y >= 2019 && y <= 2024 && fl && fl.id === r.id && r.order <= 10) p++; return p ? String(p) : ''; }; }
   else if (mode === 'fp' && det) { const lead = R.find(r => r.order === 1), L0 = lead ? V(lead, 'fastestLap') : 0;
@@ -4648,7 +4657,7 @@ $app.addEventListener('click', ev => {
   if (d.f1so) { v.sOpen = !v.sOpen; v.yOpen = false; render(); return; }
   if (d.f1y) { v.y = +d.f1y; v.yOpen = false; v.exp = {}; v.err = null; render(); f1Load(v); return; }
   if (d.f1exp) { v.exp = v.exp || {}; v.exp[d.f1exp] = !v.exp[d.f1exp]; if (!v.exp[d.f1exp]) v._scrollSec = d.f1exp; render(); return; }
-  if (d.f1s) { v.g = d.f1s; v.sOpen = false; v.q = 'T'; render(); return; }
+  if (d.f1s) { v.g = d.f1s; v.gAuto = false; v.sOpen = false; v.q = 'T'; render(); return; }
   if (d.f1sub) { v.fp = d.f1sub; render(); return; }
   if (d.f1q) { v.q = d.f1q; render(); return; }
   if (d.f1ry2) { const y = +d.f1ry2, ev0 = (F1.ev || {})[v.cat]; v.yOpen = false; if (!ev0 || y === ev0._y) { render(); return; }
