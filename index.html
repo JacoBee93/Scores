@@ -920,17 +920,20 @@ html.one #app.lst,html.one body{min-height:0}
 
 .f1list{padding-bottom:40vh}
 .f1card{display:flex;align-items:stretch;gap:10px;height:112px;box-sizing:border-box;padding:12px 16px;overflow:hidden}
-.f1cl1{flex:1 1 55%;min-width:0;display:flex;flex-direction:column;justify-content:center;gap:3px}
-.f1fl{display:inline-block;width:34px;text-align:center;font-size:23px;line-height:1;flex:none;font-family:'Apple Color Emoji','Segoe UI Emoji','Noto Color Emoji',sans-serif!important;font-size-adjust:none}
-.f1tt{display:flex;align-items:center;gap:8px;min-width:0;margin-bottom:2px}
-.f1nm{font-family:var(--num);font-weight:700;font-size:19px;line-height:1.15;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.f1big{font-family:var(--num);font-weight:700;font-size:26px;line-height:1.05;letter-spacing:.2px}
-.f1ct{color:var(--mut);font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.f1won{color:var(--mut);font-size:14px;padding-left:42px}
-.f1w{display:flex;align-items:center;gap:8px;font-family:var(--num);font-size:17px;font-weight:700;line-height:1}
-.f1w .hs{width:34px;height:34px;border-radius:50%;object-fit:cover;background:#2c2c2e;flex:none}
+.f1cl1{flex:1 1 55%;min-width:0;display:flex;flex-direction:column;justify-content:center;gap:2px}
+.f1fl{display:inline-block;width:38px;text-align:center;font-size:23px;line-height:1;flex:none;font-family:'Apple Color Emoji','Segoe UI Emoji','Noto Color Emoji',sans-serif!important;font-size-adjust:none}
+.f1tt{display:flex;align-items:center;gap:8px;min-width:0;margin-bottom:0}
+.f1tt .f1fl{display:flex;align-items:center;justify-content:center;height:24px}
+.f1nm{font-family:var(--num);font-weight:700;font-size:19px;line-height:1.1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.f1big{font-family:var(--num);font-weight:700;font-size:26px;line-height:1.05;letter-spacing:.2px;padding-left:var(--fo,5px);margin-top:2px}
+.f1ct{padding-left:var(--fo,5px);color:var(--mut);font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.f1won{color:var(--mut);font-size:14px;padding-left:46px;line-height:1.1;margin-bottom:3px}
+.f1w{display:flex;align-items:center;gap:8px;font-family:var(--num);font-size:19px;font-weight:700;line-height:1;min-width:0}
+.f1w span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.f1w .hs{width:38px;height:38px;border-radius:50%;object-fit:cover;background:#2c2c2e;flex:none}
 .f1map{flex:0 0 40%;display:flex;align-items:center;justify-content:flex-end}
-.f1nomap{flex:1;text-align:center;color:var(--mut);font-size:13px;font-weight:600}
+.f1pen{display:block;color:var(--mut);font-family:-apple-system,sans-serif;font-size:11.5px;font-weight:600;line-height:1.25}
+.f1nomap{flex:0 0 120px;text-align:center;color:var(--mut);font-size:13px;font-weight:600}
 .f1map img{display:block;width:auto;height:auto;max-width:100%;max-height:84px;filter:invert(1) brightness(1.6);opacity:.85;-webkit-user-drag:none}
 .f1d{display:flex;align-items:center;gap:10px;min-width:0}
 .f1d .hs{width:36px;height:36px;border-radius:50%;object-fit:cover;background:#2c2c2e;flex:none}
@@ -946,7 +949,7 @@ html.one #app.lst,html.one body{min-height:0}
 .f1t th.l{text-align:left}
 .f1t th.l.ph{padding-left:48px}
 .f1t th.tl,.f1t td.f1tm{text-align:right!important;padding-right:10px}
-.f1res.pc th.tl,.f1res.pc td.f1tm{padding-right:18px}
+.f1res.f1pc th.tl,.f1res.f1pc td.f1tm{padding-right:13px}
 .f1gp{display:flex;align-items:center;gap:9px;min-width:0}
 .f1gp span{font-family:var(--num);font-weight:700;font-size:18px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .f1gpl td{padding-top:9px;padding-bottom:9px}
@@ -967,7 +970,7 @@ html.one #app.lst,html.one body{min-height:0}
 .f1ph.con{align-items:flex-start;padding-top:14px}
 .f1ph.con .f1dn b{font-size:30px;line-height:1}
 .f1ph.con .f1pp b{font-size:30px}
-.f1pp{text-align:right}.f1pp b{font-family:var(--num);font-size:26px;display:block;line-height:1}.f1pp small{color:var(--mut);font-size:12px}
+.f1pp{width:58px;flex:none;text-align:center;margin-right:-2px}.f1pp b{font-family:var(--num);font-size:26px;display:block;line-height:1}.f1pp small{color:var(--mut);font-size:12px}
 .f1rcs{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 .f1rc{display:flex;align-items:center;gap:8px;background:#1c1c1e;border-radius:14px;padding:10px;min-height:52px;cursor:pointer}
 .f1rn{flex:1;min-width:0;font-size:13px;font-weight:600;line-height:1.2;overflow:hidden}
@@ -1213,6 +1216,7 @@ function ttlFor(u, j) {
   if (/\/scoreboard/.test(u)) { const ev = (j && j.events) || [], st = ev.map(stOf); if (st.includes('in')) return 15e3; if (st.includes('pre')) return 2 * MIN; return ev.length ? 12 * HR : 30 * MIN; }
   if (/\/plays\?|\/competitions\/\d+\?/.test(u)) return 30e3;
   if (/racing\/leagues\/f1\/circuits/.test(u)) return /\.(png|svg|jpe?g)/i.test(JSON.stringify(j || {})) ? 30 * 24 * HR : 12 * HR;
+  if (/racing\/leagues\/f1\/events\/\d+\/competitions\/\d+\/competitors\?/.test(u)) return 10 * MIN;
   if (/racing\/leagues\/f1\/events\/\d+\/competitions\/\d+\/competitors/.test(u)) return 2 * 24 * HR;
   if (/racing\/f1\/standings/.test(u)) return 5 * MIN;
   if (/standings/.test(u)) return 15 * MIN;
@@ -4395,7 +4399,7 @@ function renderF1List(tabs) {
   f1Fit();
   if (evs && evs.length && !F1.scrolled) { F1.scrolled = 1; requestAnimationFrame(() => f1ScrollTo(F1.curId, false)); }
 }
-function f1Fit() { requestAnimationFrame(() => { $app.querySelectorAll('.f1nm,.f1gp span,.f1rh .lvt').forEach(el => { if (el.scrollWidth > el.clientWidth + 1 && /Grand Prix/.test(el.textContent)) el.textContent = el.textContent.replace(/Grand Prix/, 'GP'); });
+function f1Fit() { requestAnimationFrame(() => { { const fl = $app.querySelector('.f1list .f1tt .f1fl'); if (fl) { const r = document.createRange(); r.selectNodeContents(fl); const g = r.getBoundingClientRect(), b = fl.getBoundingClientRect(); if (g.width) $app.querySelector('.f1list').style.setProperty('--fo', Math.max(0, g.left - b.left).toFixed(1) + 'px'); } } $app.querySelectorAll('.f1nm,.f1gp span,.f1rh .lvt').forEach(el => { if (el.scrollWidth > el.clientWidth + 1 && /Grand Prix/.test(el.textContent)) el.textContent = el.textContent.replace(/Grand Prix/, 'GP'); });
   $app.querySelectorAll('.f1dn b').forEach(el => { if (el.scrollWidth > el.clientWidth + 1) { const w = el.textContent.trim().split(/\s+/); if (w.length > 1 && !/\.$/.test(w[0])) el.textContent = w[0][0] + '. ' + w.slice(1).join(' '); } }); }); }
 function f1CenterStrip(smooth) { const s = document.getElementById('strip'), on = s && s.querySelector('.on'); if (!on) return; const tgt = Math.max(0, on.offsetLeft - (s.clientWidth - on.offsetWidth) / 2); if (smooth) s.scrollTo({ left: tgt, behavior: 'smooth' }); else s.scrollLeft = tgt; }
 F1.tok = 0;
@@ -4515,12 +4519,16 @@ function f1RaceHTML(v) {
   if (grp[0] === 'fp') { v.fp = grp[2].includes(v.fp) ? v.fp : (grp[2].filter(x => f1Done(f1Comp(ev, x))).pop() || grp[2][0]); ab = v.fp; if (grp[2].length > 1) sub = `<div class="seg pseg">${grp[2].map(x => `<button data-f1sub="${x}" class="${x === v.fp ? 'on' : ''}">${x}</button>`).join('')}</div>`; }
   const isQ = grp[0] === 'q' || grp[0] === 'ss'; if (isQ) { v.q = v.q || 'T'; const p = grp[0] === 'ss' ? 'SQ' : 'Q'; sub = `<div class="seg pseg">${[['T', 'Total'], ['1', p + '1'], ['2', p + '2'], ['3', p + '3']].map(([k, l]) => `<button data-f1q="${k}" class="${v.q === k ? 'on' : ''}">${l}</button>`).join('')}</div>`; }
   const c = f1Comp(ev, ab), race = ab === 'Race' || ab === 'SR', mode = race ? (ab === 'SR' ? 'sprint' : 'race') : isQ ? 'q' + v.q : 'fp';
-  const cd = c && c.date ? new Date(c.date) : null, when = cd && !isNaN(cd) ? `${DAYS[cd.getDay()]} ${cd.getDate()}.${cd.getMonth() + 1}. · ${String(cd.getHours()).padStart(2, '0')}:${String(cd.getMinutes()).padStart(2, '0')}` : '';
+  const cd = c && c.date ? new Date(c.date) : null, when = cd && !isNaN(cd) ? `${DAYS[cd.getDay()]} ${cd.getDate()}.${cd.getMonth() + 1}. - ${String(cd.getHours()).padStart(2, '0')}:${String(cd.getMinutes()).padStart(2, '0')}` : '';
   let body = `<div class="sec f1sh">${esc(grp[0] === 'fp' ? F1SES[ab] : grp[1])}${when ? `<span class="f1when">${esc(when)}</span>` : ''}</div>` + sub;
   if (!c) return { ysel, top, body: body + msg('No results availible') };
   const need = (cc, st) => { const k = cc.id + (st ? 's' : ''); F1.rdv = F1.rdv || {}; F1.rdp = F1.rdp || {}; if (F1.rdv[k] || F1.rdp[k]) return F1.rdv[k] || null; F1.rdp[k] = 1; f1Detail(ev.id, cc, st).then(rows => { F1.rdv[k] = rows; if (state.lv === v) render(); }).catch(() => { F1.rdp[k] = 0; }); return null; };
   if (!f1Done(c)) { const qa = ab === 'Race' ? 'Qual' : ab === 'SR' ? 'SS' : null, qc = qa && f1Comp(ev, qa);
-    if (qc && f1Done(qc) && (qc.competitors || []).length) { const det = need(qc, false); return { ysel, top, body: body + `<div class="f1grid">Starting grid</div>` + f1Table(f1Base(qc), det, 'grid', ey) }; }
+    if (qc && f1Done(qc) && (qc.competitors || []).length) { const det = need(qc, false);
+      /* official grid (startOrder, incl. grid penalties) from the race entry list; falls back to the qualifying order */
+      const gk = 'g' + c.id; F1.grid = F1.grid || {}; if (F1.grid[gk] === undefined) { F1.grid[gk] = null; getJson(F1C + 'events/' + ev.id + '/competitions/' + c.id + '/competitors?limit=40').then(L => { const m = {}; (L.items || []).forEach(it => { if (it.startOrder > 0) m[String(it.id)] = it.startOrder; }); F1.grid[gk] = Object.keys(m).length >= 10 ? m : 0; if (state.lv === v) render(); }).catch(() => { F1.grid[gk] = 0; }); }
+      const gm = F1.grid[gk], rows = f1Base(qc).map(r => gm && gm[r.id] ? Object.assign(r, { q: r.order, order: gm[r.id] }) : r);
+      return { ysel, top, body: body + `<div class="f1grid">${gm ? 'Starting grid' : 'Starting grid (qualifying order)'}</div>` + f1Table(rows, det, 'grid', ey) }; }
     return { ysel, top, body: body + msg('No results availible') }; }
   const det = need(c, race), base = (c.competitors || []).length ? f1Base(c) : (det || []).map(r => ({ id: r.id, order: r.order, name: '', team: r.team }));
   if (!base.length) return { ysel, top, body: body + msg('No results availible') };
@@ -4550,7 +4558,7 @@ function f1Table(rows, det, mode, y) {
     else { const has = R.filter(r => qt(r, k) > 0).sort((a, b) => qt(a, k) - qt(b, k)), no = k === '1' ? R.filter(r => !(qt(r, k) > 0)).sort((a, b) => (a.order || 99) - (b.order || 99)) : [];
       if (!has.length) return msg('No results availible');
       R = has.concat(no); R.forEach((r, i) => { r.order = i + 1; }); const P0 = qt(has[0], k); timeOf = r => { const t = qt(r, k); return !t ? 'DNF' : r.order === 1 ? f1Ms(t) : '+' + ((t - P0) / 1000).toFixed(3); }; } }
-  return `<section class="blk"><table class="nfx sep f1t f1res ${pc ? 'pc' : ''}"><colgroup><col style="width:34px"><col><col style="width:${pc ? 112 : 88}px">${pc ? '<col style="width:30px">' : ''}</colgroup><thead><tr><th class="n">#</th><th class="l ph">Driver</th><th class="tl">${mode === 'grid' ? '' : 'Time'}</th>${pc ? '<th>Pts</th>' : ''}</tr></thead><tbody>${R.sort((a, b) => (a.order || 99) - (b.order || 99)).map(r => `<tr data-f1drv="${esc(r.id)}"><td class="n f1rk ${pc && r.order <= 3 ? 'p' + r.order : ''}">${esc(String(r.order || ''))}</td><td class="l">${f1Drv(r.id, r.name || '', r.team).replace(/<\/div><\/div>$/, fl && fl.id === r.id ? '</div><i class="f1fast" title="Fastest lap">⚡</i></div>' : '</div></div>')}</td><td class="f1tm">${esc(det ? timeOf(r) : '')}</td>${pc ? `<td>${esc(det ? ptsOf(r) : '')}</td>` : ''}</tr>`).join('')}</tbody></table></section>`;
+  return `<section class="blk"><table class="nfx sep f1t f1res ${pc ? 'f1pc' : ''}"><colgroup><col style="width:34px"><col><col style="width:${pc ? 104 : 88}px">${pc ? '<col style="width:30px">' : ''}</colgroup><thead><tr><th class="n">#</th><th class="l ph">Driver</th><th class="tl">${mode === 'grid' ? '' : 'Time'}</th>${pc ? '<th>Pts</th>' : ''}</tr></thead><tbody>${R.sort((a, b) => (a.order || 99) - (b.order || 99)).map(r => `<tr data-f1drv="${esc(r.id)}"><td class="n f1rk ${pc && r.order <= 3 ? 'p' + r.order : ''}">${esc(String(r.order || ''))}</td><td class="l">${f1Drv(r.id, r.name || '', r.team).replace(/<\/div><\/div>$/, fl && fl.id === r.id ? '</div><i class="f1fast" title="Fastest lap">⚡</i></div>' : '</div></div>')}</td><td class="f1tm">${mode === 'grid' && r.q && r.order > r.q ? `<small class="f1pen">Grid penalty<br>Qualified P${r.q}</small>` : esc(det ? timeOf(r) : '')}</td>${pc ? `<td>${esc(det ? ptsOf(r) : '')}</td>` : ''}</tr>`).join('')}</tbody></table></section>`;
 }
 
 function route() {
