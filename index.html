@@ -1673,9 +1673,9 @@ function gSort(title, labels, rows) {
   if (!sel || sel.k >= labels.length) return { gk, k: -1, rows };
   const num = v => { const x = String(v == null ? '' : v).replace(/,/g, ''); let m; if ((m = x.match(/^(\d+):(\d+)$/))) return +m[1] * 60 + +m[2]; if ((m = x.match(/^(\d+)[-/](\d+)$/))) return +m[1] + +m[2] / 1000; const n = parseFloat(x); return isNaN(n) ? -1e9 : n; };
   const k2 = g.league === 'nhl' ? labels.indexOf('G') : -1;
-  return { gk, k: def ? -1 : sel.k, rows: [...rows].sort((a, b) => ((sel.asc ? 1 : -1) * (num(a.vals[sel.k]) - num(b.vals[sel.k]))) || (def && k2 >= 0 ? num(b.vals[k2]) - num(a.vals[k2]) : 0)) };
+  return { gk, dk: def ? sel.k : -1, k: def ? -1 : sel.k, rows: [...rows].sort((a, b) => ((sel.asc ? 1 : -1) * (num(a.vals[sel.k]) - num(b.vals[sel.k]))) || (def && k2 >= 0 ? num(b.vals[k2]) - num(a.vals[k2]) : 0)) };
 }
-const gTh = (S, labels) => labels.map((l, k) => `<th data-gsort="${k}" data-gsg="${esc(S.gk)}" class="${S.k === k ? 'on' : ''}">${esc(l)}</th>`).join('');
+const gTh = (S, labels) => labels.map((l, k) => `<th data-gsort="${k}" data-gsg="${esc(S.gk)}" class="${S.k === k ? 'on' : ''}${S.dk === k ? ' dflt' : ''}">${esc(l)}</th>`).join('');
 const gTd = (S, vals) => vals.map((v, k) => `<td class="${S.k === k ? 'on' : ''}">${nv(v)}</td>`).join('');
 function tbl(title, labels, rows) {
   const S = gSort(title, labels, rows); rows = S.rows;
@@ -2889,13 +2889,13 @@ async function loadNcaa(p) {
   p.ncaaLoading = false;
   if (state.player === p && topView() === 'player') render();
 }
-function splitReturns(c) {
+function splitReturns(c, gpOf) {
   const N = c.names || [], L = c.labels || []; if (!N.some(n => /kickReturn/i.test(n)) || !N.some(n => /puntReturn/i.test(n))) return [c];
-  const fi = re => N.findIndex(n => re.test(n)), gp = fi(/^(gamesPlayed|games)$/i);
-  const mk = (title, k) => { const spec = [['G', gp], ['ATT', fi(new RegExp('^' + k + 'Returns$', 'i'))], ['YDS', fi(new RegExp('^' + k + 'ReturnYards$', 'i'))], ['AVG', (q => q >= 0 ? q : -2)(fi(new RegExp('(yardsPer' + k + 'Return|avg' + k + 'Return|' + k + 'ReturnAverage|' + k + 'ReturnYardsPer|' + k + 'ReturnAvg)', 'i')))], ['TD', fi(new RegExp('^' + k + 'ReturnTouchdowns$', 'i'))], ['LNG', fi(new RegExp('^long' + k + 'Return$', 'i'))], ['FC', fi(new RegExp('^' + k + 'Return(FairCatches|FairCatch)$', 'i'))]].filter(x => x[1] >= 0);
-    const ia = (spec.find(x => x[0] === 'ATT') || [])[1], iy = (spec.find(x => x[0] === 'YDS') || [])[1]; const sp2 = spec.filter(x => x[1] !== -2 || (ia >= 0 && iy >= 0)); if (sp2.length < 3) return null; const ix = sp2.map(x => x[1]);
+  const fi = re => N.findIndex(n => re.test(n)); let gp = fi(/^(gamesPlayed|games|teamGamesPlayed)$/i); if (gp < 0) gp = L.findIndex(l => /^(GP|G)$/i.test(l)); if (gp < 0 && gpOf) gp = -3;
+  const mk = (title, k) => { const spec = [['G', gp], ['ATT', fi(new RegExp('^' + k + 'Returns$', 'i'))], ['YDS', fi(new RegExp('^' + k + 'ReturnYards$', 'i'))], ['AVG', (q => q >= 0 ? q : -2)(fi(new RegExp('(yardsPer' + k + 'Return|avg' + k + 'Return|' + k + 'ReturnAverage|' + k + 'ReturnYardsPer|' + k + 'ReturnAvg)', 'i')))], ['TD', fi(new RegExp('^' + k + 'Return(Touchdowns|TDs?)$', 'i'))], ['LNG', fi(new RegExp('^long' + k + 'Return(Yards)?$|^' + k + 'ReturnLong', 'i'))], ['FC', fi(new RegExp('^' + k + 'Return(s)?(FairCatches|FairCatch|FC)$|^' + k + 'FairCatches$|^fairCatches' + k, 'i'))]].filter(x => x[1] >= 0 || x[1] === -2 || x[1] === -3);
+    const ia = (spec.find(x => x[0] === 'ATT') || [])[1], iy = (spec.find(x => x[0] === 'YDS') || [])[1]; const sp2 = spec.filter(x => (x[1] !== -2 || (ia >= 0 && iy >= 0))); if (sp2.length < 3) return null; const ix = sp2.map(x => x[1]);
     const av = vals => { const a = parseFloat(String(vals[ia]).replace(/,/g, '')), y = parseFloat(String(vals[iy]).replace(/,/g, '')); return a > 0 && !isNaN(y) ? (y / a).toFixed(1) : '-'; };
-    return Object.assign({}, c, { title, labels: sp2.map(x => x[0]), names: ix.map(i => i === -2 ? 'calcAvg:' + N[iy] + ':' + N[ia] : N[i]), rows: c.rows.map(r => Object.assign({}, r, { vals: ix.map(i => i === -2 ? av(r.vals) : r.vals[i]) })), totals: c.totals ? ix.map(i => i === -2 ? av(c.totals) : c.totals[i]) : null }); };
+    return Object.assign({}, c, { title, labels: sp2.map(x => x[0]), name: title, names: ix.map(i => i === -2 ? 'calcAvg:' + N[iy] + ':' + N[ia] : i === -3 ? 'gamesPlayed' : N[i]), rows: c.rows.map(r => Object.assign({}, r, { vals: ix.map(i => i === -2 ? av(r.vals) : i === -3 ? (gpOf(r) ?? '-') : r.vals[i]) })), totals: c.totals ? ix.map(i => i === -2 ? av(c.totals) : i === -3 ? (gpOf(null) ?? '-') : c.totals[i]) : null }); };
   const out = [mk('K. Return', 'kick'), mk('P. Return', 'punt')].filter(Boolean); return out.length ? out : [c];
 }
 function careerHTML(p, cats) {
@@ -2908,7 +2908,7 @@ function careerHTML(p, cats) {
   }
   let list = cats;
   if (p.league === 'nfl' && p.pos) { const f = cats.filter(c => nflRelevant(p.pos, c.title)); if (f.length) list = f; }
-  if (p.league === 'nfl') list = list.flatMap(splitReturns);
+  if (p.league === 'nfl') { const gc = cats.find(x => (x.names || []).some(n => /^gamesPlayed$/i.test(n))), gi = gc ? gc.names.findIndex(n => /^gamesPlayed$/i.test(n)) : -1; const gpOf = r => { if (!gc || gi < 0) return null; if (!r) return gc.totals ? gc.totals[gi] : null; const m = gc.rows.find(x => x.year === r.year && x.n === r.n && String(x.sub || '') === String(r.sub || '')) || gc.rows.find(x => x.year === r.year && x.n === r.n); return m ? m.vals[gi] : null; }; list = list.flatMap(c => splitReturns(c, gc ? gpOf : null)); }
   if (p.league === 'nba') { const c = cats.find(x => /averag/i.test(x.title) && x.labels.includes('PTS')) || cats.find(x => x.labels.includes('PTS') && x.labels.includes('MIN')) || cats[0]; list = [c]; }
   const clean = v => String(v == null || v === '' ? '-' : v).replace(/,/g, '');
   const pv = (c, pm, k) => { const nm = c.names && c.names[k]; if (!nm || !pm) return null; if (/^calcAvg:/.test(nm)) { const [, yn, an] = nm.split(':'), a = parseFloat(pm[an]), y = parseFloat(pm[yn]); return a > 0 && !isNaN(y) ? (y / a).toFixed(1) : null; } if (pm[nm] != null) return pm[nm]; if (/-/.test(nm)) { const q = nm.split('-'); if (pm[q[0]] != null && pm[q[1]] != null) { const f = x => /\./.test(String(x)) ? (+x).toFixed(1) : x; return f(pm[q[0]]) + '-' + f(pm[q[1]]); } } return null; };
@@ -2970,9 +2970,9 @@ function nbaCareerHTML(p, cats) {
   return table('Regular season', reg, c.totals ? cols.map(x => c.totals[x[0]]) : null) + (post.length ? table('Postseason', post) : (p.postDone ? '' : msg('Loading playoffs…')));
 }
 function statsTabHTML(p) {
-  const cats = p.stErr ? [] : statCats(p.st, p.league);
+  const cats = p.stErr && !p.st ? [] : statCats(p.st, p.league);
   if (p.league === 'nfl' && !cats.length) return careerHTML(p, []);
-  if (p.stErr) return msg('Failed to load stats (' + p.stErr + ').');
+  if (p.stErr && !p.st) return msg('Failed to load stats (' + p.stErr + ').');
   if (!cats.length) return msg('Stats not available.');
   return careerHTML(p, cats);
   p.exp = p.exp || new Set();
@@ -3284,7 +3284,7 @@ function nbaPlayersHTML(t, tn) {
   const tw = 132 + cols.reduce((a, x) => a + x[2], 0);
   const short = teamHead(t).name.split(' ').pop();
   const trs = rows.map(r => { const a = r.a, pos = (a.position && a.position.abbreviation) || ''; return `<tr data-player="${esc(a.id)}" data-pl="nba" data-pn="${esc(a.displayName || '')}" data-pp="${esc(pos)}" data-pj="${esc(a.jersey || '')}" data-pt="${esc(tn)}"><td class="n"><span class="pn">${esc(shortNm(a.displayName || a.fullName))}</span><small>${esc(pos)}</small></td>${cols.map(x => `<td class="${man && x[0] === sk ? 'on' : ''}">${nv(String(r.vals[x[0]] == null ? '' : r.vals[x[0]]).replace(/,/g, ''))}</td>`).join('')}</tr>`; }).join('');
-  return `<section class="blk"><div class="tw"><table class="nfx sep" style="width:max(100%, ${tw}px)"><colgroup><col>${cols.map(x => `<col style="width:${x[2]}px">`).join('')}</colgroup><thead><tr><th class="n">${esc(short)}</th>${cols.map(x => `<th data-sort="${x[0]}" data-sg="${gk}" class="${man && x[0] === sk ? 'on' + (asc ? ' asc' : '') : ''}">${esc(x[1])}</th>`).join('')}</tr></thead><tbody>${trs}</tbody></table></div></section>`;
+  return `<section class="blk"><div class="tw"><table class="nfx sep" style="width:max(100%, ${tw}px)"><colgroup><col>${cols.map(x => `<col style="width:${x[2]}px">`).join('')}</colgroup><thead><tr><th class="n">${esc(short)}</th>${cols.map(x => `<th data-sort="${x[0]}" data-sg="${gk}" class="${man && x[0] === sk ? 'on' + (asc ? ' asc' : '') : ''}${!man && x[0] === sk ? ' dflt' : ''}">${esc(x[1])}</th>`).join('')}</tr></thead><tbody>${trs}</tbody></table></div></section>`;
 }
 function teamStatsHTML(t) {
   if (!t.ps) return msg('Loading…');
@@ -3297,6 +3297,9 @@ function teamStatsHTML(t) {
     const ORD = [/pass/i, /rush/i, /receiv/i, /defens|tackl/i, /intercept/i, /kick/i, /punt/i, /return/i];
     const oi = c => { const n = String(c.name || ''); const k = ORD.findIndex(re => re.test(n)); return k < 0 ? 99 : k; };
     catList = catList.filter(c => !/scor/i.test(String(c.name || ''))).sort((a, b) => oi(a) - oi(b));
+    const gc = catList.find(x => (x.names || []).some(n => /^gamesPlayed$/i.test(n))), gi = gc ? gc.names.findIndex(n => /^gamesPlayed$/i.test(n)) : -1;
+    const gpOf = r => { if (!r || !gc) return null; let best = null; [...t.ps.cats.values()].forEach(cc => { const k = (cc.names || []).findIndex(n => /^gamesPlayed$/i.test(n)); if (k < 0) return; const m = cc.rows.find(x => x.a && r.a && String(x.a.id) === String(r.a.id)); if (m && (best == null || +m.vals[k] > +best)) best = m.vals[k]; }); return best; };
+    catList = catList.flatMap(c => splitReturns(c, gpOf));
   }
   return catList.map(c => {
     const title = c.name;
@@ -3308,12 +3311,12 @@ function teamStatsHTML(t) {
     const num = v => { const x = String(v).replace(/,/g, ''); if (/^\d+:\d+$/.test(x)) { const m = x.split(':'); return +m[0] * 60 + +m[1]; } const n = parseFloat(x); return isNaN(n) ? -1e9 : n; };
     let rows = [...c.rows].sort((x, y) => (asc ? 1 : -1) * (num(x.vals[sk]) - num(y.vals[sk])));
     const manual = sel.k != null;
-    if (t.league === 'nfl' && /pass/i.test(String(c.name || ''))) { const ai = c.labels.indexOf('ATT'); if (ai >= 0) rows = rows.filter(r => num(r.vals[ai]) > 0); }
+    if (t.league === 'nfl' && (/pass/i.test(String(c.name || '')) || /^[KP]\. Return$/.test(String(c.name || '')))) { const ai = c.labels.indexOf('ATT'); if (ai >= 0) rows = rows.filter(r => num(r.vals[ai]) > 0); }
     const trs = rows.map(r => {
       const a = r.a, pos = (a.position && a.position.abbreviation) || '';
       return `<tr data-player="${esc(a.id)}" data-pl="${t.league}" data-pn="${esc(a.displayName || '')}" data-pp="${esc(pos)}" data-pj="${esc(a.jersey || '')}" data-pt="${esc(tn)}"><td class="n"><span class="pn" style="max-width:none">${esc(shortNm(a.displayName || a.fullName))}</span><small>${esc(pos)}</small></td>${cols.map(k => manual && k === sk ? cell(r.vals[k]).replace('<td class="', '<td class="on ') : `${cell(r.vals[k])}`).join('')}</tr>`;
     }).join('');
-    return `<section class="blk"><div class="tw"><table class="fx sep stk" style="width:max(100%, ${fcw + cols.reduce((a, k) => a + cw(k), 0)}px)"><colgroup><col style="width:${fcw}px">${cols.map(k => `<col style="width:${cw(k)}px">`).join('')}</colgroup><thead><tr><th class="n">${esc(CAT_NAME[String(title).toLowerCase()] || title)}</th>${cols.map(k => `<th data-sort="${k}" data-sg="${esc(gk)}" class="${manual && k === sk ? 'on' + (asc ? ' asc' : '') : ''}">${esc((t.league === 'nhl' ? nhlLab(c.labels, c.names, k) : dl(c.labels[k], t.league)))}</th>`).join('')}</tr></thead><tbody>${trs}</tbody></table></div></section>`;
+    return `<section class="blk"><div class="tw"><table class="fx sep stk" style="width:max(100%, ${fcw + cols.reduce((a, k) => a + cw(k), 0)}px)"><colgroup><col style="width:${fcw}px">${cols.map(k => `<col style="width:${cw(k)}px">`).join('')}</colgroup><thead><tr><th class="n">${esc(CAT_NAME[String(title).toLowerCase()] || title)}</th>${cols.map(k => `<th data-sort="${k}" data-sg="${esc(gk)}" class="${manual && k === sk ? 'on' + (asc ? ' asc' : '') : ''}${!manual && k === sk ? ' dflt' : ''}">${esc((t.league === 'nhl' ? nhlLab(c.labels, c.names, k) : dl(c.labels[k], t.league)))}</th>`).join('')}</tr></thead><tbody>${trs}</tbody></table></div></section>`;
   }).join('');
 }
 
@@ -3513,7 +3516,7 @@ async function loadLV() {
       if (v.league === 'nfl' && !cats.some(c => /^fieldGoalsMade$/i.test(String(c.name)))) try { const jk = await getJson('https://site.web.api.espn.com/apis/common/v3/sports/football/nfl/statistics/byathlete?region=us&lang=en&contentorigin=espn&isqualified=false&page=1&limit=10&sort=kicking.fieldGoalsMade:desc&seasontype=2' + (v.sy ? '&season=' + v.sy : ''));
         let f = null; (jk.categories || []).forEach(c => { const k = (c.names || []).indexOf('fieldGoalsMade'); if (k >= 0 && !f) f = [c.name, k]; });
         const rr = f ? (jk.athletes || []).map(x => { const ac = (x.categories || []).find(q => q.name === f[0]), arr = (ac && (ac.totals || ac.values)) || [], a = x.athlete || {}, tid = athTid(a, 'nfl'); return { val: arr[f[1]] != null ? String(arr[f[1]]) : '', a, tid: tid ? [0, tid] : null }; }).filter(r => r.val !== '' && +r.val > 0).slice(0, 5) : [];
-        if (rr.length) { const fc = { name: 'fieldGoalsMade', abbr: 'FGM', title: 'Field Goals Made', rows: rr }, li = cats.findIndex(c => /long.*fieldGoal|fieldGoal.*long/i.test(String(c.name))); if (li >= 0) cats.splice(li, 0, fc); else cats.push(fc); } } catch (e) {}
+        if (rr.length) { const fc = { name: 'fieldGoalsMade', abbr: 'FGM', title: 'Field Goals Made', ctitle: 'Field Goals', rows: rr }, li = cats.findIndex(c => /long.*fieldGoal|fieldGoal.*long/i.test(String(c.name))); if (li >= 0) cats.splice(li, 0, fc); else cats.push(fc); } } catch (e) {}
       if (v.league === 'nba') try { const [jA, TG] = await Promise.all([getJson('https://site.web.api.espn.com/apis/common/v3/sports/basketball/nba/statistics/byathlete?region=us&lang=en&contentorigin=espn&isqualified=true&limit=1000&page=1&seasontype=2' + (v.sy ? '&season=' + v.sy : '')), teamGP('nba', v.sy)]);
         const F = {}; (jA.categories || []).forEach(c => (c.names || []).forEach((n, k) => { if (!F[n.toLowerCase()]) F[n.toLowerCase()] = [c.name, k, n]; }));
         const AT = (jA.athletes || []).map(x => { const get = f => { const ac = (x.categories || []).find(q => q.name === f[0]), arr = (ac && (ac.totals || ac.values)) || []; return arr[f[1]]; }; const gf = F.gamesplayed; return { x, a: x.athlete || {}, gp: gf ? parseFloat(get(gf)) || 0 : 0, get }; });
@@ -4092,7 +4095,7 @@ async function loadLeaders() {
 function renderLeaders() {
   const v = state.lv, D = v.data;
   const lc = Object.values(state.lvC).find(x => x && x.cats && x.cats.some(c => c.name === v.cat));
-  const title = (lc && (lc.cats.find(c => c.name === v.cat) || {}).title) || v.title || 'Leaders';
+  const title = (v.cat === 'fieldGoalsMade' ? 'Field Goals' : '') || (lc && (x => x && (x.ctitle || x.title))(lc.cats.find(c => c.name === v.cat))) || (/^Field Goals Made$/i.test(v.title || '') ? 'Field Goals' : v.title) || 'Leaders';
   const ylab = '';
   let body;
   if (!D) body = msg(v.err || 'Loading…');
@@ -4285,7 +4288,7 @@ $app.addEventListener('click', ev => {
     window._fromList = true; window._ldY = state.lv.sy || null; window._ldL = { lab: d.cla || '', title: d.clt || '' }; location.hash = '#/leaders/' + state.lv.league + '/' + (d.cl || 'x');
   } else if (d.lsort !== undefined) {
     const v = state.lv, k = +d.lsort; if (v.sk0 == null) v.sk0 = v.sk;
-    if (v.sk === k && v.manual && v.asc) { v.sk = v.sk0; v.asc = !!v.asc0; v.manual = false; } else if (v.sk === k && v.manual) v.asc = true; else { v.sk = k; v.asc = false; v.manual = true; } render();
+    if (!v.manual && v.sk === k) { v.manual = true; v.asc = !v.asc0; v.dfl = 1; } else if (v.manual && v.sk === k && (v.dfl || v.asc)) { v.sk = v.sk0; v.asc = !!v.asc0; v.manual = false; v.dfl = 0; } else if (v.sk === k && v.manual) v.asc = true; else { v.sk = k; v.asc = false; v.manual = true; v.dfl = 0; } render();
   } else if (d.pst) {
     window._twReset = 1;
     state.player.pst = d.pst; if (d.pst === 'ncaa') loadNcaa(state.player); render();
@@ -4308,7 +4311,7 @@ $app.addEventListener('click', ev => {
   } else if (d.tgrp) {
     const v = state.lv; v.grp = d.tgrp; v.tk = null; v.tasc = null; v.tclk = 0; v.sl = null; v.forceL = 1; render();
   } else if (d.tlsort) {
-    const v = state.lv; if (v.tk === d.tlsort && v.tclk === 1) { v.tasc = !v._low; v.tclk = 2; } else if (v.tk === d.tlsort && v.tclk === 2) { v.tk = null; v.tasc = null; v.tclk = 0; v.sl = null; } else { v.tk = d.tlsort; v.tasc = null; v.tclk = 1; } v._slk = v.tk; render();
+    const v = state.lv; if (v.tk === d.tlsort && (v.tclk === 1 || !v.tclk)) { v.tasc = !v._low; v.tclk = 2; } else if (v.tk === d.tlsort && v.tclk === 2) { v.tk = null; v.tasc = null; v.tclk = 0; v.sl = null; } else { v.tk = d.tlsort; v.tasc = null; v.tclk = 1; } v._slk = v.tk; render();
   } else if (d.draft) {
     window._fromList = true; location.hash = '#/draft/' + state.player.league + '/' + d.draft;
   } else if (d.drp !== undefined) {
@@ -4356,10 +4359,10 @@ $app.addEventListener('click', ev => {
     const g = state.game; g.scF = g.scF || {}; g.scF[d.scf] = d.scv; render();
   } else if (d.gsort !== undefined) {
     const g = state.game; g.gsort = g.gsort || {}; const cur = g.gsort[d.gsg], k = +d.gsort;
-    if (cur && cur.k === k && cur.asc) delete g.gsort[d.gsg]; else g.gsort[d.gsg] = { k, asc: !!(cur && cur.k === k) }; render();
+    if (cur && cur.k === k && cur.asc) delete g.gsort[d.gsg]; else g.gsort[d.gsg] = { k, asc: !!(cur && cur.k === k) || (!cur && b.classList.contains('dflt')) }; render();
   } else if (d.sort !== undefined) {
     const t = state.team; t.sort = t.sort || {}; const cur = t.sort[d.sg];
-    const k = +d.sort; if (cur && cur.k === k && cur.asc) delete t.sort[d.sg]; else t.sort[d.sg] = { k, asc: !!(cur && cur.k === k) }; render();
+    const k = +d.sort; if (cur && cur.k === k && cur.asc) delete t.sort[d.sg]; else t.sort[d.sg] = { k, asc: !!(cur && cur.k === k) || (!cur && b.classList.contains('dflt')) }; render();
   } else if (d.pvt !== undefined) {
     state.game.pvTeam = +d.pvt; render();
   } else if (d.ttab) {
