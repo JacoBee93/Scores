@@ -854,6 +854,8 @@ input[type=search]::-webkit-search-cancel-button{display:none;-webkit-appearance
 .dsh b{font-weight:inherit;text-align:right}
 .dsh b:last-child{text-align:left}
 .dsh i{font-style:normal;text-align:center}
+.dsh.tcl{column-gap:0}
+td{font-variant-numeric:tabular-nums}
 .sor{display:flex;align-items:center;gap:12px;padding:7px 0}
 .sor .pl{width:26px;flex:none;display:flex}
 .sor .pl img{width:24px;height:24px;object-fit:contain}
@@ -1073,6 +1075,10 @@ function dashAlign(root) {
     Object.values(cols).forEach(list => { if (list.length < 2 && !list.some(x => x[0].parentNode.classList.contains('tot'))) { if (!list.length) return; }
       const L = Math.max(...list.map(x => x[1].length), ...list.map(x => x[2].length)), R = L;
       list.forEach(([c, a, b]) => { c.innerHTML = `<span class="dsh" style="grid-template-columns:${L}ch 6px ${R}ch"><b>${a}</b><i>-</i><b>${b}</b></span>`; }); }); });
+  /* times (TOI, MIN 31:05…): colons on one line in every font */
+  (root || $app).querySelectorAll('table:not(.lsc):not(.f1t)').forEach(tb => { const bd = tb.tBodies[0]; if (!bd) return; const RE = /^\s*(\d{1,3}):(\d{2})\s*$/, cols = {};
+    [...bd.rows].forEach(r => [...r.cells].forEach((c, i) => { if (c.classList.contains('n') || c.querySelector('*')) return; const m = c.textContent.match(RE); if (m) (cols[i] = cols[i] || []).push([c, m[1], m[2]]); }));
+    Object.values(cols).forEach(list => { const L = Math.max(...list.map(x => x[1].length)); list.forEach(([c, a, b]) => { c.innerHTML = `<span class="dsh tcl" style="grid-template-columns:${L}ch auto 2ch"><b>${a}</b><i>:</i><b>${b}</b></span>`; }); }); });
 }
 function stickTop(v) {
   if (v === 'cmp') return; const hd = $app.querySelector(':scope > header'); if (!hd) return;
