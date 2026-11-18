@@ -1139,11 +1139,8 @@ html.fsg td.n .slg{top:.75px}
 /* today / current week / current GP in the top strip: red text (black when it is the selected bubble) */
 .dy.tdy:not(.on){color:#e5484d}
 
-/* article: the close ball rides along in a sticky strip; once the text scrolls, the strip fades the text out under the ball */
+/* article: the close ball rides along in a sticky strip */
 .artbar{position:sticky;top:0;height:0;z-index:3;display:flex;justify-content:flex-end}
-.artbar::before{content:'';position:absolute;left:-18px;right:-18px;top:-18px;height:62px;background:linear-gradient(180deg,#1c1c1e 62%,rgba(28,28,30,0));opacity:0;transition:opacity .15s;pointer-events:none}
-html.d2 .artbar::before{background:linear-gradient(180deg,rgb(30,26,44) 62%,rgba(30,26,44,0))}
-.artbar.sc::before{opacity:1}
 .artbar .artx{flex:none;margin:0 -4px 0 0}
 .artul{margin:8px 0 10px;padding-left:22px;font-family:var(--num);font-weight:500;font-size:18px;line-height:1.35;color:var(--mut)}
 .artul li{margin:6px 0}
