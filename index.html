@@ -45,10 +45,11 @@ html.d2.tbg{--g1:var(--pbg)}
 html.d2{background:var(--g1) !important}
 html.d2 body{background:transparent !important}
 html.d2 body::before{background:linear-gradient(180deg,var(--g1) 0,color-mix(in srgb,var(--g1) 0%,transparent) 12vh),#000 linear-gradient(150deg,var(--g1) 0,color-mix(in srgb,var(--g1) 55%,#000) 26vh,color-mix(in srgb,var(--g1) 18%,#000) 55vh,#000 85vh) !important}
-/* sticky top: frosted glass from the very top of the screen (viewport-fit=cover → also behind the clock / battery); its only edge is the header's bottom line */
+/* sticky top: pure blur – no tint, no saturation boost – so over the plain gradient it is invisible (no seam); content sliding under it gets blurred */
 html.d2 .stkw{background:transparent !important;-webkit-backdrop-filter:none !important;backdrop-filter:none !important}
-html.d2 .stkw::before{content:'';position:absolute;left:0;right:0;top:0;bottom:0;z-index:-1;pointer-events:none;background:rgba(255,255,255,.03);-webkit-backdrop-filter:blur(3px) saturate(160%);backdrop-filter:blur(3px) saturate(160%)}
-html.d2 .stkw:not(:has(.dtabs))::before{border-bottom:1px solid rgba(255,255,255,.12)}
+html.d2 .stkw::before{content:'';position:absolute;left:0;right:0;top:0;bottom:0;z-index:-1;pointer-events:none;-webkit-backdrop-filter:blur(7px);backdrop-filter:blur(7px)}
+/* the hairline appears only once content actually slides under the glass */
+html.d2.scr .stkw:not(:has(.dtabs))::before{border-bottom:1px solid rgba(255,255,255,.12)}
 html.d2{--mut:#b4b4bb}
 html.d2 .stkw.fx0{border-top-color:transparent;box-shadow:none}
 /* one glass for the whole Design 2.0 (exceptions later) */
@@ -1830,6 +1831,7 @@ function listLock() { if (topView() !== 'list' || window._stAnim) return; const 
 document.addEventListener('click', ev => { if (!$app.querySelector('.ylist') || ev.target.closest('.ybtn, .ylist, [data-cmpcar]')) return; let ch = false;
   [state.lv, state.player, state.team, state.cmp].forEach(o => { if (!o) return; ['yOpen', 'sOpen', 'syOpen', 'brOpen', 'glYOpen', 'carOpen'].forEach(k => { if (o[k]) { o[k] = false; ch = true; } }); });
   if (ch) { ev.stopPropagation(); ev.preventDefault(); render(); } }, true);
+window.addEventListener('scroll', () => { const on = window.scrollY > 4; if (on !== document.documentElement.classList.contains('scr')) document.documentElement.classList.toggle('scr', on); }, { passive: true });
 function render() {
   if (window._restoreKey && (window._restoreKey !== location.hash || window._restoreVK !== snapVK())) window._restoreKey = null;
   if (window._restoreKey && window._restoreKey === location.hash && window._restoreVK === snapVK()) { window._restoreKey = null; state.lastView = viewKey(); window.scrollTo(0, window._restoreY || 0); window._backPend = false; requestAnimationFrame(() => { try { detLock(); listLock(); } catch (e) {} }); return; }
