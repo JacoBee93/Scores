@@ -591,7 +591,7 @@ tr.zb > td{background:#26262a !important}
 .glt th.ovt{overflow:visible;z-index:3}
 .glt tr.mb td{border-top:2px solid #48484a}
 .ysel{position:relative;margin:2px 0 6px}
-.ybtn{display:inline-flex;align-items:center;gap:8px;background:#2c2c2e;border-radius:12px;padding:7px 14px;font-weight:600;font-size:15px}
+.ybtn{display:inline-flex;align-items:center;gap:8px;background:#2c2c2e;border-radius:12px;padding:0 14px;height:30.8px;font-weight:600;font-size:15px}
 .ylist{position:absolute;z-index:20;top:calc(100% + 6px);left:0;background:#2c2c2e;border-radius:12px;max-height:300px;overflow-y:auto;min-width:140px;box-shadow:0 10px 30px rgba(0,0,0,.5)}
 .ylist button{display:block;width:100%;text-align:left;padding:10px 16px;font-size:15px;border-bottom:1px solid #3a3a3c}
 .ylist button.on{color:#fff;font-weight:700}
@@ -702,7 +702,7 @@ html.fsg .sch col:first-child{width:102px !important}
 td.n .slg{width:20px;height:20px;object-fit:contain;vertical-align:-6px;margin-left:6px}
 .nfx tr.tot td.n{font-family:var(--num)}
 .nfx th.n,.nfx td.n{overflow:hidden;text-overflow:ellipsis}
-.pseg{margin:4px auto 10px}
+.pseg{margin:2px auto 10px}
 .drv{display:flex;align-items:center;gap:12px;padding:13px 0;border-bottom:1px solid #2c2c2e;cursor:pointer}
 .drv>img,.pc .ph img{width:34px;height:34px;object-fit:contain;flex:none}
 .drv .dt{flex:1;min-width:0}
@@ -2360,7 +2360,8 @@ function gameCols(g) {
   const A = [ca], Hh = [ch]; { const a1 = pick(e.away, 1), h1 = pick(e.home, 1); if (ok(a1)) A.push(bgOf(a1)); if (ok(h1)) Hh.push(bgOf(h1)); }
   if (dist(ca.slice(1), ch.slice(1)) < 90 || !vivid(ca) || !vivid(ch)) { let best = null;
     [[0, 0], [1, 0], [0, 1], [1, 1]].forEach(([i, j]) => { const x = A[i], y = Hh[j]; if (!x || !y || best) return; if (dist(x.slice(1), y.slice(1)) >= 90 && vivid(x) && vivid(y)) best = [x, y]; });
-    if (best) [ca, ch] = best; else { if (!vivid(ch)) ch = Hh.find(vivid) || '#8e8e93'; ca = '#e5e5ea'; } }
+    if (best) [ca, ch] = best; else { const lum = c => { const [r, g2, b] = rgb(c.slice(1)); return (Math.max(r, g2, b) + Math.min(r, g2, b)) / 510; }, pv = L => L.find(c => vivid(c) && lum(c) > .25) || L.find(vivid);
+      const av = pv(A), hv = pv(Hh); if (av && hv) { ca = '#e5e5ea'; ch = hv; } else { ca = av || '#e5e5ea'; ch = hv || (av ? '#8e8e93' : '#8e8e93'); } } }
   return [ca, ch];
 }
 const TCOL = {
