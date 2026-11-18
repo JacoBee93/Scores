@@ -1000,8 +1000,12 @@ html.one #app.lst,html.one body{min-height:0}
 .f1card:not(.f1up) .f1won{margin:1px 0 1px}
 .f1tt .f1nm{position:relative;top:-2px}
 html.fsg .f1tt .f1nm{top:.5px}
-.f1nm{font-family:var(--num);font-weight:700;font-size:19px;line-height:1.1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.f1big{font-family:var(--num);font-weight:700;font-size:19px;line-height:1;letter-spacing:.2px;padding-left:var(--fo,0px);margin:5.5px 0 4.5px}
+/* names centred on photos / flags (Barlow renders ~1 px low on iOS, hence the same −2 px as the cards) */
+html.fbar .f1d .f1dn{position:relative;top:-2px}
+html.fbar .f1gp > span:not(.f1fl){position:relative;top:-2px}
+html.fsg .f1gp > span:not(.f1fl){position:relative;top:.75px}
+.f1nm{font-family:var(--num);font-weight:700;font-size:18px;line-height:1.1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.f1big{font-family:var(--num);font-weight:700;font-size:18px;line-height:1;letter-spacing:.2px;padding-left:var(--fo,0px);margin:5.5px 0 4.5px}
 .f1ct{padding-left:var(--fo,0px);color:var(--mut);font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .f1won{color:var(--mut);font-size:14px;padding-left:46px;line-height:1.1;margin-bottom:3px}
 .f1w{display:flex;align-items:center;gap:8px;font-family:var(--num);font-size:17px;font-weight:700;line-height:1.25;min-width:0}
@@ -1015,9 +1019,9 @@ html.fsg .f1tt .f1nm{top:.5px}
 .f1d .hs{width:36px;height:36px;border-radius:50%;object-fit:cover;background:#2c2c2e;flex:none}
 .f1dn{display:flex;flex-direction:column;align-items:flex-start;text-align:left;min-width:0;overflow:hidden;flex:0 1 auto}
 .f1dn b,.f1dn small{max-width:100%}
-.f1res .f1dn b{font-size:17px}
+.f1res .f1dn b{font-size:18px}
 .f1dn b{font-family:var(--num);font-weight:700;font-size:18px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.f1dn small{color:var(--mut);font-size:13.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.f1dn small{color:var(--mut);font-size:13.5px;font-weight:500 !important;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .f1t td{vertical-align:middle}
 .f1t th{font-family:var(--wide);font-stretch:112%;font-weight:800;font-size:12.5px;letter-spacing:.5px;text-transform:uppercase}
 .f1t th.l{text-align:left}
@@ -4480,7 +4484,8 @@ const f1TM = y => (F1.team[y || 0] = F1.team[y || 0] || {});
 const f1Comp = (ev, ab) => (ev.competitions || []).find(c => c.type && (c.type.abbreviation === ab || (ab === 'SR' && c.type.abbreviation === 'Sprint')));
 const f1Done = c => !!(c && c.status && c.status.type && c.status.type.completed);
 const f1Pos = (c, aid) => { const x = c && (c.competitors || []).find(z => String(z.id) === String(aid)); return x ? x.order : null; };
-async function f1Season(y) { y = y || f1Year(); if (F1.sb[y]) return F1.sb[y]; const j = await getJson(F1A + 'scoreboard?dates=' + y); const evs = (j.events || []).slice().sort((a, b) => new Date(a.date) - new Date(b.date)); F1.sb[y] = evs; evs.forEach(e => { F1.ev = F1.ev || {}; F1.ev[e.id] = Object.assign(e, { _y: y }); }); return evs; }
+async function f1Season(y) { y = y || f1Year(); if (F1.sb[y]) return F1.sb[y]; const j = await getJson(F1A + 'scoreboard?dates=' + y); const cx = e => /CANCEL/i.test(String((e.status && e.status.type && (e.status.type.name || e.status.type.description)) || '')); /* cancelled GPs disappear (like on formula1.com) → rounds renumber automatically */
+  const evs = (j.events || []).filter(e => !cx(e)).sort((a, b) => new Date(a.date) - new Date(b.date)); F1.sb[y] = evs; evs.forEach(e => { F1.ev = F1.ev || {}; F1.ev[e.id] = Object.assign(e, { _y: y }); }); return evs; }
 async function f1Stand(y) { y = y || f1Year(); if (F1.st[y]) return F1.st[y]; const j = await getJson(F1S + '?season=' + y); if (Array.isArray(j.seasons) && j.seasons.length) F1.seasons = j.seasons.map(x => +x.year).filter(Boolean); const ch = j.children || []; const r = { drv: (ch.find(c => /driver/i.test(c.name)) || ch[0] || {}).standings, con: (ch.find(c => /constructor/i.test(c.name)) || ch[1] || {}).standings }; F1.st[y] = r; return r; }
 const f1SV = (en, n) => { const s = (en.stats || []).find(x => x.name === n); return s ? s.value : null; };
 const f1StMap = j => { const m = {}; ((((j || {}).splits || {}).categories) || []).forEach(c => (c.stats || []).forEach(s => { m[s.name] = { v: s.value, d: s.displayValue }; })); return m; };
@@ -4548,7 +4553,7 @@ function f1MapSrc(url) {
   if (!url) return null; const m = F1.map[url]; if (m) return m; F1.map[url] = 'p';
   const im = new Image(); im.crossOrigin = 'anonymous';
   const done = r => { F1.map[url] = r; if (topView() === 'list' && state.league === 'f1') render(); };
-  im.onload = () => { try { const W0 = im.naturalWidth, H0 = im.naturalHeight, sc = Math.min(1, 900 / W0), W = Math.round(W0 * sc), H = Math.round(H0 * sc), cv = document.createElement('canvas'); cv.width = W; cv.height = H; const x = cv.getContext('2d'); x.drawImage(im, 0, 0, W, H); const d = x.getImageData(0, 0, W, H), p = d.data;
+  im.onload = () => { try { const W0 = im.naturalWidth, H0 = im.naturalHeight, sc = 900 / W0, W = Math.round(W0 * sc), H = Math.round(H0 * sc), cv = document.createElement('canvas'); cv.width = W; cv.height = H; const x = cv.getContext('2d'); x.imageSmoothingEnabled = true; x.imageSmoothingQuality = 'high'; x.drawImage(im, 0, 0, W, H); const d = x.getImageData(0, 0, W, H), p = d.data;
       const px = (X, Y) => { const i = (Y * W + X) * 4; return [p[i], p[i + 1], p[i + 2], p[i + 3]]; }, cs = [px(0, 0), px(W - 1, 0), px(0, H - 1), px(W - 1, H - 1)];
       if (cs.every(c => c[3] > 200)) { const bg = cs[0]; for (let i = 0; i < p.length; i += 4) { const dd = Math.abs(p[i] - bg[0]) + Math.abs(p[i + 1] - bg[1]) + Math.abs(p[i + 2] - bg[2]); if (dd < 90) p[i + 3] = Math.round(p[i + 3] * Math.max(0, (dd - 18) / 72)); } }
       let x0 = W, y0 = H, x1 = -1, y1 = -1; for (let Y = 0; Y < H; Y++) for (let X = 0; X < W; X++) if (p[(Y * W + X) * 4 + 3] > 24) { if (X < x0) x0 = X; if (X > x1) x1 = X; if (Y < y0) y0 = Y; if (Y > y1) y1 = Y; }
@@ -4578,7 +4583,7 @@ function renderF1List(tabs) {
     const cur = f1CurEv(evs); F1.curId = cur.id; if (!F1.selId || !evs.some(e => e.id === F1.selId)) F1.selId = cur.id;
     strip = evs.map(e => { const d = new Date(e.endDate || e.date); return `<button class="dy ${e.id === F1.selId ? 'on' : ''}" data-f1go="${esc(e.id)}"><small>${esc(f1Iso(e) || 'GP')}</small>${d.getDate()}.${d.getMonth() + 1}.</button>`; }).join('');
     body = f1HistHTML() + evs.map((e, k) => {
-      const rc = f1Comp(e, 'Race'), done = f1Done(rc), w = done && rc && (rc.competitors || []).find(c => c.order === 1), cid = e.circuit && e.circuit.id, cu = F1.circ[cid];
+      const rc = f1Comp(e, 'Race'), done = f1Done(rc) || !!(rc && rc.date && new Date(rc.date) < Date.now() - 3 * 36e5 && (rc.competitors || []).some(c => c.order === 1)), w = done && rc && (rc.competitors || []).find(c => c.order === 1), cid = e.circuit && e.circuit.id, cu = F1.circ[cid];
       if (cid && cu === undefined) f1Circ(e).then(() => { if (topView() === 'list' && state.league === 'f1') render(); });
       return `<div class="card f1card${done ? '' : ' f1up'}" data-f1race="${esc(e.id)}" data-f1ry="${esc(e._y || '')}" id="f1c${esc(e.id)}"><div class="f1cl1"><div class="f1rd">Round ${k + 1}</div><div class="f1tt">${f1Flag(e)}<div class="f1nm">${esc(f1Short(e))}</div></div>
         ${done ? (pod => pod.length ? `<div class="f1pod">${pod.map(c => `<img class="hs p${c.order}" src="${esc(f1Hs(c.id))}" alt="" onerror="this.onerror=null;this.src=SIL">`).join('')}</div>` : '')([1, 2, 3].map(o => (rc.competitors || []).find(c => c.order === o)).filter(Boolean)) : `<div class="f1big">${esc(f1DatesY(e))}</div><div class="f1ct">${esc((e.circuit && e.circuit.fullName) || '')}</div>`}</div>
@@ -4594,7 +4599,15 @@ function renderF1List(tabs) {
   if (evs && evs.length && !F1.scrolled) { F1.scrolled = 1; requestAnimationFrame(() => f1ScrollTo(F1.curId, false)); }
 }
 function f1Fit() { requestAnimationFrame(() => { { const fl = $app.querySelector('.f1list .f1tt .f1fl'); if (fl) { const r = document.createRange(); r.selectNodeContents(fl); const g = r.getBoundingClientRect(), b = fl.getBoundingClientRect(); if (g.width) $app.querySelector('.f1list').style.setProperty('--fo', Math.max(0, g.left - b.left).toFixed(1) + 'px'); } } $app.querySelectorAll('.f1nm,.f1gp span,.f1rh .lvt').forEach(el => { if (el.scrollWidth > el.clientWidth + 1 && /Grand Prix/.test(el.textContent)) el.textContent = el.textContent.replace(/Grand Prix/, 'GP'); });
-  $app.querySelectorAll('.f1dn b').forEach(el => { if (el.scrollWidth > el.clientWidth + 1) { const w = el.textContent.trim().split(/\s+/); if (w.length > 1 && !/\.$/.test(w[0])) el.textContent = w[0][0] + '. ' + w.slice(1).join(' '); } }); f1UpAlign(); }); }
+  $app.querySelectorAll('.f1dn b').forEach(el => { if (el.scrollWidth > el.clientWidth + 1) { const w = el.textContent.trim().split(/\s+/); if (w.length > 1 && !/\.$/.test(w[0])) el.textContent = w[0][0] + '. ' + w.slice(1).join(' '); } });
+  $app.querySelectorAll('.f1list .f1card:not(.f1hist)').forEach(f1NameFit); f1UpAlign(); }); }
+/* list card: the GP name must end before the track map starts (8 px air) – first 'Grand Prix' → 'GP', then cut with … */
+function f1NameFit(c) { const nm = c.querySelector('.f1nm'), mp = c.querySelector('.f1map'); if (!nm || !mp) return; const im = mp.querySelector('img');
+  if (im && !im.complete) { if (!im.dataset.nf) { im.dataset.nf = 1; im.addEventListener('load', () => { f1NameFit(c); try { f1UpAlign(); } catch (e) {} }, { once: true }); } }
+  const lim = () => (im && im.complete && im.naturalWidth ? im.getBoundingClientRect().left : mp.getBoundingClientRect().right - 60) - 8;
+  const tr = () => { const r = document.createRange(); r.selectNodeContents(nm); return r.getBoundingClientRect().right; };
+  nm.style.maxWidth = ''; if (tr() > lim() && /Grand Prix/.test(nm.textContent)) nm.textContent = nm.textContent.replace(/Grand Prix/, 'GP');
+  if (tr() > lim()) nm.style.maxWidth = Math.max(40, lim() - nm.getBoundingClientRect().left) + 'px'; }
 /* upcoming GP card: GP name's capitals start as far from the card top as the track map, the circuit name's baseline sits as far from the bottom as the map */
 /* F1 list cards: ROUND label and GP name at the same spots on every card (gap = what an evenly spaced upcoming card gets);
    upcoming: date + circuit evenly spaced down to the bottom edge; finished: podium (P1–P3 balls) centred between the flag and the card bottom */
