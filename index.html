@@ -1131,6 +1131,13 @@ html.fsg td.n .slg{top:.75px}
 .seg:has(> button:nth-child(3)){max-width:340px !important}
 .seg:has(> button:nth-child(4)){max-width:100% !important}
 .seg > button{flex:1 1 auto;padding-left:6px !important;padding-right:6px !important}
+
+/* close buttons (news, shot chart, win probability): red ball, white X dead centre */
+.artx,#wpov .wpclose{display:flex;align-items:center;justify-content:center;padding:0;border:0;border-radius:50% !important;background:#e5484d !important;color:#fff;box-shadow:0 3px 10px rgba(0,0,0,.4)}
+.artx svg,#wpov .wpclose svg{display:block;flex:none}
+
+/* today / current week / current GP in the top strip: red text (black when it is the selected bubble) */
+.dy.tdy:not(.on){color:#e5484d}
 </style>
 </head>
 <body>
@@ -1759,6 +1766,10 @@ function smoothTop(ms) { ms = ms || 380; const y0 = window.scrollY; cancelAnimat
 function detLock() { const v = topView(); if (window._stAnim) return; const lk = (v === 'player' && state.player && /^(ov|bio|news)$/.test(state.player.tab)) || (v === 'team' && state.team && state.team.tab === 'news');
   if (lk && document.documentElement.scrollHeight - window.innerHeight < (state.player && state.player.tab === 'bio' ? 40 : 120)) { window.scrollTo(0, 0); document.documentElement.classList.add('lock1'); } }
 function listLock() { if (topView() !== 'list' || window._stAnim) return; const m = $app.querySelector(':scope > main'), n = m ? m.querySelectorAll('[data-game]').length : 99; if (n <= 4 && document.documentElement.scrollHeight - window.innerHeight < 220) { window.scrollTo(0, 0); document.documentElement.classList.add('lock1'); } }
+/* an open year / session dropdown closes on a tap anywhere outside it (that tap does nothing else) */
+document.addEventListener('click', ev => { if (!$app.querySelector('.ylist') || ev.target.closest('.ysel, .ylist')) return; let ch = false;
+  [state.lv, state.player, state.team, state.cmp].forEach(o => { if (!o) return; ['yOpen', 'sOpen', 'syOpen', 'brOpen', 'glYOpen', 'carOpen'].forEach(k => { if (o[k]) { o[k] = false; ch = true; } }); });
+  if (ch) { ev.stopPropagation(); ev.preventDefault(); render(); } }, true);
 function render() {
   if (window._restoreKey && (window._restoreKey !== location.hash || window._restoreVK !== snapVK())) window._restoreKey = null;
   if (window._restoreKey && window._restoreKey === location.hash && window._restoreVK === snapVK()) { window._restoreKey = null; state.lastView = viewKey(); window.scrollTo(0, window._restoreY || 0); window._backPend = false; requestAnimationFrame(() => { try { detLock(); listLock(); } catch (e) {} }); return; }
@@ -1864,17 +1875,17 @@ function renderList() {
     W.cal.forEach((c, i) => {
       const on = c.t === W.sel.t && c.w === W.sel.w; if (on) onIdx = i;
       const m = /^week\s*(\d+)/i.exec(c.label);
-      items.push([on, `data-wk="${c.t}-${c.w}"`, m ? `<small>Week</small>${m[1]}` : `<small>Playoffs</small>${esc(c.alt || c.label)}`]);
+      items.push([on, `data-wk="${c.t}-${c.w}"`, m ? `<small>Week</small>${m[1]}` : `<small>Playoffs</small>${esc(c.alt || c.label)}`, W.cur && c.t === W.cur.t && c.w === W.cur.w]);
     });
   } else if (!fav && state.league !== 'nfl') {
     if (!state.stripBase || Math.abs((state.date - state.stripBase) / 864e5) > 50) state.stripBase = state.date;
     skey = 'd' + ymd(state.stripBase);
     for (let i = -60; i <= 60; i++) {
       const d = addDays(state.stripBase, i), on = ymd(d) === ymd(state.date); if (on) onIdx = i + 60;
-      items.push([on, `data-date="${ymd(d)}"`, `<small>${DAYS[d.getDay()]}</small>${d.getDate()}.${d.getMonth()+1}.`]);
+      items.push([on, `data-date="${ymd(d)}"`, `<small>${DAYS[d.getDay()]}</small>${d.getDate()}.${d.getMonth()+1}.`, ymd(d) === ymd(new Date())]);
     }
   }
-  const strip = items.map((x, i) => `<button class="dy ${x[0] ? 'on' : ''} ${((i - onIdx + 2) % 5 + 5) % 5 === 0 ? 'snap' : ''}" ${x[1]}>${x[2]}</button>`).join('');
+  const strip = items.map((x, i) => `<button class="dy ${x[0] ? 'on' : ''}${x[3] ? ' tdy' : ''} ${((i - onIdx + 2) % 5 + 5) % 5 === 0 ? 'snap' : ''}" ${x[1]}>${x[2]}</button>`).join('');
   const os = document.getElementById('strip'), prev = os && state.stripKey === skey ? os.scrollLeft : null;
   state.stripKey = skey;
   $app.innerHTML = `
@@ -2093,7 +2104,7 @@ function showArt(a, names0, web) {
   else if (a.description) paras = [['P', a.description]];
   let ov = document.getElementById('artpop'); const keep = ov ? ov.querySelector('.artbox').scrollTop : 0;
   if (!ov) { ov = document.createElement('div'); ov.id = 'artpop'; document.body.appendChild(ov); }
-  ov.innerHTML = `<div class="artbox"><button class="artx" data-artclose="1" aria-label="Close">×</button><h2>${esc(a.headline || '')}</h2>${a.byline ? `<div class="artby">${esc(a.byline)}</div>` : ''}${paras.map(([tg, t]) => /^H/.test(tg) ? `<h3>${hl(t)}</h3>` : `<p>${hl(t)}</p>`).join('')}${web ? `<p><a class="rcm" href="${esc(web)}" target="_blank" rel="noopener">Read on ESPN ›</a></p>` : ''}</div>`;
+  ov.innerHTML = `<div class="artbox"><button class="artx" data-artclose="1" aria-label="Close"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button><h2>${esc(a.headline || '')}</h2>${a.byline ? `<div class="artby">${esc(a.byline)}</div>` : ''}${paras.map(([tg, t]) => /^H/.test(tg) ? `<h3>${hl(t)}</h3>` : `<p>${hl(t)}</p>`).join('')}${web ? `<p><a class="rcm" href="${esc(web)}" target="_blank" rel="noopener">Read on ESPN ›</a></p>` : ''}</div>`;
   { const bx = ov.querySelector('.artbox'), pn = $app.querySelector(':scope > main > .pane'); if (pn) { const r = pn.getBoundingClientRect(), sy = window.scrollY, top = r.top + sy, pb = r.bottom + sy, H = window.innerHeight, full = pb > H - 4; if (sy > 0) smoothTop(); Object.assign(bx.style, { position: 'fixed', top: top + 'px', left: r.left + 'px', width: r.width + 'px', height: (full ? H + 40 - top : Math.max(220, pb - top)) + 'px', maxHeight: 'none', maxWidth: 'none', borderRadius: full ? '22px 22px 0 0' : '22px', paddingBottom: full ? '58px' : '18px' }); } bx.scrollTop = keep; }
 }
 document.addEventListener('click', ev => {
@@ -2182,7 +2193,7 @@ function shotBigInner(g) {
   const btn = (k, v, l) => `<button data-scf="${k}" data-scv="${v}" class="${f[k] === v ? 'on' : ''}">${esc(l)}</button>`, Lb = SC_LBL(g);
   return `<div class="wptop"><div class="scfw"><div class="scf">${btn('tm', 'all', 'Both')}${btn('tm', String(e.away.id), e.away.abbr)}${btn('tm', String(e.home.id), e.home.abbr)}</div>
     <div class="scf">${btn('ty', 'all', 'All')}${btn('ty', 's', Lb.s)}${btn('ty', 'g', Lb.G)}</div>
-    <div class="scf">${btn('per', 'all', 'All')}${pers.map(n => btn('per', String(n), perHead(g.league, n - 1))).join('')}</div></div><button class="wpclose" data-wpclose="1">×</button></div>
+    <div class="scf">${btn('per', 'all', 'All')}${pers.map(n => btn('per', String(n), perHead(g.league, n - 1))).join('')}</div></div><button class="wpclose" data-wpclose="1" aria-label="Close"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
     <div class="sch2"><span>${esc(e.away.abbr)} · ${cnt(String(e.away.id), true)} ${g.league === 'nba' ? 'made' : 'G'} / ${cnt(String(e.away.id))} att.</span><span>${esc(e.home.abbr)} · ${cnt(String(e.home.id), true)} ${g.league === 'nba' ? 'made' : 'G'} / ${cnt(String(e.home.id))} att.</span></div>
     <div class="rkbig">${chartSVG(g, plays, Object.assign({ big: 1 }, f))}</div><div class="scl">${Lb.leg}</div>`;
 }
@@ -2223,7 +2234,7 @@ function openWp() {
   const src = document.getElementById('wpsvg'), W = window._wp; if (!src || !W) return;
   closeWp();
   const ov = document.createElement('div'); ov.id = 'wpov';
-  ov.innerHTML = `<div class="wpbox"><div class="wptop"><div class="wpi" id="wpi">${wpInfo(W.pts.length - 1)}</div><button class="wpclose" data-wpclose="1">×</button></div><div class="wpw big">${src.outerHTML.replace('id="wpsvg"', 'id="wpsvg2"')}<div class="wpl t">${esc(W.e.h)}</div><div class="wpl b">${esc(W.e.a)}</div></div></div>`;
+  ov.innerHTML = `<div class="wpbox"><div class="wptop"><div class="wpi" id="wpi">${wpInfo(W.pts.length - 1)}</div><button class="wpclose" data-wpclose="1" aria-label="Close"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div><div class="wpw big">${src.outerHTML.replace('id="wpsvg"', 'id="wpsvg2"')}<div class="wpl t">${esc(W.e.h)}</div><div class="wpl b">${esc(W.e.a)}</div></div></div>`;
   document.body.appendChild(ov); document.body.style.overflow = 'hidden'; window._wpBg = [document.documentElement.style.background, (document.querySelector('meta[name="theme-color"]') || {}).content]; { const cc = '#000000'; document.documentElement.style.background = cc; const tm = document.querySelector('meta[name="theme-color"]'); if (tm) tm.setAttribute('content', cc); }
   const c = ov.querySelector('.wpcur'); if (c) c.setAttribute('opacity', '.8');
   fitWp();
@@ -4601,7 +4612,7 @@ function renderF1List(tabs) {
   else if (!evs.length) body = F1.listY ? f1HistHTML() + msg('No races in ' + F1.listY + '.') : msg('No races.');
   else {
     const cur = f1CurEv(evs); F1.curId = cur.id; if (!F1.selId || !evs.some(e => e.id === F1.selId)) F1.selId = cur.id;
-    strip = evs.map(e => { const d = new Date(e.endDate || e.date); return `<button class="dy ${e.id === F1.selId ? 'on' : ''}" data-f1go="${esc(e.id)}"><small>${esc(f1Iso(e) || 'GP')}</small>${d.getDate()}.${d.getMonth() + 1}.</button>`; }).join('');
+    strip = evs.map(e => { const d = new Date(e.endDate || e.date); return `<button class="dy ${e.id === F1.selId ? 'on' : ''}${e.id === F1.curId ? ' tdy' : ''}" data-f1go="${esc(e.id)}"><small>${esc(f1Iso(e) || 'GP')}</small>${d.getDate()}.${d.getMonth() + 1}.</button>`; }).join('');
     body = f1HistHTML() + evs.map((e, k) => {
       const rc = f1Comp(e, 'Race'), done = f1Done(rc) || !!(rc && rc.date && new Date(rc.date) < Date.now() - 3 * 36e5 && (rc.competitors || []).some(c => c.order === 1)), w = done && rc && (rc.competitors || []).find(c => c.order === 1), cid = e.circuit && e.circuit.id, cu = F1.circ[cid];
       if (cid && cu === undefined) f1Circ(e).then(() => { if (topView() === 'list' && state.league === 'f1') render(); });
