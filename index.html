@@ -1148,20 +1148,14 @@ html.fsg td.n .slg{top:.75px}
 
 /* ===== alternative home layouts ===== */
 .lpm button.lyf{border-top:6px solid #1c1c1e}
-header.lyb,header.lyc{padding-top:calc(env(safe-area-inset-top) + 30px)}
+header.lyc{padding-top:calc(env(safe-area-inset-top) + 30px)}
 .lyh{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;padding:0 0 0 0}
 .lyh h1{font-family:var(--num);font-weight:700;font-size:28px;line-height:38px;white-space:nowrap}
-.lyd{display:flex;align-items:center;gap:10px;min-width:0}
-.lyar{width:34px;height:34px;border-radius:50%;background:var(--card);display:flex;align-items:center;justify-content:center;flex:none;color:#fff}
-.lyar[disabled]{opacity:.3}
 .lyics{display:flex;gap:8px;flex:none}
 .lyic{display:flex;flex-direction:column;align-items:center;gap:3px}
 .lyic button{width:38px;height:38px;border-radius:50%;background:var(--card);display:flex;align-items:center;justify-content:center;color:#fff}
 .lyic small{font-family:var(--num);font-size:11px;font-weight:700;color:var(--mut);line-height:1}
 .lyic.on button{background:#fff;color:#000}
-.lysub{font-family:var(--num);font-weight:700;font-size:15px;letter-spacing:.4px;color:#e5484d;margin:-8px 0 10px}
-header.lyb .strip{margin-top:4px}
-header.lyb .strip.lyhid{display:none}
 .lybar{position:fixed;left:12px;right:12px;bottom:calc(env(safe-area-inset-bottom) + 10px);height:64px;border-radius:24px;background:rgba(28,28,30,.94);-webkit-backdrop-filter:blur(20px);backdrop-filter:blur(20px);display:flex;z-index:60;box-shadow:0 10px 30px rgba(0,0,0,.6),inset 0 1px 0 rgba(255,255,255,.08)}
 .lybar button{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;color:var(--mut);font-family:var(--num)}
 .lybar button b{font-size:20px;font-weight:700;line-height:1}
@@ -1171,11 +1165,10 @@ header.lyb .strip.lyhid{display:none}
 .lybar button svg{width:20px;height:20px}
 .lybar button.on svg{color:#ffd60a}
 html:has(.lybar) #app{padding-bottom:calc(env(safe-area-inset-bottom) + 84px)}
-.lyc .lyh h1{font-size:26px;letter-spacing:.3px}
+.lyc .lyh h1{font-size:26px;letter-spacing:.3px;line-height:38px;margin:0;padding:0}
+html.fbar .lyc .lyh h1{position:relative;top:-2.5px}
+html.fsg .lyc .lyh h1{position:relative;top:1.6px}
 .lyc .lyh h1 i{font-style:normal;color:#e5484d}
-.lytabs{display:flex;gap:24px;margin:4px -16px 0;padding:0 18px;border-bottom:1px solid #2c2c2e}
-.lytabs button{font-family:var(--num);font-size:21px;font-weight:700;color:#636366;padding:6px 0 9px}
-.lytabs button.on{color:#fff;box-shadow:inset 0 -3px 0 #fff}
 header.lyc .strip{margin-top:12px}
 </style>
 </head>
@@ -1885,31 +1878,18 @@ function listBody(evs, lg) {
   }
   return evs.map(cardHTML).join('');
 }
-/* ===== alternative home layouts (hidden menu): B3 = date header + icons + bottom league bar, C2 = title + icons + underlined league tabs ===== */
+/* ===== alternative home layout (hidden menu) C2: title + icons (Table / Stats / Search) + day strip, leagues + Favorites in a floating bottom bar ===== */
 const LY_TROPHY = '<svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 4h10v5a5 5 0 0 1-10 0z"/><path d="M7 6H4a3 3 0 0 0 3 4M17 6h3a3 3 0 0 1-3 4M12 14v4M8 20h8"/></svg>';
 const LY_CHART = '<svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M5 20V12M12 20V5M19 20v-9"/></svg>';
 const LY_SRCH = '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg>';
 const LY_STAR = '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"><path d="M12 3.5l2.6 5.4 5.9.8-4.3 4.1 1 5.9L12 17l-5.2 2.7 1-5.9-4.3-4.1 5.9-.8z"/></svg>';
-const LY_CHEV = d => `<svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><path d="${d < 0 ? 'M15 5l-7 7 7 7' : 'M9 5l7 7-7 7'}"/></svg>`;
-const lyKind = () => { try { const v = localStorage.getItem('layout'); return v === 'b' || v === 'c' ? v : ''; } catch (e) { return ''; } };
-/* date / week title + prev/next targets for the B3 header */
-function lyNav() { const fav = state.league === 'fav', n = (state.events || []).length;
-  if (fav) return { title: 'Favorites', sub: n ? n + ' GAMES' : '' };
-  if (state.league === 'nfl' && state.nflw && state.nflw.cal && state.nflw.cal.length) { const W = state.nflw, i = W.cal.findIndex(c => c.t === W.sel.t && c.w === W.sel.w), c = W.cal[i] || {}, m = /^week\s*(\d+)/i.exec(c.label || '');
-    const at = k => W.cal[k] ? `data-wk="${W.cal[k].t}-${W.cal[k].w}"` : 'disabled';
-    return { title: m ? 'Week ' + m[1] : (c.alt || c.label || 'NFL'), sub: (W.cur && W.cur.t === W.sel.t && W.cur.w === W.sel.w ? 'THIS WEEK · ' : '') + (n ? n + ' GAMES' : ''), prev: at(i - 1), next: at(i + 1) }; }
-  const d = state.date || new Date(), td = ymd(d) === ymd(new Date());
-  return { title: `${DAYS[d.getDay()]} ${d.getDate()}.${d.getMonth() + 1}.`, sub: (td ? 'TODAY · ' : '') + (n ? n + (n === 1 ? ' GAME' : ' GAMES') : 'NO GAMES'), prev: `data-date="${ymd(addDays(d, -1))}"`, next: `data-date="${ymd(addDays(d, 1))}"`, today: td }; }
+const lyKind = () => { try { const v = localStorage.getItem('layout'); return v === 'b' || v === 'c' ? 'c' : ''; } catch (e) { return ''; } };
 function lyHead(o) { const k = lyKind(); if (!k) return ''; const lg = state.league, fav = lg === 'fav';
   const ic = (a, t, svg, on) => `<div class="lyic${on ? ' on' : ''}"><button ${a} aria-label="${t}">${svg}</button><small>${t}</small></div>`;
   const quick = (o.quick || []).map(q => ic(q[0], q[1], q[2])).join('');
   const lgs = [...Object.entries(LEAGUES).map(([id, v]) => [`data-league="${id}"`, v.name, id === lg, id === 'nfl' ? 'Football' : id === 'nba' ? 'Basketball' : id === 'nhl' ? 'Hockey' : v.name]), ['data-f1="1"', 'F1', lg === 'f1', 'Racing']];
-  if (k === 'b') {
-    const nav = `<nav class="lybar">${lgs.map(x => `<button ${x[0]} class="${x[2] ? 'on' : ''}"><b>${x[1]}</b><small>${x[3]}</small></button>`).join('')}<button data-league="fav" class="${fav ? 'on' : ''}">${LY_STAR}<small>Favorites</small></button></nav>`;
-    const arrows = !o.f1 && o.prev != null;
-    return `<header class="lyb"><div class="lyh"><div class="lyd">${arrows ? `<button class="lyar" ${o.prev}>${LY_CHEV(-1)}</button>` : ''}<h1>${esc(o.title || '')}</h1>${arrows ? `<button class="lyar" ${o.next}>${LY_CHEV(1)}</button>` : ''}</div><div class="lyics">${quick}${ic('data-search', 'Search', LY_SRCH)}</div></div>${o.sub ? `<div class="lysub">${esc(o.sub)}</div>` : ''}${o.strip ? `<div class="strip${o.f1 ? '' : ' lyhid'}" id="strip">${o.strip}</div>` : ''}</header>${nav}`; }
-  return `<header class="lyc"><div class="lyh"><h1>SCORE<i>·</i>BOARD</h1><div class="lyics">${quick}${ic('data-league="fav"', 'Favs', LY_STAR, fav)}${ic('data-search', 'Search', LY_SRCH)}</div></div>
-    <div class="lytabs">${lgs.map(x => `<button ${x[0]} class="${x[2] ? 'on' : ''}">${x[1]}</button>`).join('')}</div>${o.strip ? `<div class="strip" id="strip">${o.strip}</div>` : ''}</header>`; }
+  const nav = `<nav class="lybar">${lgs.map(x => `<button ${x[0]} class="${x[2] ? 'on' : ''}"><b>${x[1]}</b><small>${x[3]}</small></button>`).join('')}<button data-league="fav" class="${fav ? 'on' : ''}">${LY_STAR}<small>Favorites</small></button></nav>`;
+  return `<header class="lyc"><div class="lyh"><h1>SCORE<i>·</i>BOARD</h1><div class="lyics">${quick}${ic('data-search', 'Search', LY_SRCH)}</div></div>${o.strip ? `<div class="strip" id="strip">${o.strip}</div>` : ''}</header>${nav}`; }
 function renderList() {
   const fav = state.league === 'fav';
   const tabs = Object.entries(LEAGUES).map(([k, v]) =>
@@ -1953,7 +1933,7 @@ function renderList() {
   const os = document.getElementById('strip'), prev = os && state.stripKey === skey ? os.scrollLeft : null;
   state.stripKey = skey;
   $app.innerHTML = `
-    ${lyHead({ strip, fav, quick: !fav && LEAGUES[state.league] ? [['data-go2="standings"', 'Table', LY_TROPHY], ['data-go2="lstats"', 'Stats', LY_CHART]] : [], ...lyNav() }) || `<header><div class="tabs htabs">${tabs}<button class="icon" data-search aria-label="Search">${SEARCH_SVG}</button></div>
+    ${lyHead({ strip, fav, quick: !fav && LEAGUES[state.league] ? [['data-go2="standings"', 'Table', LY_TROPHY], ['data-go2="lstats"', 'Stats', LY_CHART]] : [] }) || `<header><div class="tabs htabs">${tabs}<button class="icon" data-search aria-label="Search">${SEARCH_SVG}</button></div>
     ${strip ? `<div class="strip" id="strip">${strip}</div>` : ''}${!fav && LEAGUES[state.league] ? `<div class="qb"><button data-go2="lstats">Statistics</button><button data-go2="standings">Standings</button></div>` : ''}</header>`}
     <main>${body}</main>`;
   const s = document.getElementById('strip'), on = s && s.querySelector('.on');
@@ -4506,16 +4486,16 @@ function renderLeaders() {
     m.innerHTML = `<button data-go="standings">Standings</button><button data-go="lstats">League stats</button>`;
     o.addEventListener('click', close);
     m.addEventListener('click', e => { const b = e.target.closest('[data-go]'); if (!b) return; close(); window._fromList = true; location.hash = '#/' + b.dataset.go + '/' + lg; });
-    document.body.append(o, m);
+    document.body.append(o, m); if (r.top > window.innerHeight / 2) m.style.top = Math.max(8, r.top - 8 - m.offsetHeight) + 'px'; /* pressed in the bottom bar → menu opens upwards */
   };
-  const pill = e => { const p = e.target.closest && e.target.closest('.pill[data-league], .lybar [data-league], .lytabs [data-league], .lyic [data-league]'); return p && (LEAGUES[p.dataset.league] || p.dataset.league === 'fav') ? p : null; };
+  const pill = e => { const p = e.target.closest && e.target.closest('.pill[data-league], .lybar [data-league]'); return p && (LEAGUES[p.dataset.league] || p.dataset.league === 'fav') ? p : null; };
   const openCache = el => {
     window._lpAt = Date.now(); close();
     const r = el.getBoundingClientRect();
     const o = document.createElement('div'); o.className = 'lpo';
     const m = document.createElement('div'); m.className = 'lpm';
     m.style.top = (r.bottom + 8) + 'px'; m.style.left = Math.min(r.left, window.innerWidth - 216) + 'px';
-    m.innerHTML = `<button data-cc>Clear cache</button>${(() => { const de = document.documentElement, cur = de.classList.contains('fsg') ? 'sg' : 'bar'; return [['bar', 'Bleacher'], ['sg', 'Mercedes']].map(([k, t]) => `<button data-fsw="${k}" class="${k === cur ? 'on' : ''}">${t}${k === cur ? '<span class="lpck">✓</span>' : ''}</button>`).join(''); })()}<button data-d2sw class="d2b ${document.documentElement.classList.contains('d2') ? 'on' : ''}">Design 2.0${document.documentElement.classList.contains('d2') ? '<span class="lpck">✓</span>' : ''}</button>${[['', 'Classic layout'], ['b', 'B3 layout'], ['c', 'C2 layout']].map(([k, t], i) => `<button data-lysw="${k || '0'}" class="${i ? '' : 'lyf '}${lyKind() === k ? 'on' : ''}">${t}${lyKind() === k ? '<span class="lpck">✓</span>' : ''}</button>`).join('')}`;
+    m.innerHTML = `<button data-cc>Clear cache</button>${(() => { const de = document.documentElement, cur = de.classList.contains('fsg') ? 'sg' : 'bar'; return [['bar', 'Bleacher'], ['sg', 'Mercedes']].map(([k, t]) => `<button data-fsw="${k}" class="${k === cur ? 'on' : ''}">${t}${k === cur ? '<span class="lpck">✓</span>' : ''}</button>`).join(''); })()}<button data-d2sw class="d2b ${document.documentElement.classList.contains('d2') ? 'on' : ''}">Design 2.0${document.documentElement.classList.contains('d2') ? '<span class="lpck">✓</span>' : ''}</button>${[['', 'Classic layout'], ['c', 'C2 layout']].map(([k, t], i) => `<button data-lysw="${k || '0'}" class="${i ? '' : 'lyf '}${lyKind() === k ? 'on' : ''}">${t}${lyKind() === k ? '<span class="lpck">✓</span>' : ''}</button>`).join('')}`;
     o.addEventListener('click', close);
     m.addEventListener('click', ev => {
       { const ly = ev.target.closest('[data-lysw]'); if (ly) { try { localStorage.setItem('layout', ly.dataset.lysw === '0' ? '' : ly.dataset.lysw); } catch (er) {} close(); render(); window.scrollTo(0, 0); return; } }
@@ -4526,7 +4506,7 @@ function renderLeaders() {
       state.lgs = {}; state.athC = {}; state.lvC = {}; state.std = {}; _prefetched = {};
       m.innerHTML = '<button>Cache cleared ✓</button>'; setTimeout(close, 900);
     });
-    document.body.append(o, m); try { tNudge(m); } catch (e) {}
+    document.body.append(o, m); try { tNudge(m); } catch (e) {} if (r.top > window.innerHeight / 2) m.style.top = Math.max(8, r.top - 8 - m.offsetHeight) + 'px'; /* pressed in the bottom bar → menu opens upwards */
   };
   document.addEventListener('touchstart', e => { const p = pill(e); if (!p) return; sx = e.touches[0].clientX; sy = e.touches[0].clientY; clearTimeout(tmr); tmr = p.dataset.league === 'fav' ? setTimeout(() => openCache(p), 2000) : setTimeout(() => open(p), 480); }, { passive: true });
   document.addEventListener('touchmove', e => { if (tmr && (Math.abs(e.touches[0].clientX - sx) > 8 || Math.abs(e.touches[0].clientY - sy) > 8)) { clearTimeout(tmr); tmr = null; } }, { passive: true });
