@@ -37,15 +37,20 @@ html.fbar .gl2 .glr b,html.fbar .sch .rs b,html.fbar .sch .sc2 b,html.fbar .sch 
 /* ===== Design 2.0: black→purple gradient + glass cards ===== */
 html.d2 body{background:transparent}
 /* team / player pages: their colour fades down into black (no hard edge) */
-html.d2.tbg{background:#000 !important}
-html.d2.tbg body{background:transparent !important}
 /* the page gradient is fixed to the viewport; the sticky header (also pinned to the viewport top) paints the very same gradient, so there is no seam */
-html.d2.tbg body::before,html.d2.tbg .stkw{background:#000 linear-gradient(180deg,var(--pbg) 0,var(--pbg) 10vh,#000 75vh) no-repeat 0 0 / 100vw 100vh !important}
-html.d2.tbg .stkw{-webkit-backdrop-filter:none !important;backdrop-filter:none !important}
-html.d2.tbg .stkw.fx0{border-top-color:transparent;box-shadow:none}
 html.d2 body::before{content:'';position:fixed;inset:0;z-index:-1;pointer-events:none;background:#000}
-html.d2{--card:rgba(44,38,64,.5)}
-html.d2 .pane{background:rgba(30,26,44,.72)}
+/* Design 2.0 background: diagonal gradient (Bengals orange → black; team / player pages: their colour); the sticky header paints the same viewport-anchored gradient → no seam, status bar area included */
+html.d2{--g1:#fb4f14}
+html.d2.tbg{--g1:var(--pbg)}
+html.d2,html.d2 body{background:#000 !important}
+html.d2 body{background:transparent !important}
+html.d2 body::before,html.d2 .stkw{background:#000 linear-gradient(150deg,var(--g1) 0,color-mix(in srgb,var(--g1) 55%,#000) 26vh,color-mix(in srgb,var(--g1) 18%,#000) 55vh,#000 85vh) no-repeat 0 0 / 100vw 100vh !important}
+html.d2 .stkw{-webkit-backdrop-filter:none !important;backdrop-filter:none !important}
+html.d2 .stkw.fx0{border-top-color:transparent;box-shadow:none}
+html.d2{--card:rgba(24,24,28,.34)}
+html.d2 .pane{background:rgba(20,20,24,.42)}
+html.d2 :is(.card,.pane,.dy,.qb button,.lyic button,.lybar,.pill:not(.on),.icon,header .back,header .home){-webkit-backdrop-filter:blur(16px) saturate(150%);backdrop-filter:blur(16px) saturate(150%)}
+html.d2 .lybar{background:rgba(24,24,28,.38)}
 html.d2 td.n,html.d2 th.n{background:transparent}
 html.d2 .pane .tw td.n,html.d2 .pane .tw th.n{background:transparent;box-shadow:none}
 /* Design 2.0: the name column scrolls with the rest of the table (no sticky / no cover) */
@@ -53,8 +58,8 @@ html.d2 td.n,html.d2 th.n{position:static !important}
 html.d2 tr.zb > td{background:rgba(255,255,255,.055) !important}
 html.d2 .pane .tw tr.zb > td.n{background:rgba(255,255,255,.055) !important}
 html.d2 .gl2 tbody tr:nth-child(even) td{background:rgba(255,255,255,.055)}
-html.d2 :is(.card,.pane,.hero,.pill,.dy,.qb button,header .back,header .home[data-home],.ybtn,.hpill,.icon,.favh,.cmpclr,.msg button):not([style*='position']){position:relative}
-html.d2 :is(.card,.pane,.hero,.pill,.dy,.qb button,header .back,header .home[data-home],.ybtn,.hpill,.icon,.favh,.cmpclr,.msg button,.lpm,.artbox)::after{content:'';position:absolute;inset:0;border-radius:inherit;padding:1px;background:linear-gradient(180deg,rgba(255,255,255,.18),rgba(255,255,255,.05) 30%,rgba(255,255,255,.01) 60%,rgba(255,255,255,.06));-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude;pointer-events:none;z-index:3}
+html.d2 :is(.card,.pane,.hero,.pill,.dy,.qb button,header .back,header .home[data-home],.ybtn,.hpill,.icon,.favh,.cmpclr,.msg button,.lyic button):not([style*='position']){position:relative}
+html.d2 :is(.card,.pane,.hero,.pill,.dy,.qb button,header .back,header .home[data-home],.ybtn,.hpill,.icon,.favh,.cmpclr,.msg button,.lpm,.artbox,.lyic button,.lybar)::after{content:'';position:absolute;inset:0;border-radius:inherit;padding:1px;background:linear-gradient(180deg,rgba(255,255,255,.18),rgba(255,255,255,.05) 30%,rgba(255,255,255,.01) 60%,rgba(255,255,255,.06));-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude;pointer-events:none;z-index:3}
 html.d2 :is(.card,.hero){box-shadow:0 10px 28px rgba(0,0,0,.35),inset 0 1px 0 rgba(255,255,255,.03)}
 html.d2 .stkw{background:rgba(0,0,0,.72);-webkit-backdrop-filter:blur(22px) saturate(170%);backdrop-filter:blur(22px) saturate(170%)}
 html.d2 .stkw.fx0{border-top-color:transparent;box-shadow:none}
@@ -1153,10 +1158,10 @@ header.lyc{padding-top:calc(env(safe-area-inset-top) + 30px)}
 .lyh h1{font-family:var(--num);font-weight:700;font-size:28px;line-height:38px;white-space:nowrap}
 .lyics{display:flex;gap:8px;flex:none}
 .lyic{display:flex;flex-direction:column;align-items:center;gap:3px}
-.lyic button{width:38px;height:38px;border-radius:50%;background:var(--card);display:flex;align-items:center;justify-content:center;color:#fff}
+.lyic button{width:calc(10px + 25.5px * 1.15);height:calc(10px + 25.5px * 1.15);border-radius:50%;background:var(--card);display:flex;align-items:center;justify-content:center;color:#fff}
 .lyic small{font-family:var(--num);font-size:11px;font-weight:700;color:var(--mut);line-height:1}
 .lyic.on button{background:#fff;color:#000}
-.lybar{position:fixed;left:12px;right:12px;bottom:calc(env(safe-area-inset-bottom) + 10px);height:64px;border-radius:24px;background:rgba(28,28,30,.94);-webkit-backdrop-filter:blur(20px);backdrop-filter:blur(20px);display:flex;z-index:60;box-shadow:0 10px 30px rgba(0,0,0,.6),inset 0 1px 0 rgba(255,255,255,.08)}
+.lybar{position:fixed;left:12px;right:12px;bottom:calc(max(env(safe-area-inset-bottom), 12px) + 20px);height:64px;border-radius:24px;background:rgba(28,28,30,.94);-webkit-backdrop-filter:blur(20px);backdrop-filter:blur(20px);display:flex;z-index:60;box-shadow:0 10px 30px rgba(0,0,0,.6),inset 0 1px 0 rgba(255,255,255,.08)}
 .lybar button{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;color:var(--mut);font-family:var(--num)}
 .lybar button b{font-size:20px;font-weight:700;line-height:1}
 .lybar button small{font-size:12px;font-weight:700}
@@ -1164,8 +1169,10 @@ header.lyc{padding-top:calc(env(safe-area-inset-top) + 30px)}
 .lybar button.on b::after{content:'';display:block;width:18px;height:3px;border-radius:2px;background:#e5484d;margin:3px auto 0}
 .lybar button svg{width:20px;height:20px}
 .lybar button.on svg{color:#ffd60a}
-html:has(.lybar) #app{padding-bottom:calc(env(safe-area-inset-bottom) + 84px)}
-.lyc .lyh h1{font-size:26px;letter-spacing:.3px;line-height:38px;margin:0;padding:0}
+html:has(.lybar) #app{padding-bottom:calc(max(env(safe-area-inset-bottom), 12px) + 96px)}
+/* C2: the bottom bar already takes you 'home' (tap the league) → no Home pill on the list */
+html:has(.lybar) #app > .hpw .hpill{display:none}
+.lyc .lyh h1{font-size:30px;letter-spacing:.3px;line-height:calc(10px + 25.5px * 1.15);margin:0;padding:0}
 html.fbar .lyc .lyh h1{position:relative;top:-2.5px}
 html.fsg .lyc .lyh h1{position:relative;top:1.6px}
 .lyc .lyh h1 i{font-style:normal;color:#e5484d}
@@ -4476,18 +4483,6 @@ function renderLeaders() {
     try { if (navigator.vibrate) { navigator.vibrate(12); return; } } catch (e) {}
     try { const l = document.createElement('label'), i = document.createElement('input'); i.type = 'checkbox'; i.setAttribute('switch', ''); l.style.cssText = 'position:fixed;left:0;top:0;width:1px;height:1px;overflow:hidden;opacity:0;pointer-events:none'; i.tabIndex = -1; i.style.cssText = 'width:1px;height:1px;margin:0;font-size:16px'; l.appendChild(i); document.body.appendChild(l); l.click(); try { i.blur(); } catch (e) {} setTimeout(() => l.remove(), 100); } catch (e) {}
   };
-  const open = el => { return;
-    const lg = el.dataset.league; if (!LEAGUES[lg]) return;
-    window._lpAt = Date.now(); close();
-    const r = el.getBoundingClientRect();
-    const o = document.createElement('div'); o.className = 'lpo';
-    const m = document.createElement('div'); m.className = 'lpm';
-    m.style.top = (r.bottom + 8) + 'px'; m.style.left = Math.min(r.left, window.innerWidth - 216) + 'px';
-    m.innerHTML = `<button data-go="standings">Standings</button><button data-go="lstats">League stats</button>`;
-    o.addEventListener('click', close);
-    m.addEventListener('click', e => { const b = e.target.closest('[data-go]'); if (!b) return; close(); window._fromList = true; location.hash = '#/' + b.dataset.go + '/' + lg; });
-    document.body.append(o, m); if (r.top > window.innerHeight / 2) m.style.top = Math.max(8, r.top - 8 - m.offsetHeight) + 'px'; /* pressed in the bottom bar → menu opens upwards */
-  };
   const pill = e => { const p = e.target.closest && e.target.closest('.pill[data-league], .lybar [data-league]'); return p && (LEAGUES[p.dataset.league] || p.dataset.league === 'fav') ? p : null; };
   const openCache = el => {
     window._lpAt = Date.now(); close();
@@ -4508,10 +4503,10 @@ function renderLeaders() {
     });
     document.body.append(o, m); try { tNudge(m); } catch (e) {} if (r.top > window.innerHeight / 2) m.style.top = Math.max(8, r.top - 8 - m.offsetHeight) + 'px'; /* pressed in the bottom bar → menu opens upwards */
   };
-  document.addEventListener('touchstart', e => { const p = pill(e); if (!p) return; sx = e.touches[0].clientX; sy = e.touches[0].clientY; clearTimeout(tmr); tmr = p.dataset.league === 'fav' ? setTimeout(() => openCache(p), 2000) : setTimeout(() => open(p), 480); }, { passive: true });
+  document.addEventListener('touchstart', e => { const p = pill(e); if (!p) return; sx = e.touches[0].clientX; sy = e.touches[0].clientY; clearTimeout(tmr); tmr = p.dataset.league === 'fav' ? setTimeout(() => openCache(p), 2000) : null; }, { passive: true });
   document.addEventListener('touchmove', e => { if (tmr && (Math.abs(e.touches[0].clientX - sx) > 8 || Math.abs(e.touches[0].clientY - sy) > 8)) { clearTimeout(tmr); tmr = null; } }, { passive: true });
   document.addEventListener('touchend', () => { clearTimeout(tmr); tmr = null; });
-  document.addEventListener('contextmenu', e => { const p = pill(e); if (p) { e.preventDefault(); if (p.dataset.league === 'fav') openCache(p); else open(p); } });
+  document.addEventListener('contextmenu', e => { const p = pill(e); if (p) { e.preventDefault(); if (p.dataset.league === 'fav') openCache(p); } });
 })();
 function renderSearch() {
   if (!document.getElementById('sq')) {
