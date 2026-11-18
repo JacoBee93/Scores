@@ -37,15 +37,19 @@ html.fbar .gl2 .glr b,html.fbar .sch .rs b,html.fbar .sch .sc2 b,html.fbar .sch 
 /* ===== Design 2.0: black→purple gradient + glass cards ===== */
 html.d2 body{background:transparent}
 /* team / player pages: their colour fades down into black (no hard edge) */
-html.d2.tbg,html.d2.tbg body{background:#000 !important}
-html.d2.tbg body::before{background:linear-gradient(180deg,var(--pbg) 0%,var(--pbg) 12%,#000 78%) !important}
-html.d2.tbg .stkw{background:color-mix(in srgb,var(--pbg) 72%,transparent)}
+html.d2.tbg{background:#000 !important}
+html.d2.tbg body{background:transparent !important}
+/* the page gradient is fixed to the viewport; the sticky header (also pinned to the viewport top) paints the very same gradient, so there is no seam */
+html.d2.tbg body::before,html.d2.tbg .stkw{background:#000 linear-gradient(180deg,var(--pbg) 0,var(--pbg) 10vh,#000 75vh) no-repeat 0 0 / 100vw 100vh !important}
+html.d2.tbg .stkw{-webkit-backdrop-filter:none !important;backdrop-filter:none !important}
 html.d2.tbg .stkw.fx0{border-top-color:transparent;box-shadow:none}
-html.d2 body::before{content:'';position:fixed;inset:0;z-index:-1;pointer-events:none;background:linear-gradient(180deg,#000 0%,#07040d 22%,#1a0d33 55%,#3a1a6e 100%)}
+html.d2 body::before{content:'';position:fixed;inset:0;z-index:-1;pointer-events:none;background:#000}
 html.d2{--card:rgba(44,38,64,.5)}
 html.d2 .pane{background:rgba(30,26,44,.72)}
 html.d2 td.n,html.d2 th.n{background:transparent}
-html.d2 .pane .tw td.n,html.d2 .pane .tw th.n{background:rgba(36,32,52,.38);box-shadow:none;-webkit-backdrop-filter:blur(9px) saturate(140%);backdrop-filter:blur(9px) saturate(140%)}
+html.d2 .pane .tw td.n,html.d2 .pane .tw th.n{background:transparent;box-shadow:none}
+/* Design 2.0: the name column scrolls with the rest of the table (no sticky / no cover) */
+html.d2 td.n,html.d2 th.n{position:static !important}
 html.d2 tr.zb > td{background:rgba(255,255,255,.055) !important}
 html.d2 .pane .tw tr.zb > td.n{background:rgba(255,255,255,.055) !important}
 html.d2 .gl2 tbody tr:nth-child(even) td{background:rgba(255,255,255,.055)}
