@@ -50,6 +50,8 @@ html.d2 .stkw{background:transparent !important;-webkit-backdrop-filter:none !im
 html.d2 .stkw::before{content:'';position:absolute;left:0;right:0;top:0;bottom:0;z-index:-1;pointer-events:none;-webkit-backdrop-filter:blur(7px);backdrop-filter:blur(7px)}
 /* the hairline appears only once content actually slides under the glass */
 html.d2.scr .stkw:not(:has(.dtabs))::before{border-bottom:1px solid rgba(255,255,255,.12)}
+/* progressive blur below the header: content starts to blur ~44px before it reaches the line and is fully blurred at the line */
+html.d2 .stkw::after{content:'';position:absolute;left:0;right:0;top:100%;height:44px;pointer-events:none;-webkit-backdrop-filter:blur(7px);backdrop-filter:blur(7px);-webkit-mask-image:linear-gradient(180deg,#000,rgba(0,0,0,.55) 35%,transparent);mask-image:linear-gradient(180deg,#000,rgba(0,0,0,.55) 35%,transparent)}
 html.d2{--mut:#b4b4bb}
 html.d2 .stkw.fx0{border-top-color:transparent;box-shadow:none}
 /* one glass for the whole Design 2.0 (exceptions later) */
