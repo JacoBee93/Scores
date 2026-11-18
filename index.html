@@ -478,7 +478,7 @@ body{min-height:100vh}
 .artbox p{font-family:var(--num);font-weight:500;font-size:18px;line-height:1.4;color:var(--mut);margin:10px 0}
 .artby{font-family:var(--num);font-weight:600;font-size:14px;color:var(--mut)}
 .artimg{width:100%;border-radius:12px;margin:26px 0 8px;display:block}
-.artx{position:sticky;top:0;float:right;width:36px;height:36px;border-radius:50%;background:#3a3a3c;font-size:22px;z-index:2;margin:-4px -4px 0 0}
+.artx{position:relative;width:36px;height:36px;border-radius:50%;background:#3a3a3c;font-size:22px;z-index:2;margin:-4px -4px 0 0}
 .hl{color:#fff;font-weight:700;background:rgba(138,180,255,.18);border-radius:4px;padding:0 2px}
 .glsec{margin:10px 0 18px}
 .glsec + .glsec{margin-top:22px}
@@ -1138,6 +1138,16 @@ html.fsg td.n .slg{top:.75px}
 
 /* today / current week / current GP in the top strip: red text (black when it is the selected bubble) */
 .dy.tdy:not(.on){color:#e5484d}
+
+/* article: the close ball rides along in a sticky strip; once the text scrolls, the strip fades the text out under the ball */
+.artbar{position:sticky;top:0;height:0;z-index:3;display:flex;justify-content:flex-end}
+.artbar::before{content:'';position:absolute;left:-18px;right:-18px;top:-18px;height:62px;background:linear-gradient(180deg,#1c1c1e 62%,rgba(28,28,30,0));opacity:0;transition:opacity .15s;pointer-events:none}
+html.d2 .artbar::before{background:linear-gradient(180deg,rgb(30,26,44) 62%,rgba(30,26,44,0))}
+.artbar.sc::before{opacity:1}
+.artbar .artx{flex:none;margin:0 -4px 0 0}
+.artul{margin:8px 0 10px;padding-left:22px;font-family:var(--num);font-weight:500;font-size:18px;line-height:1.35;color:var(--mut)}
+.artul li{margin:6px 0}
+.artul li::marker{color:#636366}
 </style>
 </head>
 <body>
@@ -2100,12 +2110,16 @@ function showArt(a, names0, web) {
   const hl = t => { const e = esc(t); return re ? e.replace(re, '<b class="hl">$1</b>') : e; };
   let paras = [];
   if (a.story) { const d = new DOMParser().parseFromString('<div>' + a.story + '</div>', 'text/html'); d.querySelectorAll('script,style,photo,video,alsosee,inline').forEach(x => x.remove());
-    const ps = [...d.querySelectorAll('p, h2, h3')]; paras = (ps.length ? ps.map(p => [p.tagName, p.textContent.trim()]) : d.body.textContent.split(/\n{2,}/).map(t => ['P', t.trim()])).filter(x => x[1]); }
+    /* paragraphs, headings and list items (ESPN lists = rankings etc.); a short paragraph that is only an underlined/bold label counts as a heading */
+    const ps = [...d.querySelectorAll('p, h2, h3, h4, li')].filter(p => !(p.tagName === 'P' && p.closest('li')));
+    const kind = p => { if (p.tagName === 'LI') return 'LI'; if (/^H/.test(p.tagName)) return 'H'; const t = p.textContent.trim(), k = [...p.children]; return t.length < 40 && k.length === 1 && /^(U|B|STRONG)$/.test(k[0].tagName) && k[0].textContent.trim() === t ? 'H' : 'P'; };
+    paras = (ps.length ? ps.map(p => [kind(p), p.textContent.trim()]) : d.body.textContent.split(/\n{2,}/).map(t => ['P', t.trim()])).filter(x => x[1]); }
   else if (a.description) paras = [['P', a.description]];
   let ov = document.getElementById('artpop'); const keep = ov ? ov.querySelector('.artbox').scrollTop : 0;
   if (!ov) { ov = document.createElement('div'); ov.id = 'artpop'; document.body.appendChild(ov); }
-  ov.innerHTML = `<div class="artbox"><button class="artx" data-artclose="1" aria-label="Close"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button><h2>${esc(a.headline || '')}</h2>${a.byline ? `<div class="artby">${esc(a.byline)}</div>` : ''}${paras.map(([tg, t]) => /^H/.test(tg) ? `<h3>${hl(t)}</h3>` : `<p>${hl(t)}</p>`).join('')}${web ? `<p><a class="rcm" href="${esc(web)}" target="_blank" rel="noopener">Read on ESPN ›</a></p>` : ''}</div>`;
+  ov.innerHTML = `<div class="artbox"><div class="artbar"><button class="artx" data-artclose="1" aria-label="Close"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div><h2>${esc(a.headline || '')}</h2>${a.byline ? `<div class="artby">${esc(a.byline)}</div>` : ''}${paras.map(([tg, t], i) => tg === 'LI' ? `${i && paras[i - 1][0] === 'LI' ? '' : '<ul class="artul">'}<li>${hl(t)}</li>${paras[i + 1] && paras[i + 1][0] === 'LI' ? '' : '</ul>'}` : tg === 'H' ? `<h3>${hl(t)}</h3>` : `<p>${hl(t)}</p>`).join('')}${web ? `<p><a class="rcm" href="${esc(web)}" target="_blank" rel="noopener">Read on ESPN ›</a></p>` : ''}</div>`;
   { const bx = ov.querySelector('.artbox'), pn = $app.querySelector(':scope > main > .pane'); if (pn) { const r = pn.getBoundingClientRect(), sy = window.scrollY, top = r.top + sy, pb = r.bottom + sy, H = window.innerHeight, full = pb > H - 4; if (sy > 0) smoothTop(); Object.assign(bx.style, { position: 'fixed', top: top + 'px', left: r.left + 'px', width: r.width + 'px', height: (full ? H + 40 - top : Math.max(220, pb - top)) + 'px', maxHeight: 'none', maxWidth: 'none', borderRadius: full ? '22px 22px 0 0' : '22px', paddingBottom: full ? '58px' : '18px' }); } bx.scrollTop = keep; }
+  { const bx = ov.querySelector('.artbox'), bar = ov.querySelector('.artbar'); const f = () => bar.classList.toggle('sc', bx.scrollTop > 6); bx.addEventListener('scroll', f, { passive: true }); f(); }
 }
 document.addEventListener('click', ev => {
   if (ev.target.closest('[data-artopen]')) { openArticle(); return; }
