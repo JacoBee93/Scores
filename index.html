@@ -1103,18 +1103,21 @@ html.fsg td.n .slg{top:.75px}
 .f1w .hs.sil{border-radius:50% !important;background:#2c2c2e !important;object-fit:cover}
 
 @supports (overflow:clip){.f1nm,.f1w span,.f1rh .lvt,.f1dn b,.stn td.n .pn,.brt b{overflow-x:clip;overflow-y:visible}}
-/* ===== F1 2.0: dark grey F1 section, black cards lifted with shadows + light rims for depth ===== */
-html.f12.inf1,html.f12.inf1 body{background:#1f1f22 !important}
-html.f12.inf1{--pbg:#1f1f22 !important;--card:#000}
-html.f12.inf1 .pane{background:#000 !important;box-shadow:0 12px 26px rgba(0,0,0,.6),0 3px 6px rgba(0,0,0,.45),inset 0 1px 0 rgba(255,255,255,.10) !important}
-html.f12.inf1 :is(.card,.dy,.qb button,.htabs .pill:not(.on),.htabs .icon,header .back,header .home){background:linear-gradient(180deg,#17171a 0%,#050506 55%,#000 100%) !important;box-shadow:0 12px 26px rgba(0,0,0,.6),0 3px 6px rgba(0,0,0,.45),inset 0 1px 0 rgba(255,255,255,.10),inset 0 -1px 0 rgba(0,0,0,.8) !important}
-html.f12.inf1 :is(.dy.on,.htabs .pill.on){background:linear-gradient(180deg,#fff,#e6e6ea) !important;box-shadow:0 10px 22px rgba(0,0,0,.55),0 2px 5px rgba(0,0,0,.4),inset 0 -2px 0 rgba(0,0,0,.12) !important}
+
+/* finished GP: podium balls with gold / silver / bronze rings (same colours as positions 1–3) */
+.f1pod{display:flex;align-items:center;gap:10px;padding-left:2px}
+.f1pod .hs{width:38px;height:38px;border-radius:50%;object-fit:cover;background:#2c2c2e;flex:none;box-shadow:0 0 0 2px var(--rc)}
+.f1pod .p1{--rc:#ffd60a}.f1pod .p2{--rc:#d1d1d6}.f1pod .p3{--rc:#d0894a}
+/* ===== F1 2.0: black page, grey cards with a bevel (light top rim, darker bottom, soft gradient) for a 3D look ===== */
+html.f12.inf1 :is(.card,.dy,.qb button,.htabs .pill:not(.on),.htabs .icon,header .back,header .home){background:linear-gradient(180deg,#2c2c30 0%,#1e1e21 42%,#161618 100%) !important;box-shadow:inset 0 1px 0 rgba(255,255,255,.16),inset 0 -1px 0 rgba(0,0,0,.6),inset 0 -10px 18px -12px rgba(0,0,0,.55),0 0 0 .5px rgba(255,255,255,.07),0 10px 22px rgba(0,0,0,.9) !important}
+html.f12.inf1 .pane{box-shadow:inset 0 1px 0 rgba(255,255,255,.14),0 0 0 .5px rgba(255,255,255,.07) !important}
+html.f12.inf1 :is(.dy.on,.htabs .pill.on){background:linear-gradient(180deg,#fff,#dcdce0) !important;box-shadow:inset 0 1px 0 #fff,inset 0 -2px 0 rgba(0,0,0,.14),0 6px 16px rgba(0,0,0,.8) !important}
 html.f12.inf1 .strip{padding-bottom:16px;margin-bottom:-16px}
-html.f12.inf1 .f1fl{box-shadow:0 3px 7px rgba(0,0,0,.7)}
+html.f12.inf1 .f1fl{box-shadow:0 3px 6px rgba(0,0,0,.8)}
 html.f12.inf1 .f1fl::after{background:radial-gradient(circle at 32% 26%,rgba(255,255,255,.42),rgba(255,255,255,0) 58%),radial-gradient(circle at 50% 120%,rgba(0,0,0,.35),rgba(0,0,0,0) 60%)}
-html.f12.inf1 .f1w .hs{filter:drop-shadow(0 4px 5px rgba(0,0,0,.75))}
-html.f12.inf1 .f1map img{filter:invert(1) brightness(1.6) drop-shadow(0 4px 4px rgba(0,0,0,.9)) drop-shadow(0 0 6px rgba(255,255,255,.12))}
-html.f12.inf1 :is(.f1nm,.f1w span,.f1big,.f1rd,.lvt){text-shadow:0 2px 4px rgba(0,0,0,.8)}
+html.f12.inf1 .f1pod .hs{box-shadow:0 0 0 2px var(--rc),0 4px 8px rgba(0,0,0,.8),inset 0 -6px 10px rgba(0,0,0,.35)}
+html.f12.inf1 .f1map img{filter:invert(1) brightness(1.6) drop-shadow(0 4px 4px rgba(0,0,0,.9))}
+html.f12.inf1 :is(.f1nm,.f1big,.f1rd,.lvt){text-shadow:0 2px 4px rgba(0,0,0,.7)}
 </style>
 </head>
 <body>
@@ -4557,15 +4560,6 @@ function f1MapSrc(url) {
   im.onerror = () => { const t = new Image(); t.onload = () => done(url); t.onerror = () => done('none'); t.src = url; };
   im.src = url; return 'p';
 }
-/* winner photo: cut away the transparent margin so the visible shoulders start exactly at the flag's left edge and sit on the bottom */
-function f1HsTrim(url) { F1.hsT = F1.hsT || {}; const m = F1.hsT[url]; if (m !== undefined) return m || null; F1.hsT[url] = 0;
-  const im = new Image(); im.crossOrigin = 'anonymous';
-  im.onload = () => { try { const W = im.naturalWidth, H = im.naturalHeight, cv = document.createElement('canvas'); cv.width = W; cv.height = H; const x = cv.getContext('2d'); x.drawImage(im, 0, 0); const p = x.getImageData(0, 0, W, H).data;
-      if (p[3] > 200 && p[(W * H - 1) * 4 + 3] > 200) return; /* not a cut-out (has its own background) */
-      let x0 = W, y0 = H, x1 = -1, y1 = -1; for (let Y = 0; Y < H; Y++) for (let X = 0; X < W; X++) if (p[(Y * W + X) * 4 + 3] > 40) { if (X < x0) x0 = X; if (X > x1) x1 = X; if (Y < y0) y0 = Y; if (Y > y1) y1 = Y; }
-      if (x1 < 0) return; const o = document.createElement('canvas'); o.width = x1 - x0 + 1; o.height = y1 - y0 + 1; o.getContext('2d').drawImage(cv, x0, y0, o.width, o.height, 0, 0, o.width, o.height); const d = o.toDataURL(); F1.hsT[url] = d;
-      document.querySelectorAll('img.hs[data-hs]').forEach(e => { if (e.dataset.hs === url && !e.classList.contains('sil')) { e.src = d; e.classList.add('trm'); e.addEventListener('load', () => { try { f1UpAlign(); } catch (er) {} }, { once: true }); } }); } catch (e) {} };
-  im.src = url; return null; }
 const f1MapHTML = url => { const m = f1MapSrc(url); return m === 'p' ? '' : m && m !== 'none' ? `<img src="${m}" alt="">` : '<span class="f1nomap">No map data</span>'; };
 
 /* --- main list --- */
@@ -4591,7 +4585,7 @@ function renderF1List(tabs) {
       const rc = f1Comp(e, 'Race'), done = f1Done(rc), w = done && rc && (rc.competitors || []).find(c => c.order === 1), cid = e.circuit && e.circuit.id, cu = F1.circ[cid];
       if (cid && cu === undefined) f1Circ(e).then(() => { if (topView() === 'list' && state.league === 'f1') render(); });
       return `<div class="card f1card${done ? '' : ' f1up'}" data-f1race="${esc(e.id)}" data-f1ry="${esc(e._y || '')}" id="f1c${esc(e.id)}"><div class="f1cl1"><div class="f1rd">Round ${k + 1}</div><div class="f1tt">${f1Flag(e)}<div class="f1nm">${esc(f1Short(e))}</div></div>
-        ${done ? `${w ? `<div class="f1w">${(u => { const t = f1HsTrim(u); return `<img class="hs${t ? ' trm' : ''}" data-hs="${esc(u)}" src="${esc(t || u)}" alt="" onerror="this.onerror=null;this.classList.add('sil');this.src=SIL">`; })(f1Hs(w.id))}<span>${esc(w.athlete && (w.athlete.displayName || w.athlete.shortName) || '')}</span></div>` : ''}` : `<div class="f1big">${esc(f1DatesY(e))}</div><div class="f1ct">${esc((e.circuit && e.circuit.fullName) || '')}</div>`}</div>
+        ${done ? (pod => pod.length ? `<div class="f1pod">${pod.map(c => `<img class="hs p${c.order}" src="${esc(f1Hs(c.id))}" alt="" onerror="this.onerror=null;this.src=SIL">`).join('')}</div>` : '')([1, 2, 3].map(o => (rc.competitors || []).find(c => c.order === o)).filter(Boolean)) : `<div class="f1big">${esc(f1DatesY(e))}</div><div class="f1ct">${esc((e.circuit && e.circuit.fullName) || '')}</div>`}</div>
         <div class="f1map">${cu && cu !== 'p' ? f1MapHTML(cu) : cu === null || !cid ? '<span class="f1nomap">No map data</span>' : ''}</div></div>`; }).join('');
   }
   const os = document.getElementById('strip'), prev = os && state.stripKey === 'f1' ? os.scrollLeft : null; state.stripKey = 'f1';
@@ -4607,20 +4601,19 @@ function f1Fit() { requestAnimationFrame(() => { { const fl = $app.querySelector
   $app.querySelectorAll('.f1dn b').forEach(el => { if (el.scrollWidth > el.clientWidth + 1) { const w = el.textContent.trim().split(/\s+/); if (w.length > 1 && !/\.$/.test(w[0])) el.textContent = w[0][0] + '. ' + w.slice(1).join(' '); } }); f1UpAlign(); }); }
 /* upcoming GP card: GP name's capitals start as far from the card top as the track map, the circuit name's baseline sits as far from the bottom as the map */
 /* F1 list cards: ROUND label and GP name at the same spots on every card (gap = what an evenly spaced upcoming card gets);
-   upcoming: date + circuit evenly spaced down to the bottom edge; finished: winner photo centred between the flag and the card bottom, his name sitting on the photo's bottom edge */
+   upcoming: date + circuit evenly spaced down to the bottom edge; finished: podium (P1–P3 balls) centred between the flag and the card bottom */
 function f1UpAlign() { const capc = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--capc')) || .405;
   const base = el => { const z = document.createElement('i'); z.style.cssText = 'display:inline-block;width:0;height:0;vertical-align:baseline'; el.appendChild(z); const y = z.getBoundingClientRect().bottom; z.remove(); return y; };
   const fsz = el => parseFloat(getComputedStyle(el).fontSize), txt = el => { const b = base(el); return [b - 2 * capc * fsz(el), b]; };
   const mEl = x => x.closest('.f1cl1 > *'), put = (el, f, y) => { const m = mEl(el), m0 = parseFloat(getComputedStyle(m).marginTop) || 0; m.style.marginTop = Math.round((m0 + y - f(el)[0]) * 2) / 2 + 'px'; return f(el)[1]; };
   $app.querySelectorAll('.f1list .f1card:not(.f1hist)').forEach(c => { const q = x => c.querySelector(x), rd = q('.f1rd'), nm = q('.f1nm'); if (!rd || !nm) return;
-    [...c.querySelectorAll('.f1cl1 > *')].forEach(m => { m.style.marginTop = ''; }); const sp0 = q('.f1w span'); if (sp0) sp0.style.top = '';
+    [...c.querySelectorAll('.f1cl1 > *')].forEach(m => { m.style.marginTop = ''; });
     const cr = c.getBoundingClientRect(), gT = (cr.height - 2 * capc * (fsz(rd) + 2 * fsz(nm) + 12)) / 5; if (!(gT > 0)) return;
     let y = put(rd, txt, cr.top + gT); y = put(nm, txt, y + gT);
     if (c.classList.contains('f1up')) { const dt = q('.f1big'), ct = q('.f1ct'); if (!dt || !ct) return; const H = (a => a[1] - a[0])(txt(dt)) + (a => a[1] - a[0])(txt(ct)), g = (cr.bottom - y - H) / 3; y = put(dt, txt, y + g); put(ct, txt, y + g); return; }
-    const im = q('.f1w .hs'), sp = q('.f1w span'), fl = q('.f1tt .f1fl'); if (!im || !fl) return;
-    const fb = fl.getBoundingClientRect().bottom, h = im.getBoundingClientRect().height, top = (fb + cr.bottom) / 2 - h / 2;
-    put(im, e => { const r = e.getBoundingClientRect(); return [r.top, r.bottom]; }, top);
-    if (sp) sp.style.top = Math.round((im.getBoundingClientRect().bottom - base(sp)) * 2) / 2 + 'px'; }); }
+    const pd = q('.f1pod'), fl = q('.f1tt .f1fl'); if (!pd || !fl) return;
+    const fb = fl.getBoundingClientRect().bottom, h = pd.getBoundingClientRect().height;
+    put(pd, e => { const r = e.getBoundingClientRect(); return [r.top, r.bottom]; }, (fb + cr.bottom) / 2 - h / 2); }); }
 function f1CenterStrip(smooth) { const s = document.getElementById('strip'), on = s && s.querySelector('.on'); if (!on) return; const tgt = Math.max(0, on.offsetLeft - (s.clientWidth - on.offsetWidth) / 2); if (smooth) s.scrollTo({ left: tgt, behavior: 'smooth' }); else s.scrollLeft = tgt; }
 F1.tok = 0;
 function f1CancelAnim() { F1.tok++; if (window._stAnim) { window._stAnim = false; window._scrollMem[location.hash] = window.scrollY; } }
