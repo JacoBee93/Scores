@@ -47,7 +47,7 @@ html.d2 body{background:transparent !important}
 html.d2 body::before{background:linear-gradient(180deg,var(--g1) 0,color-mix(in srgb,var(--g1) 0%,transparent) 12vh),#000 linear-gradient(150deg,var(--g1) 0,color-mix(in srgb,var(--g1) 55%,#000) 26vh,color-mix(in srgb,var(--g1) 18%,#000) 55vh,#000 85vh) !important}
 /* sticky top: frosted glass from the very top of the screen (viewport-fit=cover → also behind the clock / battery); its only edge is the header's bottom line */
 html.d2 .stkw{background:transparent !important;-webkit-backdrop-filter:none !important;backdrop-filter:none !important}
-html.d2 .stkw::before{content:'';position:absolute;left:0;right:0;top:0;bottom:0;z-index:-1;pointer-events:none;background:rgba(255,255,255,.07);-webkit-backdrop-filter:blur(18px) saturate(150%);backdrop-filter:blur(18px) saturate(150%)}
+html.d2 .stkw::before{content:'';position:absolute;left:0;right:0;top:0;bottom:0;z-index:-1;pointer-events:none;background:rgba(255,255,255,.03);-webkit-backdrop-filter:blur(3px) saturate(160%);backdrop-filter:blur(3px) saturate(160%)}
 html.d2 .stkw:not(:has(.dtabs))::before{border-bottom:1px solid rgba(255,255,255,.12)}
 html.d2{--mut:#b4b4bb}
 html.d2 .stkw.fx0{border-top-color:transparent;box-shadow:none}
@@ -489,7 +489,7 @@ body{min-height:100vh}
 .artby{font-family:var(--num);font-weight:600;font-size:14px;color:var(--mut)}
 .artimg{width:100%;border-radius:12px;margin:26px 0 8px;display:block}
 .artx{position:relative;width:36px;height:36px;border-radius:50%;background:#3a3a3c;font-size:22px;z-index:2;margin:-4px -4px 0 0}
-.hl{color:#fff;font-weight:700;background:rgba(138,180,255,.18);border-radius:4px;padding:0 2px}
+.hl{color:#fff;font-weight:700}
 .glsec{margin:10px 0 18px}
 .glsec + .glsec{margin-top:22px}
 .gl2{border-collapse:collapse;table-layout:fixed}
@@ -1197,6 +1197,10 @@ html.d2 .ssh{background:rgba(255,255,255,.08) !important}
 html.d2 .tt tbody tr:nth-child(odd) td{background:rgba(255,255,255,.055)}
 html.d2 :is(.skl,.nwim,.brgc){background:rgba(255,255,255,.10) !important}
 html.d2 :is(.ld .hs,.ir .hs,.cmpo .hs,.cmph .hs,.res-row img.hs,.ldr .hs,.f1w .hs,.f1d .hs,.f1pod .hs,.hs){background-color:rgba(255,255,255,.10) !important}
+
+/* Design 2.0: buttons / switches on the clear top glass get a stronger shadow; segmented switches get a white outline */
+html.d2 .stkw :is(.dy,.lyic button,.htabs .pill,.htabs .icon,.back,.home,.ybtn,.qb button){box-shadow:0 6px 16px rgba(0,0,0,.38),0 2px 4px rgba(0,0,0,.25)}
+html.d2 .seg{border-color:rgba(255,255,255,.6)}
 </style>
 </head>
 <body>
