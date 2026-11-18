@@ -714,8 +714,8 @@ td.n .slg{width:20px;height:20px;object-fit:contain;vertical-align:-6px;margin-l
 .lpm{position:fixed;z-index:61;background:#2c2c2e;border-radius:12px;min-width:200px;overflow:hidden;box-shadow:0 10px 30px rgba(0,0,0,.5)}
 .lpm button{display:block;width:100%;text-align:left;padding:14px 16px;font-size:16px;font-weight:600;color:#fff;background:none;border:0;border-bottom:1px solid #3a3a3c;font-family:inherit}
 .lpm button:last-child{border-bottom:0}
-.lpm button[data-fsw],.lpm button[data-d2sw]{display:flex;justify-content:space-between;align-items:center}
-.lpm button[data-fsw]:not(.on),.lpm button[data-d2sw]:not(.on){color:var(--mut)}
+.lpm button[data-fsw],.lpm button[data-d2sw],.lpm button[data-f12sw]{display:flex;justify-content:space-between;align-items:center}
+.lpm button[data-fsw]:not(.on),.lpm button[data-d2sw]:not(.on),.lpm button[data-f12sw]:not(.on){color:var(--mut)}
 .lpm button[data-d2sw]{border-top:6px solid #1c1c1e}
 .lpck{color:#fff;font-size:15px}
 .lpm button[data-cc]{border-bottom:6px solid #1c1c1e}
@@ -990,9 +990,6 @@ html.one #app.lst,html.one body{min-height:0}
 .f1fl::after{content:'';position:absolute;inset:0;border-radius:50%;box-shadow:inset 0 0 0 1px rgba(255,255,255,.18);pointer-events:none}
 .f1tt{display:flex;align-items:center;gap:8px;min-width:0;margin-bottom:0}
 .f1tt .f1fl{display:block}
-.f1card:not(.f1up) .f1cl1{gap:0}
-.f1card:not(.f1hist){padding-top:9px;padding-bottom:9px}
-.f1card:not(.f1up):not(.f1hist) .f1cl1{justify-content:space-between}
 .f1card.f1up .f1big{padding-left:46px}
 .f1rh .lvt{padding-bottom:6px;margin-bottom:-6px}
 .f1card:not(.f1up) .f1won{margin:1px 0 1px}
@@ -1091,13 +1088,49 @@ html.fsg td.n .slg{top:.75px}
 .f1nm,.f1dn b,.f1w span{padding-bottom:6px;margin-bottom:-6px}
 .f1card.f1up .f1cl1{justify-content:flex-start}
 .f1card.f1up .f1ct{padding-left:46px}
+
+/* F1 list cards (Kuba's layout): ROUND label, small flag next to the GP name, cut-out driver photo */
+.f1card:not(.f1hist){padding-top:0;padding-bottom:0}
+.f1card:not(.f1hist) .f1cl1{justify-content:flex-start;gap:0}
+.f1rd{font-family:var(--num);font-weight:700;font-size:12px;letter-spacing:.6px;text-transform:uppercase;color:#fff;line-height:1.2;white-space:nowrap}
+.f1list .f1tt{gap:6px}
+.f1list .f1tt .f1fl{width:20px;height:20px}
+.f1card.f1up .f1big,.f1card.f1up .f1ct{padding-left:26px;margin:0}
+.f1w .hs{border-radius:0 !important;background:none !important;object-fit:contain;object-position:bottom}
+.f1w .hs.sil{border-radius:50% !important;background:#2c2c2e !important;object-fit:cover}
+
+/* ===== F1 2.0: dark grey F1 section, black cards with a soft shadow, session-list cards ===== */
+html.f12.inf1,html.f12.inf1 body{background:#1f1f22 !important}
+html.f12.inf1{--pbg:#1f1f22 !important;--card:#000}
+html.f12.inf1 .card,html.f12.inf1 .pane,html.f12.inf1 .dy,html.f12.inf1 .qb button,html.f12.inf1 .pill:not(.on){box-shadow:0 6px 16px rgba(0,0,0,.45),0 1px 3px rgba(0,0,0,.35)}
+html.f12.inf1 .dy.on,html.f12.inf1 .pill.on{background:#fff}
+html.f12 .f1card.f2c{display:block;height:auto;padding:12px 14px 12px;overflow:hidden}
+.f2h{display:flex;align-items:center;gap:7px;min-width:0}
+.f2r{flex:none;width:21px;height:21px;border-radius:50%;box-shadow:inset 0 0 0 1.5px #636366;color:#aeaeb2;font-family:var(--num);font-weight:700;font-size:10.5px;letter-spacing:-.2px;display:flex;align-items:center;justify-content:center}
+.f2h .f1fl{width:20px;height:20px}
+.f2t{flex:1 1 auto;min-width:0;font-family:var(--num);font-weight:700;font-size:17px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding-bottom:6px;margin-bottom:-6px}
+.f2cy{font-weight:500;color:#c7c7cc}
+.f2p{flex:none;font-family:var(--num);font-weight:600;font-size:12px;color:#aeaeb2;background:#1c1c1e;border-radius:9px;padding:3px 8px}
+.f2p.win{color:#fff;background:#2c2c2e}
+.f2s{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:6px 0 8px;padding-left:27px;min-width:0}
+.f2d{display:flex;align-items:center;gap:5px;flex:none;font-family:var(--num);font-weight:600;font-size:13.5px;color:#c7c7cc}
+.f2d svg{color:#8e8e93}
+.f2ct{min-width:0;font-size:12px;color:var(--mut);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-align:right}
+.f2b{display:flex;align-items:center;gap:10px}
+.f2l{flex:1 1 auto;min-width:0;display:flex;flex-direction:column;gap:3px}
+.f2row{display:grid;grid-template-columns:1fr auto;gap:8px;font-size:14px;line-height:1.25}
+.f2row span{color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.f2row b{font-family:var(--num);font-weight:600;color:#c7c7cc;width:72px}
+.f2row.dn span,.f2row.dn b{color:var(--mut)}
+.f2b .f1map{flex:0 0 42%;justify-content:center}
+.f2b .f1map img{max-height:96px}
 </style>
 </head>
 <body>
 <div id="app"></div>
 
 <script>
-try { localStorage.removeItem('design'); const f = localStorage.getItem('font'); document.documentElement.classList.add(f === 'sg' ? 'fsg' : 'fbar'); if (localStorage.getItem('d2') === '1') document.documentElement.classList.add('d2'); } catch (e) { document.documentElement.classList.add('fbar'); }
+try { localStorage.removeItem('design'); const f = localStorage.getItem('font'); document.documentElement.classList.add(f === 'sg' ? 'fsg' : 'fbar'); if (localStorage.getItem('d2') === '1') document.documentElement.classList.add('d2'); if (localStorage.getItem('f12') === '1') document.documentElement.classList.add('f12'); } catch (e) { document.documentElement.classList.add('fbar'); }
 const API = 'https://site.api.espn.com/apis/site/v2/sports/';
 const WEB = 'https://site.web.api.espn.com/apis/common/v3/sports/';
 const LEAGUES = {
@@ -1719,7 +1752,7 @@ function smoothTop(ms) { ms = ms || 380; const y0 = window.scrollY; cancelAnimat
 function detLock() { const v = topView(); if (window._stAnim) return; const lk = (v === 'player' && state.player && /^(ov|bio|news)$/.test(state.player.tab)) || (v === 'team' && state.team && state.team.tab === 'news');
   if (lk && document.documentElement.scrollHeight - window.innerHeight < (state.player && state.player.tab === 'bio' ? 40 : 120)) { window.scrollTo(0, 0); document.documentElement.classList.add('lock1'); } }
 function listLock() { if (topView() !== 'list' || window._stAnim) return; const m = $app.querySelector(':scope > main'), n = m ? m.querySelectorAll('[data-game]').length : 99; if (n <= 4 && document.documentElement.scrollHeight - window.innerHeight < 220) { window.scrollTo(0, 0); document.documentElement.classList.add('lock1'); } }
-function render() {
+function render() { document.documentElement.classList.toggle('inf1', state.league === 'f1');
   if (window._restoreKey && (window._restoreKey !== location.hash || window._restoreVK !== snapVK())) window._restoreKey = null;
   if (window._restoreKey && window._restoreKey === location.hash && window._restoreVK === snapVK()) { window._restoreKey = null; state.lastView = viewKey(); window.scrollTo(0, window._restoreY || 0); window._backPend = false; requestAnimationFrame(() => { try { detLock(); listLock(); } catch (e) {} }); return; }
   const key = viewKey(), same = key === state.lastView, back = window._backH === location.hash && Date.now() - (window._backT || 0) < 4000, y = same ? (back && window._backPend && window.scrollY < window._backY ? window._backY : window.scrollY) : (back ? (window._backPend = true, window._backY || 0) : (window._backPend = false, 0)), v = topView();
@@ -4388,9 +4421,10 @@ function renderLeaders() {
     const o = document.createElement('div'); o.className = 'lpo';
     const m = document.createElement('div'); m.className = 'lpm';
     m.style.top = (r.bottom + 8) + 'px'; m.style.left = Math.min(r.left, window.innerWidth - 216) + 'px';
-    m.innerHTML = `<button data-cc>Clear cache</button>${(() => { const de = document.documentElement, cur = de.classList.contains('fsg') ? 'sg' : 'bar'; return [['bar', 'Bleacher'], ['sg', 'Mercedes']].map(([k, t]) => `<button data-fsw="${k}" class="${k === cur ? 'on' : ''}">${t}${k === cur ? '<span class="lpck">✓</span>' : ''}</button>`).join(''); })()}<button data-d2sw class="d2b ${document.documentElement.classList.contains('d2') ? 'on' : ''}">Design 2.0${document.documentElement.classList.contains('d2') ? '<span class="lpck">✓</span>' : ''}</button>`;
+    m.innerHTML = `<button data-cc>Clear cache</button>${(() => { const de = document.documentElement, cur = de.classList.contains('fsg') ? 'sg' : 'bar'; return [['bar', 'Bleacher'], ['sg', 'Mercedes']].map(([k, t]) => `<button data-fsw="${k}" class="${k === cur ? 'on' : ''}">${t}${k === cur ? '<span class="lpck">✓</span>' : ''}</button>`).join(''); })()}<button data-d2sw class="d2b ${document.documentElement.classList.contains('d2') ? 'on' : ''}">Design 2.0${document.documentElement.classList.contains('d2') ? '<span class="lpck">✓</span>' : ''}</button><button data-f12sw class="${document.documentElement.classList.contains('f12') ? 'on' : ''}">F1 2.0${document.documentElement.classList.contains('f12') ? '<span class="lpck">✓</span>' : ''}</button>`;
     o.addEventListener('click', close);
     m.addEventListener('click', ev => {
+      if (ev.target.closest('[data-f12sw]')) { const on = document.documentElement.classList.toggle('f12'); try { localStorage.setItem('f12', on ? '1' : '0'); } catch (er) {} close(); render(); return; }
       if (ev.target.closest('[data-d2sw]')) { const on = document.documentElement.classList.toggle('d2'); try { localStorage.setItem('d2', on ? '1' : '0'); } catch (er) {} close(); render(); return; }
       if (ev.target.closest('[data-fsw]')) { const de = document.documentElement, nx = ev.target.closest('[data-fsw]').dataset.fsw; de.classList.toggle('fbar', nx !== 'sg'); de.classList.toggle('fsg', nx === 'sg'); try { localStorage.setItem('font', nx); } catch (er) {} close(); render(); return; }
       if (!ev.target.closest('[data-cc]')) return;
@@ -4553,11 +4587,12 @@ function renderF1List(tabs) {
   else {
     const cur = f1CurEv(evs); F1.curId = cur.id; if (!F1.selId || !evs.some(e => e.id === F1.selId)) F1.selId = cur.id;
     strip = evs.map(e => { const d = new Date(e.endDate || e.date); return `<button class="dy ${e.id === F1.selId ? 'on' : ''}" data-f1go="${esc(e.id)}"><small>${esc(f1Iso(e) || 'GP')}</small>${d.getDate()}.${d.getMonth() + 1}.</button>`; }).join('');
-    body = f1HistHTML() + evs.map(e => {
+    body = f1HistHTML() + evs.map((e, k) => {
       const rc = f1Comp(e, 'Race'), done = f1Done(rc), w = done && rc && (rc.competitors || []).find(c => c.order === 1), cid = e.circuit && e.circuit.id, cu = F1.circ[cid];
       if (cid && cu === undefined) f1Circ(e).then(() => { if (topView() === 'list' && state.league === 'f1') render(); });
-      return `<div class="card f1card${done ? '' : ' f1up'}" data-f1race="${esc(e.id)}" data-f1ry="${esc(e._y || '')}" id="f1c${esc(e.id)}"><div class="f1cl1"><div class="f1tt">${f1Flag(e)}<div class="f1nm">${esc(f1Short(e))}</div></div>
-        ${done ? `${w ? `<div class="f1w"><img class="hs" src="${esc(f1Hs(w.id))}" alt="" onerror="this.onerror=null;this.src=SIL"><span>${esc(w.athlete && (w.athlete.displayName || w.athlete.shortName) || '')}</span></div>` : ''}` : `<div class="f1big">${esc(f1DatesY(e))}</div><div class="f1ct">${esc((e.circuit && e.circuit.fullName) || '')}</div>`}</div>
+      if (document.documentElement.classList.contains('f12')) return f2Card(e, k, done, w, cu, cid);
+      return `<div class="card f1card${done ? '' : ' f1up'}" data-f1race="${esc(e.id)}" data-f1ry="${esc(e._y || '')}" id="f1c${esc(e.id)}"><div class="f1cl1"><div class="f1rd">Round ${k + 1}</div><div class="f1tt">${f1Flag(e)}<div class="f1nm">${esc(f1Short(e))}</div></div>
+        ${done ? `${w ? `<div class="f1w"><img class="hs" src="${esc(f1Hs(w.id))}" alt="" onerror="this.onerror=null;this.classList.add('sil');this.src=SIL"><span>${esc(w.athlete && (w.athlete.displayName || w.athlete.shortName) || '')}</span></div>` : ''}` : `<div class="f1big">${esc(f1DatesY(e))}</div><div class="f1ct">${esc((e.circuit && e.circuit.fullName) || '')}</div>`}</div>
         <div class="f1map">${cu && cu !== 'p' ? f1MapHTML(cu) : cu === null || !cid ? '<span class="f1nomap">No map data</span>' : ''}</div></div>`; }).join('');
   }
   const os = document.getElementById('strip'), prev = os && state.stripKey === 'f1' ? os.scrollLeft : null; state.stripKey = 'f1';
@@ -4572,15 +4607,28 @@ function renderF1List(tabs) {
 function f1Fit() { requestAnimationFrame(() => { { const fl = $app.querySelector('.f1list .f1tt .f1fl'); if (fl) { const r = document.createRange(); r.selectNodeContents(fl); const g = r.getBoundingClientRect(), b = fl.getBoundingClientRect(); if (g.width) $app.querySelector('.f1list').style.setProperty('--fo', Math.max(0, g.left - b.left).toFixed(1) + 'px'); } } $app.querySelectorAll('.f1nm,.f1gp span,.f1rh .lvt').forEach(el => { if (el.scrollWidth > el.clientWidth + 1 && /Grand Prix/.test(el.textContent)) el.textContent = el.textContent.replace(/Grand Prix/, 'GP'); });
   $app.querySelectorAll('.f1dn b').forEach(el => { if (el.scrollWidth > el.clientWidth + 1) { const w = el.textContent.trim().split(/\s+/); if (w.length > 1 && !/\.$/.test(w[0])) el.textContent = w[0][0] + '. ' + w.slice(1).join(' '); } }); f1UpAlign(); }); }
 /* upcoming GP card: GP name's capitals start as far from the card top as the track map, the circuit name's baseline sits as far from the bottom as the map */
-/* upcoming GP card: GP name / date / circuit evenly spaced (cap-top to baseline), last gap to the card bottom = the name's distance from the top */
+/* F1 2.0 card: round badge, flag, 'GP · city', countdown / winner pill; date + circuit; session times next to the map */
+const F2SES = { FP1: '1st Practice', FP2: '2nd Practice', FP3: '3rd Practice', SS: 'S. Qualifying', SR: 'Sprint', Sprint: 'Sprint', Qual: 'Qualifying', Race: 'Race' };
+const F2CAL = '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5" width="17" height="15.5" rx="2.5"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg>';
+function f2Card(e, k, done, w, cu, cid) {
+  const city = (e.circuit && e.circuit.address && e.circuit.address.city) || '', t2 = (x => x.getHours().toString().padStart(2, '0') + ':' + x.getMinutes().toString().padStart(2, '0'));
+  const ses = (e.competitions || []).filter(c => c.date).slice().sort((a, b) => new Date(a.date) - new Date(b.date)).map(c => { const ab = c.type && c.type.abbreviation, d = new Date(c.date); return `<div class="f2row${f1Done(c) ? ' dn' : ''}"><span>${esc(F2SES[ab] || (c.type && (c.type.text || c.type.name)) || ab || '')}</span><b>${DAYS[d.getDay()]} ${t2(d)}</b></div>`; }).join('');
+  let pill = ''; if (done) { const n = w && w.athlete && (w.athlete.lastName || String(w.athlete.displayName || '').split(' ').slice(-1)[0]); pill = n ? `<span class="f2p win">${esc(n)}</span>` : ''; }
+  else { const st = new Date((e.competitions || []).map(c => c.date).filter(Boolean).sort()[0] || e.date), dd = Math.ceil((st - Date.now()) / 864e5); pill = `<span class="f2p">${dd > 1 ? 'in ' + dd + 'd' : dd === 1 ? 'Tomorrow' : dd === 0 && st > Date.now() ? 'Today' : 'Live'}</span>`; }
+  return `<div class="card f1card f2c${done ? ' dn' : ''}" data-f1race="${esc(e.id)}" data-f1ry="${esc(e._y || '')}" id="f1c${esc(e.id)}">
+    <div class="f2h"><span class="f2r">${k + 1}</span>${f1Flag(e)}<b class="f2t">${esc(f1Short(e).replace(/Grand Prix/, 'GP'))}${city ? `<span class="f2cy"> · ${esc(city)}</span>` : ''}</b>${pill}</div>
+    <div class="f2s"><span class="f2d">${F2CAL}${esc(f1DatesY(e))}</span><span class="f2ct">${esc((e.circuit && e.circuit.fullName) || '')}</span></div>
+    <div class="f2b"><div class="f2l">${ses}</div><div class="f1map">${cu && cu !== 'p' ? f1MapHTML(cu) : cu === null || !cid ? '<span class="f1nomap">No map data</span>' : ''}</div></div></div>`; }
+/* F1 list cards: ROUND label, GP name, then winner row (finished) or date + circuit (upcoming) – all gaps equal, incl. the gaps to the card's top and bottom edge (text measured cap-top → baseline, the photo by its box) */
 function f1UpAlign() { const capc = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--capc')) || .405;
   const base = el => { const z = document.createElement('i'); z.style.cssText = 'display:inline-block;width:0;height:0;vertical-align:baseline'; el.appendChild(z); const y = z.getBoundingClientRect().bottom; z.remove(); return y; };
-  const fs = el => parseFloat(getComputedStyle(el).fontSize);
-  $app.querySelectorAll('.f1list .f1card.f1up').forEach(c => { const nm = c.querySelector('.f1nm'), dt = c.querySelector('.f1big'), ct = c.querySelector('.f1ct'); if (!nm || !dt || !ct) return; dt.style.marginTop = ''; ct.style.marginTop = '';
-    const cr = c.getBoundingClientRect(), nb = base(nm), D = nb - 2 * capc * fs(nm) - cr.top, dcap = 2 * capc * fs(dt), ccap = 2 * capc * fs(ct), cTarget = cr.bottom - D;
-    const g = (cTarget - nb - dcap - ccap) / 2; if (!(g > 0)) return;
-    const dm = parseFloat(getComputedStyle(dt).marginTop) || 0; dt.style.marginTop = Math.round((dm + nb + g + dcap - base(dt)) * 2) / 2 + 'px';
-    const cm = parseFloat(getComputedStyle(ct).marginTop) || 0; ct.style.marginTop = Math.round((cm + cTarget - base(ct)) * 2) / 2 + 'px'; }); }
+  const txt = el => { const b = base(el); return [b - 2 * capc * parseFloat(getComputedStyle(el).fontSize), b]; };
+  const box = el => { const r = el.getBoundingClientRect(); return [r.top, r.bottom]; };
+  $app.querySelectorAll('.f1list .f1card:not(.f1hist):not(.f2c)').forEach(c => { const q = x => c.querySelector(x);
+    const it = [[q('.f1rd'), txt], [q('.f1nm'), txt]].concat(c.classList.contains('f1up') ? [[q('.f1big'), txt], [q('.f1ct'), txt]] : q('.f1w') ? [[q('.f1w .hs'), box]] : []).filter(x => x[0]);
+    if (it.length < 2) return; const mEl = x => x.closest('.f1cl1 > *'); it.forEach(([el]) => { mEl(el).style.marginTop = ''; });
+    const cr = c.getBoundingClientRect(), H = it.reduce((a, [el, f]) => { const v = f(el); return a + v[1] - v[0]; }, 0), g = (cr.height - H) / (it.length + 1); if (!(g > 0)) return;
+    let y = cr.top + g; it.forEach(([el, f]) => { const m = mEl(el), m0 = parseFloat(getComputedStyle(m).marginTop) || 0, v = f(el); m.style.marginTop = Math.round((m0 + y - v[0]) * 2) / 2 + 'px'; const v2 = f(el); y = v2[1] + g; }); }); }
 function f1CenterStrip(smooth) { const s = document.getElementById('strip'), on = s && s.querySelector('.on'); if (!on) return; const tgt = Math.max(0, on.offsetLeft - (s.clientWidth - on.offsetWidth) / 2); if (smooth) s.scrollTo({ left: tgt, behavior: 'smooth' }); else s.scrollLeft = tgt; }
 F1.tok = 0;
 function f1CancelAnim() { F1.tok++; if (window._stAnim) { window._stAnim = false; window._scrollMem[location.hash] = window.scrollY; } }
@@ -4797,7 +4845,7 @@ window._forceY = y => { const t0 = Date.now(), de = document.documentElement, go
 window._scrollMem = {}; window._hstack = [location.hash];
 window.addEventListener('scroll', () => { if (!window._stAnim) window._scrollMem[location.hash] = window.scrollY; }, { passive: true });
 window._snap = {}; window._curH = location.hash;
-try { document.fonts.ready.then(() => { try { glDash(); } catch (e) {} try { stnFit(); } catch (e) {} }); } catch (e) {}
+try { document.fonts.ready.then(() => { try { glDash(); } catch (e) {} try { stnFit(); } catch (e) {} try { if ($app.querySelector('.f1list')) f1UpAlign(); } catch (e) {} }); } catch (e) {}
 window.goHome = () => { const st = window._hstack || [], d = st.length - 1; window._fromList = false;
   if (state.league === 'f1' && typeof F1 !== 'undefined') { F1.listY = null; F1.hOpen = false; F1.selId = null; F1.scrolled = 0; state.stripKey = null; }
   if (d > 0 && (st[0] === '' || st[0] === '#')) { window._noRestore = 1; history.go(-d); return; }
