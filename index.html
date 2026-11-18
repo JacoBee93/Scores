@@ -42,10 +42,11 @@ html.d2 body::before{content:'';position:fixed;inset:0;z-index:-1;pointer-events
 /* Design 2.0 background: diagonal gradient (Bengals orange → black; team / player pages: their colour); the sticky header paints the same viewport-anchored gradient → no seam, status bar area included */
 html.d2{--g1:#fb4f14}
 html.d2.tbg{--g1:var(--pbg)}
-html.d2,html.d2 body{background:#000 !important}
+html.d2{background:linear-gradient(180deg,var(--g1) 0 50%,#000 50% 100%) !important}
 html.d2 body{background:transparent !important}
-html.d2 body::before,html.d2 .stkw{background:#000 linear-gradient(150deg,var(--g1) 0,color-mix(in srgb,var(--g1) 55%,#000) 26vh,color-mix(in srgb,var(--g1) 18%,#000) 55vh,#000 85vh) no-repeat 0 0 / 100vw 100vh !important}
-html.d2 .stkw{-webkit-backdrop-filter:none !important;backdrop-filter:none !important}
+html.d2 body::before{background:linear-gradient(180deg,var(--g1) 0,color-mix(in srgb,var(--g1) 0%,transparent) 12vh),#000 linear-gradient(150deg,var(--g1) 0,color-mix(in srgb,var(--g1) 55%,#000) 26vh,color-mix(in srgb,var(--g1) 18%,#000) 55vh,#000 85vh) !important}
+/* sticky top: frosted glass – the content slides under it blurred */
+html.d2 .stkw{background:rgba(255,255,255,.04) !important;-webkit-backdrop-filter:blur(22px) saturate(160%) !important;backdrop-filter:blur(22px) saturate(160%) !important}
 html.d2 .stkw.fx0{border-top-color:transparent;box-shadow:none}
 html.d2{--card:rgba(24,24,28,.34)}
 html.d2 .pane{background:rgba(20,20,24,.42)}
@@ -943,13 +944,13 @@ html.one,html.one body{overflow:hidden;height:100%}
 html.lock1 body{touch-action:none}
 html.lock1 .tw,html.lock1 .strip,html.lock1 .mstrip,html.lock1 .htabs{touch-action:pan-x}
 html.one #app.lst,html.one body{min-height:0}
-.stkw .hero{padding:calc(16px - 10px * var(--p,0)) 0}
-.stkw .hero .s{font-size:calc(42px - 12px * var(--p,0)) !important}
-.stkw .hero .t img,.stkw .hero .t .ph{width:calc(42px - 16px * var(--p,0)) !important;height:calc(42px - 16px * var(--p,0)) !important}
-.stkw .hero .t .rc,.stkw .hero .wk{max-height:calc(24px * (1 - var(--p,0)));opacity:calc(1 - var(--p,0) * 1.6);overflow:hidden;margin-top:calc(2px * (1 - var(--p,0)))}
-.stkw .hero .wk{margin-bottom:calc(6px * (1 - var(--p,0)))}
-.stkw .hero .t{gap:calc(5px - 3px * var(--p,0))}
-.stkw .hero .m .dt1,.stkw .hero .m .fin{font-size:calc(19px - 3px * var(--p,0))}
+.stkw .hero{padding:16px 0}
+.stkw .hero .s{font-size:42px !important}
+.stkw .hero .t img,.stkw .hero .t .ph{width:42px !important;height:42px !important}
+.stkw .hero .t .rc,.stkw .hero .wk{max-height:24px;overflow:hidden;margin-top:2px}
+.stkw .hero .wk{margin-bottom:6px}
+.stkw .hero .t{gap:5px}
+.stkw .hero .m .dt1,.stkw .hero .m .fin{font-size:19px}
 .stkw.det.v-lv{padding-bottom:8px}
 .stkw.det .hero{margin-left:-6px;margin-right:-6px;padding:9px 0}
 .stkw.det .hero .s{font-size:36px !important}
@@ -990,7 +991,7 @@ html.one #app.lst,html.one body{min-height:0}
 .gl2 .glr small{position:relative;top:1px}
 
 .f1list{padding-bottom:0}
-#app:has(> main.f1list) > .hpw{margin-top:0;padding-bottom:calc(100vh - 290px)}
+#app:has(> main.f1list) > .hpw{margin-top:0}
 .f1card.f1hist{height:auto;min-height:112px;flex-direction:column;justify-content:center;align-items:stretch}
 .f1hh{display:flex;align-items:center;justify-content:space-between;gap:10px;min-height:86px}
 .f1hh .f1ct{padding-left:0;margin-top:3px;font-size:13px}
@@ -1161,22 +1162,33 @@ header.lyc{padding-top:calc(env(safe-area-inset-top) + 30px)}
 .lyic button{width:calc(10px + 25.5px * 1.15);height:calc(10px + 25.5px * 1.15);border-radius:50%;background:var(--card);display:flex;align-items:center;justify-content:center;color:#fff}
 .lyic small{font-family:var(--num);font-size:11px;font-weight:700;color:var(--mut);line-height:1}
 .lyic.on button{background:#fff;color:#000}
-.lybar{position:fixed;left:12px;right:12px;bottom:calc(max(env(safe-area-inset-bottom), 12px) + 20px);height:64px;border-radius:24px;background:rgba(28,28,30,.94);-webkit-backdrop-filter:blur(20px);backdrop-filter:blur(20px);display:flex;z-index:60;box-shadow:0 10px 30px rgba(0,0,0,.6),inset 0 1px 0 rgba(255,255,255,.08)}
+.lybar{position:fixed;left:16px;right:16px;bottom:calc(max(env(safe-area-inset-bottom), 12px) + 20px);height:56px;border-radius:18px;background:var(--card);display:flex;z-index:60;box-shadow:0 10px 30px rgba(0,0,0,.6),inset 0 1px 0 rgba(255,255,255,.08)}
 .lybar button{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;color:var(--mut);font-family:var(--num)}
-.lybar button b{font-size:20px;font-weight:700;line-height:1}
-.lybar button small{font-size:12px;font-weight:700}
+.lybar button b{font-size:19px;font-weight:700;line-height:1}
+.lybar button small{font-size:11px;font-weight:700}
 .lybar button.on{color:#fff}
-.lybar button.on b::after{content:'';display:block;width:18px;height:3px;border-radius:2px;background:#e5484d;margin:3px auto 0}
+.lybar button.on b::after{content:'';display:block;width:18px;height:3px;border-radius:2px;background:#e5484d;margin:2px auto 0}
 .lybar button svg{width:20px;height:20px}
 .lybar button.on svg{color:#ffd60a}
 html:has(.lybar) #app{padding-bottom:calc(max(env(safe-area-inset-bottom), 12px) + 96px)}
 /* C2: the bottom bar already takes you 'home' (tap the league) → no Home pill on the list */
 html:has(.lybar) #app > .hpw .hpill{display:none}
-.lyc .lyh h1{font-size:30px;letter-spacing:.3px;line-height:calc(10px + 25.5px * 1.15);margin:0;padding:0}
+.lyc .lyh h1{font-size:34px;letter-spacing:.3px;line-height:calc(10px + 25.5px * 1.15);margin:0;padding:0}
 html.fbar .lyc .lyh h1{position:relative;top:-2.5px}
 html.fsg .lyc .lyh h1{position:relative;top:1.6px}
 .lyc .lyh h1 i{font-style:normal;color:#e5484d}
 header.lyc .strip{margin-top:12px}
+
+/* glossy top edge (as on the bottom bar) on cards, panes and buttons – both layouts, classic design */
+html:not(.d2) :is(.card,.pane,.dy,.qb button,.htabs .pill,.htabs .icon,.lyic button,header .back,header .home,.hpill,.ybtn,.lybar){box-shadow:inset 0 1px 0 rgba(255,255,255,.08),0 0 0 .5px rgba(255,255,255,.04)}
+html:not(.d2) .lybar{box-shadow:inset 0 1px 0 rgba(255,255,255,.08),0 0 0 .5px rgba(255,255,255,.04),0 10px 30px rgba(0,0,0,.6)}
+html:not(.d2) :is(.dy.on,.htabs .pill.on){box-shadow:none}
+
+html.d2 :is(tr[data-player]:active td,tr[data-topen]:active td,.gl2 tbody tr:active td,.glt tbody tr:active td,.bpr:active){background:rgba(255,255,255,.10) !important}
+html.d2 :is(.gl2 td.on,.lbt td.on,.gst td.on,.fx td.on,.nfx td.on,.fx tbody td.on,.nfx tbody td.on,.gst tbody td.on,.lbt tbody td.on,.gloss .gg .gon){background:rgba(255,255,255,.14) !important;-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
+html.d2 :is(.gl2 .gh2 th.on,.lbt th.on,.gst th.on,.fx th.on,.nfx th.on){color:#fff}
+html.d2 .artbox{background:rgba(24,24,28,.45) !important;-webkit-backdrop-filter:blur(26px) saturate(160%) !important;backdrop-filter:blur(26px) saturate(160%) !important}
+html.d2 .rcp{background:rgba(255,255,255,.07);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px)}
 </style>
 </head>
 <body>
@@ -1249,7 +1261,6 @@ function stickTop(v) {
   keep.forEach(([x, l]) => { if (l) x.scrollLeft = l; });
   const sp = document.createElement('div'); sp.className = 'stksp'; w.after(sp); w.classList.add('fx0');
   const fit = () => { sp.style.height = w.offsetHeight + 'px'; }; fit(); try { if (window._stkRO) window._stkRO.disconnect(); window._stkRO = new ResizeObserver(fit); window._stkRO.observe(w); } catch (e) {}
-  try { shrinkUpd(); } catch (e) {}
 }
 function fitNames(root) {
   (root || $app).querySelectorAll('[data-player] .pn').forEach(el => { if (el.children.length || el.dataset.fit) return; const t = el.textContent.trim(); if (!/\s/.test(t) || /\.\s/.test(t.split(' ')[0] + ' ')) return;
@@ -1382,8 +1393,6 @@ function tabHTML(k) {
     state.search = false; state.cmpOn = true; window._fromList = true; state.lastView = null; $app.innerHTML = ''; render(); loadCmp(0);
     const inp = document.getElementById('cq1'); if (inp) inp.focus(); window._noSnap = 1; location.hash = '#/compare'; }, { passive: false });
 })();
-let _shR = 0; const shrinkUpd = () => { _shR = 0; const w = document.querySelector('.stkw.det'); if (!w) return; const p = 0; w.style.setProperty('--p', p.toFixed(3)); };
-window.addEventListener('scroll', () => { if (!_shR) _shR = requestAnimationFrame(shrinkUpd); }, { passive: true });
 (() => { let x0 = 0, y0 = 0; document.addEventListener('touchstart', e => { x0 = e.touches[0].clientX; y0 = e.touches[0].clientY; }, { passive: true });
   document.addEventListener('touchmove', e => { if (!document.documentElement.classList.contains('lock1') || e.touches.length !== 1) return; const dx = Math.abs(e.touches[0].clientX - x0), dy = Math.abs(e.touches[0].clientY - y0); if (dy > dx && !e.target.closest('#artpop, .ylist')) e.preventDefault(); }, { passive: false });
   window.addEventListener('scroll', () => { if (document.documentElement.classList.contains('lock1') && !window._stAnim && window.scrollY !== 0 && !document.getElementById('artpop')) window.scrollTo(0, 0); }, { passive: true }); })();
@@ -4675,7 +4684,7 @@ function renderF1List(tabs) {
 }
 function f1Fit() { requestAnimationFrame(() => { { const fl = $app.querySelector('.f1list .f1tt .f1fl'); if (fl) { const r = document.createRange(); r.selectNodeContents(fl); const g = r.getBoundingClientRect(), b = fl.getBoundingClientRect(); if (g.width) $app.querySelector('.f1list').style.setProperty('--fo', Math.max(0, g.left - b.left).toFixed(1) + 'px'); } } $app.querySelectorAll('.f1nm,.f1gp span,.f1rh .lvt').forEach(el => { if (el.scrollWidth > el.clientWidth + 1 && /Grand Prix/.test(el.textContent)) el.textContent = el.textContent.replace(/Grand Prix/, 'GP'); });
   $app.querySelectorAll('.f1dn b').forEach(el => { if (el.scrollWidth > el.clientWidth + 1) { const w = el.textContent.trim().split(/\s+/); if (w.length > 1 && !/\.$/.test(w[0])) el.textContent = w[0][0] + '. ' + w.slice(1).join(' '); } });
-  $app.querySelectorAll('.f1list .f1card:not(.f1hist)').forEach(f1NameFit); f1UpAlign(); }); }
+  $app.querySelectorAll('.f1list .f1card:not(.f1hist)').forEach(f1NameFit); f1UpAlign(); try { f1Spacer(); } catch (e) {} }); }
 /* list card: the GP name must end before the track map starts (14 px air) – first 'Grand Prix' → 'GP', then cut with … */
 function f1NameFit(c) { const nm = c.querySelector('.f1nm'), mp = c.querySelector('.f1map'); if (!nm || !mp) return; const im = mp.querySelector('img');
   if (im && !im.dataset.nf) { im.dataset.nf = 1; const again = () => { if (c.isConnected) { f1NameFit(c); try { f1UpAlign(); } catch (e) {} } }; if (im.decode) im.decode().then(again, () => {}); im.addEventListener('load', again, { once: true }); }
@@ -4703,7 +4712,12 @@ function f1UpAlign() { const capc = parseFloat(getComputedStyle(document.documen
 function f1CenterStrip(smooth) { const s = document.getElementById('strip'), on = s && s.querySelector('.on'); if (!on) return; const tgt = Math.max(0, on.offsetLeft - (s.clientWidth - on.offsetWidth) / 2); if (smooth) s.scrollTo({ left: tgt, behavior: 'smooth' }); else s.scrollLeft = tgt; }
 F1.tok = 0;
 function f1CancelAnim() { F1.tok++; if (window._stAnim) { window._stAnim = false; window._scrollMem[location.hash] = window.scrollY; } }
+/* the empty space under the F1 list is only as tall as needed for the current race to reach the top */
+function f1Spacer() { const hp = $app.querySelector(':scope > .hpw'), c = F1.curId && document.getElementById('f1c' + F1.curId), f = $app.querySelector('.f1list > .f1card'); if (!hp || !c || !f) return;
+  hp.style.paddingBottom = ''; const base = parseFloat(getComputedStyle(hp).paddingBottom) || 0, need = Math.round(c.offsetTop - f.offsetTop) + window.innerHeight - document.documentElement.scrollHeight;
+  if (need > 0) hp.style.paddingBottom = (base + need) + 'px'; }
 function f1ScrollTo(id, smooth) {
+  try { f1Spacer(); } catch (e) {}
   const c = document.getElementById('f1c' + id), f = $app.querySelector('.f1list > .f1card'); if (!c || !f) return;
   const target = Math.max(0, Math.round(c.offsetTop - f.offsetTop));
   if (!smooth) { window.scrollTo(0, target); window._scrollMem[location.hash] = window.scrollY; return; }
