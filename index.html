@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="robots" content="noindex, nofollow">
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <meta name="theme-color" content="#000000">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
@@ -45,9 +45,11 @@ html.d2.tbg{--g1:var(--pbg)}
 html.d2{background:var(--g1) !important}
 html.d2 body{background:transparent !important}
 html.d2 body::before{background:linear-gradient(180deg,var(--g1) 0,color-mix(in srgb,var(--g1) 0%,transparent) 12vh),#000 linear-gradient(150deg,var(--g1) 0,color-mix(in srgb,var(--g1) 55%,#000) 26vh,color-mix(in srgb,var(--g1) 18%,#000) 55vh,#000 85vh) !important}
-/* sticky top: clear frosted glass (no tint, so it meets the iPhone status-bar strip seamlessly); its only edge is the header's bottom line (under Overview / Stats …) */
+/* sticky top: frosted glass from the very top of the screen (viewport-fit=cover → also behind the clock / battery); its only edge is the header's bottom line */
 html.d2 .stkw{background:transparent !important;-webkit-backdrop-filter:none !important;backdrop-filter:none !important}
-html.d2 .stkw::before{content:'';position:absolute;left:0;right:0;top:-80px;bottom:0;z-index:-1;pointer-events:none;-webkit-backdrop-filter:blur(12px) saturate(140%);backdrop-filter:blur(12px) saturate(140%)}
+html.d2 .stkw::before{content:'';position:absolute;left:0;right:0;top:0;bottom:0;z-index:-1;pointer-events:none;background:rgba(255,255,255,.07);-webkit-backdrop-filter:blur(18px) saturate(150%);backdrop-filter:blur(18px) saturate(150%)}
+html.d2 .stkw:not(:has(.dtabs))::before{border-bottom:1px solid rgba(255,255,255,.12)}
+html.d2{--mut:#b4b4bb}
 html.d2 .stkw.fx0{border-top-color:transparent;box-shadow:none}
 /* one glass for the whole Design 2.0 (exceptions later) */
 html.d2{--gl:rgba(18,18,22,.2);--card:var(--gl)}
