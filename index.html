@@ -4627,7 +4627,7 @@ function renderF1List(tabs) {
     body = f1HistHTML() + evs.map((e, k) => {
       const rc = f1Comp(e, 'Race'), done = f1Done(rc) || !!(rc && rc.date && new Date(rc.date) < Date.now() - 3 * 36e5 && (rc.competitors || []).some(c => c.order === 1)), w = done && rc && (rc.competitors || []).find(c => c.order === 1), cid = e.circuit && e.circuit.id, cu = F1.circ[cid];
       if (cid && cu === undefined) f1Circ(e).then(() => { if (topView() === 'list' && state.league === 'f1') render(); });
-      return `<div class="card f1card${done ? '' : ' f1up'}" data-f1race="${esc(e.id)}" data-f1ry="${esc(e._y || '')}" id="f1c${esc(e.id)}"><div class="f1cl1"><div class="f1rd">Round ${k + 1}</div><div class="f1tt">${f1Flag(e)}<div class="f1nm">${esc(f1Short(e))}</div></div>
+      return `<div class="card f1card${done ? '' : ' f1up'}" data-f1race="${esc(e.id)}" data-f1ry="${esc(e._y || '')}" id="f1c${esc(e.id)}"><div class="f1cl1"><div class="f1rd">Round ${k + 1}</div><div class="f1tt">${f1Flag(e)}<div class="f1nm">${esc(f1Short(e).replace(/-Catalunya/i, ''))}</div></div>
         ${done ? (pod => pod.length ? `<div class="f1pod">${pod.map(c => `<img class="hs p${c.order}" src="${esc(f1Hs(c.id))}" alt="" onerror="this.onerror=null;this.src=SIL">`).join('')}</div>` : '')([1, 2, 3].map(o => (rc.competitors || []).find(c => c.order === o)).filter(Boolean)) : `<div class="f1big">${esc(f1DatesY(e))}</div><div class="f1ct">${esc((e.circuit && e.circuit.fullName) || '')}</div>`}</div>
         <div class="f1map">${cu && cu !== 'p' ? f1MapHTML(cu) : cu === null || !cid ? '<span class="f1nomap">No map data</span>' : ''}</div></div>`; }).join('');
   }
@@ -4643,10 +4643,11 @@ function renderF1List(tabs) {
 function f1Fit() { requestAnimationFrame(() => { { const fl = $app.querySelector('.f1list .f1tt .f1fl'); if (fl) { const r = document.createRange(); r.selectNodeContents(fl); const g = r.getBoundingClientRect(), b = fl.getBoundingClientRect(); if (g.width) $app.querySelector('.f1list').style.setProperty('--fo', Math.max(0, g.left - b.left).toFixed(1) + 'px'); } } $app.querySelectorAll('.f1nm,.f1gp span,.f1rh .lvt').forEach(el => { if (el.scrollWidth > el.clientWidth + 1 && /Grand Prix/.test(el.textContent)) el.textContent = el.textContent.replace(/Grand Prix/, 'GP'); });
   $app.querySelectorAll('.f1dn b').forEach(el => { if (el.scrollWidth > el.clientWidth + 1) { const w = el.textContent.trim().split(/\s+/); if (w.length > 1 && !/\.$/.test(w[0])) el.textContent = w[0][0] + '. ' + w.slice(1).join(' '); } });
   $app.querySelectorAll('.f1list .f1card:not(.f1hist)').forEach(f1NameFit); f1UpAlign(); }); }
-/* list card: the GP name must end before the track map starts (8 px air) – first 'Grand Prix' → 'GP', then cut with … */
+/* list card: the GP name must end before the track map starts (14 px air) – first 'Grand Prix' → 'GP', then cut with … */
 function f1NameFit(c) { const nm = c.querySelector('.f1nm'), mp = c.querySelector('.f1map'); if (!nm || !mp) return; const im = mp.querySelector('img');
-  if (im && !im.complete) { if (!im.dataset.nf) { im.dataset.nf = 1; im.addEventListener('load', () => { f1NameFit(c); try { f1UpAlign(); } catch (e) {} }, { once: true }); } }
-  const lim = () => (im && im.complete && im.naturalWidth ? im.getBoundingClientRect().left : mp.getBoundingClientRect().right - 60) - 8;
+  if (im && !im.dataset.nf) { im.dataset.nf = 1; const again = () => { if (c.isConnected) { f1NameFit(c); try { f1UpAlign(); } catch (e) {} } }; if (im.decode) im.decode().then(again, () => {}); im.addEventListener('load', again, { once: true }); }
+  /* limit: where the drawn track starts; until the picture is ready, the start of the map column */
+  const lim = () => { const ir = im && im.naturalWidth ? im.getBoundingClientRect() : null; return (ir && ir.width > 4 ? ir.left : mp.getBoundingClientRect().left) - 14; };
   const tr = () => { const r = document.createRange(); r.selectNodeContents(nm); return r.getBoundingClientRect().right; };
   nm.style.maxWidth = ''; if (tr() > lim() && /Grand Prix/.test(nm.textContent)) nm.textContent = nm.textContent.replace(/Grand Prix/, 'GP');
   if (tr() > lim()) nm.style.maxWidth = Math.max(40, lim() - nm.getBoundingClientRect().left) + 'px'; }
@@ -4882,7 +4883,7 @@ window._forceY = y => { const t0 = Date.now(), de = document.documentElement, go
 window._scrollMem = {}; window._hstack = [location.hash];
 window.addEventListener('scroll', () => { if (!window._stAnim) window._scrollMem[location.hash] = window.scrollY; }, { passive: true });
 window._snap = {}; window._curH = location.hash;
-try { document.fonts.ready.then(() => { try { glDash(); } catch (e) {} try { stnFit(); } catch (e) {} try { if ($app.querySelector('.f1list')) f1UpAlign(); } catch (e) {} }); } catch (e) {}
+try { document.fonts.ready.then(() => { try { glDash(); } catch (e) {} try { stnFit(); } catch (e) {} try { if ($app.querySelector('.f1list')) { $app.querySelectorAll('.f1list .f1card:not(.f1hist)').forEach(f1NameFit); f1UpAlign(); } } catch (e) {} }); } catch (e) {}
 window.addEventListener('resize', () => { try { if ($app.querySelector('.f1list')) f1UpAlign(); } catch (e) {} });
 window.goHome = () => { const st = window._hstack || [], d = st.length - 1; window._fromList = false;
   if (state.league === 'f1' && typeof F1 !== 'undefined') { F1.listY = null; F1.hOpen = false; F1.selId = null; F1.scrolled = 0; state.stripKey = null; }
