@@ -840,7 +840,7 @@ td.n .slg{width:20px;height:20px;object-fit:contain;vertical-align:-6px;margin-l
 .phw .ptl{position:absolute;right:-8px;bottom:-4px;width:44px;height:44px;object-fit:contain;filter:drop-shadow(0 2px 4px rgba(0,0,0,.55)) drop-shadow(0 0 1px rgba(0,0,0,.6))}
 .gloss .gg .gon{background:#26314a;border-radius:999px;padding:5px 10px;margin:-5px -10px}
 .htabs{gap:7px}
-.htabs .pill{flex:1 1 0;min-width:0;display:flex;align-items:center;justify-content:center;padding:0;height:calc(10px + 25.5px * 1.15);font-size:20px;line-height:1}
+.htabs .pill{flex:1 1 0;min-width:0;display:flex;align-items:center;justify-content:center;padding:0;height:calc(10px + 25.5px * 1.15);font-size:19px;line-height:1}
 .htabs .icon{height:calc(10px + 25.5px * 1.15);width:calc(10px + 25.5px * 1.15)}
 header:has(> .htabs){padding-top:calc(env(safe-area-inset-top) + 36.7px)}
 .htabs .icon{flex:none}
@@ -933,6 +933,7 @@ td{font-variant-numeric:tabular-nums}
 header.d + main{padding-top:0}
 .play.g.gs{border-radius:12px;margin:5px -7px;padding:11px 7px;background:linear-gradient(90deg,color-mix(in srgb,var(--tc,#555) 62%,transparent),color-mix(in srgb,var(--tc,#555) 16%,transparent) 80%)}
 .play.g.gs .ast{color:rgba(255,255,255,.62)}
+.play.g.gs .clk{color:rgba(255,255,255,.78)}
 html.one,html.one body{overflow:hidden;height:100%}
 html.lock1 body{touch-action:none}
 html.lock1 .tw,html.lock1 .strip,html.lock1 .mstrip,html.lock1 .htabs{touch-action:pan-x}
@@ -1122,6 +1123,14 @@ html.fsg td.n .slg{top:.75px}
 .f1pod{display:flex;align-items:center;gap:10px;padding-left:30px}
 .f1pod .hs{width:34px;height:34px;border-radius:50%;object-fit:cover;background:#2c2c2e;flex:none;box-shadow:0 0 0 2px var(--rc)}
 .f1pod .p1{--rc:#ffd60a}.f1pod .p2{--rc:#d1d1d6}.f1pod .p3{--rc:#d0894a}
+
+/* switches + quick buttons: same text as the table names (16.5 px bold); line-height trimmed so every pill keeps its height */
+.seg button,.sseg4 button{font-size:16.5px !important;font-weight:700 !important;line-height:1.02 !important;white-space:nowrap}
+.qb button{font-size:16.5px;line-height:1.02}
+.seg:not(:has(> button:nth-child(3))){max-width:270px !important}
+.seg:has(> button:nth-child(3)){max-width:340px !important}
+.seg:has(> button:nth-child(4)){max-width:100% !important}
+.seg > button{flex:1 1 auto;padding-left:6px !important;padding-right:6px !important}
 </style>
 </head>
 <body>
@@ -2331,6 +2340,12 @@ async function loadPreviewStats(g) {
   if (state.game === g && topView() === 'game') render();
 }
 const lumOf = h => { const n = parseInt(h, 16); const r = n >> 16, gg = (n >> 8) & 255, b = n & 255; return (0.299 * r + 0.587 * gg + 0.114 * b) / 255; };
+/* scoring-play rows carry white text: a light team colour (silver, white, light gold) is taken down to a mid tone of the same hue */
+function tcDark(c) { const m = /^#?([0-9a-f]{6})$/i.exec(String(c || '')); if (!m) return c; const n = parseInt(m[1], 16); let r = (n >> 16) / 255, g = ((n >> 8) & 255) / 255, b = (n & 255) / 255;
+  const mx = Math.max(r, g, b), mn = Math.min(r, g, b), l = (mx + mn) / 2; if (l <= .5) return '#' + m[1]; const d = mx - mn, s = d ? d / (1 - Math.abs(2 * l - 1)) : 0; let h = 0;
+  if (d) h = mx === r ? ((g - b) / d) % 6 : mx === g ? (b - r) / d + 2 : (r - g) / d + 4; h *= 60; if (h < 0) h += 360;
+  const L = s < .15 ? .42 : .45, C = (1 - Math.abs(2 * L - 1)) * s, X = C * (1 - Math.abs((h / 60) % 2 - 1)), M = L - C / 2, [a, bb, cc] = h < 60 ? [C, X, 0] : h < 120 ? [X, C, 0] : h < 180 ? [0, C, X] : h < 240 ? [0, X, C] : h < 300 ? [X, 0, C] : [C, 0, X];
+  return '#' + [a, bb, cc].map(v => Math.round((v + M) * 255).toString(16).padStart(2, '0')).join(''); }
 function gameCols(g) {
   const e = g.ev, comps = (g.sum && g.sum.header && g.sum.header.competitions && g.sum.header.competitions[0] && g.sum.header.competitions[0].competitors) || [];
   const cmp = t => comps.find(c => c.team && String(c.team.id) === String(t.id)) || { team: { color: t.color, alternateColor: t.alt, abbreviation: t.abbr } };
@@ -2753,7 +2768,7 @@ function scoringHTML(g) {
         if (gl && ev) { if (String(p.team && p.team.id) === String(ev.home.id)) nh++; else na++; }
         const who = (p.participants && p.participants[0] && p.participants[0].athlete && p.participants[0].athlete.displayName) || (t.match(/^(.+?)\s+(?:shootout|penalty shot|scores|goal|missed|misses|saved|shot|attempt|wrist|snap|backhand|slap)\b/i) || [])[1] || t;
         return `<div class="sor"><span class="pl">${lg ? `<img src="${esc(lg)}" alt="" onerror="this.style.visibility='hidden'">` : ''}</span><span class="som ${gl ? 'y' : 'n'}">${gl ? '✓' : '✕'}</span><span class="son">${esc(who)}</span></div>`; }).join('') || msg('Shootout details not available.')}</section>`; } }
-  const GCs = ev ? gameCols(g) : null, tcOf = p => { if (!GCs || !p.team) return ''; const h = String(p.team.id) === String(ev.home.id); return ` style="--tc:${GCs[h ? 1 : 0]}"`; };
+  const GCs = ev ? gameCols(g) : null, tcOf = p => { if (!GCs || !p.team) return ''; const h = String(p.team.id) === String(ev.home.id); return ` style="--tc:${tcDark(GCs[h ? 1 : 0])}"`; };
   return [...groups.keys()].sort((a, b) => a - b).map(k => {
     const rows = groups.get(k).map(p => {
       const lg = p.team && logos[p.team.id];
