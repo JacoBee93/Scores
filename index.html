@@ -132,7 +132,17 @@ header.d + main{padding-top:0}
 .hero .s.lose{color:var(--mut)}
 .hero .m{text-align:center;font-size:14.5px;font-weight:500;line-height:1.35;position:relative;top:2px}
 .hero .m.live{color:var(--live)}
-.hero .m .srs{font-size:12.5px;line-height:15px;font-weight:600;color:var(--mut);letter-spacing:.2px;white-space:nowrap;margin-top:3px;text-transform:none}
+/* playoff series state: out of the flow (FINAL / time stay centred between the scores), on the baseline of the team records */
+.hero{position:relative}
+.hero > .srs{position:absolute;left:0;right:0;top:0;text-align:center;white-space:nowrap;font-size:12px;font-weight:500;color:var(--mut);pointer-events:none;visibility:hidden}
+.hero > .srs.ok{visibility:visible}
+#app .hero.hu.hw{grid-template-rows:42px;padding:16px 0 34px !important}
+#app .hero.hu.hw > .t{top:0}
+#app .hero.hu.hw > .wk,#app .hero.hu.hw > .srs{font-size:11px !important;line-height:13px !important;min-height:0 !important}
+#app .hero.hu.hw > .s{position:relative;top:9px}
+#app .hero.hu.hw > .m{top:10.5px}
+.hero.hu.hw > .wk{position:absolute !important;left:0;right:0;top:0 !important;margin:0 !important;padding:0 !important;visibility:hidden}
+.hero.hu.hw > .wk.ok{visibility:visible}
 .hero .m span{color:#fff}
 .hero .m.pre{grid-column:2 / span 3}
 .hero .m .dt1{font-family:var(--num);font-weight:700;font-size:22px;letter-spacing:.3px;white-space:nowrap}
@@ -1846,6 +1856,7 @@ function render() {
   try { dashAlign(); } catch (e) {}
   try { pmAlign(); } catch (e) {}
   try { tNudge(); } catch (e) {}
+  try { heroSrs(); } catch (e) {}
   try { glDash(); } catch (e) {}
   try { stnFit(); } catch (e) {}
   try { tblAlign(); } catch (e) {}
@@ -1995,7 +2006,7 @@ function renderGame() {
     const hd = (g.sum && g.sum.header) || {}, hc = (hd.competitions && hd.competitions[0]) || {};
     const wk = e.week || hd.week, st = e.stype || (hd.season && hd.season.type), note = e.note || (hc.notes && hc.notes[0] && hc.notes[0].headline) || '';
     const sn = +st, wlab = g.ncaa ? (note || (sn === 3 ? 'Postseason' : wk ? 'Week ' + wk : '')) : sn === 1 ? (g.league === 'nfl' && wk ? 'Preseason • Week ' + wk : 'Preseason') : sn === 5 ? 'Play-In Tournament' : (g.league !== 'nfl' && sn !== 3) ? '' : note || (sn === 3 && (g.rnd || (hc.series && hc.series.title))) || (sn === 3 ? poLabel(g.league, wk, (hd.season && hd.season.year) || new Date(e.date).getFullYear() - (new Date(e.date).getMonth() < 6 ? 1 : 0), e) : g.league === 'nfl' && wk ? (st === 1 ? 'Preseason · Week ' + wk : 'Week ' + wk) : '');
-    const srs = (() => { if (sn !== 3 || g.league === 'nfl' || e.state === 'pre') return ''; const L = [].concat(hc.series || []).concat(e.series || []).filter(x => x && typeof x === 'object'), x = L.find(q => q.type === 'playoff') || L.find(q => q.type !== 'season'); if (!x) return '';
+    const srs = (() => { if (sn !== 3 || g.league === 'nfl') return ''; const L = [].concat(hc.series || []).concat(e.series || []).filter(x => x && typeof x === 'object'), x = L.find(q => q.type === 'playoff') || L.find(q => q.type !== 'season'); if (!x) return '';
       const wOf = t => { const c = (x.competitors || []).find(q => String(q.id) === String(t.id)); return c && c.wins != null ? +c.wins : null; }, wa = wOf(e.away), wh = wOf(e.home);
       if (wa == null || wh == null) return String(x.summary || '').replace(/\s*series\s*/i, ' ').trim();
       if (wa === wh) return 'Tied ' + wa + '-' + wh; const ld = wa > wh ? e.away : e.home, hi = Math.max(wa, wh), lo = Math.min(wa, wh), need = Math.floor((+x.totalCompetitions || 7) / 2) + 1;
@@ -2003,9 +2014,9 @@ function renderGame() {
     const pre = e.state === 'pre', ab = t => `<span class="s ab ${String(t.abbr || '').length > 3 ? 'ab4' : ''}" data-topen="${esc(t.id)}" data-tl="${g.league}" data-tn="${esc(t.name)}" data-tlogo="${esc(t.logo)}">${esc(t.abbr || '')}</span>`;
     hero = `<div class="hero hu${wlab ? ' hw' : ''}${pre ? ' hpre' : ''}"><div class="wk">${wlab ? esc(wlab) : '&nbsp;'}</div>${side(e.away, true)}
       ${pre ? ab(e.away) : `<span class="s ${e.state === 'post' && !e.away.winner ? 'lose' : ''}">${esc(e.away.score)}${ball(e.away)}</span>`}
-      <div class="m ${e.state === 'in' ? 'live' : ''}">${mid}${srs ? `<div class="srs">${esc(srs)}</div>` : ''}</div>
+      <div class="m ${e.state === 'in' ? 'live' : ''}">${mid}</div>
       ${pre ? ab(e.home) : `<span class="s ${e.state === 'post' && !e.home.winner ? 'lose' : ''}">${esc(e.home.score)}${ball(e.home)}</span>`}
-      ${side(e.home, true)}</div>`;
+      ${side(e.home, true)}${srs ? `<div class="srs">${esc(srs)}</div>` : ''}</div>`;
   }
   $app.innerHTML = `
     <header class="d"><div class="tabs"><button class="back" data-back aria-label="Back"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></button><button class="home" data-home aria-label="Home"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"><path d="M3 10.5 12 3l9 7.5"/><path d="M5.5 9v11h13V9"/><path d="M10 20v-6h4v6"/></svg></button><button class="home" data-refresh aria-label="Refresh"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12a8 8 0 1 1-2.34-5.66"/><path d="M20 4v5h-5"/></svg></button></div></header>
@@ -4724,6 +4735,14 @@ function f1UpAlign() { const capc = parseFloat(getComputedStyle(document.documen
     const pd = q('.f1pod'), fl = q('.f1tt .f1fl'); if (!pd || !fl) return;
     const fb = (fl.getBoundingClientRect().bottom - R.top) / S, h = pd.offsetHeight;
     put(pd, e => { const r = e.getBoundingClientRect(); return [r.top, r.bottom]; }, (fb + cr.bottom) / 2 - h / 2); }); }
+function heroSrs() { const E = 11; const capc = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--capc')) || .405;
+  const base = el => { const z = document.createElement('i'); z.style.cssText = 'display:inline-block;width:0;height:0;vertical-align:baseline'; el.appendChild(z); const y = z.getBoundingClientRect().bottom; z.remove(); return y; };
+  /* playoff card = same size and layout as any card; round label (top) and series state (bottom) sit E px from the card edges */
+  $app.querySelectorAll('.hero.hw').forEach(h => { const hr = h.getBoundingClientRect(), S = hr.height / h.offsetHeight || 1, wk = h.querySelector(':scope > .wk'), sr = h.querySelector(':scope > .srs');
+    if (wk) { wk.style.top = '0px'; const fs = parseFloat(getComputedStyle(wk).fontSize); wk.style.setProperty('top', Math.round((E - ((base(wk) - hr.top) / S - 2 * capc * fs)) * 2) / 2 + 'px', 'important'); wk.classList.add('ok'); }
+    if (sr) { sr.style.top = '0px'; sr.style.top = Math.round(((hr.bottom - base(sr)) / S - E) * 2) / 2 + 'px'; sr.classList.add('ok'); } });
+  $app.querySelectorAll('.hero:not(.hw) > .srs').forEach(sr => sr.classList.add('ok')); }
+try { document.fonts.ready.then(() => { try { heroSrs(); } catch (e) {} }); } catch (e) {}
 function f1CenterStrip(smooth) { const s = document.getElementById('strip'), on = s && s.querySelector('.on'); if (!on) return; const tgt = Math.max(0, on.offsetLeft - (s.clientWidth - on.offsetWidth) / 2); if (smooth) s.scrollTo({ left: tgt, behavior: 'smooth' }); else s.scrollLeft = tgt; }
 F1.tok = 0;
 function f1CancelAnim() { F1.tok++; if (window._stAnim) { window._stAnim = false; window._scrollMem[location.hash] = window.scrollY; } }
