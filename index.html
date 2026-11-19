@@ -132,6 +132,7 @@ header.d + main{padding-top:0}
 .hero .s.lose{color:var(--mut)}
 .hero .m{text-align:center;font-size:14.5px;font-weight:500;line-height:1.35;position:relative;top:2px}
 .hero .m.live{color:var(--live)}
+.hero .m .srs{font-size:12.5px;line-height:15px;font-weight:600;color:var(--mut);letter-spacing:.2px;white-space:nowrap;margin-top:3px;text-transform:none}
 .hero .m span{color:#fff}
 .hero .m.pre{grid-column:2 / span 3}
 .hero .m .dt1{font-family:var(--num);font-weight:700;font-size:22px;letter-spacing:.3px;white-space:nowrap}
@@ -932,7 +933,7 @@ html.one #app.lst,html.one body{min-height:0}
 .stkw.det.v-game .dtabs{margin-left:-16px;margin-right:-16px;padding-left:20px;padding-right:20px}
 .stkw.det.v-game .hero{margin-bottom:3px}
 .hero.hu,.stkw.det .hero.hu{height:auto;padding:7px 0 23px;align-items:center}
-.hero.hu .wk{position:relative;top:1px;min-height:15px;line-height:15px;font-size:12.5px;margin:0 0 5px !important;max-height:none !important;opacity:1 !important}
+.hero.hu .wk{position:relative;top:1px;min-height:15px;line-height:15px;font-size:12.5px;margin:0 0 1px !important;padding:0 0 4px;max-height:none !important;opacity:1 !important}
 .hero.hu .t{position:relative;gap:0 !important}
 .hero.hu .t .rc{position:absolute;top:100%;left:50%;transform:translateX(-50%);margin-top:4px !important;max-height:none !important;opacity:1 !important;line-height:14px}
 .hero.hu .s,.hero.hu .m{line-height:1}
@@ -945,7 +946,7 @@ html.one #app.lst,html.one body{min-height:0}
 .hero .s .pball{position:absolute;left:50%;top:100%;margin-top:5px;transform:translateX(-50%);width:15px;height:9px;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 18'%3E%3Cellipse cx='15' cy='9' rx='14' ry='8' fill='%23a0522d'/%3E%3Cpath d='M4 9h22' stroke='%23fff' stroke-width='1.2'/%3E%3Cpath d='M11 6v6M13.7 6v6M16.3 6v6M19 6v6' stroke='%23fff' stroke-width='1.2' stroke-linecap='round'/%3E%3Cpath d='M3 5.5a14 8 0 0 0 0 7M27 5.5a14 8 0 0 1 0 7' stroke='%23fff' stroke-width='1' fill='none'/%3E%3C/svg%3E") center/contain no-repeat}
 .hero.hu.hw{padding-bottom:25px !important}
 .hero.hu.hw > .t{position:relative;top:-6px}
-.hero.hu.hw .wk{margin-bottom:3px !important}
+.hero.hu.hw .wk{margin-bottom:-1px !important}
 .hero.hu:not(.hw) .wk{display:none}
 .hero.hu:not(.hw){grid-template-rows:42px;padding:16px 0 34px !important}
 .hero.hu:not(.hw) > .s{position:relative;top:9px}
@@ -1485,7 +1486,7 @@ function normEvent(ev) {
   const t = ((ev.status || c.status || {}).type) || {};
   const e = { id: ev.id, date: ev.date || c.date, state: t.state, short: t.shortDetail || t.detail || '',
               home: normTeam(homeC), away: normTeam(awayC),
-              week: ev.week && ev.week.number, stype: (ev.season && ev.season.type) || (ev.seasonType && (ev.seasonType.type || +ev.seasonType.id)), note: (c.notes && c.notes[0] && c.notes[0].headline) || '' };
+              week: ev.week && ev.week.number, stype: (ev.season && ev.season.type) || (ev.seasonType && (ev.seasonType.type || +ev.seasonType.id)), note: (c.notes && c.notes[0] && c.notes[0].headline) || '', series: c.series || null };
   e.tbd = t.state === 'pre' && (c.timeValid === false || ev.timeValid === false || /\bTBD\b/i.test(String(t.shortDetail || t.detail || '')));
   if (e.state === 'post' && !e.home.winner && !e.away.winner) {
     const h = parseInt(e.home.score), a = parseInt(e.away.score);
@@ -1812,7 +1813,7 @@ document.addEventListener('click', ev => { if (!$app.querySelector('.ylist') || 
   if (ch) { ev.stopPropagation(); ev.preventDefault(); render(); } }, true);
 function render() {
   if (window._restoreKey && (window._restoreKey !== location.hash || window._restoreVK !== snapVK())) window._restoreKey = null;
-  if (window._restoreKey && window._restoreKey === location.hash && window._restoreVK === snapVK()) { window._restoreKey = null; state.lastView = viewKey(); window.scrollTo(0, window._restoreY || 0); window._backPend = false; requestAnimationFrame(() => { try { detLock(); listLock(); } catch (e) {} }); return; }
+  if (window._restoreKey != null && window._restoreKey === location.hash && window._restoreVK === snapVK()) { window._restoreKey = null; state.lastView = viewKey(); window.scrollTo(0, window._restoreY || 0); window._backPend = false; requestAnimationFrame(() => { try { detLock(); listLock(); } catch (e) {} }); return; }
   const key = viewKey(), same = key === state.lastView, back = window._backH === location.hash && Date.now() - (window._backT || 0) < 4000, y = same ? (back && window._backPend && window.scrollY < window._backY ? window._backY : window.scrollY) : (back ? (window._backPend = true, window._backY || 0) : (window._backPend = false, 0)), v = topView();
   const tws = same && !window._twReset ? [...document.querySelectorAll('.tw')].map(x => x.scrollLeft) : null; window._twReset = 0;
   if (v === 'player') renderPlayer(); else if (v === 'game') renderGame(); else if (v === 'team') renderTeam();
@@ -1856,6 +1857,7 @@ function render() {
   if (window._slide) { const p = window._slideSel ? $app.querySelector('main') : $app.querySelector('.pane'), d = window._slide; window._slide = 0; window._slideSel = null; if (p && p.animate) p.animate([{ transform: `translateX(${d * 70}px)`, opacity: .3 }, { transform: 'none', opacity: 1 }], { duration: 230, easing: 'cubic-bezier(.2,.7,.3,1)' }); }
   const fh = document.getElementById('fhome'); if (fh) fh.hidden = true;
   $app.querySelectorAll(':scope > .hpw').forEach(x => x.remove()); if (v !== 'search') $app.insertAdjacentHTML('beforeend', '<div class="hpw"><button class="hpill" data-home><svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linejoin="round" stroke-linecap="round" style="vertical-align:-3px;margin-right:7px"><path d="M3 10.5 12 3l9 7.5"/><path d="M5.5 9v11h13V9"/><path d="M10 20v-6h4v6"/></svg>Home</button></div>');
+  if (v === 'list' && state.league === 'f1' && typeof F1 !== 'undefined' && F1._y0 != null) { const y0 = F1._y0; F1._y0 = null; try { f1Spacer(); } catch (e) {} if (!window._stAnim && Math.abs(window.scrollY - y0) > 1) window.scrollTo(0, y0); }
   const bsw = document.getElementById('brsw');
   if (bsw && state.lv) { const lv = state.lv; bsw.scrollLeft = (lv.brPg || 0) * bsw.clientWidth;
     bsw.addEventListener('scroll', () => { const i = Math.round(bsw.scrollLeft / Math.max(1, bsw.clientWidth)); if (i !== lv.brPg) { lv.brPg = i; document.querySelectorAll('[data-brpg]').forEach((b, k) => b.classList.toggle('on', k === i)); } }, { passive: true }); }
@@ -1896,7 +1898,7 @@ const LY_FB = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke
 const LY_BB = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3v18M5.6 5.6c3 3 3 9.8 0 12.8M18.4 5.6c-3 3-3 9.8 0 12.8"/></svg>';
 const LY_PK = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><ellipse cx="12" cy="9.5" rx="8" ry="3.5"/><path d="M4 9.5v4c0 2 3.6 3.5 8 3.5s8-1.5 8-3.5v-4"/></svg>';
 const LY_FLG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M5 21V4M5 4h13l-2.5 4.5L18 13H5"/></svg>';
-const lyKind = () => { try { const v = localStorage.getItem('layout'); return v === 'b' || v === 'c' ? 'c' : ''; } catch (e) { return ''; } };
+const lyKind = () => { try { return localStorage.getItem('layout') === 'classic' ? '' : 'c'; } catch (e) { return 'c'; } };
 function lyHead(o) { const k = lyKind(); if (!k) return ''; const lg = state.league, fav = lg === 'fav';
   const ic = (a, t, svg, on) => `<div class="lyic${on ? ' on' : ''}"><button ${a} aria-label="${t}">${svg}</button><small>${t}</small></div>`;
   const quick = (o.quick || []).map(q => ic(q[0], q[1], q[2])).join('');
@@ -1993,10 +1995,15 @@ function renderGame() {
     const hd = (g.sum && g.sum.header) || {}, hc = (hd.competitions && hd.competitions[0]) || {};
     const wk = e.week || hd.week, st = e.stype || (hd.season && hd.season.type), note = e.note || (hc.notes && hc.notes[0] && hc.notes[0].headline) || '';
     const sn = +st, wlab = g.ncaa ? (note || (sn === 3 ? 'Postseason' : wk ? 'Week ' + wk : '')) : sn === 1 ? (g.league === 'nfl' && wk ? 'Preseason • Week ' + wk : 'Preseason') : sn === 5 ? 'Play-In Tournament' : (g.league !== 'nfl' && sn !== 3) ? '' : note || (sn === 3 && (g.rnd || (hc.series && hc.series.title))) || (sn === 3 ? poLabel(g.league, wk, (hd.season && hd.season.year) || new Date(e.date).getFullYear() - (new Date(e.date).getMonth() < 6 ? 1 : 0), e) : g.league === 'nfl' && wk ? (st === 1 ? 'Preseason · Week ' + wk : 'Week ' + wk) : '');
+    const srs = (() => { if (sn !== 3 || g.league === 'nfl' || e.state === 'pre') return ''; const L = [].concat(hc.series || []).concat(e.series || []).filter(x => x && typeof x === 'object'), x = L.find(q => q.type === 'playoff') || L.find(q => q.type !== 'season'); if (!x) return '';
+      const wOf = t => { const c = (x.competitors || []).find(q => String(q.id) === String(t.id)); return c && c.wins != null ? +c.wins : null; }, wa = wOf(e.away), wh = wOf(e.home);
+      if (wa == null || wh == null) return String(x.summary || '').replace(/\s*series\s*/i, ' ').trim();
+      if (wa === wh) return 'Tied ' + wa + '-' + wh; const ld = wa > wh ? e.away : e.home, hi = Math.max(wa, wh), lo = Math.min(wa, wh), need = Math.floor((+x.totalCompetitions || 7) / 2) + 1;
+      return (ld.abbr || '') + (hi >= need || x.completed ? ' wins ' : ' leads ') + hi + '-' + lo; })();
     const pre = e.state === 'pre', ab = t => `<span class="s ab ${String(t.abbr || '').length > 3 ? 'ab4' : ''}" data-topen="${esc(t.id)}" data-tl="${g.league}" data-tn="${esc(t.name)}" data-tlogo="${esc(t.logo)}">${esc(t.abbr || '')}</span>`;
     hero = `<div class="hero hu${wlab ? ' hw' : ''}${pre ? ' hpre' : ''}"><div class="wk">${wlab ? esc(wlab) : '&nbsp;'}</div>${side(e.away, true)}
       ${pre ? ab(e.away) : `<span class="s ${e.state === 'post' && !e.away.winner ? 'lose' : ''}">${esc(e.away.score)}${ball(e.away)}</span>`}
-      <div class="m ${e.state === 'in' ? 'live' : ''}">${mid}</div>
+      <div class="m ${e.state === 'in' ? 'live' : ''}">${mid}${srs ? `<div class="srs">${esc(srs)}</div>` : ''}</div>
       ${pre ? ab(e.home) : `<span class="s ${e.state === 'post' && !e.home.winner ? 'lose' : ''}">${esc(e.home.score)}${ball(e.home)}</span>`}
       ${side(e.home, true)}</div>`;
   }
@@ -4502,7 +4509,7 @@ function renderLeaders() {
     o.addEventListener('click', close);
     m.addEventListener('click', ev => {
       { const bmb = ev.target.closest('[data-bmsw]'); if (bmb) { const k = bmb.dataset.bmsw; try { localStorage.setItem('bmenu', lyMenu() === k ? '' : k); } catch (er) {} close(); render(); return; } } /* tapping the active one switches it off */
-      { const ly = ev.target.closest('[data-lysw]'); if (ly) { try { localStorage.setItem('layout', ly.dataset.lysw === '0' ? '' : ly.dataset.lysw); } catch (er) {} close(); render(); window.scrollTo(0, 0); return; } }
+      { const ly = ev.target.closest('[data-lysw]'); if (ly) { try { localStorage.setItem('layout', ly.dataset.lysw === '0' ? 'classic' : ly.dataset.lysw); } catch (er) {} close(); render(); window.scrollTo(0, 0); return; } }
       if (ev.target.closest('[data-fsw]')) { const de = document.documentElement, nx = ev.target.closest('[data-fsw]').dataset.fsw; de.classList.toggle('fbar', nx !== 'sg'); de.classList.toggle('fsg', nx === 'sg'); try { localStorage.setItem('font', nx); } catch (er) {} close(); render(); return; }
       if (!ev.target.closest('[data-cc]')) return;
       try { Object.keys(localStorage).forEach(k => { if (/^(lgs\d*_|tps_|athc$)/.test(k)) localStorage.removeItem(k); }); } catch (e) {}
@@ -4588,9 +4595,9 @@ async function f1Detail(eid, c, withStatus) {
 async function f1Teams(evs) { const done = evs.filter(e => f1Done(f1Comp(e, 'Race'))); const last = done[done.length - 1]; if (!last) return {}; if (F1.tm && F1.tm[last.id]) return F1.tm[last.id];
   const rc = f1Comp(last, 'Race'), m = {}; try { const L = await getJson(F1C + 'events/' + last.id + '/competitions/' + rc.id + '/competitors?limit=40'); (L.items || []).forEach(it => { const TM = f1TM(last._y); if (it.vehicle && it.vehicle.manufacturer && !TM[String(it.id)]) TM[String(it.id)] = it.vehicle.manufacturer; m[String(it.id)] = { team: (it.vehicle && it.vehicle.manufacturer) || '', color: (it.vehicle && it.vehicle.teamColor) || '' }; }); } catch (e) {}
   F1.tm = F1.tm || {}; F1.tm[last.id] = m; return m; }
-async function f1Circ(ev) { const id = ev && ev.circuit && ev.circuit.id; if (!id) return null; if (F1.circ[id] !== undefined) return F1.circ[id] === 'p' ? null : F1.circ[id]; F1.circ[id] = 'p';
+async function f1Circ(ev) { const id = ev && ev.circuit && ev.circuit.id; if (!id) return null; if (!F1.pReady) await F1.pLoad; if (F1.circ[id] !== undefined) return F1.circ[id] === 'p' ? null : F1.circ[id]; F1.circ[id] = 'p';
   try { const j = await getJson(F1C + 'circuits/' + id); const hs = []; const walk = o => { if (!o || typeof o !== 'object') return; if (Array.isArray(o)) return o.forEach(walk); Object.entries(o).forEach(([k, v]) => { if (typeof v === 'string' && /^https?:.*\.(png|svg|jpe?g)/i.test(v)) hs.push([k, v]); else walk(v); }); }; walk(j);
-    const pick = hs.find(([k, v]) => /diagram|map|track|layout|circuit/i.test(k + v) && !/logo|flag/i.test(v)) || hs.find(([k, v]) => !/logo|flag/i.test(v)); F1.circ[id] = pick ? pick[1].replace(/^http:/, 'https:') : null; } catch (e) { F1.circ[id] = null; }
+    const pick = hs.find(([k, v]) => /diagram|map|track|layout|circuit/i.test(k + v) && !/logo|flag/i.test(v)) || hs.find(([k, v]) => !/logo|flag/i.test(v)); F1.circ[id] = pick ? pick[1].replace(/^http:/, 'https:') : null; if (F1.circ[id]) F1.pSave(); } catch (e) { F1.circ[id] = null; }
   return F1.circ[id]; }
 const f1Hdr = (extra) => `<header class="d"><div class="tabs"><button class="back" data-back aria-label="Back"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></button><button class="home" data-home aria-label="Home"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"><path d="M3 10.5 12 3l9 7.5"/><path d="M5.5 9v11h13V9"/><path d="M10 20v-6h4v6"/></svg></button><button class="home" data-refresh aria-label="Refresh"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12a8 8 0 1 1-2.34-5.66"/><path d="M20 4v5h-5"/></svg></button><span class="grow"></span>${extra || ''}</div></header>`;
 const f1YSel = (v, cur, list, lab) => `<div class="ysel tys"><button class="ybtn" data-f1yo="1">${esc(lab ? lab(cur) : String(cur))}<i class="chev ${v.yOpen ? 'up' : ''}"></i></button>${v.yOpen ? `<div class="ylist">${list.map(x => `<button data-f1y="${x}" class="${String(x) === String(cur) ? 'on' : ''}">${esc(lab ? lab(x) : String(x))}</button>`).join('')}</div>` : ''}</div>`;
@@ -4631,12 +4638,20 @@ async function f1ResolveY() { if (F1.curY) return F1.curY; const Y = f1Year(); l
 function f1PtsTable(y, sprint) { if (sprint) return y === 2021 ? [3, 2, 1] : y >= 2022 ? [8, 7, 6, 5, 4, 3, 2, 1] : []; return y >= 2010 ? [25, 18, 15, 12, 10, 8, 6, 4, 2, 1] : y >= 2003 ? [10, 8, 6, 5, 4, 3, 2, 1] : [10, 6, 4, 3, 2, 1]; }
 /* circuit map → white track only */
 F1.map = {};
+/* circuit links + processed maps are kept in IndexedDB, so opening F1 never re-downloads / re-processes them */
+F1.pReady = false;
+F1.pLoad = (async () => { try { const v = await IDB.get('f1persist'), d = v && v.d; if (d) { Object.entries(d.circ || {}).forEach(([k, x]) => { if (typeof x === 'string' && F1.circ[k] === undefined) F1.circ[k] = x; }); Object.entries(d.map || {}).forEach(([k, x]) => { if (!F1.map[k] || F1.map[k] === 'p') F1.map[k] = x; }); if (Date.now() - v.t > 3 * 864e5) F1.pSave(); } } catch (e) {} F1.pReady = true; })();
+F1.pSave = () => { clearTimeout(F1._ps); F1._ps = setTimeout(() => { const circ = {}, map = {}; Object.entries(F1.circ).forEach(([k, x]) => { if (typeof x === 'string' && x !== 'p') circ[k] = x; }); Object.entries(F1.map).forEach(([k, x]) => { if (x && x !== 'p' && (x === 'none' || /^data:/.test(x))) map[k] = x; }); IDB.put('f1persist', { t: Date.now(), ttl: 1e13, d: { circ, map } }); }, 1500); };
+/* one list re-render for a burst of finished maps / circuits */
+const f1Rr = () => { clearTimeout(F1._rr); F1._rr = setTimeout(() => { if (topView() === 'list' && state.league === 'f1') render(); }, 90); };
 /* circuit map: trim empty margins (and a solid background if the image has one) so the track can sit flush right */
 function f1MapSrc(url) {
-  if (!url) return null; const m = F1.map[url]; if (m) return m; F1.map[url] = 'p';
+  if (!url) return null; const m = F1.map[url]; if (m) return m; if (!F1.pReady) { F1.pLoad.then(f1Rr); return 'p'; } F1.map[url] = 'p';
   const im = new Image(); im.crossOrigin = 'anonymous';
-  const done = r => { F1.map[url] = r; if (topView() === 'list' && state.league === 'f1') render(); };
-  im.onload = () => { try { const W0 = im.naturalWidth, H0 = im.naturalHeight, sc = 900 / W0, W = Math.round(W0 * sc), H = Math.round(H0 * sc), cv = document.createElement('canvas'); cv.width = W; cv.height = H; const x = cv.getContext('2d'); x.imageSmoothingEnabled = true; x.imageSmoothingQuality = 'high'; x.drawImage(im, 0, 0, W, H); const d = x.getImageData(0, 0, W, H), p = d.data;
+  const done = r => { F1.map[url] = r; if (r === 'none' || /^data:/.test(r)) F1.pSave(); f1Rr(); };
+  /* heavy pixel work: one map at a time, each in its own task, so scrolling/taps stay smooth */
+  im.onload = () => { F1.mq = (F1.mq || Promise.resolve()).then(() => new Promise(r => setTimeout(r, 16))).then(() => proc()); };
+  const proc = () => { try { const W0 = im.naturalWidth, H0 = im.naturalHeight, sc = 900 / W0, W = Math.round(W0 * sc), H = Math.round(H0 * sc), cv = document.createElement('canvas'); cv.width = W; cv.height = H; const x = cv.getContext('2d'); x.imageSmoothingEnabled = true; x.imageSmoothingQuality = 'high'; x.drawImage(im, 0, 0, W, H); const d = x.getImageData(0, 0, W, H), p = d.data;
       const px = (X, Y) => { const i = (Y * W + X) * 4; return [p[i], p[i + 1], p[i + 2], p[i + 3]]; }, cs = [px(0, 0), px(W - 1, 0), px(0, H - 1), px(W - 1, H - 1)];
       if (cs.every(c => c[3] > 200)) { const bg = cs[0]; for (let i = 0; i < p.length; i += 4) { const dd = Math.abs(p[i] - bg[0]) + Math.abs(p[i + 1] - bg[1]) + Math.abs(p[i + 2] - bg[2]); if (dd < 90) p[i + 3] = Math.round(p[i + 3] * Math.max(0, (dd - 18) / 72)); } }
       let x0 = W, y0 = H, x1 = -1, y1 = -1; for (let Y = 0; Y < H; Y++) for (let X = 0; X < W; X++) if (p[(Y * W + X) * 4 + 3] > 24) { if (X < x0) x0 = X; if (X > x1) x1 = X; if (Y < y0) y0 = Y; if (Y > y1) y1 = Y; }
@@ -4658,6 +4673,7 @@ function f1HistHTML() { const sy = f1ShowY(), I = F1.idx && F1.idx.ready ? F1.id
   return `<div class="card f1card f1hist ${F1.hOpen ? 'open' : ''}" data-f1hist="1"><div class="f1hh"><div><div class="f1nm">Historic results</div><div class="f1ct">${F1.listY ? 'Season ' + F1.listY : 'Choose a season'}</div></div><i class="chev ${F1.hOpen ? 'up' : ''}"></i></div>
     ${F1.hOpen ? `<div class="f1hy">${F1.listY ? `<button data-f1ly="0">Current season</button>` : ''}${ys.map(y => `<button data-f1ly="${y}" class="${F1.listY === y ? 'on' : ''}">${y}</button>`).join('')}</div>` : ''}</div>`; }
 function renderF1List(tabs) {
+  F1._y0 = F1.scrolled ? window.scrollY : null;
   const evs = f1ListEvs();
   let body = '', strip = '';
   if (!evs) body = F1.listY ? f1HistHTML() + msg('Loading…') : msg(F1.err || 'Loading…');
@@ -4667,7 +4683,7 @@ function renderF1List(tabs) {
     strip = evs.map(e => { const d = new Date(e.endDate || e.date); return `<button class="dy ${e.id === F1.selId ? 'on' : ''}${e.id === F1.curId ? ' tdy' : ''}" data-f1go="${esc(e.id)}"><small>${esc(f1Iso(e) || 'GP')}</small>${d.getDate()}.${d.getMonth() + 1}.</button>`; }).join('');
     body = f1HistHTML() + evs.map((e, k) => {
       const rc = f1Comp(e, 'Race'), done = f1Done(rc) || !!(rc && rc.date && new Date(rc.date) < Date.now() - 3 * 36e5 && (rc.competitors || []).some(c => c.order === 1)), w = done && rc && (rc.competitors || []).find(c => c.order === 1), cid = e.circuit && e.circuit.id, cu = F1.circ[cid];
-      if (cid && cu === undefined) f1Circ(e).then(() => { if (topView() === 'list' && state.league === 'f1') render(); });
+      if (cid && cu === undefined) f1Circ(e).then(f1Rr);
       return `<div class="card f1card${done ? '' : ' f1up'}" data-f1race="${esc(e.id)}" data-f1ry="${esc(e._y || '')}" id="f1c${esc(e.id)}"><div class="f1cl1"><div class="f1rd">Round ${k + 1}</div><div class="f1tt">${f1Flag(e)}<div class="f1nm">${esc(f1Short(e).replace(/-Catalunya/i, ''))}</div></div>
         ${done ? (pod => pod.length ? `<div class="f1pod">${pod.map(c => `<img class="hs p${c.order}" src="${esc(f1Hs(c.id))}" alt="" onerror="this.onerror=null;this.src=SIL">`).join('')}</div>` : '')([1, 2, 3].map(o => (rc.competitors || []).find(c => c.order === o)).filter(Boolean)) : `<div class="f1big">${esc(f1DatesY(e))}</div><div class="f1ct">${esc((e.circuit && e.circuit.fullName) || '')}</div>`}</div>
         <div class="f1map">${cu && cu !== 'p' ? f1MapHTML(cu) : cu === null || !cid ? '<span class="f1nomap">No map data</span>' : ''}</div></div>`; }).join('');
@@ -4726,14 +4742,16 @@ function f1ScrollTo(id, smooth) {
 }
 async function loadF1List() {
   if (forceNow() && Object.keys(F1.sb).length) return f1Refresh(true, true);
-  const Y = f1Year();
-  try { const cur = await f1Season(Y); F1.err = null; if (topView() === 'list' && state.league === 'f1') render();
+  const Y = f1Year(), sg = () => f1Sig(f1ListEvs()) + '|' + (F1.listY || '') + '|' + Object.keys(F1.sb).join(), sig0 = $app.querySelector('.f1list > .f1card[data-f1race]') ? sg() : null;
+  /* list restored from memory and nothing changed → keep it as it is (no re-render, no flicker) */
+  const rr = () => { if (topView() !== 'list' || state.league !== 'f1') return; if (sig0 && sg() === sig0 && $app.querySelector('.f1list > .f1card[data-f1race]')) return; render(); };
+  try { const cur = await f1Season(Y); F1.err = null; rr();
     const ex = []; if (!cur.length) ex.push(Y - 1); if (!cur.length || cur.every(f1RaceDone)) ex.push(Y + 1);
     if (ex.length) { await Promise.all(ex.map(y => f1Season(y).catch(() => null))); F1.scrolled = 0; }
     /* warm Statistics/Standings in the background so they open instantly */
     setTimeout(() => { f1ResolveY().then(y => Promise.all([f1Season(y), f1Stand(y)]).then(() => { f1Teams(F1.sb[y]).catch(() => {}); f1Agg(y); })).catch(() => {}); }, 1200);
   } catch (e) { F1.err = 'Failed to load F1 (' + (e.message || e) + ').'; }
-  if (topView() === 'list' && state.league === 'f1') render();
+  rr();
 }
 
 /* --- views (state.lv kinds: f1stats, f1std, f1race, f1drv, f1con) --- */
@@ -4932,8 +4950,10 @@ window._snap = {}; window._curH = location.hash;
 try { document.fonts.ready.then(() => { try { glDash(); } catch (e) {} try { stnFit(); } catch (e) {} try { if ($app.querySelector('.f1list')) { $app.querySelectorAll('.f1list .f1card:not(.f1hist)').forEach(f1NameFit); f1UpAlign(); } } catch (e) {} }); } catch (e) {}
 window.addEventListener('resize', () => { try { if ($app.querySelector('.f1list')) f1UpAlign(); } catch (e) {} });
 window.goHome = () => { const st = window._hstack || [], d = st.length - 1; window._fromList = false;
+  const rt = d > 0 && (st[0] === '' || st[0] === '#'), sn0 = rt && window._snap[st[0]], keep = state.league === 'f1' && typeof F1 !== 'undefined' && !F1.listY && sn0 && Date.now() - sn0.t < 30 * 60e3 && sn0.f && sn0.f.querySelector && sn0.f.querySelector('.f1list');
+  if (keep) { F1.hOpen = false; window._f1Home = 1; setTimeout(() => { window._f1Home = 0; }, 1500); history.go(-d); return; }
   if (state.league === 'f1' && typeof F1 !== 'undefined') { F1.listY = null; F1.hOpen = false; F1.selId = null; F1.scrolled = 0; state.stripKey = null; }
-  if (d > 0 && (st[0] === '' || st[0] === '#')) { window._noRestore = 1; history.go(-d); return; }
+  if (rt) { window._noRestore = 1; history.go(-d); return; }
   state.player = null; state.game = null; state.team = null; state.lv = null; state.search = false; state.cmpOn = false;
   if (location.hash && location.hash !== '#') { window._noRestore = 1; window._repl = 1; location.replace(location.href.split('#')[0] + '#'); } render(); window.scrollTo(0, 0); };
 const snapVK = () => { try { return viewKey() + '|' + (state.lv ? lvKey(state.lv) + (state.lv.tm || '') : '') + '|' + (state.team ? (state.team.sy || '') + (state.team.stype || '') + state.team.tab : '') + '|' + (state.player ? state.player.tab : '') + '|' + (state.game ? state.game.tab : '') + '|' + (state.league || ''); } catch (e) { return ''; } };
@@ -4945,7 +4965,7 @@ window.addEventListener('hashchange', () => { const h = location.hash, st = wind
   if (bi >= 0) { st.splice(bi + 1).forEach(x => { if (x !== h) delete window._snap[x]; }); delete window._snap[prev]; window._backY = window._scrollMem[h] || 0; window._backT = Date.now(); window._backH = h;
     const sn = noR ? null : window._snap[h]; delete window._snap[h]; if (noR) window._backY = 0;
     { const u = document.getElementById('under'); if (u) { if (sn && sn.f) [...u.childNodes].forEach(n => { if (!(n.classList && n.classList.contains('undim'))) sn.f.appendChild(n); }); u.remove(); } }
-    if (sn && Date.now() - sn.t < 30 * 60e3) { $app.style.transition = ''; $app.style.transform = ''; $app.innerHTML = ''; $app.appendChild(sn.f); (sn.sl || []).forEach(([x, l, tp]) => { x.scrollLeft = l; x.scrollTop = tp; }); $app.className = sn.cls; const bg = sn.bg; document.documentElement.style.background = bg.h; document.body.style.background = bg.b; document.documentElement.style.setProperty('--pbg', bg.p); const tm = document.querySelector('meta[name="theme-color"]'); if (tm && bg.t) tm.setAttribute('content', bg.t); document.documentElement.classList.remove('lock1'); window.scrollTo(0, sn.y); window._restoreKey = h; window._restoreY = sn.y; window._restoreVK = sn.vk;
+    if (sn && Date.now() - sn.t < 30 * 60e3) { $app.style.transition = ''; $app.style.transform = ''; $app.innerHTML = ''; $app.appendChild(sn.f); (sn.sl || []).forEach(([x, l, tp]) => { x.scrollLeft = l; x.scrollTop = tp; }); $app.className = sn.cls; if (window._f1Home) { window._f1Home = 0; try { if (state.league === 'f1' && F1.curId) { F1.selId = F1.curId; $app.querySelectorAll('.strip .dy').forEach(x => x.classList.toggle('on', x.dataset.f1go === F1.curId)); f1CenterStrip(false); const c = document.getElementById('f1c' + F1.curId), f = $app.querySelector('.f1list > .f1card'); if (c && f) { f1Spacer(); sn.y = Math.max(0, Math.round(c.offsetTop - f.offsetTop)); window._scrollMem[h] = sn.y; } } } catch (e) {} } const bg = sn.bg; document.documentElement.style.background = bg.h; document.body.style.background = bg.b; document.documentElement.style.setProperty('--pbg', bg.p); const tm = document.querySelector('meta[name="theme-color"]'); if (tm && bg.t) tm.setAttribute('content', bg.t); document.documentElement.classList.remove('lock1'); window.scrollTo(0, sn.y); window._restoreKey = h; window._restoreY = sn.y; window._restoreVK = sn.vk;
       const chk = () => { if (location.hash !== h) return; const mx = document.documentElement.scrollHeight - window.innerHeight; if (!$app.firstElementChild || !$app.querySelector('main')) { window._restoreKey = null; state.lastView = null; render(); return; } if (window.scrollY > mx + 1) window.scrollTo(0, Math.max(0, mx)); else if (Math.abs(window.scrollY - sn.y) > 2 && window._touchT < sn.t0) window.scrollTo(0, Math.min(sn.y, Math.max(0, mx))); }; sn.t0 = Date.now(); requestAnimationFrame(chk); setTimeout(chk, 80); setTimeout(chk, 250); setTimeout(chk, 500); }
   } else { st.push(h); window._backY = 0; window._backH = null;
     if (window._noSnap) window._noSnap = 0; else if (prev != null && $app.firstChild) { const sl = [...$app.querySelectorAll('.strip, .mstrip, .tw, .dtabs, .brsw, .tgs, .ysel .ylist')].filter(x => x.scrollLeft > 0 || x.scrollTop > 0).map(x => [x, x.scrollLeft, x.scrollTop]); const f = document.createDocumentFragment(); while ($app.firstChild) f.appendChild($app.firstChild); window._snap[prev] = { sl, vk: snapVK(), f, y: window._scrollMem[prev] || 0, cls: $app.className, bg: snapBg(), t: Date.now() };
