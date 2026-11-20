@@ -922,6 +922,7 @@ html.one,html.one body{overflow:hidden;height:100%}
 html.lock1 body{touch-action:none}
 html.lock1 .tw,html.lock1 .strip,html.lock1 .mstrip,html.lock1 .htabs{touch-action:pan-x}
 html.one #app.lst,html.one body{min-height:0}
+html,body{overflow-anchor:none}
 .stkw .hero{padding:16px 0}
 .stkw .hero .s{font-size:42px !important}
 .stkw .hero .t img,.stkw .hero .t .ph{width:42px !important;height:42px !important}
@@ -4765,13 +4766,19 @@ function f1CancelAnim() { F1.tok++; if (window._stAnim) { window._stAnim = false
 function f1Spacer() { const hp = $app.querySelector(':scope > .hpw'), cs = $app.querySelectorAll('.f1list > .f1card'), f = cs[0], c = cs[cs.length - 1]; if (!hp || !c || !f) return;
   const ex = parseFloat(hp.dataset.ex || 0), base = (parseFloat(getComputedStyle(hp).paddingBottom) || 0) - ex, need = Math.max(0, Math.round(c.offsetTop - f.offsetTop) + window.innerHeight - (document.documentElement.scrollHeight - ex));
   if (Math.abs(need - ex) > 1) { hp.dataset.ex = need; hp.style.paddingBottom = (base + need) + 'px'; } }
+/* after the list is put on the current GP, hold it there for a moment: whatever settles late (maps, fonts, Safari's own scroll fixes) cannot move it; the first touch releases it */
+function f1Pin(id) { const t0 = Date.now(), tok = F1.tok; cancelAnimationFrame(F1._pin);
+  const step = () => { if (tok !== F1.tok || window._touchT > t0 || Date.now() - t0 > 2500 || topView() !== 'list' || state.league !== 'f1') return;
+    const c = document.getElementById('f1c' + id), f = $app.querySelector('.f1list > .f1card'); if (c && f) { try { f1Spacer(); } catch (e) {} const y = Math.max(0, Math.round(c.offsetTop - f.offsetTop)); if (Math.abs(window.scrollY - y) > 1) { window.scrollTo(0, y); window._scrollMem[location.hash] = y; } }
+    F1._pin = requestAnimationFrame(step); };
+  F1._pin = requestAnimationFrame(step); }
 function f1ScrollTo(id, smooth) {
   try { f1Spacer(); } catch (e) {}
   const c = document.getElementById('f1c' + id), f = $app.querySelector('.f1list > .f1card'); if (!c || !f) return;
   const target = Math.max(0, Math.round(c.offsetTop - f.offsetTop));
-  if (!smooth) { window.scrollTo(0, target); window._scrollMem[location.hash] = window.scrollY; return; }
+  if (!smooth) { window.scrollTo(0, target); window._scrollMem[location.hash] = window.scrollY; f1Pin(id); return; }
   const tok = ++F1.tok, y0 = window.scrollY, dy = target - y0, T = Math.min(650, 260 + Math.abs(dy) / 6), t0 = performance.now(); window._stAnim = true;
-  const step = now => { if (tok !== F1.tok || topView() !== 'list' || state.league !== 'f1') { if (tok === F1.tok) window._stAnim = false; return; } const k = Math.min(1, (now - t0) / T), e = 1 - Math.pow(1 - k, 3); window.scrollTo(0, Math.round(y0 + dy * e)); if (k < 1) requestAnimationFrame(step); else { window._stAnim = false; window._scrollMem[location.hash] = window.scrollY; } };
+  const step = now => { if (tok !== F1.tok || topView() !== 'list' || state.league !== 'f1') { if (tok === F1.tok) window._stAnim = false; return; } const k = Math.min(1, (now - t0) / T), e = 1 - Math.pow(1 - k, 3); window.scrollTo(0, Math.round(y0 + dy * e)); if (k < 1) requestAnimationFrame(step); else { window._stAnim = false; window._scrollMem[location.hash] = window.scrollY; f1Pin(id); } };
   requestAnimationFrame(step);
 }
 async function loadF1List() {
@@ -4999,7 +5006,7 @@ window.addEventListener('hashchange', () => { const h = location.hash, st = wind
   if (bi >= 0) { st.splice(bi + 1).forEach(x => { if (x !== h) delete window._snap[x]; }); delete window._snap[prev]; window._backY = window._scrollMem[h] || 0; window._backT = Date.now(); window._backH = h;
     const sn = noR ? null : window._snap[h]; delete window._snap[h]; if (noR) window._backY = 0;
     { const u = document.getElementById('under'); if (u) { if (sn && sn.f) [...u.childNodes].forEach(n => { if (!(n.classList && n.classList.contains('undim'))) sn.f.appendChild(n); }); u.remove(); } }
-    if (sn && Date.now() - sn.t < 30 * 60e3) { $app.style.transition = ''; $app.style.transform = ''; $app.innerHTML = ''; $app.appendChild(sn.f); (sn.sl || []).forEach(([x, l, tp]) => { x.scrollLeft = l; x.scrollTop = tp; }); $app.className = sn.cls; if (window._f1Home) { window._f1Home = 0; try { if (state.league === 'f1' && F1.curId) { F1.selId = F1.curId; $app.querySelectorAll('.strip .dy').forEach(x => x.classList.toggle('on', x.dataset.f1go === F1.curId)); f1CenterStrip(false); const c = document.getElementById('f1c' + F1.curId), f = $app.querySelector('.f1list > .f1card'); if (c && f) { f1Spacer(); sn.y = Math.max(0, Math.round(c.offsetTop - f.offsetTop)); window._scrollMem[h] = sn.y; } } } catch (e) {} } const bg = sn.bg; document.documentElement.style.background = bg.h; document.body.style.background = bg.b; document.documentElement.style.setProperty('--pbg', bg.p); const tm = document.querySelector('meta[name="theme-color"]'); if (tm && bg.t) tm.setAttribute('content', bg.t); document.documentElement.classList.remove('lock1'); window.scrollTo(0, sn.y); window._restoreKey = h; window._restoreY = sn.y; window._restoreVK = sn.vk;
+    if (sn && Date.now() - sn.t < 30 * 60e3) { $app.style.transition = ''; $app.style.transform = ''; $app.innerHTML = ''; $app.appendChild(sn.f); (sn.sl || []).forEach(([x, l, tp]) => { x.scrollLeft = l; x.scrollTop = tp; }); $app.className = sn.cls; if (window._f1Home) { window._f1Home = 0; try { if (state.league === 'f1' && F1.curId) { F1.selId = F1.curId; $app.querySelectorAll('.strip .dy').forEach(x => x.classList.toggle('on', x.dataset.f1go === F1.curId)); f1CenterStrip(false); const c = document.getElementById('f1c' + F1.curId), f = $app.querySelector('.f1list > .f1card'); if (c && f) { f1Spacer(); sn.y = Math.max(0, Math.round(c.offsetTop - f.offsetTop)); window._scrollMem[h] = sn.y; setTimeout(() => f1Pin(F1.curId), 0); } } } catch (e) {} } const bg = sn.bg; document.documentElement.style.background = bg.h; document.body.style.background = bg.b; document.documentElement.style.setProperty('--pbg', bg.p); const tm = document.querySelector('meta[name="theme-color"]'); if (tm && bg.t) tm.setAttribute('content', bg.t); document.documentElement.classList.remove('lock1'); window.scrollTo(0, sn.y); window._restoreKey = h; window._restoreY = sn.y; window._restoreVK = sn.vk;
       const chk = () => { if (location.hash !== h) return; const mx = document.documentElement.scrollHeight - window.innerHeight; if (!$app.firstElementChild || !$app.querySelector('main')) { window._restoreKey = null; state.lastView = null; render(); return; } if (window.scrollY > mx + 1) window.scrollTo(0, Math.max(0, mx)); else if (Math.abs(window.scrollY - sn.y) > 2 && window._touchT < sn.t0) window.scrollTo(0, Math.min(sn.y, Math.max(0, mx))); }; sn.t0 = Date.now(); requestAnimationFrame(chk); setTimeout(chk, 80); setTimeout(chk, 250); setTimeout(chk, 500); }
   } else { st.push(h); window._backY = 0; window._backH = null;
     if (window._noSnap) window._noSnap = 0; else if (prev != null && $app.firstChild) { const sl = [...$app.querySelectorAll('.strip, .mstrip, .tw, .dtabs, .brsw, .tgs, .ysel .ylist')].filter(x => x.scrollLeft > 0 || x.scrollTop > 0).map(x => [x, x.scrollLeft, x.scrollTop]); const f = document.createDocumentFragment(); while ($app.firstChild) f.appendChild($app.firstChild); window._snap[prev] = { sl, vk: snapVK(), f, y: window._scrollMem[prev] || 0, cls: $app.className, bg: snapBg(), t: Date.now() };
