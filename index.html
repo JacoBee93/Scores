@@ -542,7 +542,7 @@ tr.zb > td{background:#26262a !important}
 .wph{font-size:11.5px;color:var(--mut);text-align:center;margin-top:5px}
 #wpov{position:fixed;inset:0;z-index:200;background:#000;display:flex;align-items:center;justify-content:center}
 #wpov .wpbox{width:100vw;height:100vh;padding:14px 18px calc(14px + env(safe-area-inset-bottom));box-sizing:border-box;display:flex;flex-direction:column;background:#000}
-#wpov.rot .wpbox{position:absolute;left:50%;top:50%;flex:none;width:100vh;height:100vw;transform:translate(-50%,-50%) rotate(90deg);padding:14px max(28px, env(safe-area-inset-top)) 14px}
+#wpov.rot .wpbox{position:absolute;left:50%;top:50%;flex:none;width:100vh;height:100vw;transform:translate(-50%,-50%) rotate(90deg);padding:14px calc(env(safe-area-inset-top) + 34px) 14px}
 #wpov .wptop{display:flex;align-items:flex-start;gap:10px}
 #wpov .wpi{flex:1;min-height:62px}
 #wpov .wpclose{width:38px;height:38px;border-radius:12px;background:#2c2c2e;font-size:24px;flex:none;margin:2px 6px 0 8px}
@@ -1107,7 +1107,16 @@ html.fsg td.n .slg{top:.75px}
 .seg > button{flex:1 1 auto;padding-left:6px !important;padding-right:6px !important}
 
 /* close buttons (news, shot chart, win probability): red ball, white X dead centre */
-.artx,#wpov .wpclose{display:flex;align-items:center;justify-content:center;padding:0;border:0;border-radius:50% !important;background:#e5484d !important;color:#fff;box-shadow:0 3px 10px rgba(0,0,0,.4)}
+.artx,/* full-screen charts: filter rows centred (close button out of the flow), play text gets more room than the graph */
+#wpov.scov .wptop{position:relative;justify-content:center;padding:0 48px}
+#wpov.scov .wpclose{position:absolute;right:0;top:0;margin:0}
+#wpov .scfw{flex:none;display:flex;flex-direction:column;align-items:center;gap:6px}
+#wpov .scr{display:flex;justify-content:center;gap:16px}
+#wpov .scf{flex:none}
+#wpov .scf button{flex:none;min-width:54px;padding:5px 12px}
+#wpov:not(.scov) .wpi{min-height:104px}
+#wpov:not(.scov) .wpx{-webkit-line-clamp:3;font-size:15px}
+#wpov .wpclose{display:flex;align-items:center;justify-content:center;padding:0;border:0;border-radius:50% !important;background:#e5484d !important;color:#fff;box-shadow:0 3px 10px rgba(0,0,0,.4)}
 .artx svg,#wpov .wpclose svg{display:block;flex:none}
 
 /* today / current week / current GP in the top strip: red text (black when it is the selected bubble) */
@@ -1344,7 +1353,7 @@ function tabHTML(k) {
   const ghost = (st, html, off) => { const g = document.createElement('div'); g.className = st.cls + ' ghost'; g._off = off;
     g.style.cssText = `position:absolute;top:${st.el.offsetTop}px;left:${st.el.offsetLeft}px;width:${st.W}px;min-height:${st.mode === 'day' ? Math.max(st.el.offsetHeight, window.innerHeight) : 0}px;margin:0;pointer-events:none;will-change:transform;transform:translate3d(${off * st.P}px,0,0)`;
     g.style.setProperty('margin', '0', 'important'); if (st.mode === 'day') { const cs = getComputedStyle(st.el); g.style.padding = cs.padding; g.style.boxSizing = 'border-box'; }
-    g.innerHTML = html; try { relabel(g); markSort(g); zebra(g); dashAlign(g); pmAlign(g); } catch (e) {} st.el.parentNode.appendChild(g); try { tblAlign(g.parentNode); alignGrp(g); if (st.mode !== 'day') addGlossary(topView(), g); } catch (e) {} if (st.mode !== 'day' && g.querySelector('.nws')) { const h = window._ovH || +(localStorage.getItem('ovH') || 0) || 415; g.style.minHeight = h + 'px'; g.classList.add('nwp'); } else if (st.mode !== 'day' && g.querySelector('tr.nomore')) { const h = window._ovH || +(localStorage.getItem('ovH') || 0); if (h > 200) g.style.minHeight = h + 'px'; }
+    g.innerHTML = html; try { relabel(g); markSort(g); zebra(g); dashAlign(g); pmAlign(g); } catch (e) {} try { tNudge(g); } catch (e) {} st.el.parentNode.appendChild(g); try { tblAlign(g.parentNode); alignGrp(g); if (st.mode !== 'day') addGlossary(topView(), g); } catch (e) {} try { glDash(g); stnFit(g); } catch (e) {} if (st.mode !== 'day' && g.querySelector('.nws')) { const h = window._ovH || +(localStorage.getItem('ovH') || 0) || 415; g.style.minHeight = h + 'px'; g.classList.add('nwp'); } else if (st.mode !== 'day' && g.querySelector('tr.nomore')) { const h = window._ovH || +(localStorage.getItem('ovH') || 0); if (h > 200) g.style.minHeight = h + 'px'; }
     st.gh.push(g);
     if (st.hp) { const c = st.hp.cloneNode(true); c._off = off; c.classList.add('ghost'); const day = st.hpGap == null; c.style.cssText = `position:absolute;left:${day ? st.hp.offsetLeft : g.offsetLeft}px;width:${day ? st.hp.offsetWidth : g.offsetWidth}px;top:${day ? st.hpTop : g.offsetTop + g.offsetHeight + st.hpGap}px;margin:0;pointer-events:none;will-change:transform;transform:translate3d(${off * st.P}px,0,0)`; st.el.parentNode.appendChild(c); st.gh.push(c); } };
   document.addEventListener('touchcancel', () => { const st = S; S = null; if (!st || !st.hz) return; if (raf) { cancelAnimationFrame(raf); raf = 0; } anim(st, 0, 200, () => cleanup(st)); }, { passive: true });
@@ -2272,16 +2281,16 @@ function shotBigInner(g) {
   const pers = [...new Set(plays.map(p => (p.period && p.period.number) || 1))].sort((a, b) => a - b);
   const cnt = (tid, goal) => plays.filter(p => String(p.team && p.team.id) === tid && (f.per === 'all' || String((p.period && p.period.number) || 1) === f.per) && (goal ? scKind(p) === 'g' : true)).length;
   const btn = (k, v, l) => `<button data-scf="${k}" data-scv="${v}" class="${f[k] === v ? 'on' : ''}">${esc(l)}</button>`, Lb = SC_LBL(g);
-  return `<div class="wptop"><div class="scfw"><div class="scf">${btn('tm', 'all', 'Both')}${btn('tm', String(e.away.id), e.away.abbr)}${btn('tm', String(e.home.id), e.home.abbr)}</div>
-    <div class="scf">${btn('ty', 'all', 'All')}${btn('ty', 's', Lb.s)}${btn('ty', 'g', Lb.G)}</div>
-    <div class="scf">${btn('per', 'all', 'All')}${pers.map(n => btn('per', String(n), perHead(g.league, n - 1))).join('')}</div></div><button class="wpclose" data-wpclose="1" aria-label="Close"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
+  return `<div class="wptop"><div class="scfw"><div class="scr"><div class="scf">${btn('tm', 'all', 'Both')}${btn('tm', String(e.away.id), e.away.abbr)}${btn('tm', String(e.home.id), e.home.abbr)}</div>
+    <div class="scf">${btn('ty', 'all', 'All')}${btn('ty', 's', Lb.s)}${btn('ty', 'g', Lb.G)}</div></div>
+    <div class="scr"><div class="scf">${btn('per', 'all', 'All')}${pers.map(n => btn('per', String(n), perHead(g.league, n - 1))).join('')}</div></div></div><button class="wpclose" data-wpclose="1" aria-label="Close"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
     <div class="sch2"><span>${esc(e.away.abbr)} · ${cnt(String(e.away.id), true)} ${g.league === 'nba' ? 'made' : 'G'} / ${cnt(String(e.away.id))} att.</span><span>${esc(e.home.abbr)} · ${cnt(String(e.home.id), true)} ${g.league === 'nba' ? 'made' : 'G'} / ${cnt(String(e.home.id))} att.</span></div>
     <div class="rkbig">${chartSVG(g, plays, Object.assign({ big: 1 }, f))}</div><div class="scl">${Lb.leg}</div>`;
 }
 function openShot() {
   const g = state.game; if (!g) return; closeWp();
   const ov = document.createElement('div'); ov.id = 'wpov'; ov.className = 'scov';
-  ov.innerHTML = `<div class="wpbox">${shotBigInner(g)}</div>`;
+  ov.innerHTML = `<div class="wpbox">${shotBigInner(g)}</div>`; try { tNudge(ov); } catch (e) {}
   document.body.appendChild(ov); document.body.style.overflow = 'hidden'; fitWp();
 }
 document.addEventListener('click', ev => {
@@ -2291,7 +2300,7 @@ document.addEventListener('click', ev => {
       rb.insertAdjacentHTML('beforeend', `<div class="sgpop">${lg && lg.logo ? `<img src="${esc(lg.logo)}" alt="">` : ''}<div><div class="sgt">${esc((p.clock && p.clock.displayValue) || '')} · ${esc(perHead('nhl', ((p.period && p.period.number) || 1) - 1))}</div><div class="sgx">${k < 0 ? esc(txt) : esc(txt.slice(0, k)) + `<span class="ast">${esc(txt.slice(k))}</span>`}</div></div></div>`); } }
     return; }
   if (ev.target.closest('[data-scopen]')) { openShot(); return; }
-  const b = ev.target.closest('#wpov [data-scf]'); if (b && state.game) { const g = state.game; g.scF = g.scF || {}; g.scF[b.dataset.scf] = b.dataset.scv; const box = document.querySelector('#wpov .wpbox'); if (box) box.innerHTML = shotBigInner(g); }
+  const b = ev.target.closest('#wpov [data-scf]'); if (b && state.game) { const g = state.game; g.scF = g.scF || {}; g.scF[b.dataset.scf] = b.dataset.scv; const box = document.querySelector('#wpov .wpbox'); if (box) { box.innerHTML = shotBigInner(g); try { tNudge(box); } catch (e) {} } }
 });
 function wpHTML(g) {
   const sum = g.sum, wp = (sum.winprobability || []).filter(x => x && x.homeWinPercentage != null);
@@ -3791,7 +3800,7 @@ function paintSearch() {
       ? `<div class="res-row" data-topen="${esc(x.id)}" data-tl="${x.l}" data-tn="${esc(x.name)}" data-tlogo="${esc(x.logo || '')}">${logoImg(x.logo)}<div class="grow"><div class="rn">${esc(x.name)}</div><div class="rs">${x.l.toUpperCase()}</div></div></div>`
       : `<div class="res-row" data-player="${esc(x.id)}" data-pl="${x.l}" data-pn="${esc(x.name)}" data-pp="" data-pj="" data-pt="${esc(x.sub || '')}"><img class="hs" src="https://a.espncdn.com/i/headshots/${x.l}/players/full/${esc(x.id)}.png" alt="" onerror="this.onerror=null;this.src=SIL"><div><div class="rn">${esc(x.name)}</div><div class="rs">${esc(x.l.toUpperCase() + (x.sub ? ' · ' + x.sub : ''))}</div></div></div>`).join('');
     else html += msg('No search history yet.');
-    res.innerHTML = html; return;
+    res.innerHTML = html; try { tNudge(res); } catch (e) {} return;
   }
   if (rows.length) html += '<div class="sec">Teams</div>' + rows.join('');
   if (!loaded) html += failed ? msg('Failed to load teams (' + state.teamErrText + ').') : msg('Loading…');
@@ -3806,7 +3815,7 @@ function paintSearch() {
       <img class="hs" src="https://a.espncdn.com/i/headshots/${i.league}/players/full/${esc(i.id)}.png" alt="" onerror="this.onerror=null;this.src=SIL"><div><div class="rn">${esc(i.name)}</div><div class="rs">${esc(sub)}</div></div></div>`;
     }).join('');
   }
-  res.innerHTML = html;
+  res.innerHTML = html; try { tNudge(res); } catch (e) {}
 }
 /* ----- standings & league stats ----- */
 const STD_COLS = {
@@ -4162,7 +4171,7 @@ function paintCompare() {
       return String(Math.round(ns.reduce((a, b) => a + b, 0) * 10) / 10); }); };
   common.forEach(([x, y], i) => { car += tab(x, y, fill(x), fill(y), i === 0 ? [ya.size + ' seasons', yb.size + ' seasons'] : null); });
   if (car) out += `<section class="pv cmpcar"><button class="cmps cmpt2" data-cmpcar="1">Career<i class="chev ${c.carOpen ? 'up' : ''}"></i></button>${c.carOpen ? car : ''}</section>`;
-  body.innerHTML = out;
+  body.innerHTML = out; try { tNudge(body); } catch (e) {}
   relabel(body);
   addGlossary('cmp');
 }
@@ -4638,7 +4647,7 @@ function f1Idx() { if (F1.idx) return F1.idx.ready ? F1.idx : null; F1.idx = { r
       de.forEach(en => add(I.drv, String((en.athlete || {}).id), y)); ce.forEach(en => add(I.con, String((en.team || {}).id), y));
       const gps = (de[0].stats || []).filter(st => st.id && !/overall|total/i.test(String(st.displayName || st.name || ''))); gps.forEach(st => { const code = f1GpKey(st.displayName || st.name); I.evc[String(st.id)] = code; (I.gp[code] = I.gp[code] || []).push({ y, id: String(st.id) }); }); } };
     await Promise.all(Array.from({ length: 5 }, work)); I.years.sort((a, b) => b - a); Object.values(I.gp).forEach(L => L.sort((a, b) => b.y - a.y)); F1.idx = I;
-    if (topView() === 'lv' && state.lv && /^f1/.test(state.lv.kind)) render(); else if (topView() === 'list' && state.league === 'f1') render(); })();
+    if (topView() === 'lv' && state.lv && /^f1/.test(state.lv.kind)) render(); else if (topView() === 'list' && state.league === 'f1' && F1.hOpen) render(); })();
   return null; }
 /* same Grand Prix across seasons: name without sponsor and "Grand Prix" (+ a few renames) */
 function f1GpKey(n) { let k = f1Short({ name: String(n || '') }).toLowerCase().replace(/grand prix|\bgp\b/g, '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/\s+/g, ' ').trim();
@@ -4651,10 +4660,15 @@ function f1PtsTable(y, sprint) { if (sprint) return y === 2021 ? [3, 2, 1] : y >
 F1.map = {};
 /* circuit links + processed maps are kept in IndexedDB, so opening F1 never re-downloads / re-processes them */
 F1.pReady = false;
-F1.pLoad = (async () => { try { const v = await IDB.get('f1persist'), d = v && v.d; if (d) { Object.entries(d.circ || {}).forEach(([k, x]) => { if (typeof x === 'string' && F1.circ[k] === undefined) F1.circ[k] = x; }); Object.entries(d.map || {}).forEach(([k, x]) => { if (!F1.map[k] || F1.map[k] === 'p') F1.map[k] = x; }); if (Date.now() - v.t > 3 * 864e5) F1.pSave(); } } catch (e) {} F1.pReady = true; })();
-F1.pSave = () => { clearTimeout(F1._ps); F1._ps = setTimeout(() => { const circ = {}, map = {}; Object.entries(F1.circ).forEach(([k, x]) => { if (typeof x === 'string' && x !== 'p') circ[k] = x; }); Object.entries(F1.map).forEach(([k, x]) => { if (x && x !== 'p' && (x === 'none' || /^data:/.test(x))) map[k] = x; }); IDB.put('f1persist', { t: Date.now(), ttl: 1e13, d: { circ, map } }); }, 1500); };
+F1.pLoad = (async () => { try { const v = await IDB.get('f1persist2'), d = v && v.d; if (d) { Object.entries(d.circ || {}).forEach(([k, x]) => { if (typeof x === 'string' && F1.circ[k] === undefined) F1.circ[k] = x; }); Object.entries(d.map || {}).forEach(([k, x]) => { if (!F1.map[k] || F1.map[k] === 'p') F1.map[k] = x; }); if (Date.now() - v.t > 3 * 864e5) F1.pSave(); } } catch (e) {} F1.pReady = true; })();
+F1.pSave = () => { clearTimeout(F1._ps); F1._ps = setTimeout(() => { const circ = {}, map = {}; Object.entries(F1.circ).forEach(([k, x]) => { if (typeof x === 'string' && x !== 'p') circ[k] = x; }); Object.entries(F1.map).forEach(([k, x]) => { if (x && x !== 'p' && (x === 'none' || /^data:/.test(x))) map[k] = x; }); IDB.put('f1persist2', { t: Date.now(), ttl: 1e13, d: { circ, map } }); }, 1500); };
 /* one list re-render for a burst of finished maps / circuits */
-const f1Rr = () => { clearTimeout(F1._rr); F1._rr = setTimeout(() => { if (topView() === 'list' && state.league === 'f1') render(); }, 90); };
+/* finished maps / circuits are put into the cards already on screen – no list re-render, so nothing can jump */
+const f1MapCell = e => { const cid = e.circuit && e.circuit.id, cu = F1.circ[cid]; return cu && cu !== 'p' ? f1MapHTML(cu) : cu === null || !cid ? '<span class="f1nomap">No map data</span>' : ''; };
+const f1Rr = () => { clearTimeout(F1._rr); F1._rr = setTimeout(() => { if (topView() !== 'list' || state.league !== 'f1') return; let ch = 0;
+  $app.querySelectorAll('.f1list > .f1card[data-f1race]').forEach(c => { const e = F1.ev && F1.ev[c.dataset.f1race], mp = c.querySelector('.f1map'); if (!e || !mp) return; const h = f1MapCell(e);
+    if (mp.dataset.mh === h) return; const cur = mp.querySelector('img'), nw = /src="([^"]*)"/.exec(h); mp.dataset.mh = h; if (cur && nw && cur.getAttribute('src') === nw[1]) return; mp.innerHTML = h; ch = 1; f1NameFit(c); });
+  if (ch) { try { f1UpAlign(); } catch (e) {} } }, 60); };
 /* circuit map: trim empty margins (and a solid background if the image has one) so the track can sit flush right */
 function f1MapSrc(url) {
   if (!url) return null; const m = F1.map[url]; if (m) return m; if (!F1.pReady) { F1.pLoad.then(f1Rr); return 'p'; } F1.map[url] = 'p';
@@ -4666,7 +4680,7 @@ function f1MapSrc(url) {
       const px = (X, Y) => { const i = (Y * W + X) * 4; return [p[i], p[i + 1], p[i + 2], p[i + 3]]; }, cs = [px(0, 0), px(W - 1, 0), px(0, H - 1), px(W - 1, H - 1)];
       if (cs.every(c => c[3] > 200)) { const bg = cs[0]; for (let i = 0; i < p.length; i += 4) { const dd = Math.abs(p[i] - bg[0]) + Math.abs(p[i + 1] - bg[1]) + Math.abs(p[i + 2] - bg[2]); if (dd < 90) p[i + 3] = Math.round(p[i + 3] * Math.max(0, (dd - 18) / 72)); } }
       let x0 = W, y0 = H, x1 = -1, y1 = -1; for (let Y = 0; Y < H; Y++) for (let X = 0; X < W; X++) if (p[(Y * W + X) * 4 + 3] > 24) { if (X < x0) x0 = X; if (X > x1) x1 = X; if (Y < y0) y0 = Y; if (Y > y1) y1 = Y; }
-      if (x1 < 0) return done('none'); x.putImageData(d, 0, 0); const o = document.createElement('canvas'); o.width = x1 - x0 + 1; o.height = y1 - y0 + 1; o.getContext('2d').drawImage(cv, x0, y0, o.width, o.height, 0, 0, o.width, o.height); done(o.toDataURL()); } catch (e) { done(url); } };
+      if (x1 < 0) return done('none'); x.putImageData(d, 0, 0); const tw = x1 - x0 + 1, th = y1 - y0 + 1, k = Math.min(1, 460 / tw, 260 / th), o = document.createElement('canvas'); o.width = Math.round(tw * k); o.height = Math.round(th * k); const ox = o.getContext('2d'); ox.imageSmoothingEnabled = true; ox.imageSmoothingQuality = 'high'; ox.drawImage(cv, x0, y0, tw, th, 0, 0, o.width, o.height); done(o.toDataURL()); } catch (e) { done(url); } };
   im.onerror = () => { const t = new Image(); t.onload = () => done(url); t.onerror = () => done('none'); t.src = url; };
   im.src = url; return 'p';
 }
@@ -4683,6 +4697,7 @@ function f1CurEv(evs) { if (F1.listY) return evs[0]; const now = Date.now(); ret
 function f1HistHTML() { const sy = f1ShowY(), I = F1.idx && F1.idx.ready ? F1.idx : null, ys = (I ? I.years : (F1.seasons || f1Years())).filter(y => y !== sy && y <= f1Year()).sort((a, b) => b - a);
   return `<div class="card f1card f1hist ${F1.hOpen ? 'open' : ''}" data-f1hist="1"><div class="f1hh"><div><div class="f1nm">Historic results</div><div class="f1ct">${F1.listY ? 'Season ' + F1.listY : 'Choose a season'}</div></div><i class="chev ${F1.hOpen ? 'up' : ''}"></i></div>
     ${F1.hOpen ? `<div class="f1hy">${F1.listY ? `<button data-f1ly="0">Current season</button>` : ''}${ys.map(y => `<button data-f1ly="${y}" class="${F1.listY === y ? 'on' : ''}">${y}</button>`).join('')}</div>` : ''}</div>`; }
+const f1LSig = () => { const evs = f1ListEvs(); return (evs ? f1Sig(evs) : 'x') + '|' + (F1.listY || '') + '|' + (F1.listY || f1ShowY() || '') + '|' + (F1.err || '') + '|' + (F1.hOpen ? 1 : 0); };
 function renderF1List(tabs) {
   F1._y0 = F1.scrolled ? window.scrollY : null;
   const evs = f1ListEvs();
@@ -4697,13 +4712,13 @@ function renderF1List(tabs) {
       if (cid && cu === undefined) f1Circ(e).then(f1Rr);
       return `<div class="card f1card${done ? '' : ' f1up'}" data-f1race="${esc(e.id)}" data-f1ry="${esc(e._y || '')}" id="f1c${esc(e.id)}"><div class="f1cl1"><div class="f1rd">Round ${k + 1}</div><div class="f1tt">${f1Flag(e)}<div class="f1nm">${esc(f1Short(e).replace(/-Catalunya/i, ''))}</div></div>
         ${done ? (pod => pod.length ? `<div class="f1pod">${pod.map(c => `<img class="hs p${c.order}" src="${esc(f1Hs(c.id))}" alt="" onerror="this.onerror=null;this.src=SIL">`).join('')}</div>` : '')([1, 2, 3].map(o => (rc.competitors || []).find(c => c.order === o)).filter(Boolean)) : `<div class="f1big">${esc(f1DatesY(e))}</div><div class="f1ct">${esc((e.circuit && e.circuit.fullName) || '')}</div>`}</div>
-        <div class="f1map">${cu && cu !== 'p' ? f1MapHTML(cu) : cu === null || !cid ? '<span class="f1nomap">No map data</span>' : ''}</div></div>`; }).join('');
+        <div class="f1map">${f1MapCell(e)}</div></div>`; }).join('');
   }
   const os = document.getElementById('strip'), prev = os && state.stripKey === 'f1' ? os.scrollLeft : null; state.stripKey = 'f1';
   $app.innerHTML = `
     ${lyHead({ strip, f1: 1, quick: [['data-f1v="std"', 'Table', LY_TROPHY], ['data-f1v="stats"', 'Stats', LY_CHART]], title: 'F1 ' + (F1.listY || f1ShowY() || f1Year()), sub: (evs && evs.length ? evs.length + ' RACES' : '') }) || `<header><div class="tabs htabs">${tabs}<button class="icon" data-search aria-label="Search">${SEARCH_SVG}</button></div>
     ${strip ? `<div class="strip" id="strip">${strip}</div>` : ''}<div class="qb"><button data-f1v="stats">Statistics</button><button data-f1v="std">Standings</button></div></header>`}
-    <main class="f1list">${body}</main>`;
+    <main class="f1list" data-sig="${esc(f1LSig())}">${body}</main>`;
   const s = document.getElementById('strip'); if (s) { if (prev != null) s.scrollLeft = prev; else f1CenterStrip(false); }
   f1Fit();
   if (evs && evs.length && !F1.scrolled) { F1.scrolled = 1; requestAnimationFrame(() => f1ScrollTo(F1.curId, false)); }
@@ -4761,9 +4776,9 @@ function f1ScrollTo(id, smooth) {
 }
 async function loadF1List() {
   if (forceNow() && Object.keys(F1.sb).length) return f1Refresh(true, true);
-  const Y = f1Year(), sg = () => f1Sig(f1ListEvs()) + '|' + (F1.listY || '') + '|' + Object.keys(F1.sb).join(), sig0 = $app.querySelector('.f1list > .f1card[data-f1race]') ? sg() : null;
-  /* list restored from memory and nothing changed → keep it as it is (no re-render, no flicker) */
-  const rr = () => { if (topView() !== 'list' || state.league !== 'f1') return; if (sig0 && sg() === sig0 && $app.querySelector('.f1list > .f1card[data-f1race]')) return; render(); };
+  const Y = f1Year();
+  /* the list on screen already shows exactly this → keep it as it is (no re-render, no jump) */
+  const rr = () => { if (topView() !== 'list' || state.league !== 'f1') return; const m = $app.querySelector('main.f1list'); if (m && m.dataset.sig === f1LSig() && m.querySelector('.f1card[data-f1race]')) return; render(); };
   try { const cur = await f1Season(Y); F1.err = null; rr();
     const ex = []; if (!cur.length) ex.push(Y - 1); if (!cur.length || cur.every(f1RaceDone)) ex.push(Y + 1);
     if (ex.length) { await Promise.all(ex.map(y => f1Season(y).catch(() => null))); F1.scrolled = 0; }
