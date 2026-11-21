@@ -1087,6 +1087,7 @@ html.fsg td.n .slg{top:.75px}
 .f1card:not(.f1hist){padding-top:0;padding-bottom:0}
 .f1card:not(.f1hist) .f1cl1{justify-content:flex-start;gap:0}
 .f1rd .rdl{color:var(--live)}
+.f1rd .f1ld{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--live);margin-left:6px;vertical-align:calc(var(--capc, .405em) - 3px);animation:blink 1.4s infinite}
 .f1rd{font-family:var(--num);font-weight:700;font-size:12px;letter-spacing:.6px;text-transform:uppercase;color:#fff;line-height:1.2;white-space:nowrap}
 .f1list .f1tt{gap:6px}
 .f1list .f1tt .f1fl{width:22px;height:22px}
@@ -4701,6 +4702,13 @@ function f1HistHTML() { const sy = f1ShowY(), I = F1.idx && F1.idx.ready ? F1.id
     ${F1.hOpen ? `<div class="f1hy">${F1.listY ? `<button data-f1ly="0">Current season</button>` : ''}${ys.map(y => `<button data-f1ly="${y}" class="${F1.listY === y ? 'on' : ''}">${y}</button>`).join('')}</div>` : ''}</div>`; }
 /* race weekend under way: from the start of the first session (FP1) until the race is over */
 const f1WkOn = e => { const ts = (e.competitions || []).map(c => new Date(c.date).getTime()).filter(t => t > 0); return !!ts.length && Date.now() >= Math.min(...ts); };
+/* a session running right now (ESPN says so, or by the clock: start → start + its usual length) */
+const f1SesLive = e => { const now = Date.now(); return (e.competitions || []).some(c => { const st = c.status && c.status.type || {}; if (st.completed || st.state === 'post') return false; if (st.state === 'in') return true;
+  const t = new Date(c.date).getTime(), ab = String((c.type && c.type.abbreviation) || ''), dur = /race/i.test(ab) ? 135 : /^(SS|SQ)/i.test(ab) ? 50 : 65; return t > 0 && now >= t && now < t + dur * 6e4; }); };
+const f1RdHTML = (e, k, done) => 'Round ' + (k + 1) + (!done && f1WkOn(e) ? ' · <span class="rdl">Race weekend</span>' + (f1SesLive(e) ? '<i class="f1ld"></i>' : '') : '');
+/* keep the label / dot current while the list is open (no re-render) */
+setInterval(() => { if (document.hidden || typeof topView !== 'function' || topView() !== 'list' || state.league !== 'f1') return; const evs = f1ListEvs(); if (!evs) return;
+  evs.forEach((e, k) => { const c = document.getElementById('f1c' + e.id), rd = c && c.querySelector('.f1rd'); if (!rd || !c.classList.contains('f1up')) return; const h = f1RdHTML(e, k, false); if (rd.innerHTML !== h) rd.innerHTML = h; }); }, 20000);
 const f1LSig = () => { const evs = f1ListEvs(); return (evs ? f1Sig(evs) + evs.filter(f1WkOn).map(e => e.id).join() : 'x') + '|' + (F1.listY || '') + '|' + (F1.listY || f1ShowY() || '') + '|' + (F1.err || '') + '|' + (F1.hOpen ? 1 : 0); };
 function renderF1List(tabs) {
   F1._y0 = F1.scrolled ? window.scrollY : null;
@@ -4714,7 +4722,7 @@ function renderF1List(tabs) {
     body = f1HistHTML() + evs.map((e, k) => {
       const rc = f1Comp(e, 'Race'), done = f1Done(rc) || !!(rc && rc.date && new Date(rc.date) < Date.now() - 3 * 36e5 && (rc.competitors || []).some(c => c.order === 1)), w = done && rc && (rc.competitors || []).find(c => c.order === 1), cid = e.circuit && e.circuit.id, cu = F1.circ[cid];
       if (cid && cu === undefined) f1Circ(e).then(f1Rr);
-      return `<div class="card f1card${done ? '' : ' f1up'}" data-f1race="${esc(e.id)}" data-f1ry="${esc(e._y || '')}" id="f1c${esc(e.id)}"><div class="f1cl1"><div class="f1rd">Round ${k + 1}${!done && f1WkOn(e) ? ' · <span class="rdl">Race weekend</span>' : ''}</div><div class="f1tt">${f1Flag(e)}<div class="f1nm">${esc(f1Short(e).replace(/-Catalunya/i, ''))}</div></div>
+      return `<div class="card f1card${done ? '' : ' f1up'}" data-f1race="${esc(e.id)}" data-f1ry="${esc(e._y || '')}" id="f1c${esc(e.id)}"><div class="f1cl1"><div class="f1rd">${f1RdHTML(e, k, done)}</div><div class="f1tt">${f1Flag(e)}<div class="f1nm">${esc(f1Short(e).replace(/-Catalunya/i, ''))}</div></div>
         ${done ? (pod => pod.length ? `<div class="f1pod">${pod.map(c => `<img class="hs p${c.order}" src="${esc(f1Hs(c.id))}" alt="" onerror="this.onerror=null;this.src=SIL">`).join('')}</div>` : '')([1, 2, 3].map(o => (rc.competitors || []).find(c => c.order === o)).filter(Boolean)) : `<div class="f1big">${esc(f1DatesY(e))}</div><div class="f1ct">${esc((e.circuit && e.circuit.fullName) || '')}</div>`}</div>
         <div class="f1map">${f1MapCell(e)}</div></div>`; }).join('');
   }
