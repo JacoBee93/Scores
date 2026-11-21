@@ -1088,7 +1088,7 @@ html.fsg td.n .slg{top:.75px}
 .f1card:not(.f1hist){padding-top:0;padding-bottom:0}
 .f1card:not(.f1hist) .f1cl1{justify-content:flex-start;gap:0}
 .f1rd .rdl,.f1big .rdl{color:var(--live)}
-.f1big .f1fl{display:inline-block;width:9px;height:9px;border-radius:50%;margin-left:7px;vertical-align:calc(var(--capc, .405em) - 4.5px)}
+.f1big .f1fl{position:relative;display:inline-block;width:9px;height:9px;border-radius:50%;margin-left:7px;vertical-align:calc(var(--capc, .405em) - 4.5px)}
 .f1ct .f1t3n{color:#fff}
 tr.f1out td.f1rk,tr.f1out .f1dn b{color:var(--live)}
 .f1big{white-space:nowrap}
@@ -4670,7 +4670,7 @@ function f1LivePatch() { if (topView() !== 'list' || state.league !== 'f1') retu
     const lc = f1LiveComp(e), big = c.querySelector('.f1big'), ct = c.querySelector('.f1ct'); if (!big || !ct) return;
     const W = !lc && f1WkOn(e) ? f1WkLines(e) : null, hb = lc ? f1LiveBig(lc) : W ? W[0] : esc(f1DatesY(e)), hc = lc ? (f1Top3(lc) || esc((e.circuit && e.circuit.fullName) || '')) : W ? W[1] : esc((e.circuit && e.circuit.fullName) || '');
     if (big.innerHTML !== hb) { big.innerHTML = hb; ch = 1; f1NameFit(c); } if (ct.innerHTML !== hc) { ct.innerHTML = hc; ch = 1; } });
-  if (ch) { try { f1UpAlign(); } catch (e) {} } }
+  if (ch) { try { f1UpAlign(); f1LvAlign(); } catch (e) {} } }
 /* live: while a session runs, the current GP (small scoreboard) every 25 s + the session flag; the open session's driver table every 60 s */
 F1.lv = { t: 0, d: 0 };
 async function f1LiveTick() { if (document.hidden || !Object.keys(F1.sb).length) return; const all = [].concat(...Object.values(F1.sb).map(x => x || [])), lev = all.filter(e => f1LiveComp(e)); if (!lev.length) return;
@@ -4714,7 +4714,9 @@ function f1LvAlign() { const cv = (f1LvAlign.c = f1LvAlign.c || document.createE
   const base = el => { const z = document.createElement('i'); z.style.cssText = 'display:inline-block;width:0;height:0;vertical-align:baseline'; el.appendChild(z); const y = z.getBoundingClientRect().bottom; z.remove(); return y; };
   $app.querySelectorAll('.f1sh').forEach(sh => { const sp = sh.querySelector('.f1lvh'); if (!sp) return; sp.style.top = '0px'; const d = sp.querySelector('.f1ld'); if (d) d.style.top = '0px';
     const tC = base(sh) - asc(sh) / 2, sC = base(sp) - asc(sp) / 2, dy = Math.round((tC - sC) * 2) / 2; sp.style.top = dy + 'px';
-    if (d) { const r = d.getBoundingClientRect(), dc = (r.top + r.bottom) / 2; d.style.top = Math.round((tC - dc) * 2) / 2 + 'px'; } }); }
+    if (d) { const r = d.getBoundingClientRect(), dc = (r.top + r.bottom) / 2; d.style.top = Math.round((tC - dc) * 2) / 2 + 'px'; } });
+  /* card: flag dot centred on the capitals of "Qualifying · Lap 3" */
+  $app.querySelectorAll('.f1big .f1fl').forEach(d => { const bg = d.parentElement; d.style.top = '0px'; const cC = base(bg) - asc(bg) / 2, r = d.getBoundingClientRect(); d.style.top = Math.round((cC - (r.top + r.bottom) / 2) * 2) / 2 + 'px'; }); }
 function f1Fit() { requestAnimationFrame(() => { try { f1LvAlign(); } catch (e) {} { const fl = $app.querySelector('.f1list .f1tt .f1fl'); if (fl) { const r = document.createRange(); r.selectNodeContents(fl); const g = r.getBoundingClientRect(), b = fl.getBoundingClientRect(); if (g.width) $app.querySelector('.f1list').style.setProperty('--fo', Math.max(0, g.left - b.left).toFixed(1) + 'px'); } } $app.querySelectorAll('.f1nm,.f1gp span,.f1rh .lvt').forEach(el => { if (el.scrollWidth > el.clientWidth + 1 && /Grand Prix/.test(el.textContent)) el.textContent = el.textContent.replace(/Grand Prix/, 'GP'); });
   $app.querySelectorAll('.f1dn b').forEach(el => { if (el.scrollWidth > el.clientWidth + 1) { const w = el.textContent.trim().split(/\s+/); if (w.length > 1 && !/\.$/.test(w[0])) el.textContent = w[0][0] + '. ' + w.slice(1).join(' '); } });
   $app.querySelectorAll('.f1list .f1card:not(.f1hist)').forEach(f1NameFit); f1UpAlign(); try { f1Spacer(); } catch (e) {} }); }
