@@ -1090,6 +1090,7 @@ html.fsg td.n .slg{top:.75px}
 .f1rd .rdl,.f1big .rdl{color:var(--live)}
 .f1big .f1fl{position:relative;display:inline-block;width:9px;height:9px;border-radius:50%;margin-left:7px;vertical-align:calc(var(--capc, .405em) - 4.5px)}
 .f1ct .f1t3n{color:#fff}
+.f1fl.chq,.f1lvh .f1ld.chq{background:repeating-conic-gradient(#fff 0 25%, #1c1c1e 0 50%) 0 0/3px 3px !important;animation:none !important;box-shadow:0 0 0 .5px rgba(255,255,255,.6)}
 tr.f1out td.f1rk,tr.f1out .f1dn b{color:var(--live)}
 .f1big{white-space:nowrap}
 .f1big .f1in{font-size:.78em;color:var(--mut)}
@@ -1889,7 +1890,7 @@ function render() {
   if (window._slide) { const p = window._slideSel ? $app.querySelector('main') : $app.querySelector('.pane'), d = window._slide; window._slide = 0; window._slideSel = null; if (p && p.animate) p.animate([{ transform: `translateX(${d * 70}px)`, opacity: .3 }, { transform: 'none', opacity: 1 }], { duration: 230, easing: 'cubic-bezier(.2,.7,.3,1)' }); }
   const fh = document.getElementById('fhome'); if (fh) fh.hidden = true;
   $app.querySelectorAll(':scope > .hpw').forEach(x => x.remove()); if (v !== 'search') $app.insertAdjacentHTML('beforeend', '<div class="hpw"><button class="hpill" data-home><svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linejoin="round" stroke-linecap="round" style="vertical-align:-3px;margin-right:7px"><path d="M3 10.5 12 3l9 7.5"/><path d="M5.5 9v11h13V9"/><path d="M10 20v-6h4v6"/></svg>Home</button></div>');
-  if (v === 'list' && state.league === 'f1' && typeof F1 !== 'undefined' && F1._y0 != null) { const y0 = F1._y0; F1._y0 = null; try { f1Spacer(); } catch (e) {} if (!window._stAnim && Math.abs(window.scrollY - y0) > 1) window.scrollTo(0, y0); }
+  if (v === 'list' && state.league === 'f1' && typeof F1 !== 'undefined' && F1._y0 != null) { const y0 = F1._y0; F1._y0 = null; try { f1Spacer(); } catch (e) {} if (!window._stAnim && Math.abs(window.scrollY - y0) > 1) window.scrollTo(0, y0); const A = F1._anc; F1._anc = null; const ac = A && document.getElementById(A[0]); if (ac && !window._stAnim) { const d = ac.getBoundingClientRect().top - A[1]; if (Math.abs(d) > 1) window.scrollBy(0, d); } window._yOv = window.scrollY; }
   const bsw = document.getElementById('brsw');
   if (bsw && state.lv) { const lv = state.lv; bsw.scrollLeft = (lv.brPg || 0) * bsw.clientWidth;
     bsw.addEventListener('scroll', () => { const i = Math.round(bsw.scrollLeft / Math.max(1, bsw.clientWidth)); if (i !== lv.brPg) { lv.brPg = i; document.querySelectorAll('[data-brpg]').forEach((b, k) => b.classList.toggle('on', k === i)); } }, { passive: true }); }
@@ -1897,7 +1898,7 @@ function render() {
   addGlossary(v);
   $app.querySelectorAll('img[src*="/teamlogos/"]').forEach(im => { const d = dk(im.getAttribute('src')); if (d !== im.getAttribute('src')) im.setAttribute('src', d); });
   if (tws) document.querySelectorAll('.tw').forEach((x, i) => { if (tws[i]) x.scrollLeft = tws[i]; });
-  window.scrollTo(0, y); if (window._backPend && Math.abs(window.scrollY - (window._backY || 0)) < 2) window._backPend = false;
+  { const yo = window._yOv; window._yOv = null; window.scrollTo(0, yo != null ? yo : y); } if (window._backPend && Math.abs(window.scrollY - (window._backY || 0)) < 2) window._backPend = false;
 }
 const dk = u => String(u || '').replace(/(\/teamlogos\/\w+\/)500\/(?:scoreboard\/)?([\w-]+\.png)/, '$1500-dark/$2');
 const logoImg = src => src ? `<img src="${esc(src)}" alt="" onerror="this.style.visibility='hidden'">` : '<span class="ph"></span>';
@@ -4537,7 +4538,8 @@ const f1TM = y => (F1.team[y || 0] = F1.team[y || 0] || {});
 const f1Comp = (ev, ab) => (ev.competitions || []).find(c => c.type && (c.type.abbreviation === ab || (ab === 'SR' && c.type.abbreviation === 'Sprint')));
 const f1Done = c => !!(c && c.status && c.status.type && c.status.type.completed);
 const f1Pos = (c, aid) => { const x = c && (c.competitors || []).find(z => String(z.id) === String(aid)); return x ? x.order : null; };
-async function f1Season(y) { y = y || f1Year(); if (F1.sb[y]) return F1.sb[y]; const j = await getJson(F1A + 'scoreboard?dates=' + y); const cx = e => /CANCEL/i.test(String((e.status && e.status.type && (e.status.type.name || e.status.type.description)) || '')); /* cancelled GPs disappear (like on formula1.com) → rounds renumber automatically */
+const f1Cx = e => /CANCEL/i.test(String((e.status && e.status.type && (e.status.type.name || e.status.type.description)) || '')); /* cancelled GPs disappear (like on formula1.com) → rounds renumber automatically */
+async function f1Season(y) { y = y || f1Year(); if (F1.sb[y]) return F1.sb[y]; const j = await getJson(F1A + 'scoreboard?dates=' + y), cx = f1Cx; if (+y === f1Year()) F1.lastFull = Date.now();
   const evs = (j.events || []).filter(e => !cx(e)).sort((a, b) => new Date(a.date) - new Date(b.date)); F1.sb[y] = evs; evs.forEach(e => { F1.ev = F1.ev || {}; F1.ev[e.id] = Object.assign(e, { _y: y }); }); return evs; }
 async function f1Stand(y) { y = y || f1Year(); if (F1.st[y]) return F1.st[y]; const j = await getJson(F1S + '?season=' + y); if (Array.isArray(j.seasons) && j.seasons.length) F1.seasons = j.seasons.map(x => +x.year).filter(Boolean); const ch = j.children || []; const r = { drv: (ch.find(c => /driver/i.test(c.name)) || ch[0] || {}).standings, con: (ch.find(c => /constructor/i.test(c.name)) || ch[1] || {}).standings }; F1.st[y] = r; return r; }
 const f1SV = (en, n) => { const s = (en.stats || []).find(x => x.name === n); return s ? s.value : null; };
@@ -4572,9 +4574,18 @@ const f1Weekend = () => { const now = Date.now(); return Object.values(F1.sb).so
 async function f1Refresh(now, force) {
   const t = Date.now(), iv = f1Weekend() ? 10 * MIN : 30 * MIN; /* live sessions are followed by f1LiveTick (small scoreboard) */ if (!force) { if (!now && t - (F1.lastRef || 0) < iv) return; if (now && t - (F1.lastRef || 0) < MIN) return; } F1.lastRef = t;
   let changed = false;
-  await Promise.all(Object.keys(F1.sb).filter(y => +y >= f1Year() - 1).map(async y => { try { const j = await getJson(F1A + 'scoreboard?dates=' + y, true), evs = (j.events || []).slice().sort((a, b) => new Date(a.date) - new Date(b.date));
+  /* normally only the current GP (small scoreboard, ~30 kB); the whole season (~800 kB) only on pull-to-refresh or every 6 h */
+  const fullIv = f1Weekend() ? 6 * 36e5 : 24 * 36e5;
+  if (!force && t - (F1.lastFull || 0) < fullIv && Object.keys(F1.sb).length) {
+    /* nothing can have changed unless a session has started and is not final yet → don't ask at all */
+    const pend = Object.values(F1.ev || {}).some(e => (e.competitions || []).some(c => { const st = c.status && c.status.type || {}, d = new Date(c.date).getTime(); return d < t && t - d < 2 * 864e5 && !st.completed && st.state !== 'post'; }));
+    if (!pend) return;
+    try { const j = await netJson(F1A + 'scoreboard', true); (j.events || []).forEach(ne => { const e = F1.ev[ne.id]; if (!e || f1Cx(ne)) return; const s0 = f1Sig([e]); (ne.competitions || []).forEach(nc => { const c = (e.competitions || []).find(x => String(x.id) === String(nc.id)); if (!c) return; if (nc.competitors) c.competitors = nc.competitors; if (nc.status) c.status = nc.status; });
+      if (f1Sig([e]) !== s0) { changed = true; delete F1.agg[e._y]; delete F1.st[e._y]; F1.rdv = {}; F1.rdp = {}; F1.rd = {}; } }); } catch (e) {}
+  } else { F1.lastFull = t;
+  await Promise.all(Object.keys(F1.sb).filter(y => +y >= f1Year() - 1).map(async y => { try { const j = await getJson(F1A + 'scoreboard?dates=' + y, true), evs = (j.events || []).filter(e => !f1Cx(e)).sort((a, b) => new Date(a.date) - new Date(b.date));
     if (f1Sig(evs) === f1Sig(F1.sb[y])) return; changed = true; F1.sb[y] = evs; evs.forEach(e => { F1.ev[e.id] = Object.assign(e, { _y: +y }); });
-    delete F1.agg[y]; delete F1.st[y]; if (F1.tmY) delete F1.tmY[y]; F1.rdv = {}; F1.rdp = {}; F1.rd = {}; if (+y === f1Year()) F1.curY = 0; } catch (e) {} }));
+    delete F1.agg[y]; delete F1.st[y]; if (F1.tmY) delete F1.tmY[y]; F1.rdv = {}; F1.rdp = {}; F1.rd = {}; if (+y === f1Year()) F1.curY = 0; } catch (e) {} })); }
   if (!changed) return; await f1ResolveY().catch(() => {});
   const v = topView(); if (v === 'list' && state.league === 'f1') { F1.scrolled = F1.selId === F1.curId ? 0 : 1; render(); } else if (v === 'lv' && /^f1/.test(state.lv.kind)) { render(); f1Load(state.lv); }
 }
@@ -4643,10 +4654,11 @@ function f1HistHTML() { const sy = f1ShowY(), I = F1.idx && F1.idx.ready ? F1.id
 /* race weekend under way: from the start of the first session (FP1) until the race is over */
 const f1WkOn = e => { const ts = (e.competitions || []).map(c => new Date(c.date).getTime()).filter(t => t > 0); return !!ts.length && Date.now() >= Math.min(...ts); };
 /* a session running right now (ESPN says so, or by the clock: start → start + its usual length) */
-const f1SesLive = e => { const now = Date.now(); return (e.competitions || []).some(c => { const st = c.status && c.status.type || {}; if (st.completed || st.state === 'post') return false; if (st.state === 'in') return true;
+const f1SesLive = e => { const now = Date.now(); return (e.competitions || []).some(c => { if (f1Chq(c)) return false; const st = c.status && c.status.type || {}; if (st.completed || st.state === 'post') return false; if (st.state === 'in') return true;
   const t = new Date(c.date).getTime(), ab = String((c.type && c.type.abbreviation) || ''), dur = /race/i.test(ab) ? 135 : /^(SS|SQ)/i.test(ab) ? 50 : 65; return t > 0 && now >= t && now < t + dur * 6e4; }); };
 /* one session (competition) running right now; null otherwise */
-const f1CompLive = c => { if (!c) return false; const st = c.status && c.status.type || {}; if (st.completed || st.state === 'post') return false; if (st.state === 'in') return true;
+const f1Chq = c => /cheq|check|finish/i.test(String((c && c._flag) || ''));
+const f1CompLive = c => { if (!c) return false; const st = c.status && c.status.type || {}; if (st.completed || st.state === 'post') return false; if (st.state === 'in') return Date.now() < new Date(c.date).getTime() + 4 * 36e5; /* ESPN sometimes keeps "in progress" long after the end */
   const t = new Date(c.date).getTime(), ab = String((c.type && c.type.abbreviation) || ''), dur = /race/i.test(ab) ? 135 : /^(SS|SQ)/i.test(ab) ? 50 : 65, now = Date.now(); return t > 0 && now >= t && now < t + dur * 6e4; };
 const f1LiveComp = e => (e.competitions || []).find(f1CompLive) || null;
 const F1AB = { FP1: 'Practice 1', FP2: 'Practice 2', FP3: 'Practice 3', SS: 'Sprint Q', SQ: 'Sprint Q', SR: 'Sprint', Sprint: 'Sprint', Qual: 'Qualifying', Race: 'Race' };
@@ -4655,7 +4667,7 @@ const f1FlagC = f => { f = String(f || '').toLowerCase(); return !f ? '' : /gree
 const f1FlagT = f => { f = String(f || '').trim(); if (!f) return ''; const t = f.toLowerCase().replace(/_/g, ' ').replace(/\b\w/g, x => x.toUpperCase()); return /flag|safety|car/i.test(t) ? t : t + ' flag'; };
 const f1Top3 = c => [1, 2, 3].map(o => (c.competitors || []).find(x => x.order === o)).filter(Boolean).map(x => { const n = (x.athlete && (x.athlete.fullName || x.athlete.displayName)) || ''; return `<span class="f1t3n">${x.order}</span> ${esc(n.split(' ').slice(1).join(' ') || n)}`; }).join(' · ');
 /* card lines while a session is running: "FP3 · Lap 10 ●(flag)" and the current top 3 */
-const f1LiveBig = c => `<span class="rdl">${esc(F1AB[c.type && c.type.abbreviation] || (c.type && c.type.abbreviation) || 'Live')}</span>${f1Lap(c) ? ' · Lap ' + f1Lap(c) : ''}${f1FlagC(c._flag) ? `<i class="f1fl" style="background:${f1FlagC(c._flag)}"></i>` : ''}`;
+const f1LiveBig = c => `<span class="rdl">${esc(F1AB[c.type && c.type.abbreviation] || (c.type && c.type.abbreviation) || 'Live')}</span>${f1Lap(c) ? ' · Lap ' + f1Lap(c) : ''}${f1Chq(c) ? '<i class="f1fl chq"></i>' : f1FlagC(c._flag) ? `<i class="f1fl" style="background:${f1FlagC(c._flag)}"></i>` : ''}`;
 /* between sessions of a race weekend: the next session with a countdown (last hour in red) and its day/time */
 const F1NX = { FP1: 'Practice 1', FP2: 'Practice 2', FP3: 'Practice 3', SS: 'Sprint Q', SQ: 'Sprint Q', SR: 'Sprint', Sprint: 'Sprint', Qual: 'Qualifying', Race: 'Race' };
 function f1WkLines(e) { const now = Date.now(), nx = (e.competitions || []).filter(c => { const st = c.status && c.status.type || {}; return !st.completed && st.state !== 'in' && new Date(c.date).getTime() > now; }).sort((a, b) => new Date(a.date) - new Date(b.date))[0]; if (!nx) return null;
@@ -4686,7 +4698,9 @@ setInterval(() => { f1LiveTick().catch(() => {}); }, 5000);
 document.addEventListener('visibilitychange', () => { if (!document.hidden) { F1.lv.t = 0; f1LiveTick().catch(() => {}); } });
 const f1LSig = () => { const evs = f1ListEvs(); return (evs ? f1Sig(evs) + evs.filter(f1WkOn).map(e => e.id).join() : 'x') + '|' + (F1.listY || '') + '|' + (F1.listY || f1ShowY() || '') + '|' + (F1.err || '') + '|' + (F1.hOpen ? 1 : 0); };
 function renderF1List() {
-  F1._y0 = F1.scrolled ? window.scrollY : null;
+  F1._y0 = F1.scrolled ? window.scrollY : null; F1._anc = null;
+  /* keep the card that is at the top where it is, even if cards above it change */
+  if (F1._y0 != null) { const he = $app.querySelector(':scope > .stkw, :scope > header'), hb = he ? he.getBoundingClientRect().bottom : 0, c0 = [...$app.querySelectorAll('.f1list > .f1card[data-f1race]')].find(c => c.getBoundingClientRect().bottom > hb + 4); if (c0) F1._anc = [c0.id, c0.getBoundingClientRect().top]; }
   const evs = f1ListEvs();
   let body = '', strip = '';
   if (!evs) body = F1.listY ? f1HistHTML() + msg('Loading…') : msg(F1.err || 'Loading…');
@@ -4705,7 +4719,7 @@ function renderF1List() {
   $app.innerHTML = `
     ${lyHead({ strip, f1: 1, quick: [['data-f1v="std"', 'Table', LY_TROPHY], ['data-f1v="stats"', 'Stats', LY_CHART]] })}
     <main class="f1list" data-sig="${esc(f1LSig())}">${body}</main>`;
-  const s = document.getElementById('strip'); if (s) { if (prev != null) s.scrollLeft = prev; else f1CenterStrip(false); }
+  const s = document.getElementById('strip'); if (s) f1CenterStrip(false); /* always centred on the chosen GP (a kept scroll position could point elsewhere after the list changed) */
   f1Fit();
   if (evs && evs.length && !F1.scrolled) { F1.scrolled = 1; requestAnimationFrame(() => f1ScrollTo(F1.curId, false)); }
 }
@@ -4716,7 +4730,8 @@ function f1LvAlign() { const cv = (f1LvAlign.c = f1LvAlign.c || document.createE
     const tC = base(sh) - asc(sh) / 2, sC = base(sp) - asc(sp) / 2, dy = Math.round((tC - sC) * 2) / 2; sp.style.top = dy + 'px';
     if (d) { const r = d.getBoundingClientRect(), dc = (r.top + r.bottom) / 2; d.style.top = Math.round((tC - dc) * 2) / 2 + 'px'; } });
   /* card: flag dot centred on the capitals of "Qualifying · Lap 3" */
-  $app.querySelectorAll('.f1big .f1fl').forEach(d => { const bg = d.parentElement; d.style.top = '0px'; const cC = base(bg) - asc(bg) / 2, r = d.getBoundingClientRect(); d.style.top = Math.round((cC - (r.top + r.bottom) / 2) * 2) / 2 + 'px'; }); }
+  const capc = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--capc')) || .405;
+  $app.querySelectorAll('.f1big .f1fl').forEach(d => { const bg = d.parentElement; d.style.top = '0px'; const cC = base(bg) - capc * parseFloat(getComputedStyle(bg).fontSize), /* app fonts: the tuned cap-centre (--capc) */ r = d.getBoundingClientRect(); d.style.top = Math.round((cC - (r.top + r.bottom) / 2) * 2) / 2 + 'px'; }); }
 function f1Fit() { requestAnimationFrame(() => { try { f1LvAlign(); } catch (e) {} { const fl = $app.querySelector('.f1list .f1tt .f1fl'); if (fl) { const r = document.createRange(); r.selectNodeContents(fl); const g = r.getBoundingClientRect(), b = fl.getBoundingClientRect(); if (g.width) $app.querySelector('.f1list').style.setProperty('--fo', Math.max(0, g.left - b.left).toFixed(1) + 'px'); } } $app.querySelectorAll('.f1nm,.f1gp span,.f1rh .lvt').forEach(el => { if (el.scrollWidth > el.clientWidth + 1 && /Grand Prix/.test(el.textContent)) el.textContent = el.textContent.replace(/Grand Prix/, 'GP'); });
   $app.querySelectorAll('.f1dn b').forEach(el => { if (el.scrollWidth > el.clientWidth + 1) { const w = el.textContent.trim().split(/\s+/); if (w.length > 1 && !/\.$/.test(w[0])) el.textContent = w[0][0] + '. ' + w.slice(1).join(' '); } });
   $app.querySelectorAll('.f1list .f1card:not(.f1hist)').forEach(f1NameFit); f1UpAlign(); try { f1Spacer(); } catch (e) {} }); }
@@ -4776,7 +4791,7 @@ function f1ScrollTo(id, smooth) {
   requestAnimationFrame(step);
 }
 async function loadF1List() {
-  if (forceNow() && Object.keys(F1.sb).length) return f1Refresh(true, true);
+  if (forceNow() && Object.keys(F1.sb).length) { if (topView() === 'list' && state.league === 'f1' && !$app.querySelector('main.f1list')) render(); return f1Refresh(true, true); } /* switched to F1 right after a pull-to-refresh: show it at once, refresh behind */
   const Y = f1Year();
   /* the list on screen already shows exactly this → keep it as it is (no re-render, no jump) */
   const rr = () => { if (topView() !== 'list' || state.league !== 'f1') return; const m = $app.querySelector('main.f1list'); if (m && m.dataset.sig === f1LSig() && m.querySelector('.f1card[data-f1race]')) return; render(); };
@@ -4898,7 +4913,7 @@ function f1RaceHTML(v) {
   const isQ = grp[0] === 'q' || grp[0] === 'ss'; if (isQ) { v.q = v.q || 'T'; const p = grp[0] === 'ss' ? 'SQ' : 'Q'; sub = `<div class="seg pseg">${[['T', 'Total'], ['1', p + '1'], ['2', p + '2'], ['3', p + '3']].map(([k, l]) => `<button data-f1q="${k}" class="${v.q === k ? 'on' : ''}">${l}</button>`).join('')}</div>`; }
   const c = f1Comp(ev, ab), race = ab === 'Race' || ab === 'SR' || grp[3] === 'sprint', mode = grp[3] || (race ? (ab === 'SR' ? 'sprint' : 'race') : isQ ? 'q' + v.q : 'fp');
   const cd = c && c.date ? new Date(c.date) : null, when = cd && !isNaN(cd) ? `${DAYS[cd.getDay()]} ${cd.getDate()}.${cd.getMonth() + 1}. - ${String(cd.getHours()).padStart(2, '0')}:${String(cd.getMinutes()).padStart(2, '0')}` : '';
-  const lvh = f1CompLive(c) ? `<span class="f1when f1lvh"><i class="f1ld"></i>${f1Lap(c) ? 'Lap ' + f1Lap(c) : 'Live'}${f1FlagT(c._flag) ? ` · <span class="flg" style="color:${f1FlagC(c._flag)}">${esc(f1FlagT(c._flag))}</span>` : ''}</span>` : '';
+  const lvh = f1CompLive(c) ? (f1Chq(c) ? `<span class="f1when f1lvh"><i class="f1ld chq"></i>${f1Lap(c) ? 'Lap ' + f1Lap(c) + ' · ' : ''}Chequered flag</span>` : `<span class="f1when f1lvh"><i class="f1ld"></i>${f1Lap(c) ? 'Lap ' + f1Lap(c) : 'Live'}${f1FlagT(c._flag) ? ` · <span class="flg" style="color:${f1FlagC(c._flag)}">${esc(f1FlagT(c._flag))}</span>` : ''}</span>`) : '';
   const whenT = grp[0] === 'g' ? '' : c && f1Done(c) ? 'Finished' : when;
   let body = `<div class="sec f1sh">${esc(grp[0] === 'fp' ? (F1SES[ab] || ab) : grp[1])}${lvh || (whenT ? `<span class="f1when">${esc(whenT)}</span>` : '')}</div>` + sub;
   if (!c) return { ysel, top, body: body + msg('No results availible') };
