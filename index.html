@@ -1437,6 +1437,9 @@ document.addEventListener('touchstart', e => { const t = e.target && e.target.cl
     else if (d.topen && LEAGUES[d.tl]) { const b = API + LEAGUES[d.tl].path + '/teams/' + d.topen; pre(b); pre(b + '/roster'); pre(b + '/schedule'); }
   } catch (x) {} }, { passive: true, capture: true });
 const stOf = e => (e && e.status && e.status.type && e.status.type.state) || (e && e.competitions && e.competitions[0] && e.competitions[0].status && e.competitions[0].status.type && e.competitions[0].status.type.state) || '';
+/* F1 driver stats with no time at all yet (live / just finished) → re-read soon instead of keeping them for days */
+const F1TK = /^(fastestLap|totalTime|behindTime|qual[123]TimeMS)$/;
+function f1StNoTime(j) { try { const cs = (j && j.splits && j.splits.categories) || []; return !cs.some(c => (c.stats || []).some(x => F1TK.test(x.name) && +x.value > 0)); } catch (e) { return false; } }
 function ttlFor(u, j) {
   const sm = u.match(/[?&]season=(\d{4})/) || u.match(/\/seasons\/(\d{4})\//); if (sm && +sm[1] < new Date().getFullYear() - 1) return 30 * 24 * HR;
   if (/\/summary\?event=/.test(u)) { const c = j && j.header && j.header.competitions && j.header.competitions[0], t = c && c.status && c.status.type; return t && t.completed ? 7 * 24 * HR : t && t.state === 'pre' ? 2 * MIN : 15e3; }
@@ -1445,6 +1448,7 @@ function ttlFor(u, j) {
   { const fm = u.match(/racing\/f1\/scoreboard\?dates=(\d{4})/); if (fm && +fm[1] < new Date().getFullYear() - 1) return 30 * 24 * HR; }
   if (/racing\/leagues\/f1\/circuits/.test(u)) return /\.(png|svg|jpe?g)/i.test(JSON.stringify(j || {})) ? 30 * 24 * HR : 12 * HR;
   if (/racing\/leagues\/f1\/events\/\d+\/competitions\/\d+\/competitors\?/.test(u)) return 10 * MIN;
+  if (/racing\/leagues\/f1\/events\/\d+\/competitions\/\d+\/competitors\/\d+\/statistics/.test(u) && f1StNoTime(j)) return 5 * MIN;
   if (/racing\/leagues\/f1\/events\/\d+\/competitions\/\d+\/competitors/.test(u)) return 2 * 24 * HR;
   if (/racing\/f1\/standings/.test(u)) return 5 * MIN;
   if (/standings/.test(u)) return 15 * MIN;
@@ -1463,7 +1467,8 @@ async function getJson(url, fresh) {
   const force = forceNow();
   let rec = JC.get(url);
   if (!rec && !force) { rec = await IDB.get(url); if (rec) JC.set(url, rec); }
-  const age = rec ? Date.now() - rec.t : 1e15;
+  let age = rec ? Date.now() - rec.t : 1e15;
+  if (rec && age > 5 * MIN && rec.ttl > 5 * MIN && /racing\/leagues\/f1\/.*\/competitors\/\d+\/statistics/.test(url) && f1StNoTime(rec.d)) { rec.ttl = 0; }
   if (rec && !force && age < rec.ttl) return rec.d;
   if (rec && !force && rec.ttl >= 30 * MIN && age < rec.ttl * 4) { if (!JIN.has(url)) { const p = netJson(url).catch(() => null).finally(() => JIN.delete(url)); JIN.set(url, p); } return rec.d; }
   if (JIN.has(url) && !force) { const r = await JIN.get(url); if (r) return r; }
@@ -4957,7 +4962,8 @@ function f1RaceHTML(v) {
   const c = f1Comp(ev, ab), race = ab === 'Race' || ab === 'SR' || grp[3] === 'sprint', mode = grp[3] || (race ? (ab === 'SR' ? 'sprint' : 'race') : isQ ? 'q' + v.q : 'fp');
   const cd = c && c.date ? new Date(c.date) : null, when = cd && !isNaN(cd) ? `${DAYS[cd.getDay()]} ${cd.getDate()}.${cd.getMonth() + 1}. - ${String(cd.getHours()).padStart(2, '0')}:${String(cd.getMinutes()).padStart(2, '0')}` : '';
   const lvh = f1CompLive(c) ? `<span class="f1when f1lvh"><i class="f1ld"></i>${f1Lap(c) ? 'Lap ' + f1Lap(c) : 'Live'}${f1FlagT(c._flag) ? ` · <span class="flg" style="color:${f1FlagC(c._flag)}">${esc(f1FlagT(c._flag))}</span>` : ''}</span>` : '';
-  let body = `<div class="sec f1sh">${esc(grp[0] === 'fp' ? (F1SES[ab] || ab) : grp[1])}${lvh || (when ? `<span class="f1when">${esc(when)}</span>` : '')}</div>` + sub;
+  const whenT = c && f1Done(c) ? 'Finished' : when;
+  let body = `<div class="sec f1sh">${esc(grp[0] === 'fp' ? (F1SES[ab] || ab) : grp[1])}${lvh || (whenT ? `<span class="f1when">${esc(whenT)}</span>` : '')}</div>` + sub;
   if (!c) return { ysel, top, body: body + msg('No results availible') };
   const need0 = (cc, st) => { const k = cc.id + (st ? 's' : ''); F1.rdv = F1.rdv || {}; F1.rdp = F1.rdp || {}; if (F1.rdv[k] || F1.rdp[k]) return F1.rdv[k] || null; F1.rdp[k] = 1; f1Detail(ev.id, cc, st).then(rows => { F1.rdv[k] = rows; if (state.lv === v) render(); }).catch(() => { F1.rdp[k] = 0; }); return null; };
   if (grp[0] === 'g') { /* official grid (startOrder, incl. grid penalties); falls back to the qualifying order */
@@ -4973,6 +4979,9 @@ function f1RaceHTML(v) {
       return { ysel, top, body: body + `<div class="f1grid">Starting grid (sprint qualifying order)</div>` + f1Table(f1Base(qc), det, 'grid', ey) }; }
     return { ysel, top, body: body + msg('No results availible') }; }
   const det = need0(c, race), base = (c.competitors || []).length ? f1Base(c) : (det || []).map(r => ({ id: r.id, order: r.order, name: '', team: r.team }));
+  /* finished in the last hours but ESPN has no times yet → look again every 2 minutes while this is open */
+  if (det && det.length && Date.now() - new Date(c.date).getTime() < 12 * 36e5 && !det.some(r => Object.keys(r.st || {}).some(n => F1TK.test(n) && r.st[n] && r.st[n].v > 0))) { const k = c.id + (race ? 's' : ''); F1.rck = F1.rck || {};
+    if (!F1.rck[k]) F1.rck[k] = setTimeout(() => { F1.rck[k] = 0; if (state.lv !== v || topView() !== 'lv') return; delete F1.rd[k]; F1.rdp[k] = 0; F1.rdp[k] = 1; f1Detail(ev.id, c, race, true).then(rows => { F1.rdv[k] = rows; F1.rdp[k] = 0; if (state.lv === v) render(); }).catch(() => { F1.rdp[k] = 0; }); }, 120e3); }
   if (!base.length) return { ysel, top, body: body + msg('No results availible') };
   return { ysel, top, body: body + f1Table(base, det, mode, ey) };
 }
