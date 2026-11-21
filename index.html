@@ -17,6 +17,7 @@
 <link rel="preconnect" href="https://sports.core.api.espn.com" crossorigin>
 <link rel="preconnect" href="https://a.espncdn.com">
 <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@100..125,600..800&family=Barlow+Condensed:wght@500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
 <title>Scores</title>
 <style>
@@ -40,7 +41,7 @@ html.fbar .gl2 .glr b,html.fbar .sch .rs b,html.fbar .sch .sc2 b,html.fbar .sch 
 html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
 html,body,button,input,td,th{font-variant-numeric:tabular-nums lining-nums}
 /* Barlow: cislice maji stejnou sirku, ale kerning zuzuje dvojici 11 -> vypnout u cisel */
-td,th,.pill,.dy,.row .sc,.hero .s,.hero .m .dt1,.lv,.lvt,.cv,.ld .dash,.l5r .rs2,.l5r .ro,.sch,.ldr .lv2,.dsc b,.res-row,.lgt{font-kerning:none}
+td,th,.dy,.row .sc,.hero .s,.lv,.lvt,.cv,.ld .dash,.l5r .rs2,.l5r .ro,.sch,.ldr .lv2,.dsc b,.res-row,.lgt{font-kerning:none}
 html,body{overflow-x:clip;max-width:100%;overscroll-behavior-x:none}
 .pane{overflow-x:clip}
 main,header{max-width:100vw}
@@ -52,20 +53,20 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer;paddin
 header{padding:calc(env(safe-area-inset-top) + 38px) 16px 6px}
 header.d{padding:calc(env(safe-area-inset-top) + 30px) 12px 7px}
 .tabs{display:flex;gap:8px;align-items:center}
-.pill{background:var(--card);border-radius:12px;padding:7px 15px;font-family:var(--num);font-weight:700;font-size:19px;letter-spacing:.5px;line-height:1.2}
-.pill.on{background:#fff;color:#000}
-.pill.star{padding:7px 12px;display:flex;align-items:center}
-.pill.star svg{width:21px;height:21px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linejoin:round}
-.pill.star.on svg{fill:currentColor}
-.pill.cmpb svg{fill:none !important;stroke-linecap:round}
+
+
+
+
+
+
 .fstar{flex:none;width:44px;height:44px;display:flex;align-items:center;justify-content:center;border-radius:12px}
 .fstar svg{width:26px;height:26px;fill:none;stroke:var(--mut);stroke-width:2;stroke-linejoin:round}
 .fstar.on svg{fill:#ffd60a;stroke:#ffd60a}
 .row .nm.fv{color:#ffd60a}
 .row.lose .nm.fv{color:#a88a12}
 .rcx{background:none;border:0;color:var(--mut);font-size:13px;font-weight:600;float:right;margin-top:-2px;font-family:inherit}
-.qb{display:flex;gap:8px;margin:10px 0 0}
-.qb button{flex:1;background:var(--card);border-radius:12px;padding:9px 0;font-weight:700;font-size:14px;color:#fff;border:0;font-family:inherit}
+
+
 .fstar:active{opacity:.6}
 .card .top{display:flex;justify-content:space-between}
 .card .top .lgt{font-family:var(--num);font-weight:700;letter-spacing:.5px;font-size:13px}
@@ -111,7 +112,7 @@ header.d + main{padding-top:0}
 .msg.ld{animation:ldin .25s ease}
 @keyframes ldin{from{opacity:0}to{opacity:1}}
 .msg button{margin-top:12px;background:var(--card);padding:9px 16px;border-radius:12px;color:#fff}
-.foot{color:var(--mut);font-size:12px;text-align:center;margin-top:20px;padding-bottom:30px}
+
 /* detail zápasu */
 .hero{background:var(--card);border-radius:22px;padding:16px 0;display:grid;grid-template-columns:repeat(5,1fr);align-items:center;justify-items:center;margin:0 4px}
 .hero.hw{padding-top:10px}
@@ -145,7 +146,7 @@ header.d + main{padding-top:0}
 .hero.hu.hw > .wk.ok{visibility:visible}
 .hero .m span{color:#fff}
 .hero .m.pre{grid-column:2 / span 3}
-.hero .m .dt1{font-family:var(--num);font-weight:700;font-size:22px;letter-spacing:.3px;white-space:nowrap}
+
 .dtabs{display:flex;gap:21px;border-bottom:1px solid #3a3a3c;margin:4px -16px 0;padding:0 20px;overflow:hidden;touch-action:pan-y;overscroll-behavior:none}
 .dtabs::-webkit-scrollbar{display:none}
 .dtabs button{flex:none;padding:12px 0 13px;font-weight:600;font-size:16px;letter-spacing:1px;color:var(--mut);border-bottom:3px solid transparent;margin-bottom:-1px;white-space:nowrap}
@@ -169,7 +170,7 @@ header.d + main{padding-top:0}
 .pv{margin-bottom:6px}
 .pv .sec{margin:22px 0 8px;font-size:15px}
 .pane > .pv:first-child .sec{margin-top:6px}
-.pane.pvp{padding-top:14px}
+
 .lhd{display:flex;align-items:center;gap:8px;margin:2px 0 10px;font-family:var(--num);font-weight:700;font-size:19px;letter-spacing:.5px}
 .lhd img{width:26px;height:26px;object-fit:contain}
 .lc{padding:10px 0;border-top:1px solid #2c2c2e}
@@ -208,8 +209,8 @@ header.d + main{padding-top:0}
 .tst th img{width:24px;height:24px;object-fit:contain;vertical-align:middle}
 .tst th:not(.n),.tst td:not(.n){min-width:58px;text-align:right}
 .tst td.rk{color:var(--mut);font-size:13px;min-width:44px}
-.ld.ldx{justify-content:center;align-items:center;min-height:56px}
-.ld.ldx .dash{padding-top:0}
+
+
 .ld .dash{font-family:var(--num);font-weight:700;font-size:21px;color:var(--mut);padding-top:16px}
 .tt{width:100%;border-collapse:collapse;white-space:normal}
 .tt th{padding:10px 6px;text-align:right;border-bottom:1px solid #3a3a3c}
@@ -320,7 +321,7 @@ details[open] summary::after{transform:translateY(2px) rotate(-135deg)}
 .cmpcs{display:flex;justify-content:space-between;align-items:center}
 .cmpcs span{font-size:12.5px;font-weight:500;text-transform:none;letter-spacing:0;width:30%}
 .cmpcs span:last-child{text-align:right}
-.cmpn{display:flex;justify-content:space-between;font-size:12.5px;color:var(--mut);margin:0 4px}
+
 .cmpt td{padding:9px 4px;border-top:1px solid #2c2c2e;font-size:15px}
 .cmpt td.c0{text-align:left;font-family:var(--num);font-weight:700;font-size:19px;color:var(--mut);width:30%}
 .cmpt td.c1{text-align:right;font-family:var(--num);font-weight:700;font-size:19px;color:var(--mut);width:30%}
@@ -328,17 +329,17 @@ details[open] summary::after{transform:translateY(2px) rotate(-135deg)}
 .cmpt td.mut{font-size:13px;font-family:inherit;font-weight:500}
 .cmpt td.cl{text-align:center;color:var(--mut);font-size:13px;font-weight:600}
 .sseg4 button{font-size:13px;padding:3px 2px}
-.brn{font-size:12.5px;color:var(--mut);margin:2px 0 6px}
-.brr .sec{margin:18px 0 8px}
+
+
 .brsw{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;scrollbar-width:none;margin:0 -16px;overscroll-behavior-x:contain}
 .brsw::-webkit-scrollbar{display:none}
 .brp{flex:0 0 100%;box-sizing:border-box;padding:0 16px;scroll-snap-align:start}
 .brp .sec{margin:12px 0 8px;text-align:center;position:relative}
 .brpn{position:absolute;right:0;top:1px;font-size:11px;color:var(--mut);font-weight:600;letter-spacing:0}
-.brdots{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;margin:10px 0 0}
-.brdots::-webkit-scrollbar{display:none}
-.brdots button{flex:none;padding:5px 10px;border-radius:12px;background:#2c2c2e;font-size:12px;font-weight:600;color:var(--mut)}
-.brdots button.on{background:#fff;color:#000}
+
+
+
+
 .brpair{margin-bottom:14px}
 .brpair .brm{margin-bottom:6px}
 #brpop{position:fixed;inset:0;z-index:150;background:rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center;padding:16px}
@@ -355,14 +356,14 @@ details[open] summary::after{transform:translateY(2px) rotate(-135deg)}
 .bpt b{font-family:var(--num);font-size:18px;min-width:20px;text-align:right}
 .bpt.w{color:#fff}.bpt.w span{font-weight:700}
 .bpo{width:44px;flex:none;text-align:right;font-size:12px;color:var(--mut)}
-.brgs{display:flex;flex-wrap:wrap;gap:4px;margin-top:6px;justify-content:center}
-.brgc{font-family:var(--num);font-size:12px;background:#3a3a3c;border-radius:6px;padding:2px 5px;color:var(--mut);cursor:pointer}
-.brgc small{font-family:-apple-system,sans-serif;font-size:9px;margin-right:3px;opacity:.7}
-.brgc.w{color:#fff}
-.brgc.l{color:#8e8e93}
-.brg{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+
+
+
+
+
+
 .brc{font-size:11px;font-weight:700;color:var(--mut);text-transform:uppercase;letter-spacing:.5px;margin:0 0 6px 2px}
-.brfin{max-width:60%;margin:0 auto}
+
 .brm{background:#2c2c2e;border-radius:12px;padding:7px 12px;margin-bottom:8px;cursor:pointer}
 .brm:active{opacity:.6}
 .brt{display:flex;align-items:center;gap:6px;padding:3px 0}
@@ -371,7 +372,7 @@ details[open] summary::after{transform:translateY(2px) rotate(-135deg)}
 .brt b{font-size:15px;font-weight:500;flex:1;color:#c7c7cc;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .brt b small{color:var(--mut);font-weight:400}
 .brt.win b{color:#fff;font-weight:700}
-.brt .brs{width:20px;font-size:11px;color:var(--mut);text-align:right;flex:none}
+
 .brt .brv{font-family:var(--num);font-weight:700;font-size:16px;min-width:18px;text-align:right}
 .brt.lose b,.brt.lose .brv{color:var(--mut)}
 .brt.tbd b{color:var(--mut);font-weight:600}
@@ -462,7 +463,7 @@ body{min-height:100vh}
 .artbox h3{color:var(--mut);font-family:var(--num);font-weight:700;font-size:18px;margin:16px 0 4px}
 .artbox p{font-family:var(--num);font-weight:500;font-size:18px;line-height:1.4;color:var(--mut);margin:10px 0}
 .artby{font-family:var(--num);font-weight:600;font-size:14px;color:var(--mut)}
-.artimg{width:100%;border-radius:12px;margin:26px 0 8px;display:block}
+
 .artx{position:relative;width:36px;height:36px;border-radius:50%;background:#3a3a3c;font-size:22px;z-index:2;margin:-4px -4px 0 0}
 .hl{color:#fff;font-weight:700}
 .glsec{margin:10px 0 18px}
@@ -570,11 +571,11 @@ tr.zb > td{background:#26262a !important}
 .ssr{font-size:12.5px;color:var(--mut)}
 .ssg > div[data-sstat]{cursor:pointer}
 .ssg > div[data-sstat]:active{opacity:.6}
-.glbt{font-family:var(--wide);font-stretch:112%;font-weight:800;font-size:15px;letter-spacing:.5px;text-transform:uppercase;color:#fff;white-space:nowrap}
-.glt th.gh{text-align:left}
-.glt thead tr:first-child th{vertical-align:baseline !important}
-.glt th.ovt{overflow:visible;z-index:3}
-.glt tr.mb td{border-top:2px solid #48484a}
+
+
+
+
+
 .ysel{position:relative;margin:2px 0 6px}
 .ybtn{display:inline-flex;align-items:center;gap:8px;background:#2c2c2e;border-radius:12px;padding:0 14px;height:30.8px;font-weight:600;font-size:15px}
 .ylist{position:absolute;z-index:20;top:calc(100% + 6px);left:0;background:#2c2c2e;border-radius:12px;max-height:300px;overflow-y:auto;min-width:140px;box-shadow:0 10px 30px rgba(0,0,0,.5)}
@@ -589,8 +590,8 @@ tr.zb > td{background:#26262a !important}
 .pname{font-family:var(--num);font-weight:700;font-size:28px;line-height:1.05}
 .psub{color:rgba(255,255,255,.6);font-size:15.5px;margin-top:4px;font-weight:500}
 .grow{flex:1}
-.icon{width:38px;height:38px;border-radius:12px;background:var(--card);display:flex;align-items:center;justify-content:center}
-.icon svg{width:19px;height:19px;stroke:#fff;fill:none;stroke-width:2.2;stroke-linecap:round}
+
+
 .sinp{flex:1;min-width:0;height:40px;background:var(--card);border:0;border-radius:12px;padding:0 14px;color:#fff;font-size:16px;font-family:inherit;outline:none;-webkit-appearance:none;appearance:none}
 .sinp::placeholder{color:var(--mut)}
 .sinp::-webkit-search-cancel-button{-webkit-appearance:none}
@@ -603,7 +604,7 @@ tr.zb > td{background:#26262a !important}
 .res-row .rs{color:var(--mut);font-size:13px}
 .phero .tl{width:64px;height:64px;object-fit:contain;flex:none}
 .hero .t{cursor:pointer}
-.jn{display:inline-block;width:24px;color:var(--mut);font-family:-apple-system,sans-serif;font-size:11px;font-weight:600}
+
 .pane > .blk:first-child{margin-top:6px}
 .sch th.n,.sch td.n{width:auto;min-width:92px}
 .sch td.n{padding-left:14px !important}
@@ -623,7 +624,7 @@ html.fsg .sch col:first-child{width:102px !important}
 .sch .opp b{font-family:var(--num);font-size:17px}
 .sch .rs{text-align:right;white-space:nowrap;padding-right:1px}
 .sch tr[data-game]{cursor:pointer}
-.stt{white-space:normal}
+
 .fx{table-layout:fixed}
 .fx th,.fx td{padding-left:1px;padding-right:1px;overflow:visible}
 .fx th{font-size:11px}
@@ -641,14 +642,14 @@ html.fsg .sch col:first-child{width:102px !important}
 .nfx tr.tot td{font-weight:700;border-top:1px solid #3a3a3c}
 .nfx th.n,.nfx td.n{width:auto}
 .tw{max-width:100%}
-.glt td.rs2{text-align:left;white-space:nowrap}
-.glt td.rs2 .W,.glt td.rs2 .L{font-family:var(--num);font-weight:700;display:inline-block;width:16px}
-.glt td.rs2 b{font-family:var(--num);font-weight:600;font-size:16px}
-.glt thead tr:first-child th{border-bottom:0;padding-bottom:0}
-.glt th.grp{text-align:left;padding-left:8px;color:#fff;font-size:12px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;border-bottom:0;padding-bottom:2px}
-.glt td.n small{margin-left:3px}
-.glt td.n .pn{display:inline-block;width:41px}
-.glt td.n small{display:inline-block;width:15px;text-align:center;margin-left:0 !important}
+
+
+
+
+
+
+
+
 .bio{width:100%;border-collapse:collapse}
 .bio td{text-align:left;padding:6px 0;font-size:15px;vertical-align:top}
 .bio td:first-child{color:var(--mut);text-transform:uppercase;font-size:13px;width:110px;letter-spacing:.3px}
@@ -661,29 +662,29 @@ html.fsg .sch col:first-child{width:102px !important}
 .bh img{width:28px;height:28px;object-fit:contain}
 .bh .bt{font-weight:600;font-size:15px}
 .bh .bs{color:var(--mut);font-size:12.5px}
-.glt td.n .glo{width:20px;height:20px;object-fit:contain;vertical-align:-6px;margin-left:2px}
-.glt td.n{text-overflow:clip !important}
-.glt td.n .pn{font-size:15px}
-.glt td.rs2 b{letter-spacing:-.2px}
-.glt td.n .pn{font-size:15.5px}
-.glt tbody td:nth-child(2),.glt thead tr:last-child th:nth-child(2){position:sticky;left:84px;padding-left:0;background:var(--card);z-index:1}
-.glt td.n,.glt th.n{z-index:2}
-.glt tbody tr{cursor:pointer}
-.glt tbody tr:active td{background:#2a2a2e}
-.glt td.rs2 b{font-family:inherit;font-weight:400;font-size:15px}
-.glt td.rs2 .W,.glt td.rs2 .L,.glt td.rs2 .T{font-family:inherit;font-weight:700;font-size:15px;width:17px;display:inline-block;text-align:left}
-.glt td.rs2{padding-left:6px !important;overflow:hidden}
-.glt .gsc{position:relative;display:inline-block}
-.glt .gsc sup{position:absolute;right:-1px;top:-8px;font-size:9px;font-weight:700;line-height:1;color:var(--mut);font-family:-apple-system,sans-serif}
-.glt thead tr:first-child th{height:22px;line-height:14px;padding-top:4px;padding-bottom:4px;box-sizing:border-box;vertical-align:bottom}
-.glt thead tr:last-child th{height:44px;line-height:16px;box-sizing:border-box;vertical-align:middle}
-.glt tbody td{line-height:20px}
-.glt td.n .glo{display:inline-block}
-.glt th.gh{background:var(--card);z-index:3}
-.glt th.grp{overflow:hidden;white-space:nowrap}
-.glt th.n,.glt td.n,.glt tbody td:nth-child(2),.glt thead tr:last-child th:nth-child(2){-webkit-transform:translate3d(0,0,0);transform:translate3d(0,0,0)}
-.glt td.rs2 .T{color:var(--mut)}
-.glt td.rs2 small{font-size:11px;font-weight:400;font-family:inherit;color:inherit}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 td.n .slg{width:20px;height:20px;object-fit:contain;vertical-align:-6px;margin-left:6px}
 .nfx tr.tot td.n{font-family:var(--num)}
 .nfx th.n,.nfx td.n{overflow:hidden;text-overflow:ellipsis}
@@ -708,15 +709,15 @@ td.n .slg{width:20px;height:20px;object-fit:contain;vertical-align:-6px;margin-l
 .lpm{position:fixed;z-index:61;background:#2c2c2e;border-radius:12px;min-width:200px;overflow:hidden;box-shadow:0 10px 30px rgba(0,0,0,.5)}
 .lpm button{display:block;width:100%;text-align:left;padding:14px 16px;font-size:16px;font-weight:600;color:#fff;background:none;border:0;border-bottom:1px solid #3a3a3c;font-family:inherit}
 .lpm button:last-child{border-bottom:0}
-.lpm button[data-fsw],.lpm button[data-lysw],.lpm button[data-bmsw]{display:flex;justify-content:space-between;align-items:center}
-.lpm button[data-fsw]:not(.on),.lpm button[data-lysw]:not(.on),.lpm button[data-bmsw]:not(.on){color:var(--mut)}
+.lpm button[data-fsw],.lpm button[data-bmsw]{display:flex;justify-content:space-between;align-items:center}
+.lpm button[data-fsw]:not(.on),.lpm button[data-bmsw]:not(.on){color:var(--mut)}
 .lpck{color:#fff;font-size:15px}
 .lpm button[data-cc]{border-bottom:6px solid #1c1c1e}
 .lvt{font-family:var(--num);font-weight:700;font-size:26px;margin:4px 4px 12px}
-.lvt.lvy{display:flex;align-items:center;justify-content:space-between;gap:10px}
-.lvt.lvy .ysel{margin:0;font-family:-apple-system,sans-serif;font-size:15px;font-weight:600}
-.lvt.lvy .ylist{left:auto;right:0;z-index:60}
-.lvt.lvy{position:relative;z-index:50}
+
+
+
+
 .stn tr{cursor:pointer}
 .stn tr.cut td{border-bottom:2px solid #e5484d !important}
 .stn td.n .tc{display:flex;align-items:center;gap:6px;min-width:0}
@@ -765,7 +766,7 @@ td.n .slg{width:20px;height:20px;object-fit:contain;vertical-align:-6px;margin-l
 .fx th.n,.fx td.n{width:auto;padding-left:0;position:static}
 .fx .pn{max-width:100%}
 .fx td.n{overflow:hidden;text-overflow:ellipsis}
-.stt td.n{min-width:0}
+
 .mu{color:var(--mut)}
 .per{border-bottom:2px solid #3a3a3c;padding-bottom:0}
 .per > .drv:last-child,.per > .dpl:last-child{border-bottom:0}
@@ -799,7 +800,7 @@ td.n .slg{width:20px;height:20px;object-fit:contain;vertical-align:-6px;margin-l
 .sch .opp b{font-size:16.5px}
 .sch .opp img{width:24px;height:24px;margin:0 6px 0 0 !important}
 .sch td{padding-top:7px;padding-bottom:7px}
-.sch .rs .sf.sfb{margin:0 4px 0 0}
+
 .sch .rs .sf{font-size:10px;margin:0 0 0 4px;width:auto;color:var(--mut);font-family:-apple-system,sans-serif;font-weight:600;vertical-align:2px}
 .sch .opp small{width:32px;margin:0 0 0 -2px}
 .sch .rg.rgw{grid-template-columns:22px 70px 16px;column-gap:3px;margin-right:12px}
@@ -823,17 +824,17 @@ td.n .slg{width:20px;height:20px;object-fit:contain;vertical-align:-6px;margin-l
 .phero.pp .phw .hs{margin-right:0}
 .phw .ptl{position:absolute;right:-8px;bottom:-4px;width:44px;height:44px;object-fit:contain;filter:drop-shadow(0 2px 4px rgba(0,0,0,.55)) drop-shadow(0 0 1px rgba(0,0,0,.6))}
 .gloss .gg .gon{background:#26314a;border-radius:999px;padding:5px 10px;margin:-5px -10px}
-.htabs{gap:7px}
-.htabs .pill{flex:1 1 0;min-width:0;display:flex;align-items:center;justify-content:center;padding:0;height:calc(10px + 25.5px * 1.15);font-size:19px;line-height:1}
-.htabs .icon{height:calc(10px + 25.5px * 1.15);width:calc(10px + 25.5px * 1.15)}
-header:has(> .htabs){padding-top:calc(env(safe-area-inset-top) + 36.7px)}
-.htabs .icon{flex:none}
+
+
+
+
+
 /* optical centring of the top bubbles' text (Barlow sits low, Space Grotesk high) */
-html.fbar .htabs .pill{padding-bottom:.11em}
-html.fsg .htabs .pill{padding-top:1px}
+
+
 html.fbar .dy{padding:3.9px 0 6.1px}
 html.fsg .dy{padding:6px 0 4px}
-.pill.f1{font-style:italic;letter-spacing:0}
+
 #toast{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom) + 30px);transform:translateX(-50%);background:#2c2c2e;color:#fff;padding:10px 16px;border-radius:12px;font-weight:600;font-size:14px;z-index:200;box-shadow:0 10px 30px rgba(0,0,0,.5);animation:ldin .2s}
 .pc{display:block;width:100%;box-sizing:border-box}
 .play.g .ast.nx{display:inline-block}
@@ -878,7 +879,7 @@ input[type=search]::-webkit-search-cancel-button{display:none;-webkit-appearance
 .play.so .som{width:42px;flex:none;font-weight:800;font-size:16px}
 .play.so .som.y{color:#30d158}
 .play.so .som.n{color:#ff453a}
-.sosum{text-align:right;font-family:var(--num);font-weight:700;font-size:16px;padding:6px 0 10px;color:var(--mut)}
+
 .gdd{display:flex;justify-content:space-between;align-items:baseline;gap:4px}
 .gdd > span{text-align:right}
 .dsh{display:inline-grid;align-items:baseline;font-variant-numeric:tabular-nums;column-gap:2px}
@@ -903,8 +904,8 @@ td{font-variant-numeric:tabular-nums}
 .ssg > div{display:flex;flex-direction:column;align-items:center;justify-content:flex-start}
 .pmh{position:relative;display:inline-block}
 .pmh i{position:absolute;right:100%;top:0;font-style:normal}
-.pma{align-items:baseline;vertical-align:baseline;display:inline-grid;grid-template-columns:.6em 2ch;text-align:right}
-.pma i{font-style:normal;text-align:right}
+
+
 .gst td,.gst th{padding-left:6px !important;padding-right:6px !important}
 .stkw + main > .sec.dh:first-child,.stkw + main > .favh:first-child,.stksp + main > .sec.dh:first-child,.stksp + main > .favh:first-child,.ghost > .sec.dh:first-child,.ghost > .favh:first-child{margin-top:-4px !important}
 .stkw{position:sticky;top:0;z-index:40;background:var(--pbg,#000)}
@@ -920,7 +921,7 @@ header.d + main{padding-top:0}
 .play.g.gs .clk{color:rgba(255,255,255,.78)}
 html.one,html.one body{overflow:hidden;height:100%}
 html.lock1 body{touch-action:none}
-html.lock1 .tw,html.lock1 .strip,html.lock1 .mstrip,html.lock1 .htabs{touch-action:pan-x}
+html.lock1 .tw,html.lock1 .strip,html.lock1 .mstrip{touch-action:pan-x}
 html.one #app.lst,html.one body{min-height:0}
 html,body{overflow-anchor:none}
 .stkw .hero{padding:16px 0}
@@ -929,14 +930,14 @@ html,body{overflow-anchor:none}
 .stkw .hero .t .rc,.stkw .hero .wk{max-height:24px;overflow:hidden;margin-top:2px}
 .stkw .hero .wk{margin-bottom:6px}
 .stkw .hero .t{gap:5px}
-.stkw .hero .m .dt1,.stkw .hero .m .fin{font-size:19px}
+.stkw .hero .m .fin{font-size:19px}
 .stkw.det.v-lv{padding-bottom:8px}
 .stkw.det .hero{margin-left:-6px;margin-right:-6px;padding:9px 0}
 .stkw.det .hero .s{font-size:36px !important}
 .stkw.det .hero .t img,.stkw.det .hero .t .ph{width:36px !important;height:36px !important}
 .stkw.det .hero .t{gap:3px}
 .stkw.det .hero .wk{margin-bottom:3px}
-.stkw.det .hero .m .dt1,.stkw.det .hero .m .fin{font-size:17px}
+.stkw.det .hero .m .fin{font-size:17px}
 .stkw.det .dtabs{margin-left:-6px;margin-right:-6px;padding-left:12px;padding-right:12px}
 .stkw.det .phero{margin-top:-5px;margin-bottom:0;height:100px;min-height:100px}
 .stkw.det .dtabs{margin-top:0}
@@ -1089,6 +1090,10 @@ html.fsg td.n .slg{top:.75px}
 .f1rd .rdl,.f1big .rdl{color:var(--live)}
 .f1big .f1fl{display:inline-block;width:9px;height:9px;border-radius:50%;margin-left:7px;vertical-align:calc(var(--capc, .405em) - 4.5px)}
 .f1ct .f1t3n{color:#fff}
+.f1big{white-space:nowrap}
+.f1big .f1in{font-size:.78em;color:var(--mut)}
+.f1big .f1in.rdl{color:var(--live)}
+.f1big .f1in.hid{display:none}
 .f1lvh{color:#fff !important;font-weight:600;position:relative;white-space:nowrap}
 .f1lvh .f1ld{position:relative;display:inline-block;border-radius:50%;background:var(--live);animation:blink 1.4s infinite;margin:0 7px 0 0 !important;width:7px !important;height:7px !important;vertical-align:calc(var(--capc, .405em) - 3.5px) !important}
 .f1lvh .flg{margin-left:2px}
@@ -1108,7 +1113,7 @@ html.fsg td.n .slg{top:.75px}
 
 /* switches + quick buttons: same text as the table names (16.5 px bold); line-height trimmed so every pill keeps its height */
 .seg button,.sseg4 button{font-size:16.5px !important;font-weight:700 !important;line-height:1.02 !important;white-space:nowrap}
-.qb button{font-size:16.5px;line-height:1.02}
+
 .seg:not(:has(> button:nth-child(3))){max-width:270px !important}
 .seg:has(> button:nth-child(3)){max-width:340px !important}
 .seg:has(> button:nth-child(4)){max-width:100% !important}
@@ -1149,15 +1154,15 @@ header.lyc{padding-top:calc(env(safe-area-inset-top) + 30px)}
 .lyic.on button{background:#fff;color:#000}
 .lybar{position:fixed;left:16px;right:16px;bottom:calc(max(env(safe-area-inset-bottom), 12px) + 20px);height:56px;border-radius:18px;background:var(--card);display:flex;z-index:60;box-shadow:0 10px 30px rgba(0,0,0,.6),inset 0 1px 0 rgba(255,255,255,.08)}
 .lybar button{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;color:var(--mut);font-family:var(--num)}
-.lybar button b{font-size:19px;font-weight:700;line-height:1}
-.lybar button small{font-size:11px;font-weight:700}
+
+
 .lybar button.on{color:#fff}
 .lybar button.on b::after{content:'';display:block;width:18px;height:3px;border-radius:2px;background:#e5484d;margin:2px auto 0}
-.lybar button svg{width:20px;height:20px}
-.lybar button.on svg{color:#ffd60a}
+
+
 /* the list ends above the bar with the same gap as between cards (the last card's 10px margin) */
 html:has(.lybar) #app{padding-bottom:calc(max(env(safe-area-inset-bottom), 12px) + 20px + 56px)}
-html:has(.lybar.bm1) #app{padding-bottom:calc(max(env(safe-area-inset-bottom), 12px) + 4px + 64px)}
+
 html:has(.lybar.bm2) #app{padding-bottom:calc(max(env(safe-area-inset-bottom), 12px) + 4px + 58px)}
 html:has(.lybar) #app > .hpw{padding:0;margin:0}
 /* C2: the bottom bar already takes you 'home' (tap the league) → no Home pill on the list */
@@ -1169,14 +1174,14 @@ html.fsg .lyc .lyh h1{position:relative;top:1.6px}
 header.lyc .strip{margin-top:12px}
 
 /* glossy top edge (as on the bottom bar) on cards, panes and buttons – both layouts, classic design */
-:is(.card,.pane,.dy,.qb button,.htabs .pill,.htabs .icon,.lyic button,header .back,header .home,.hpill,.ybtn,.lybar){box-shadow:inset 0 1px 0 rgba(255,255,255,.08),0 0 0 .5px rgba(255,255,255,.04)}
+:is(.card,.pane,.dy,.lyic button,header .back,header .home,.hpill,.ybtn,.lybar){box-shadow:inset 0 1px 0 rgba(255,255,255,.08),0 0 0 .5px rgba(255,255,255,.04)}
 .lybar{box-shadow:inset 0 1px 0 rgba(255,255,255,.08),0 0 0 .5px rgba(255,255,255,.04),0 10px 30px rgba(0,0,0,.6)}
-:is(.dy.on,.htabs .pill.on){box-shadow:none}
+:is(.dy.on){box-shadow:none}
 
 
 
 /* ===== bottom-bar variants ===== */
-.lybar.bm1,.lybar.bm2{background:rgba(36,36,40,.36);-webkit-backdrop-filter:blur(18px) saturate(170%);backdrop-filter:blur(18px) saturate(170%);box-shadow:inset 0 1px 0 rgba(255,255,255,.14),inset 0 0 0 .5px rgba(255,255,255,.08),0 12px 30px rgba(0,0,0,.6)}
+.lybar.bm2{background:rgba(36,36,40,.36);-webkit-backdrop-filter:blur(18px) saturate(170%);backdrop-filter:blur(18px) saturate(170%);box-shadow:inset 0 1px 0 rgba(255,255,255,.14),inset 0 0 0 .5px rgba(255,255,255,.08),0 12px 30px rgba(0,0,0,.6)}
 .lybar[class*="bm"] button{gap:3px}
 .lybar[class*="bm"] button svg{width:23px;height:23px;flex:none}
 .lybar[class*="bm"] button span{font-family:var(--num);font-size:13px;font-weight:700;line-height:1}
@@ -1184,8 +1189,8 @@ header.lyc .strip{margin-top:12px}
 .lybar[class*="bm"] button.on svg{color:#e5484d}
 .lybar[class*="bm"] button[data-league="nhl"] svg{transform:translateX(-1px)}
 /* Menu 1 – full capsule; the chosen item = white label + red icon (no pill) */
-.lybar.bm1{height:64px;border-radius:999px;padding:5px;gap:2px;bottom:calc(max(env(safe-area-inset-bottom), 12px) + 4px)}
-.lybar.bm1 button{border-radius:999px}
+
+
 
 /* Menu 2 – compact capsule in the middle, icons + labels, no pill */
 .lybar.bm2{left:50%;right:auto;transform:translateX(-50%);height:58px;border-radius:999px;padding:0 8px;bottom:calc(max(env(safe-area-inset-bottom), 12px) + 4px)}
@@ -1238,9 +1243,7 @@ const addDays = (d, n) => { const x = new Date(d); x.setDate(x.getDate() + n); r
 const DAYS = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
 const fmtTime = iso => new Date(iso).toLocaleTimeString('cs-CZ', { hour:'2-digit', minute:'2-digit' });
 const fmtShort = iso => { const d = new Date(iso); return d.getDate() + '.' + (d.getMonth()+1) + '.'; };
-const dayWord = iso => ymd(new Date(iso)) === ymd(new Date()) ? 'Today' : fmtShort(iso);
 const todayLoc = () => { const d = new Date(); return new Date(d.getFullYear(), d.getMonth(), d.getDate(), 12); };
-const todayET = () => { const p = new Date().toLocaleDateString('en-CA', { timeZone: 'America/New_York' }).split('-').map(Number); return new Date(p[0], p[1]-1, p[2], 12); };
 const FAVKEY = 'favs';
 const getFavs = () => { try { return JSON.parse(localStorage.getItem(FAVKEY) || '[]'); } catch (e) { return []; } };
 const isFav = (l, id) => getFavs().some(f => f.l === l && f.id === String(id));
@@ -1282,10 +1285,6 @@ function stickTop(v) {
   const sp = document.createElement('div'); sp.className = 'stksp'; w.after(sp); w.classList.add('fx0');
   const fit = () => { sp.style.height = w.offsetHeight + 'px'; }; fit(); try { if (window._stkRO) window._stkRO.disconnect(); window._stkRO = new ResizeObserver(fit); window._stkRO.observe(w); } catch (e) {}
 }
-function fitNames(root) {
-  (root || $app).querySelectorAll('[data-player] .pn').forEach(el => { if (el.children.length || el.dataset.fit) return; const t = el.textContent.trim(); if (!/\s/.test(t) || /\.\s/.test(t.split(' ')[0] + ' ')) return;
-    if (el.scrollWidth > el.clientWidth + 1) { const sh = shortNm(t); if (sh !== t) { el.textContent = sh; el.dataset.fit = '1'; } } });
-}
 function tblAlign(root) {
   (root || $app).querySelectorAll('.pane').forEach(pn => {
     const G = [...pn.querySelectorAll('table.gst')]; const by = {};
@@ -1315,7 +1314,7 @@ function glDash(root) { (root || $app).querySelectorAll('table.gl2').forEach(tb 
   /* the RESULT header starts exactly where the scores start */
   const h = tb.querySelector('th.grh'); if (h && h.firstChild) { h.style.setProperty('padding-left', (23 + sh) + 'px', 'important'); const sl = Math.min(...rows.map(r => { const b = r.querySelector('.glr b'); return b && b.textContent.trim() ? tx(b).left : 1e9; })), hl = tx(h).left; if (sl < 1e8) h.style.setProperty('padding-left', Math.max(0, 23 + sh + sl - hl) + 'px', 'important'); } }); }
 function tNudge(root) { if (!document.documentElement.classList.contains('fbar')) return;
-  (root || document).querySelectorAll('.seg button, .qb button, .dtabs button, .ybtn, .hpill, .cl, .lpm button, .msg button, .favh, .cmpclr, .ylist button, .f1hy button').forEach(b => { [...b.childNodes].forEach(n => { if (n.nodeType === 3 && n.textContent.trim()) { const sp = document.createElement('span'); sp.className = 'tnud'; n.replaceWith(sp); sp.appendChild(n); } }); }); }
+  (root || document).querySelectorAll('.seg button, .dtabs button, .ybtn, .hpill, .cl, .lpm button, .msg button, .favh, .cmpclr, .ylist button, .f1hy button').forEach(b => { [...b.childNodes].forEach(n => { if (n.nodeType === 3 && n.textContent.trim()) { const sp = document.createElement('span'); sp.className = 'tnud'; n.replaceWith(sp); sp.appendChild(n); } }); }); }
 function zebra(root) {
   (root || $app).querySelectorAll('table.nfx, table.fx, table.lbt, table.gst, table.ros, table.sch').forEach(tb => { const bd = tb.tBodies[0]; if (!bd) return; let z = false, last = false;
     [...bd.rows].forEach(r => { if (r.classList.contains('tot')) { r.classList.remove('zb'); return; } if (r.classList.contains('csub')) { r.classList.toggle('zb', last); return; } if (r.classList.contains('hid')) return; r.classList.toggle('zb', z); last = z; z = !z; }); });
@@ -1417,7 +1416,6 @@ function tabHTML(k) {
   document.addEventListener('touchmove', e => { if (!document.documentElement.classList.contains('lock1') || e.touches.length !== 1) return; const dx = Math.abs(e.touches[0].clientX - x0), dy = Math.abs(e.touches[0].clientY - y0); if (dy > dx && !e.target.closest('#artpop, .ylist')) e.preventDefault(); }, { passive: false });
   window.addEventListener('scroll', () => { if (document.documentElement.classList.contains('lock1') && !window._stAnim && window.scrollY !== 0 && !document.getElementById('artpop')) window.scrollTo(0, 0); }, { passive: true }); })();
 window.SIL = 'data:image/svg+xml,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" fill="#2c2c2e"/><circle cx="50" cy="38" r="18" fill="#0d0d0f"/><path d="M14 100c2-22 17-34 36-34s34 12 36 34z" fill="#0d0d0f"/></svg>');
-const CMP_SVG = '<svg viewBox="0 0 24 24"><path d="M4 8h14l-4-4M20 16H6l4 4"/></svg>';
 const STAR_SVG = '<svg viewBox="0 0 24 24"><path d="M12 3.2l2.7 5.6 6.1.8-4.5 4.2 1.1 6.1L12 17l-5.4 2.9 1.1-6.1L3.2 9.6l6.1-.8z"/></svg>';
 const store = { get(k){ try { return localStorage.getItem(k); } catch(e){ return null; } }, set(k,v){ try { localStorage.setItem(k,v); } catch(e){} } };
 const nv = v => /^-\d/.test(String(v)) ? `<span class="neg">-</span>${esc(String(v).slice(1))}` : esc(v);
@@ -1925,28 +1923,23 @@ const LY_TROPHY = '<svg viewBox="0 0 24 24" width="19" height="19" fill="none" s
 const LY_CHART = '<svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M5 20V12M12 20V5M19 20v-9"/></svg>';
 const LY_SRCH = '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg>';
 const LY_STAR = '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"><path d="M12 3.5l2.6 5.4 5.9.8-4.3 4.1 1 5.9L12 17l-5.2 2.7 1-5.9-4.3-4.1 5.9-.8z"/></svg>';
-/* bottom-bar variant (hidden menu): '' = current bar, '1' = capsule with item pills, '2' = compact capsule, '3' = docked tab bar */
-const lyMenu = () => { try { const v = localStorage.getItem('bmenu'); return /^[123]$/.test(v || '') ? v : ''; } catch (e) { return ''; } };
+/* bottom bar (hidden menu): '2' = Pill menu (compact capsule, default), '3' = Bar menu (docked tab bar) */
+try { localStorage.removeItem('layout'); if (localStorage.getItem('bmenu') !== '3') localStorage.removeItem('bmenu'); } catch (e) {}
+const lyMenu = () => { try { return localStorage.getItem('bmenu') === '3' ? '3' : '2'; } catch (e) { return '2'; } };
 const LY_FB = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><ellipse cx="12" cy="12" rx="9.5" ry="5.8" transform="rotate(-35 12 12)"/><path d="M9 15l6-6M10.5 10.5l1.5 1.5M12 9l1.5 1.5M9.5 12.5l1.5 1.5"/></svg>';
 const LY_BB = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3v18M5.6 5.6c3 3 3 9.8 0 12.8M18.4 5.6c-3 3-3 9.8 0 12.8"/></svg>';
 const LY_PK = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><ellipse cx="12" cy="9.5" rx="8" ry="3.5"/><path d="M4 9.5v4c0 2 3.6 3.5 8 3.5s8-1.5 8-3.5v-4"/></svg>';
 const LY_FLG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M5 21V4M5 4h13l-2.5 4.5L18 13H5"/></svg>';
-const lyKind = () => { try { return localStorage.getItem('layout') === 'classic' ? '' : 'c'; } catch (e) { return 'c'; } };
-function lyHead(o) { const k = lyKind(); if (!k) return ''; const lg = state.league, fav = lg === 'fav';
+function lyHead(o) { const lg = state.league, fav = lg === 'fav';
   const ic = (a, t, svg, on) => `<div class="lyic${on ? ' on' : ''}"><button ${a} aria-label="${t}">${svg}</button><small>${t}</small></div>`;
   const quick = (o.quick || []).map(q => ic(q[0], q[1], q[2])).join('');
   const lgs = [...Object.entries(LEAGUES).map(([id, v]) => [`data-league="${id}"`, v.name, id === lg, id === 'nfl' ? 'Football' : id === 'nba' ? 'Basketball' : id === 'nhl' ? 'Hockey' : v.name]), ['data-f1="1"', 'F1', lg === 'f1', 'Racing']];
   const bm = lyMenu(), sic = { 'data-league="nfl"': LY_FB, 'data-league="nba"': LY_BB, 'data-league="nhl"': LY_PK, 'data-f1="1"': LY_FLG };
-  const nav = bm ? `<nav class="lybar bm${bm}">${lgs.map(x => `<button ${x[0]} class="${x[2] ? 'on' : ''}">${sic[x[0]] || ''}<span>${x[1]}</span></button>`).join('')}<button data-league="fav" class="${fav ? 'on' : ''}">${LY_STAR}<span>${bm === '2' ? 'Favs' : 'Favorites'}</span></button></nav>`
-    : `<nav class="lybar">${lgs.map(x => `<button ${x[0]} class="${x[2] ? 'on' : ''}"><b>${x[1]}</b><small>${x[3]}</small></button>`).join('')}<button data-league="fav" class="${fav ? 'on' : ''}">${LY_STAR}<small>Favorites</small></button></nav>`;
+  const nav = `<nav class="lybar bm${bm}">${lgs.map(x => `<button ${x[0]} class="${x[2] ? 'on' : ''}">${sic[x[0]] || ''}<span>${x[1]}</span></button>`).join('')}<button data-league="fav" class="${fav ? 'on' : ''}">${LY_STAR}<span>${bm === '2' ? 'Favs' : 'Favorites'}</span></button></nav>`;
   return `<header class="lyc"><div class="lyh"><h1>SCORE<i></i>BOARD</h1><div class="lyics">${quick}${ic('data-search', 'Search', LY_SRCH)}</div></div>${o.strip ? `<div class="strip" id="strip">${o.strip}</div>` : ''}</header>${nav}`; }
 function renderList() {
   const fav = state.league === 'fav';
-  const tabs = Object.entries(LEAGUES).map(([k, v]) =>
-    `<button class="pill ${k === state.league ? 'on' : ''}" data-league="${k}">${v.name}</button>`).join('') +
-    `<button class="pill f1 ${state.league === 'f1' ? 'on' : ''}" data-f1="1">F1</button>` +
-    `<button class="pill star ${fav ? 'on' : ''}" data-league="fav" aria-label="Favorites">${STAR_SVG}</button>`;
-  if (state.league === 'f1') return renderF1List(tabs);
+  if (state.league === 'f1') return renderF1List();
   let body;
   if (state.loading && !state.events.length) body = msg('Loading…');
   else if (state.error && !state.events.length) body = `<div class="msg">${esc(state.error)}<br><button data-refresh>Try again</button></div>`;
@@ -1983,8 +1976,7 @@ function renderList() {
   const os = document.getElementById('strip'), prev = os && state.stripKey === skey ? os.scrollLeft : null;
   state.stripKey = skey;
   $app.innerHTML = `
-    ${lyHead({ strip, fav, quick: !fav && LEAGUES[state.league] ? [['data-go2="standings"', 'Table', LY_TROPHY], ['data-go2="lstats"', 'Stats', LY_CHART]] : [] }) || `<header><div class="tabs htabs">${tabs}<button class="icon" data-search aria-label="Search">${SEARCH_SVG}</button></div>
-    ${strip ? `<div class="strip" id="strip">${strip}</div>` : ''}${!fav && LEAGUES[state.league] ? `<div class="qb"><button data-go2="lstats">Statistics</button><button data-go2="standings">Standings</button></div>` : ''}</header>`}
+    ${lyHead({ strip, fav, quick: !fav && LEAGUES[state.league] ? [['data-go2="standings"', 'Table', LY_TROPHY], ['data-go2="lstats"', 'Stats', LY_CHART]] : [] })}
     <main>${body}</main>`;
   const s = document.getElementById('strip'), on = s && s.querySelector('.on');
   if (on) {
@@ -2453,7 +2445,6 @@ async function loadPreviewStats(g) {
   g.tsLoading = false;
   if (state.game === g && topView() === 'game') render();
 }
-const lumOf = h => { const n = parseInt(h, 16); const r = n >> 16, gg = (n >> 8) & 255, b = n & 255; return (0.299 * r + 0.587 * gg + 0.114 * b) / 255; };
 /* scoring-play rows carry white text: a light team colour (silver, white, light gold) is taken down to a mid tone of the same hue */
 function tcDark(c) { const m = /^#?([0-9a-f]{6})$/i.exec(String(c || '')); if (!m) return c; const n = parseInt(m[1], 16); let r = (n >> 16) / 255, g = ((n >> 8) & 255) / 255, b = (n & 255) / 255;
   const mx = Math.max(r, g, b), mn = Math.min(r, g, b), l = (mx + mn) / 2; if (l <= .5) return '#' + m[1]; const d = mx - mn, s = d ? d / (1 - Math.abs(2 * l - 1)) : 0; let h = 0;
@@ -2492,16 +2483,6 @@ function bgOf(hex) {
   else { if (l < .08) l = .13; else l = Math.min(l, .32); }
   const C = (1 - Math.abs(2 * l - 1)) * sa, X = C * (1 - Math.abs((h / 60) % 2 - 1)), m = l - C / 2, [R, G, B] = h < 60 ? [C, X, 0] : h < 120 ? [X, C, 0] : h < 180 ? [0, C, X] : h < 240 ? [0, X, C] : h < 300 ? [X, 0, C] : [C, 0, X];
   return '#' + [R, G, B].map(v => Math.round((v + m) * 255).toString(16).padStart(2, '0')).join('');
-}
-function teamColor(c, fb) {
-  const t = (c && c.team) || {};
-  const ok = x => /^[0-9a-f]{6}$/i.test(String(x || '').replace('#', ''));
-  let h = ok(t.color) ? t.color.replace('#', '') : (ok(t.alternateColor) ? t.alternateColor.replace('#', '') : '');
-  if (!h) return fb;
-  const sat = x => { const n = parseInt(x, 16), r = n >> 16, g2 = (n >> 8) & 255, b = n & 255; return Math.max(r, g2, b) - Math.min(r, g2, b); };
-  if (lumOf(h) < 0.3 && sat(h) < 40 && ok(t.alternateColor) && sat(t.alternateColor.replace('#', '')) >= 40) h = t.alternateColor.replace('#', '');
-  if (lumOf(h) < 0.25) { const n = parseInt(h, 16), ch = [n >> 16, (n >> 8) & 255, n & 255], mx = Math.max(...ch, 1), L = Math.max(lumOf(h), 0.02), f = Math.min(255 / mx, 0.25 / L); h = sat(h) < 40 ? ch.map(v => Math.round(v + (255 - v) * 0.3)).map(v => v.toString(16).padStart(2, '0')).join('') : ch.map(v => Math.min(255, Math.round(v * f))).map(v => v.toString(16).padStart(2, '0')).join(''); }
-  return '#' + h;
 }
 const SL_CATS = {
   nfl: [[/^passingYards$/i, 'Passing Yards', 'YDS'], [/^rushingYards$/i, 'Rushing Yards', 'YDS'], [/^receivingYards$/i, 'Receiving Yards', 'YDS'], [/^sacks$/i, 'Sacks', 'SACKS'], [/^interceptions$/i, 'Interceptions', 'INT']],
@@ -2590,23 +2571,6 @@ function findStars(o, d) {
   for (const k of Object.keys(o)) { const r = findStars(o[k], d + 1); if (r) return r; }
   return null;
 }
-async function loadStars(g) {
-  g.starsL = true;
-  let arr = findStars(g.sum, 0);
-  if (!arr) try { const c = await getJson('https://sports.core.api.espn.com/v2/sports/hockey/leagues/nhl/events/' + g.id + '/competitions/' + g.id + '?lang=en&region=us'); arr = findStars(c, 0); } catch (e) {}
-  const out = [];
-  if (arr) for (const x of arr.slice(0, 3)) { try { let a = x.athlete || x; if (a.$ref && !a.displayName) a = await getJson(String(a.$ref).replace(/^http:/, 'https:')); out.push({ a, x }); } catch (e) {} }
-  g.stars = out; g.starsL = false;
-  if (state.game === g && topView() === 'game') render();
-}
-function starsHTML(g) {
-  if (g.stars === undefined) { if (!g.starsL) loadStars(g); return ''; }
-  if (!g.stars.length) return null;
-  const tn = id => { const t = [g.ev.away, g.ev.home].find(z => String(z.id) === String(id)); return t || {}; };
-  return `<section class="pv"><div class="sec">Three stars</div>${g.stars.map(({ a, x }, i) => { const tid = (a.team && (a.team.id || ((a.team.$ref || '').match(/teams\/(\d+)/) || [])[1])) || ''; const t = tn(tid), pos = (a.position && a.position.abbreviation) || '';
-    const line = x.displayValue || x.summary || (x.statistics && x.statistics.map(q => q.displayValue + ' ' + (q.abbreviation || '')).join(', ')) || '';
-    return `<div class="ir" data-player="${esc(a.id)}" data-pl="nhl" data-pn="${esc(a.displayName || '')}" data-pp="${esc(pos)}" data-pj="${esc(a.jersey || '')}" data-pt="${esc(t.name || '')}"><div class="star3">${'★'.repeat(i + 1)}</div><img class="hs" src="${esc(hsOf(a, 'nhl'))}" alt="" onerror="this.onerror=null;this.src=SIL"><div class="grow"><div class="ln">${esc(a.displayName || '')}</div><div class="ls">${esc([t.abbr, pos].filter(Boolean).join(' · '))}</div></div><div class="is"><div class="ls">${esc(line)}</div></div></div>`; }).join('')}</section>`;
-}
 function pvLeaders(g, gm) {
   const sum = g.sum, e = g.ev, comps = (sum.header && sum.header.competitions && sum.header.competitions[0] && sum.header.competitions[0].competitors) || [];
   let arr = (sum.leaders || []).filter(x => x && x.leaders && x.leaders.length);
@@ -2673,8 +2637,6 @@ function nhlRows(L) {
   ];
   return R;
 }
-const nrm = x => String(x || '').replace(/[^a-z0-9]/gi, '').toLowerCase();
-const findNhl = (list, re) => list.find(x => re.test(String(x.name || ''))) || list.find(x => re.test(String(x.displayName || ''))) || list.find(x => re.test(nrm(x.displayName))) || list.find(x => re.test(nrm(x.shortDisplayName)));
 function flatStats(j) {
   if (!j) return [];
   const cats = (j.results && j.results.stats && j.results.stats.categories) || (j.stats && j.stats.categories) || (j.splits && j.splits.categories) || j.categories || [];
@@ -2739,12 +2701,6 @@ function ensureStandings(league) {
 }
 function tstTable(title, heads, rows) {
   return `<section class="blk"><div class="tw"><table class="ros sep tst"><thead><tr><th class="n">${esc(title)}</th>${heads.map(h => `<th>${h}</th>`).join('')}</tr></thead><tbody>${rows.map(r => `<tr><td class="n"><span class="pn">${esc(r[0])}</span></td>${r.slice(1).map((v, i) => `<td class="${r.rk && i === r.length - 2 ? 'rk' : ''}">${esc(v != null && v !== '' ? v : '-')}</td>`).join('')}</tr>`).join('')}</tbody></table></div></section>`;
-}
-function pvTeamTable(g) {
-  const e = g.ev, A = nhlRows(flatStats(g.ts[0])), H = nhlRows(flatStats(g.ts[1]));
-  const rows = A.map((r, i) => [r[0], r[1], H[i][1]]).filter(r => r[1] != null || r[2] != null);
-  if (!rows.length) return '';
-  return tstTable('Team stats', [logoImg(e.away.logo), logoImg(e.home.logo)], rows);
 }
 const NHL_RANK = [['Goals For per Game'], ['Goals Against Average', true], ['Shots per Game'], ['Shots Against per Game', true], ['Power Play Percentage'], ['Penalty Kill Percentage'], ['Penalty Minutes', true]];
 function pvStats(g) {
@@ -3010,12 +2966,6 @@ const nhlShotIdx = names => { const n = names || []; let i = n.findIndex(x => /^
 const nhlHide = (labels, names, k) => { if (labels[k] === 'PROD') return true; if (names && /^shootout/i.test(names[k] || '')) return true; const si = nhlShotIdx(names); if (si >= 0) return (labels[k] === 'S' || labels[k] === 'SOG') && k !== si; return labels[k] === 'SOG' && labels.includes('S'); };
 const nhlLab = (labels, names, k) => nhlShotIdx(names) === k ? 'SOG' : dl(labels[k], 'nhl');
 const cell = v => { const t = String(v == null ? '' : v).replace(/,/g, ''); return `<td>${nv(t)}</td>`; };
-function simpleTable(title, labels, rows, totals, league, names) {
-  const cols = pickStatCols(labels, league, 7, names);
-  const trs = rows.map(r => `<tr><td class="n"><span class="pn">${esc(r.n)}</span><small>${esc(r.sub || '')}</small></td>${cols.map(k => cell(r.vals[k])).join('')}</tr>`).join('');
-  const tot = totals ? `<tr><td class="n">Career</td>${cols.map(k => `<td${String(totals[k]).replace(/,/g, '').length > 4 ? ' class="sm"' : ''}><b>${esc(String(totals[k]).replace(/,/g, ''))}</b></td>`).join('')}</tr>` : '';
-  return `<section class="blk"><div class="tw"><table class="fx sep"><colgroup><col style="width:104px"></colgroup><thead><tr><th class="n">${esc(catName(title, labels, league))}</th>${cols.map(k => `<th>${esc(dl(labels[k], league))}</th>`).join('')}</tr></thead><tbody>${trs}${tot}</tbody></table></div></section>`;
-}
 function gamelogHTML(p, o) {
   o = o || {};
   const J = o.j !== undefined ? o.j : p.gl;
@@ -3361,17 +3311,6 @@ function careerHTML(p, cats) {
 }
 /* career season label: always short 'YY-YY' (NFL/NCAA '2026' → '26-27', NBA '2026-27' → '26-27') */
 function crtYr(n, lg, mode) { n = String(n == null ? '' : n).trim(); let m = n.match(/^(\d{4})-(\d{2})$/); if (m) return m[1].slice(2) + '-' + m[2]; m = n.match(/^(\d{4})$/); if (m && (lg === 'nfl' || mode === 'ncaa')) return m[1].slice(2) + '-' + String(+m[1] + 1).slice(2); return n; }
-function nbaCareerHTML(p, cats) {
-  const c = cats.find(x => /averag/i.test(x.title) && x.labels.includes('PTS')) || cats.find(x => x.labels.includes('PTS') && x.labels.includes('MIN')) || cats[0];
-  const cols = NBA_ALL.map(([l, d, w]) => [c.labels.indexOf(l === '3P%' && !c.labels.includes('3P%') ? '3PT%' : l), d, w]).filter(x => x[0] >= 0);
-  const tw = 120 + cols.reduce((a, x) => a + x[2], 0);
-  const pv = (pm, k) => { const nm = c.names && c.names[k]; if (!nm) return null; if (pm[nm] != null) return pm[nm]; if (/-/.test(nm)) { const q = nm.split('-'); if (pm[q[0]] != null && pm[q[1]] != null) return (+pm[q[0]]).toFixed(1) + '-' + (+pm[q[1]]).toFixed(1); } return null; };
-  const clean = v => String(v == null || v === '' ? '-' : v).replace(/,/g, '');
-  const table = (title, rows, tot) => `<section class="blk"><div class="tw"><table class="nfx sep" style="width:max(100%, ${tw}px)"><colgroup><col>${cols.map(x => `<col style="width:${x[2]}px">`).join('')}</colgroup><thead><tr><th class="n">${esc(title)}</th>${cols.map(x => `<th>${esc(x[1])}</th>`).join('')}</tr></thead><tbody>${rows.map(r => `<tr><td class="n"><span class="pn">${esc(r.n)}</span><small>${esc(r.sub || '')}</small></td>${r.v.map(v => `<td>${nv(clean(v))}</td>`).join('')}</tr>`).join('')}${tot ? `<tr class="tot"><td class="n">Career</td>${tot.map(v => `<td>${nv(clean(v))}</td>`).join('')}</tr>` : ''}</tbody></table></div></section>`;
-  const reg = [...c.rows].reverse().map(r => ({ n: r.n, sub: r.sub, v: cols.map(x => r.vals[x[0]]) }));
-  const post = [...c.rows].reverse().filter(r => p.post && r.year && p.post[r.year]).map(r => ({ n: r.n, sub: r.sub, v: cols.map(x => pv(p.post[r.year], x[0])) })).filter(r => r.v.some(v => v != null && v !== ''));
-  return table('Regular season', reg, c.totals ? cols.map(x => c.totals[x[0]]) : null) + (post.length ? table('Postseason', post) : (p.postDone ? '' : msg('Loading playoffs…')));
-}
 function statsTabHTML(p) {
   const cats = p.stErr && !p.st ? [] : statCats(p.st, p.league);
   if (p.league === 'nfl' && !cats.length) return careerHTML(p, []);
@@ -3382,7 +3321,6 @@ function statsTabHTML(p) {
   return cats.map((c, ci) => {
     const cols = pickStatCols(c.labels, p.league, 7, c.names);
     const nm = k => c.names && c.names[k];
-    const tcols = cols.map(k => c.labels[k]);
     const sum = Array(cols.length).fill(0), okSum = Array(cols.length).fill(true);
     let anyPost = false;
     const rows = [...c.rows].reverse().map((r, ri) => {
@@ -3724,7 +3662,6 @@ function teamStatsHTML(t) {
 }
 
 /* ---------- hledání ---------- */
-const SEARCH_SVG = '<svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>';
 let sTimer = null;
 async function searchPlayers(q, league) {
   const parts = LEAGUES[league].path.split('/'), qq = encodeURIComponent(q);
@@ -4135,7 +4072,6 @@ async function loadCmp(i) {
 function renderCompare() {
   const c = state.cmp;
   if (!document.getElementById('cmpw')) {
-    const lseg = `<div class="seg pseg" style="max-width:260px">${Object.entries(LEAGUES).map(([k, v]) => `<button data-cmpl="${k}" class="${c.league === k ? 'on' : ''}">${v.name}</button>`).join('')}</div>`;
     const inp = i => `<div class="cmpi"><input id="cq${i}" class="sinp" type="search" autocomplete="off" placeholder="Player ${i + 1}" value="${esc(c.q[i])}"><button class="cmpx" data-cmpx="${i}" aria-label="Clear">×</button><div class="cmpr" id="cr${i}"></div></div>`;
     $app.innerHTML = `<header class="d"><div class="tabs"><button class="back" data-back aria-label="Back"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></button><button class="home" data-home aria-label="Home"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"><path d="M3 10.5 12 3l9 7.5"/><path d="M5.5 9v11h13V9"/><path d="M10 20v-6h4v6"/></svg></button></div></header>
     <main id="cmpw"><div class="cmptl"><div class="lvt">Compare players</div><button class="cmpclr" data-cmpclr="1">Clear</button></div><div class="cmpin">${inp(0)}${inp(1)}</div><div class="pane t" id="cmpbody"></div></main>`;
@@ -4208,8 +4144,6 @@ function renderLV() {
     <main>${top}<div class="pane t">${body}</div></main>`;
   const pn = $app.querySelector('main > .pane'), sg = pn && pn.querySelector(':scope > .seg'); if (sg && v.kind === 'standings') { sg.classList.add('lvseg'); pn.before(sg); }
 }
-const GRP_NAME = {};
-const grpName = g => String(g);
 const lySel = v => { const Y = brYears(v.league), y = v.sy || Y[0]; return `<span class="grow"></span><div class="ysel tys"><button class="ybtn" data-lyo="1">${esc(seasonLbl2(v.league, y))}<i class="chev ${v.yOpen ? 'up' : ''}"></i></button>${v.yOpen ? `<div class="ylist">${Y.map(x => `<button data-ly="${x}" class="${x === y ? 'on' : ''}">${esc(seasonLbl2(v.league, x))}</button>`).join('')}</div>` : ''}</div>`; };
 const seasonLbl2 = (lg, yy) => lg === 'nfl' ? yy + '-' + String(yy + 1).slice(2) : (yy - 1) + '-' + String(yy).slice(2);
 const LOWBETTER = /against|allowed|turnover|giveaway|penalt|sacked|lost|GAA/i;
@@ -4527,22 +4461,17 @@ function renderLeaders() {
 (function () {
   let tmr = null, sx = 0, sy = 0;
   const close = () => { document.querySelectorAll('.lpo,.lpm').forEach(x => x.remove()); };
-  const haptic = () => {
-    try { if (navigator.vibrate) { navigator.vibrate(12); return; } } catch (e) {}
-    try { const l = document.createElement('label'), i = document.createElement('input'); i.type = 'checkbox'; i.setAttribute('switch', ''); l.style.cssText = 'position:fixed;left:0;top:0;width:1px;height:1px;overflow:hidden;opacity:0;pointer-events:none'; i.tabIndex = -1; i.style.cssText = 'width:1px;height:1px;margin:0;font-size:16px'; l.appendChild(i); document.body.appendChild(l); l.click(); try { i.blur(); } catch (e) {} setTimeout(() => l.remove(), 100); } catch (e) {}
-  };
-  const pill = e => { const p = e.target.closest && e.target.closest('.pill[data-league], .lybar [data-league]'); return p && (LEAGUES[p.dataset.league] || p.dataset.league === 'fav') ? p : null; };
+  const pill = e => { const p = e.target.closest && e.target.closest('.lybar [data-league]'); return p && (LEAGUES[p.dataset.league] || p.dataset.league === 'fav') ? p : null; };
   const openCache = el => {
     window._lpAt = Date.now(); close();
     const r = el.getBoundingClientRect();
     const o = document.createElement('div'); o.className = 'lpo';
     const m = document.createElement('div'); m.className = 'lpm';
     m.style.top = (r.bottom + 8) + 'px'; m.style.left = Math.min(r.left, window.innerWidth - 216) + 'px';
-    m.innerHTML = `<button data-cc>Clear cache</button>${(() => { const de = document.documentElement, cur = de.classList.contains('fsg') ? 'sg' : 'bar'; return [['bar', 'Bleacher'], ['sg', 'Mercedes']].map(([k, t]) => `<button data-fsw="${k}" class="${k === cur ? 'on' : ''}">${t}${k === cur ? '<span class="lpck">✓</span>' : ''}</button>`).join(''); })()}${[['1', 'Menu 1'], ['2', 'Menu 2'], ['3', 'Menu 3']].map(([k, t], i) => `<button data-bmsw="${k}" class="${i ? '' : 'lyf '}${lyMenu() === k ? 'on' : ''}">${t}${lyMenu() === k ? '<span class="lpck">✓</span>' : ''}</button>`).join('')}${[['', 'Classic layout'], ['c', 'C2 layout']].map(([k, t], i) => `<button data-lysw="${k || '0'}" class="${i ? '' : 'lyf '}${lyKind() === k ? 'on' : ''}">${t}${lyKind() === k ? '<span class="lpck">✓</span>' : ''}</button>`).join('')}`;
+    m.innerHTML = `<button data-cc>Clear cache</button>${(() => { const de = document.documentElement, cur = de.classList.contains('fsg') ? 'sg' : 'bar'; return [['bar', 'Bleacher font'], ['sg', 'Mercedes font']].map(([k, t]) => `<button data-fsw="${k}" class="${k === cur ? 'on' : ''}">${t}${k === cur ? '<span class="lpck">✓</span>' : ''}</button>`).join(''); })()}${[['2', 'Pill menu'], ['3', 'Bar menu']].map(([k, t], i) => `<button data-bmsw="${k}" class="${i ? '' : 'lyf '}${lyMenu() === k ? 'on' : ''}">${t}${lyMenu() === k ? '<span class="lpck">✓</span>' : ''}</button>`).join('')}`;
     o.addEventListener('click', close);
     m.addEventListener('click', ev => {
-      { const bmb = ev.target.closest('[data-bmsw]'); if (bmb) { const k = bmb.dataset.bmsw; try { localStorage.setItem('bmenu', lyMenu() === k ? '' : k); } catch (er) {} close(); render(); return; } } /* tapping the active one switches it off */
-      { const ly = ev.target.closest('[data-lysw]'); if (ly) { try { localStorage.setItem('layout', ly.dataset.lysw === '0' ? 'classic' : ly.dataset.lysw); } catch (er) {} close(); render(); window.scrollTo(0, 0); return; } }
+      { const bmb = ev.target.closest('[data-bmsw]'); if (bmb) { const k = bmb.dataset.bmsw; try { localStorage.setItem('bmenu', k); } catch (er) {} close(); render(); return; } }
       if (ev.target.closest('[data-fsw]')) { const de = document.documentElement, nx = ev.target.closest('[data-fsw]').dataset.fsw; de.classList.toggle('fbar', nx !== 'sg'); de.classList.toggle('fsg', nx === 'sg'); try { localStorage.setItem('font', nx); } catch (er) {} close(); render(); return; }
       if (!ev.target.closest('[data-cc]')) return;
       try { Object.keys(localStorage).forEach(k => { if (/^(lgs\d*_|tps_|athc$)/.test(k)) localStorage.removeItem(k); }); } catch (e) {}
@@ -4640,7 +4569,7 @@ const f1Con = name => `<div class="f1d"><div class="f1dn"><b>${esc(name)}</b></d
 const f1Sig = evs => (evs || []).map(e => e.id + (e.competitions || []).map(c => f1Done(c) ? 1 : 0).join('')).join('|');
 const f1Weekend = () => { const now = Date.now(); return Object.values(F1.sb).some(evs => (evs || []).some(e => now >= new Date(e.date).getTime() - 864e5 && now <= new Date(e.endDate || e.date).getTime() + 864e5)); };
 async function f1Refresh(now, force) {
-  const t = Date.now(), iv = f1Weekend() ? 3 * MIN : 30 * MIN; if (!force) { if (!now && t - (F1.lastRef || 0) < iv) return; if (now && t - (F1.lastRef || 0) < MIN) return; } F1.lastRef = t;
+  const t = Date.now(), iv = f1Weekend() ? 10 * MIN : 30 * MIN; /* live sessions are followed by f1LiveTick (small scoreboard) */ if (!force) { if (!now && t - (F1.lastRef || 0) < iv) return; if (now && t - (F1.lastRef || 0) < MIN) return; } F1.lastRef = t;
   let changed = false;
   await Promise.all(Object.keys(F1.sb).filter(y => +y >= f1Year() - 1).map(async y => { try { const j = await getJson(F1A + 'scoreboard?dates=' + y, true), evs = (j.events || []).slice().sort((a, b) => new Date(a.date) - new Date(b.date));
     if (f1Sig(evs) === f1Sig(F1.sb[y])) return; changed = true; F1.sb[y] = evs; evs.forEach(e => { F1.ev[e.id] = Object.assign(e, { _y: +y }); });
@@ -4726,6 +4655,11 @@ const f1FlagT = f => { f = String(f || '').trim(); if (!f) return ''; const t = 
 const f1Top3 = c => [1, 2, 3].map(o => (c.competitors || []).find(x => x.order === o)).filter(Boolean).map(x => { const n = (x.athlete && (x.athlete.fullName || x.athlete.displayName)) || ''; return `<span class="f1t3n">${x.order}</span> ${esc(n.split(' ').slice(1).join(' ') || n)}`; }).join(' · ');
 /* card lines while a session is running: "FP3 · Lap 10 ●(flag)" and the current top 3 */
 const f1LiveBig = c => `<span class="rdl">${esc(F1AB[c.type && c.type.abbreviation] || (c.type && c.type.abbreviation) || 'Live')}</span>${f1Lap(c) ? ' · Lap ' + f1Lap(c) : ''}${f1FlagC(c._flag) ? `<i class="f1fl" style="background:${f1FlagC(c._flag)}"></i>` : ''}`;
+/* between sessions of a race weekend: the next session with a countdown (last hour in red) and its day/time */
+const F1NX = { FP1: 'Practice 1', FP2: 'Practice 2', FP3: 'Practice 3', SS: 'Sprint Q', SQ: 'Sprint Q', SR: 'Sprint', Sprint: 'Sprint', Qual: 'Qualifying', Race: 'Race' };
+function f1WkLines(e) { const now = Date.now(), nx = (e.competitions || []).filter(c => { const st = c.status && c.status.type || {}; return !st.completed && st.state !== 'in' && new Date(c.date).getTime() > now; }).sort((a, b) => new Date(a.date) - new Date(b.date))[0]; if (!nx) return null;
+  const t = new Date(nx.date), m = Math.max(1, Math.round((t - now) / 6e4)), cd = m < 60 ? m + 'm' : m < 1440 ? Math.floor(m / 60) + 'h ' + (m % 60) + 'm' : Math.floor(m / 1440) + 'd ' + Math.floor((m % 1440) / 60) + 'h', ab = nx.type && nx.type.abbreviation;
+  return [`${esc(F1NX[ab] || (nx.type && nx.type.text) || ab || 'Next')} <span class="f1in${m < 60 ? ' rdl' : ''}">in ${cd}</span>`, `${DAYS[t.getDay()]} ${t.getDate()}.${t.getMonth() + 1}. · ${String(t.getHours()).padStart(2, '0')}:${String(t.getMinutes()).padStart(2, '0')}`]; }
 const f1RdHTML = (e, k, done) => 'Round ' + (k + 1) + (!done && f1WkOn(e) ? ' · <span class="rdl">Race weekend</span>' + (f1SesLive(e) ? '<i class="f1ld"></i>' : '') : '');
 /* keep the label / dot current while the list is open (no re-render) */
 setInterval(() => { if (document.hidden || typeof topView !== 'function' || topView() !== 'list' || state.league !== 'f1') return; const evs = f1ListEvs(); if (!evs) return;
@@ -4733,8 +4667,8 @@ setInterval(() => { if (document.hidden || typeof topView !== 'function' || topV
 function f1LivePatch() { if (topView() !== 'list' || state.league !== 'f1') return; const evs = f1ListEvs(); if (!evs) return; let ch = 0;
   evs.forEach((e, k) => { const c = document.getElementById('f1c' + e.id), rd = c && c.querySelector('.f1rd'); if (!rd || !c.classList.contains('f1up')) return; const h = f1RdHTML(e, k, false); if (rd.innerHTML !== h) { rd.innerHTML = h; ch = 1; }
     const lc = f1LiveComp(e), big = c.querySelector('.f1big'), ct = c.querySelector('.f1ct'); if (!big || !ct) return;
-    const hb = lc ? f1LiveBig(lc) : esc(f1DatesY(e)), hc = lc ? (f1Top3(lc) || esc((e.circuit && e.circuit.fullName) || '')) : esc((e.circuit && e.circuit.fullName) || '');
-    if (big.innerHTML !== hb) { big.innerHTML = hb; ch = 1; } if (ct.innerHTML !== hc) { ct.innerHTML = hc; ch = 1; } });
+    const W = !lc && f1WkOn(e) ? f1WkLines(e) : null, hb = lc ? f1LiveBig(lc) : W ? W[0] : esc(f1DatesY(e)), hc = lc ? (f1Top3(lc) || esc((e.circuit && e.circuit.fullName) || '')) : W ? W[1] : esc((e.circuit && e.circuit.fullName) || '');
+    if (big.innerHTML !== hb) { big.innerHTML = hb; ch = 1; f1NameFit(c); } if (ct.innerHTML !== hc) { ct.innerHTML = hc; ch = 1; } });
   if (ch) { try { f1UpAlign(); } catch (e) {} } }
 /* live: while a session runs, the current GP (small scoreboard) every 25 s + the session flag; the open session's driver table every 60 s */
 F1.lv = { t: 0, d: 0 };
@@ -4750,7 +4684,7 @@ async function f1LiveTick() { if (document.hidden || !Object.keys(F1.sb).length)
 setInterval(() => { f1LiveTick().catch(() => {}); }, 5000);
 document.addEventListener('visibilitychange', () => { if (!document.hidden) { F1.lv.t = 0; f1LiveTick().catch(() => {}); } });
 const f1LSig = () => { const evs = f1ListEvs(); return (evs ? f1Sig(evs) + evs.filter(f1WkOn).map(e => e.id).join() : 'x') + '|' + (F1.listY || '') + '|' + (F1.listY || f1ShowY() || '') + '|' + (F1.err || '') + '|' + (F1.hOpen ? 1 : 0); };
-function renderF1List(tabs) {
+function renderF1List() {
   F1._y0 = F1.scrolled ? window.scrollY : null;
   const evs = f1ListEvs();
   let body = '', strip = '';
@@ -4763,13 +4697,12 @@ function renderF1List(tabs) {
       const rc = f1Comp(e, 'Race'), done = f1Done(rc) || !!(rc && rc.date && new Date(rc.date) < Date.now() - 3 * 36e5 && (rc.competitors || []).some(c => c.order === 1)), w = done && rc && (rc.competitors || []).find(c => c.order === 1), cid = e.circuit && e.circuit.id, cu = F1.circ[cid];
       if (cid && cu === undefined) f1Circ(e).then(f1Rr);
       return `<div class="card f1card${done ? '' : ' f1up'}" data-f1race="${esc(e.id)}" data-f1ry="${esc(e._y || '')}" id="f1c${esc(e.id)}"><div class="f1cl1"><div class="f1rd">${f1RdHTML(e, k, done)}</div><div class="f1tt">${f1Flag(e)}<div class="f1nm">${esc(f1Short(e).replace(/-Catalunya/i, ''))}</div></div>
-        ${!done && f1LiveComp(e) ? (lc => `<div class="f1big">${f1LiveBig(lc)}</div><div class="f1ct">${f1Top3(lc) || esc((e.circuit && e.circuit.fullName) || '')}</div>`)(f1LiveComp(e)) : done ? (pod => pod.length ? `<div class="f1pod">${pod.map(c => `<img class="hs p${c.order}" src="${esc(f1Hs(c.id))}" alt="" onerror="this.onerror=null;this.src=SIL">`).join('')}</div>` : '')([1, 2, 3].map(o => (rc.competitors || []).find(c => c.order === o)).filter(Boolean)) : `<div class="f1big">${esc(f1DatesY(e))}</div><div class="f1ct">${esc((e.circuit && e.circuit.fullName) || '')}</div>`}</div>
+        ${!done && !f1LiveComp(e) && f1WkOn(e) && f1WkLines(e) ? (L => `<div class="f1big">${L[0]}</div><div class="f1ct">${L[1]}</div>`)(f1WkLines(e)) : !done && f1LiveComp(e) ? (lc => `<div class="f1big">${f1LiveBig(lc)}</div><div class="f1ct">${f1Top3(lc) || esc((e.circuit && e.circuit.fullName) || '')}</div>`)(f1LiveComp(e)) : done ? (pod => pod.length ? `<div class="f1pod">${pod.map(c => `<img class="hs p${c.order}" src="${esc(f1Hs(c.id))}" alt="" onerror="this.onerror=null;this.src=SIL">`).join('')}</div>` : '')([1, 2, 3].map(o => (rc.competitors || []).find(c => c.order === o)).filter(Boolean)) : `<div class="f1big">${esc(f1DatesY(e))}</div><div class="f1ct">${esc((e.circuit && e.circuit.fullName) || '')}</div>`}</div>
         <div class="f1map">${f1MapCell(e)}</div></div>`; }).join('');
   }
   const os = document.getElementById('strip'), prev = os && state.stripKey === 'f1' ? os.scrollLeft : null; state.stripKey = 'f1';
   $app.innerHTML = `
-    ${lyHead({ strip, f1: 1, quick: [['data-f1v="std"', 'Table', LY_TROPHY], ['data-f1v="stats"', 'Stats', LY_CHART]], title: 'F1 ' + (F1.listY || f1ShowY() || f1Year()), sub: (evs && evs.length ? evs.length + ' RACES' : '') }) || `<header><div class="tabs htabs">${tabs}<button class="icon" data-search aria-label="Search">${SEARCH_SVG}</button></div>
-    ${strip ? `<div class="strip" id="strip">${strip}</div>` : ''}<div class="qb"><button data-f1v="stats">Statistics</button><button data-f1v="std">Standings</button></div></header>`}
+    ${lyHead({ strip, f1: 1, quick: [['data-f1v="std"', 'Table', LY_TROPHY], ['data-f1v="stats"', 'Stats', LY_CHART]] })}
     <main class="f1list" data-sig="${esc(f1LSig())}">${body}</main>`;
   const s = document.getElementById('strip'); if (s) { if (prev != null) s.scrollLeft = prev; else f1CenterStrip(false); }
   f1Fit();
@@ -4791,7 +4724,8 @@ function f1NameFit(c) { const nm = c.querySelector('.f1nm'), mp = c.querySelecto
   const lim = () => { const ir = im && im.naturalWidth ? im.getBoundingClientRect() : null; return (ir && ir.width > 4 ? ir.left : mp.getBoundingClientRect().left) - 14; };
   const tr = () => { const r = document.createRange(); r.selectNodeContents(nm); return r.getBoundingClientRect().right; };
   nm.style.maxWidth = ''; if (tr() > lim() && /Grand Prix/.test(nm.textContent)) nm.textContent = nm.textContent.replace(/Grand Prix/, 'GP');
-  if (tr() > lim()) nm.style.maxWidth = Math.max(40, lim() - nm.getBoundingClientRect().left) + 'px'; }
+  if (tr() > lim()) nm.style.maxWidth = Math.max(40, lim() - nm.getBoundingClientRect().left) + 'px';
+  { const bg = c.querySelector('.f1big'), fi = bg && bg.querySelector('.f1in'); if (fi) { fi.classList.remove('hid'); const r = document.createRange(); r.selectNodeContents(bg); if (r.getBoundingClientRect().right > lim()) fi.classList.add('hid'); } } }
 /* upcoming GP card: GP name's capitals start as far from the card top as the track map, the circuit name's baseline sits as far from the bottom as the map */
 /* F1 list cards: ROUND label and GP name at the same spots on every card (gap = what an evenly spaced upcoming card gets);
    upcoming: date + circuit evenly spaced down to the bottom edge; finished: podium (P1–P3 balls) centred between the flag and the card bottom */
@@ -4968,7 +4902,8 @@ function f1RaceHTML(v) {
   const need0 = (cc, st) => { const k = cc.id + (st ? 's' : ''); F1.rdv = F1.rdv || {}; F1.rdp = F1.rdp || {}; if (F1.rdv[k] || F1.rdp[k]) return F1.rdv[k] || null; F1.rdp[k] = 1; f1Detail(ev.id, cc, st).then(rows => { F1.rdv[k] = rows; if (state.lv === v) render(); }).catch(() => { F1.rdp[k] = 0; }); return null; };
   if (grp[0] === 'g') { /* official grid (startOrder, incl. grid penalties); falls back to the qualifying order */
     const qc = f1Comp(ev, 'Qual'); if (!qc || !f1Done(qc) || !(qc.competitors || []).length) return { ysel, top, body: body + msg('No results availible') };
-    const det = need0(qc, false), gm = f1GridMap(ev, v), rows = f1Base(qc).map(r => gm && gm[r.id] ? Object.assign(r, { q: r.order, order: gm[r.id] }) : r);
+    const gm0 = f1GridMap(ev, v); if (gm0 === null) return { ysel, top, body: body + msg('Loading…') }; /* still asking ESPN for the official grid – no "not published" flash */
+    const det = need0(qc, false), gm = gm0, rows = f1Base(qc).map(r => gm && gm[r.id] ? Object.assign(r, { q: r.order, order: gm[r.id] }) : r);
     return { ysel, top, body: body + (gm ? '' : `<div class="f1grid">Qualifying order – official grid not published yet</div>`) + f1Table(rows, det, 'grid', ey) }; }
   if (f1CompLive(c) && (c.competitors || []).length) { /* running now: live order (+ laps / gaps, re-read every minute) */
     F1.lvd = F1.lvd || {}; const L = F1.lvd[c.id] || (F1.lvd[c.id] = { rows: null, t: 0, p: 0 });
@@ -5008,6 +4943,8 @@ function f1Table(rows, det, mode, y) {
     { const has = R.filter(r => qt(r, k) > 0).sort((a, b) => qt(a, k) - qt(b, k)), no = k === '1' ? R.filter(r => !(qt(r, k) > 0)).sort((a, b) => (a.order || 99) - (b.order || 99)) : [];
       if (!has.length) return msg('No results availible');
       R = has.concat(no); R.forEach((r, i) => { r.order = i + 1; }); const P0 = qt(has[0], k); timeOf = r => { const t = qt(r, k); return !t ? 'DNF' : r.order === 1 ? f1Ms(t) : '+' + ((t - P0) / 1000).toFixed(3); }; } }
+  /* no times from ESPN (yet / at all) but laps are known → show laps instead of an empty column */
+  if (det && mode !== 'grid' && !/^live/.test(mode) && R.length && !R.some(r => timeOf(r)) && R.some(r => V(r, 'lapsCompleted') > 0)) { timeOf = r => { const l = V(r, 'lapsCompleted'); return l ? String(l) : ''; }; mode = 'liveL'; }
   return `<section class="blk"><table class="nfx sep f1t f1res ${pc ? 'f1pc' : ''}"><colgroup><col style="width:34px"><col><col style="width:${pc ? 104 : 88}px">${pc ? '<col style="width:30px">' : ''}</colgroup><thead><tr><th class="n">#</th><th class="l ph">Driver</th><th class="tl">${mode === 'grid' ? '' : mode === 'liveL' ? 'Laps' : mode === 'liveG' ? 'Gap' : 'Time'}</th>${pc ? '<th>Pts</th>' : ''}</tr></thead><tbody>${R.sort((a, b) => (a.order || 99) - (b.order || 99)).map(r => `<tr data-f1drv="${esc(r.id)}"><td class="n f1rk ${pc && r.order <= 3 ? 'p' + r.order : ''}">${esc(String(r.order || ''))}</td><td class="l">${f1Drv(r.id, r.name || '', r.team).replace(/<\/div><\/div>$/, fl && fl.id === r.id ? '</div><i class="f1fast" title="Fastest lap">⚡</i></div>' : '</div></div>')}</td><td class="f1tm">${mode === 'grid' && r.q && r.order > r.q ? `<small class="f1pen">Grid penalty<br><span style="white-space:nowrap">Qualified P${r.q}</span></small>` : esc(det ? timeOf(r) : '')}</td>${pc ? `<td>${esc(det ? ptsOf(r) : '')}</td>` : ''}</tr>`).join('')}</tbody></table></section>`;
 }
 
