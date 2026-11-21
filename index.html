@@ -4939,13 +4939,12 @@ function f1Table(rows, det, mode, y) {
     const ldr = R.filter(r => own(r) > 0).sort((a, b) => (a.order || 99) - (b.order || 99))[0], L0 = ldr ? own(ldr) : 0, withT = R.filter(r => own(r) > 0 || V(r, 'behindTime') > 0).length, many = withT >= R.length / 2;
     timeOf = r => { const t = own(r); if (r === ldr) return f1Ms(t); const b = S(r, 'behindTime'); if (b && b.v > 0) return b.d; if (t && L0) return '+' + ((t - L0) / 1000).toFixed(3); return mode === 'qT' && many ? 'DNF' : ''; }; }
   let outFrom = 99;
-  if (mode === 'liveQ') { /* live qualifying: once Q1 (Q2) is over, the drivers knocked out are shown in red – 6 per segment with 22 cars, 5 with 20 */
-    const seg = R.some(r => V(r, 'qual3TimeMS') > 0) ? 3 : R.some(r => V(r, 'qual2TimeMS') > 0) ? 2 : 1, n = R.length, k = n >= 22 ? 6 : 5;
+  if (mode === 'liveQ') { /* live qualifying: ESPN fills Q1 (Q2) times only for the drivers knocked out, once that segment is over → those are red and keep their time; the rest show the live gap to the leader */
+    const n = R.length, k = n >= 22 ? 6 : 5, q = (r, m) => V(r, 'qual' + m + 'TimeMS'), seg = R.some(r => q(r, 2) > 0) ? 3 : R.some(r => q(r, 1) > 0) ? 2 : 1;
     if (seg >= 2) outFrom = n - k + 1; if (seg >= 3) outFrom = n - 2 * k + 1;
-    /* time column: best lap of the running segment; knocked-out drivers keep the time they went out with */
-    timeOf = r => { const q = m => V(r, 'qual' + m + 'TimeMS'), t = r.order >= outFrom ? (r.order > n - k ? q(1) : q(2)) : q(seg); return t ? f1Ms(t) : ''; }; mode = R.some(r => timeOf(r)) ? 'liveT' : 'liveN';
-    /* ESPN sends the Q1–Q3 times only afterwards, but a live gap to the leader */
-    if (mode === 'liveN' && R.some(r => V(r, 'gapToLeader') > 0)) { timeOf = r => { const b = S(r, 'gapToLeader'); return r.order === 1 ? 'Leader' : b && b.v > 0 ? b.d : ''; }; mode = 'liveG'; } }
+    const gap = R.some(r => r.order < outFrom && V(r, 'gapToLeader') > 0);
+    timeOf = r => { if (r.order >= outFrom) { const t = r.order > n - k ? q(r, 1) : q(r, 2); return t ? f1Ms(t) : ''; } if (!gap) return ''; const b = S(r, 'gapToLeader'); return r.order === 1 ? 'Leader' : b && b.v > 0 ? b.d : ''; };
+    mode = gap ? 'liveG' : R.some(r => timeOf(r)) ? 'liveT' : 'liveN'; }
   if (mode === 'live') { const gk = R.some(r => V(r, 'gapToLeader') > 0) ? 'gapToLeader' : R.some(r => V(r, 'behindTime') > 0) ? 'behindTime' : '';
     timeOf = r => { if (gk) { const b = S(r, gk); return r.order === 1 ? 'Leader' : b && b.v > 0 ? b.d : ''; } const l = V(r, 'lapsCompleted'); return l ? String(l) : ''; }; mode = gk ? 'liveG' : 'liveL'; }
   else if (/^q[123]$/.test(mode) && det) { const k = mode.slice(1), qt = (r, n) => V(r, 'qual' + n + 'TimeMS');
