@@ -1090,6 +1090,7 @@ html.fsg td.n .slg{top:.75px}
 .f1rd .rdl,.f1big .rdl{color:var(--live)}
 .f1big .f1fl{display:inline-block;width:9px;height:9px;border-radius:50%;margin-left:7px;vertical-align:calc(var(--capc, .405em) - 4.5px)}
 .f1ct .f1t3n{color:#fff}
+tr.f1out td.f1rk,tr.f1out .f1dn b{color:var(--live)}
 .f1big{white-space:nowrap}
 .f1big .f1in{font-size:.78em;color:var(--mut)}
 .f1big .f1in.rdl{color:var(--live)}
@@ -4896,7 +4897,7 @@ function f1RaceHTML(v) {
   const c = f1Comp(ev, ab), race = ab === 'Race' || ab === 'SR' || grp[3] === 'sprint', mode = grp[3] || (race ? (ab === 'SR' ? 'sprint' : 'race') : isQ ? 'q' + v.q : 'fp');
   const cd = c && c.date ? new Date(c.date) : null, when = cd && !isNaN(cd) ? `${DAYS[cd.getDay()]} ${cd.getDate()}.${cd.getMonth() + 1}. - ${String(cd.getHours()).padStart(2, '0')}:${String(cd.getMinutes()).padStart(2, '0')}` : '';
   const lvh = f1CompLive(c) ? `<span class="f1when f1lvh"><i class="f1ld"></i>${f1Lap(c) ? 'Lap ' + f1Lap(c) : 'Live'}${f1FlagT(c._flag) ? ` · <span class="flg" style="color:${f1FlagC(c._flag)}">${esc(f1FlagT(c._flag))}</span>` : ''}</span>` : '';
-  const whenT = c && f1Done(c) ? 'Finished' : when;
+  const whenT = grp[0] === 'g' ? '' : c && f1Done(c) ? 'Finished' : when;
   let body = `<div class="sec f1sh">${esc(grp[0] === 'fp' ? (F1SES[ab] || ab) : grp[1])}${lvh || (whenT ? `<span class="f1when">${esc(whenT)}</span>` : '')}</div>` + sub;
   if (!c) return { ysel, top, body: body + msg('No results availible') };
   const need0 = (cc, st) => { const k = cc.id + (st ? 's' : ''); F1.rdv = F1.rdv || {}; F1.rdp = F1.rdp || {}; if (F1.rdv[k] || F1.rdp[k]) return F1.rdv[k] || null; F1.rdp[k] = 1; f1Detail(ev.id, cc, st).then(rows => { F1.rdv[k] = rows; if (state.lv === v) render(); }).catch(() => { F1.rdp[k] = 0; }); return null; };
@@ -4908,7 +4909,7 @@ function f1RaceHTML(v) {
   if (f1CompLive(c) && (c.competitors || []).length) { /* running now: live order (+ laps / gaps, re-read every minute) */
     F1.lvd = F1.lvd || {}; const L = F1.lvd[c.id] || (F1.lvd[c.id] = { rows: null, t: 0, p: 0 });
     if (!L.p && Date.now() - L.t > 55e3) { L.p = 1; f1Detail(ev.id, c, false, true).then(r => { L.rows = r; L.t = Date.now(); L.p = 0; if (state.lv === v && topView() === 'lv') render(); }).catch(() => { L.p = 0; L.t = Date.now(); }); }
-    return { ysel, top, body: body + f1Table(f1Base(c), L.rows, 'live', ey) }; }
+    return { ysel, top, body: (isQ && sub ? body.replace(sub, '') : body) + f1Table(f1Base(c), L.rows, isQ ? 'liveQ' : 'live', ey) }; } /* Q1/Q2/Q3 tabs only once the times are in */
   if (!f1Done(c)) { const qc = ab === 'SR' ? f1Comp(ev, 'SS') : null;
     if (qc && f1Done(qc) && (qc.competitors || []).length) { const det = need0(qc, false);
       return { ysel, top, body: body + `<div class="f1grid">Starting grid (sprint qualifying order)</div>` + f1Table(f1Base(qc), det, 'grid', ey) }; }
@@ -4937,15 +4938,19 @@ function f1Table(rows, det, mode, y) {
     const qt = (r, n) => V(r, 'qual' + n + 'TimeMS'), own = r => (mode === 'qT' ? (qt(r, 3) || qt(r, 2) || qt(r, 1)) : 0) || V(r, 'fastestLap') || V(r, 'totalTime');
     const ldr = R.filter(r => own(r) > 0).sort((a, b) => (a.order || 99) - (b.order || 99))[0], L0 = ldr ? own(ldr) : 0, withT = R.filter(r => own(r) > 0 || V(r, 'behindTime') > 0).length, many = withT >= R.length / 2;
     timeOf = r => { const t = own(r); if (r === ldr) return f1Ms(t); const b = S(r, 'behindTime'); if (b && b.v > 0) return b.d; if (t && L0) return '+' + ((t - L0) / 1000).toFixed(3); return mode === 'qT' && many ? 'DNF' : ''; }; }
-  else if (mode === 'live') { const gap = R.some(r => V(r, 'behindTime') > 0);
+  let outFrom = 99;
+  if (mode === 'liveQ') { /* live qualifying: once Q1 (Q2) is over, the drivers knocked out are shown in red – 6 per segment with 22 cars, 5 with 20 */
+    const seg = R.some(r => V(r, 'qual3TimeMS') > 0) ? 3 : R.some(r => V(r, 'qual2TimeMS') > 0) ? 2 : 1, n = R.length, k = n >= 22 ? 6 : 5;
+    if (seg >= 2) outFrom = n - k + 1; if (seg >= 3) outFrom = n - 2 * k + 1; mode = 'live'; }
+  if (mode === 'live') { const gap = R.some(r => V(r, 'behindTime') > 0);
     timeOf = r => { if (gap) { const b = S(r, 'behindTime'); return r.order === 1 ? '' : b && b.v > 0 ? b.d : ''; } const l = V(r, 'lapsCompleted'); return l ? String(l) : ''; }; mode = gap ? 'liveG' : 'liveL'; }
-  else if (/^q/.test(mode) && det) { const k = mode.slice(1), qt = (r, n) => V(r, 'qual' + n + 'TimeMS');
+  else if (/^q[123]$/.test(mode) && det) { const k = mode.slice(1), qt = (r, n) => V(r, 'qual' + n + 'TimeMS');
     { const has = R.filter(r => qt(r, k) > 0).sort((a, b) => qt(a, k) - qt(b, k)), no = k === '1' ? R.filter(r => !(qt(r, k) > 0)).sort((a, b) => (a.order || 99) - (b.order || 99)) : [];
       if (!has.length) return msg('No results availible');
       R = has.concat(no); R.forEach((r, i) => { r.order = i + 1; }); const P0 = qt(has[0], k); timeOf = r => { const t = qt(r, k); return !t ? 'DNF' : r.order === 1 ? f1Ms(t) : '+' + ((t - P0) / 1000).toFixed(3); }; } }
   /* no times from ESPN (yet / at all) but laps are known → show laps instead of an empty column */
   if (det && mode !== 'grid' && !/^live/.test(mode) && R.length && !R.some(r => timeOf(r)) && R.some(r => V(r, 'lapsCompleted') > 0)) { timeOf = r => { const l = V(r, 'lapsCompleted'); return l ? String(l) : ''; }; mode = 'liveL'; }
-  return `<section class="blk"><table class="nfx sep f1t f1res ${pc ? 'f1pc' : ''}"><colgroup><col style="width:34px"><col><col style="width:${pc ? 104 : 88}px">${pc ? '<col style="width:30px">' : ''}</colgroup><thead><tr><th class="n">#</th><th class="l ph">Driver</th><th class="tl">${mode === 'grid' ? '' : mode === 'liveL' ? 'Laps' : mode === 'liveG' ? 'Gap' : 'Time'}</th>${pc ? '<th>Pts</th>' : ''}</tr></thead><tbody>${R.sort((a, b) => (a.order || 99) - (b.order || 99)).map(r => `<tr data-f1drv="${esc(r.id)}"><td class="n f1rk ${pc && r.order <= 3 ? 'p' + r.order : ''}">${esc(String(r.order || ''))}</td><td class="l">${f1Drv(r.id, r.name || '', r.team).replace(/<\/div><\/div>$/, fl && fl.id === r.id ? '</div><i class="f1fast" title="Fastest lap">⚡</i></div>' : '</div></div>')}</td><td class="f1tm">${mode === 'grid' && r.q && r.order > r.q ? `<small class="f1pen">Grid penalty<br><span style="white-space:nowrap">Qualified P${r.q}</span></small>` : esc(det ? timeOf(r) : '')}</td>${pc ? `<td>${esc(det ? ptsOf(r) : '')}</td>` : ''}</tr>`).join('')}</tbody></table></section>`;
+  return `<section class="blk"><table class="nfx sep f1t f1res ${pc ? 'f1pc' : ''}"><colgroup><col style="width:34px"><col><col style="width:${pc ? 104 : 88}px">${pc ? '<col style="width:30px">' : ''}</colgroup><thead><tr><th class="n">#</th><th class="l ph">Driver</th><th class="tl">${mode === 'grid' ? '' : mode === 'liveL' ? 'Laps' : mode === 'liveG' ? 'Gap' : 'Time'}</th>${pc ? '<th>Pts</th>' : ''}</tr></thead><tbody>${R.sort((a, b) => (a.order || 99) - (b.order || 99)).map(r => `<tr data-f1drv="${esc(r.id)}"${r.order >= outFrom ? ' class="f1out"' : ''}><td class="n f1rk ${pc && r.order <= 3 ? 'p' + r.order : ''}">${esc(String(r.order || ''))}</td><td class="l">${f1Drv(r.id, r.name || '', r.team).replace(/<\/div><\/div>$/, fl && fl.id === r.id ? '</div><i class="f1fast" title="Fastest lap">⚡</i></div>' : '</div></div>')}</td><td class="f1tm">${mode === 'grid' && r.q && r.order > r.q ? `<small class="f1pen">Grid penalty<br><span style="white-space:nowrap">Qualified P${r.q}</span></small>` : esc(det ? timeOf(r) : '')}</td>${pc ? `<td>${esc(det ? ptsOf(r) : '')}</td>` : ''}</tr>`).join('')}</tbody></table></section>`;
 }
 
 function route() {
