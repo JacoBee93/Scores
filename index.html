@@ -4551,8 +4551,34 @@ const f1Comp = (ev, ab) => (ev.competitions || []).find(c => c.type && (c.type.a
 const f1Done = c => !!(c && ((c.status && c.status.type && c.status.type.completed) || (typeof f1Chq === 'function' && f1Chq(c) && (c.competitors || []).length)));
 const f1Pos = (c, aid) => { const x = c && (c.competitors || []).find(z => String(z.id) === String(aid)); return x ? x.order : null; };
 const f1Cx = e => /CANCEL/i.test(String((e.status && e.status.type && (e.status.type.name || e.status.type.description)) || '')); /* cancelled GPs disappear (like on formula1.com) → rounds renumber automatically */
+/* ESPN links an old Grand Prix to the venue that GP uses today (2016 Spanish GP → Madring) or to none (2016 European GP) → the real venue by year */
+const F1VEN = {
+  spanish: [[2002, 2025, 'Circuit de Barcelona-Catalunya'], [2026, 2026, 'Madring']],
+  european: [[2002, 2007, 'Nürburgring'], [2008, 2012, 'Valencia Street Circuit'], [2016, 2016, 'Baku City Circuit']],
+  german: [[2002, 2006, 'Hockenheimring'], [2008, 2008, 'Hockenheimring'], [2009, 2009, 'Nürburgring'], [2010, 2010, 'Hockenheimring'], [2011, 2011, 'Nürburgring'], [2012, 2012, 'Hockenheimring'], [2013, 2013, 'Nürburgring'], [2014, 2019, 'Hockenheimring']],
+  japanese: [[2002, 2006, 'Suzuka Circuit'], [2007, 2008, 'Fuji Speedway'], [2009, 2026, 'Suzuka Circuit']],
+  'united states': [[2002, 2007, 'Indianapolis Motor Speedway'], [2012, 2026, 'Circuit of the Americas']],
+  french: [[2002, 2008, 'Circuit de Nevers Magny-Cours'], [2018, 2022, 'Circuit Paul Ricard']],
+  'san marino': [[2002, 2006, 'Autodromo Enzo e Dino Ferrari']],
+  'emilia romagna': [[2020, 2026, 'Autodromo Enzo e Dino Ferrari']],
+  eifel: [[2020, 2020, 'Nürburgring']], tuscan: [[2020, 2020, 'Mugello Circuit']], portuguese: [[2020, 2021, 'Algarve International Circuit']],
+  styrian: [[2020, 2021, 'Red Bull Ring']], '70th anniversary': [[2020, 2020, 'Silverstone Circuit']], sakhir: [[2020, 2020, 'Bahrain International Circuit']],
+  malaysian: [[2002, 2017, 'Sepang International Circuit']], korean: [[2010, 2013, 'Korea International Circuit']], indian: [[2011, 2013, 'Buddh International Circuit']],
+  turkish: [[2005, 2011, 'Istanbul Park'], [2020, 2021, 'Istanbul Park']], russian: [[2014, 2021, 'Sochi Autodrom']], dutch: [[2021, 2026, 'Circuit Zandvoort']]
+};
+const f1Nrm = n => String(n || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/\b(circuit|circuito|de|del|da|the|of|international|internacional|autodromo|autódromo|street|city|park|speedway|motor|grand|prix|ring|e|y|nevers)\b/g, ' ').replace(/[^a-z]/g, '');
+/* seasons after the table: the venue ESPN gave while that season was the current one is remembered, so a later move of the GP can't rewrite it */
+F1.venMem = (() => { try { return JSON.parse(localStorage.getItem('f1ven') || '{}'); } catch (e) { return {}; } })();
+function f1VenRemember(evs, y) { if (y < f1Year()) return; let ch = 0; (evs || []).forEach(e => { const n = e.circuit && e.circuit.fullName, k = f1GpKey(e.name || e.shortName || ''); if (!n || !k) return; const m = F1.venMem[k] = F1.venMem[k] || {}; if (m[y] !== n) { m[y] = n; ch = 1; } }); if (ch) try { localStorage.setItem('f1ven', JSON.stringify(F1.venMem)); } catch (e) {} }
+function f1FixCirc(e, y) { const gk = f1GpKey(e.name || e.shortName || ''), L = F1VEN[gk] || (/europ/.test(gk) ? F1VEN.european : /^(?!.*barcelona).*spain/.test(gk) ? F1VEN.spanish : /german|deutschland/.test(gk) ? F1VEN.german : null);
+  let r = L && L.find(x => y >= x[0] && y <= x[1]); if (!r && y < f1Year() && F1.venMem[gk] && F1.venMem[gk][y]) r = [y, y, F1.venMem[gk][y]]; if (!r) return;
+  const have = e.circuit && e.circuit.fullName, kh = f1Nrm(have), kr = f1Nrm(r[2]), ok = have && kh && kr && (kh.includes(kr.slice(0, 6)) || kr.includes(kh.slice(0, 6)));
+  if (ok) return; e.circuit = Object.assign({}, e.circuit || {}, { fullName: r[2], id: undefined, _fix: 1 }); }
+/* the map of a corrected venue: the same circuit from another season, if ESPN has it there */
+function f1FixCid(e) { const c = e.circuit; if (!c || !c._fix || c.id !== undefined) return; const n = f1Nrm(c.fullName).slice(0, 6); if (!n) return;
+  const m = Object.values(F1.ev || {}).find(x => x.circuit && !x.circuit._fix && x.circuit.id && f1Nrm(x.circuit.fullName).includes(n)); c.id = m ? m.circuit.id : null; if (!m) c.id = undefined; return c.id; }
 async function f1Season(y) { y = y || f1Year(); if (F1.sb[y]) return F1.sb[y]; const j = await getJson(F1A + 'scoreboard?dates=' + y), cx = f1Cx; if (+y === f1Year()) F1.lastFull = Date.now();
-  const evs = (j.events || []).filter(e => !cx(e)).sort((a, b) => new Date(a.date) - new Date(b.date)); F1.sb[y] = evs; evs.forEach(e => { F1.ev = F1.ev || {}; F1.ev[e.id] = Object.assign(e, { _y: y }); }); return evs; }
+  const evs = (j.events || []).filter(e => !cx(e)).sort((a, b) => new Date(a.date) - new Date(b.date)); F1.sb[y] = evs; f1VenRemember(evs, +y); evs.forEach(e => { F1.ev = F1.ev || {}; f1FixCirc(e, +y); F1.ev[e.id] = Object.assign(e, { _y: y }); }); return evs; }
 async function f1Stand(y) { y = y || f1Year(); if (F1.st[y]) return F1.st[y]; const j = await getJson(F1S + '?season=' + y); if (Array.isArray(j.seasons) && j.seasons.length) F1.seasons = j.seasons.map(x => +x.year).filter(Boolean); const ch = j.children || []; const r = { drv: (ch.find(c => /driver/i.test(c.name)) || ch[0] || {}).standings, con: (ch.find(c => /constructor/i.test(c.name)) || ch[1] || {}).standings }; F1.st[y] = r; return r; }
 const f1SV = (en, n) => { const s = (en.stats || []).find(x => x.name === n); return s ? s.value : null; };
 const f1StMap = j => { const m = {}; ((((j || {}).splits || {}).categories) || []).forEach(c => (c.stats || []).forEach(s => { m[s.name] = { v: s.value, d: s.displayValue }; })); return m; };
@@ -4596,7 +4622,7 @@ async function f1Refresh(now, force) {
       if (f1Sig([e]) !== s0) { changed = true; delete F1.agg[e._y]; delete F1.st[e._y]; F1.rdv = {}; F1.rdp = {}; F1.rd = {}; } }); } catch (e) {}
   } else { F1.lastFull = t;
   await Promise.all(Object.keys(F1.sb).filter(y => +y >= f1Year() - 1).map(async y => { try { const j = await getJson(F1A + 'scoreboard?dates=' + y, true), evs = (j.events || []).filter(e => !f1Cx(e)).sort((a, b) => new Date(a.date) - new Date(b.date));
-    if (f1Sig(evs) === f1Sig(F1.sb[y])) return; changed = true; F1.sb[y] = evs; evs.forEach(e => { F1.ev[e.id] = Object.assign(e, { _y: +y }); });
+    if (f1Sig(evs) === f1Sig(F1.sb[y])) return; changed = true; F1.sb[y] = evs; f1VenRemember(evs, +y); evs.forEach(e => { f1FixCirc(e, +y); F1.ev[e.id] = Object.assign(e, { _y: +y }); });
     delete F1.agg[y]; delete F1.st[y]; if (F1.tmY) delete F1.tmY[y]; F1.rdv = {}; F1.rdp = {}; F1.rd = {}; if (+y === f1Year()) F1.curY = 0; } catch (e) {} })); }
   if (!changed) return; await f1ResolveY().catch(() => {});
   const v = topView(); if (v === 'list' && state.league === 'f1') { F1.scrolled = F1.selId === F1.curId ? 0 : 1; render(); } else if (v === 'lv' && /^f1/.test(state.lv.kind)) { render(); f1Load(state.lv); }
@@ -4626,11 +4652,11 @@ function f1PtsTable(y, sprint) { if (sprint) return y === 2021 ? [3, 2, 1] : y >
 F1.map = {};
 /* circuit links + processed maps are kept in IndexedDB, so opening F1 never re-downloads / re-processes them */
 F1.pReady = false;
-F1.pLoad = (async () => { try { const v = await IDB.get('f1persist5'), d = v && v.d; if (d) { Object.entries(d.circ || {}).forEach(([k, x]) => { if (typeof x === 'string' && F1.circ[k] === undefined) F1.circ[k] = x; }); Object.entries(d.map || {}).forEach(([k, x]) => { if (!F1.map[k] || F1.map[k] === 'p') F1.map[k] = x; }); if (Date.now() - v.t > 3 * 864e5) F1.pSave(); } } catch (e) {} F1.pReady = true; })();
-F1.pSave = () => { clearTimeout(F1._ps); F1._ps = setTimeout(() => { const circ = {}, map = {}; Object.entries(F1.circ).forEach(([k, x]) => { if (typeof x === 'string' && x !== 'p') circ[k] = x; }); Object.entries(F1.map).forEach(([k, x]) => { if (x && x !== 'p' && (x === 'none' || /^data:/.test(x))) map[k] = x; }); IDB.put('f1persist5', { t: Date.now(), ttl: 1e13, d: { circ, map } }); }, 1500); };
+F1.pLoad = (async () => { try { const v = await IDB.get('f1persist7'), d = v && v.d; if (d) { Object.entries(d.circ || {}).forEach(([k, x]) => { if (typeof x === 'string' && F1.circ[k] === undefined) F1.circ[k] = x; }); Object.entries(d.map || {}).forEach(([k, x]) => { if (!F1.map[k] || F1.map[k] === 'p') F1.map[k] = x; }); if (Date.now() - v.t > 3 * 864e5) F1.pSave(); } } catch (e) {} F1.pReady = true; })();
+F1.pSave = () => { clearTimeout(F1._ps); F1._ps = setTimeout(() => { const circ = {}, map = {}; Object.entries(F1.circ).forEach(([k, x]) => { if (typeof x === 'string' && x !== 'p') circ[k] = x; }); Object.entries(F1.map).forEach(([k, x]) => { if (x && x !== 'p' && (x === 'none' || /^data:/.test(x))) map[k] = x; }); IDB.put('f1persist7', { t: Date.now(), ttl: 1e13, d: { circ, map } }); }, 1500); };
 /* one list re-render for a burst of finished maps / circuits */
 /* finished maps / circuits are put into the cards already on screen – no list re-render, so nothing can jump */
-const f1MapCell = e => { const cid = e.circuit && e.circuit.id, cu = F1.circ[cid]; return cu && cu !== 'p' ? f1MapHTML(cu) : cu === null || !cid ? '<span class="f1nomap">No map data</span>' : ''; };
+const f1MapCell = e => { try { f1FixCid(e); } catch (er) {} const cid = e.circuit && e.circuit.id, cu = F1.circ[cid]; return cu && cu !== 'p' ? f1MapHTML(cu) : cu === null || !cid ? '<span class="f1nomap">No map data</span>' : ''; };
 const f1Rr = () => { clearTimeout(F1._rr); F1._rr = setTimeout(() => { if (topView() !== 'list' || state.league !== 'f1') return; let ch = 0;
   $app.querySelectorAll('.f1list > .f1card[data-f1race]').forEach(c => { const e = F1.ev && F1.ev[c.dataset.f1race], mp = c.querySelector('.f1map'); if (!e || !mp) return; const h = f1MapCell(e);
     if (mp.dataset.mh === h) return; const cur = mp.querySelector('img'), nw = /src="([^"]*)"/.exec(h); mp.dataset.mh = h; if (cur && nw && cur.getAttribute('src') === nw[1]) return; mp.innerHTML = h; ch = 1; f1NameFit(c); });
@@ -4646,14 +4672,15 @@ function f1MapSrc(url) {
       const px = (X, Y) => { const i = (Y * W + X) * 4; return [p[i], p[i + 1], p[i + 2], p[i + 3]]; }, cs = [px(0, 0), px(W - 1, 0), px(0, H - 1), px(W - 1, H - 1)];
       if (cs.every(c => c[3] > 200)) { const bg = cs[0]; for (let i = 0; i < p.length; i += 4) { const dd = Math.abs(p[i] - bg[0]) + Math.abs(p[i + 1] - bg[1]) + Math.abs(p[i + 2] - bg[2]); if (dd < 90) p[i + 3] = Math.round(p[i + 3] * Math.max(0, (dd - 18) / 72)); } }
       /* dark ESPN drawings: the sector labels (and other captions) are grey – the track itself is coloured → drop grey pixels */
-      /* one simple outline: grey/black/white bits (labels, shadows, captions) go, the coloured track becomes one yellow line */
+      const O = new Uint8Array(W * H); for (let k = 0; k < W * H; k++) O[k] = p[k * 4 + 3] > 40 ? 1 : 0; /* what the drawing itself covered */
+      /* one simple outline: grey/black/white bits (labels, shadows, captions) go, the coloured track becomes one grey line (the colour of the circuit name) */
       for (let i = 0; i < p.length; i += 4) { if (!p[i + 3]) continue; const r = p[i], g = p[i + 1], b = p[i + 2], mx = Math.max(r, g, b), sat = mx - Math.min(r, g, b);
-        if (sat < 45) { p[i + 3] = 0; continue; } p[i] = 255; p[i + 1] = 197; p[i + 2] = 47; p[i + 3] = Math.round(p[i + 3] * Math.min(1, sat / 110)); }
+        if (sat < 45) { p[i + 3] = 0; continue; } p[i] = 142; p[i + 1] = 142; p[i + 2] = 147; p[i + 3] = Math.round(p[i + 3] * Math.min(1, sat / 110)); }
       /* markers drawn on the track (start line, sector dots) leave gaps → close a gap when track continues on both sides of it */
-      { const A0 = new Uint8Array(W * H); for (let k = 0; k < W * H; k++) A0[k] = p[k * 4 + 3] > 60 ? 1 : 0; const R = Math.max(6, Math.round(W / 45)), D = [[1, 0], [0, 1], [1, 1], [1, -1]];
-        for (let Y = R; Y < H - R; Y++) for (let X = R; X < W - R; X++) { const k = Y * W + X; if (A0[k]) continue;
+      { const A0 = new Uint8Array(W * H); for (let k = 0; k < W * H; k++) A0[k] = p[k * 4 + 3] > 60 ? 1 : 0; const R = Math.max(5, Math.round(W / 75)), D = [[1, 0], [0, 1], [1, 1], [1, -1]];
+        for (let Y = R; Y < H - R; Y++) for (let X = R; X < W - R; X++) { const k = Y * W + X; if (A0[k] || !O[k]) continue; /* only where something was drawn (a marker) – never the empty space between two close bits of track */
           for (const [dx, dy] of D) { let a = 0, b = 0; for (let t = 1; t <= R && !(a && b); t++) { if (!a && A0[(Y + dy * t) * W + X + dx * t]) a = t; if (!b && A0[(Y - dy * t) * W + X - dx * t]) b = t; }
-            if (a && b && a + b <= R + 1) { const i = k * 4; p[i] = 255; p[i + 1] = 197; p[i + 2] = 47; p[i + 3] = 255; break; } } } }
+            if (a && b && a + b <= R + 1) { const i = k * 4; p[i] = 142; p[i + 1] = 142; p[i + 2] = 147; p[i + 3] = 255; break; } } } }
       let x0 = W, y0 = H, x1 = -1, y1 = -1; for (let Y = 0; Y < H; Y++) for (let X = 0; X < W; X++) if (p[(Y * W + X) * 4 + 3] > 24) { if (X < x0) x0 = X; if (X > x1) x1 = X; if (Y < y0) y0 = Y; if (Y > y1) y1 = Y; }
       if (x1 < 0) return done('none'); x.putImageData(d, 0, 0); const tw = x1 - x0 + 1, th = y1 - y0 + 1, k = Math.min(1, 460 / tw, 260 / th), o = document.createElement('canvas'); o.width = Math.round(tw * k); o.height = Math.round(th * k); const ox = o.getContext('2d'); ox.imageSmoothingEnabled = true; ox.imageSmoothingQuality = 'high'; ox.drawImage(cv, x0, y0, tw, th, 0, 0, o.width, o.height); done(o.toDataURL()); } catch (e) { done(url); } };
   im.onerror = () => { const t = new Image(); t.onload = () => done(url); t.onerror = () => done('none'); t.src = url; };
@@ -4737,7 +4764,7 @@ function renderF1List() {
     const cur = f1CurEv(evs); F1.curId = cur.id; if (!F1.selId || !evs.some(e => e.id === F1.selId)) F1.selId = cur.id;
     strip = evs.map(e => { const d = new Date(e.endDate || e.date); return `<button class="dy ${e.id === F1.selId ? 'on' : ''}${e.id === F1.curId ? ' tdy' : ''}" data-f1go="${esc(e.id)}"><small>${esc(f1Iso(e) || 'GP')}</small>${d.getDate()}.${d.getMonth() + 1}.</button>`; }).join('');
     body = f1HistHTML() + evs.map((e, k) => {
-      const rc = f1Comp(e, 'Race'), done = f1Done(rc) || !!(rc && rc.date && new Date(rc.date) < Date.now() - 3 * 36e5 && (rc.competitors || []).some(c => c.order === 1)), w = done && rc && (rc.competitors || []).find(c => c.order === 1), cid = e.circuit && e.circuit.id, cu = F1.circ[cid];
+      try { f1FixCid(e); } catch (er) {} const rc = f1Comp(e, 'Race'), done = f1Done(rc) || !!(rc && rc.date && new Date(rc.date) < Date.now() - 3 * 36e5 && (rc.competitors || []).some(c => c.order === 1)), w = done && rc && (rc.competitors || []).find(c => c.order === 1), cid = e.circuit && e.circuit.id, cu = F1.circ[cid];
       if (cid && cu === undefined) f1Circ(e).then(f1Rr);
       return `<div class="card f1card${done ? '' : ' f1up'}" data-f1race="${esc(e.id)}" data-f1ry="${esc(e._y || '')}" id="f1c${esc(e.id)}"><div class="f1cl1"><div class="f1rd">${f1RdHTML(e, k, done)}</div><div class="f1tt">${f1Flag(e)}<div class="f1nm">${esc(f1Short(e).replace(/-Catalunya/i, ''))}</div></div>
         ${!done && !f1LiveComp(e) && f1WkOn(e) && f1WkLines(e) ? (L => `<div class="f1big">${L[0]}</div><div class="f1ct">${L[1]}</div>`)(f1WkLines(e)) : !done && f1LiveComp(e) ? (lc => `<div class="f1big">${f1LiveBig(lc)}</div><div class="f1ct">${f1Top3(lc) || esc((e.circuit && e.circuit.fullName) || '')}</div>`)(f1LiveComp(e)) : done ? (pod => pod.length ? `<div class="f1pod">${pod.map(c => `<img class="hs p${c.order}" src="${esc(f1Hs(c.id))}" alt="" onerror="this.onerror=null;this.src=SIL">`).join('')}</div>` : '')([1, 2, 3].map(o => (rc.competitors || []).find(c => c.order === o)).filter(Boolean)) : `<div class="f1big">${esc(f1DatesY(e))}</div><div class="f1ct">${esc((e.circuit && e.circuit.fullName) || '')}</div>`}</div>
