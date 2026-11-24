@@ -642,6 +642,8 @@ html.fsg .sch col:first-child{width:102px !important}
 .nfx tr.tot td{font-weight:700;border-top:1px solid #3a3a3c}
 .nfx th.n,.nfx td.n{width:auto}
 .tw{max-width:100%}
+.tw.snp{scroll-snap-type:x mandatory}
+.tw.snp thead tr:last-child th:not(.n){scroll-snap-align:start}
 
 
 
@@ -709,8 +711,8 @@ td.n .slg{width:20px;height:20px;object-fit:contain;vertical-align:-6px;margin-l
 .lpm{position:fixed;z-index:61;background:#2c2c2e;border-radius:12px;min-width:200px;overflow:hidden;box-shadow:0 10px 30px rgba(0,0,0,.5)}
 .lpm button{display:block;width:100%;text-align:left;padding:14px 16px;font-size:16px;font-weight:600;color:#fff;background:none;border:0;border-bottom:1px solid #3a3a3c;font-family:inherit}
 .lpm button:last-child{border-bottom:0}
-.lpm button[data-fsw],.lpm button[data-bmsw]{display:flex;justify-content:space-between;align-items:center}
-.lpm button[data-fsw]:not(.on),.lpm button[data-bmsw]:not(.on){color:var(--mut)}
+.lpm button[data-mapsw],.lpm button[data-fsw],.lpm button[data-bmsw]{display:flex;justify-content:space-between;align-items:center}
+.lpm button[data-mapsw]:not(.on),.lpm button[data-fsw]:not(.on),.lpm button[data-bmsw]:not(.on){color:var(--mut)}
 .lpck{color:#fff;font-size:15px}
 .lpm button[data-cc]{border-bottom:6px solid #1c1c1e}
 .lvt{font-family:var(--num);font-weight:700;font-size:26px;margin:4px 4px 12px}
@@ -1000,6 +1002,7 @@ html.fsg .f1gp > span:not(.f1fl){position:relative;top:.75px}
 .f1map{flex:0 0 40%;display:flex;align-items:center;justify-content:flex-end}
 .f1pen{display:block;color:var(--mut);font-family:-apple-system,sans-serif;font-size:11.5px;font-weight:600;line-height:1.25}
 .f1nomap{flex:0 0 120px;text-align:center;color:var(--mut);font-size:13px;font-weight:600}
+.f1map img.raw{filter:none;opacity:1}
 .f1map img{display:block;width:auto;height:auto;max-width:100%;max-height:84px;filter:invert(1) brightness(1.6);opacity:.85;-webkit-user-drag:none}
 .f1d{display:flex;align-items:center;gap:10px;min-width:0}
 .f1d .hs{width:36px;height:36px;border-radius:50%;object-fit:cover;background:#2c2c2e;flex:none}
@@ -1317,6 +1320,9 @@ function glDash(root) { (root || $app).querySelectorAll('table.gl2').forEach(tb 
   const h = tb.querySelector('th.grh'); if (h && h.firstChild) { h.style.setProperty('padding-left', (23 + sh) + 'px', 'important'); const sl = Math.min(...rows.map(r => { const b = r.querySelector('.glr b'); return b && b.textContent.trim() ? tx(b).left : 1e9; })), hl = tx(h).left; if (sl < 1e8) h.style.setProperty('padding-left', Math.max(0, 23 + sh + sl - hl) + 'px', 'important'); } }); }
 function tNudge(root) { if (!document.documentElement.classList.contains('fbar')) return;
   (root || document).querySelectorAll('.seg button, .dtabs button, .ybtn, .hpill, .cl, .lpm button, .msg button, .favh, .cmpclr, .ylist button, .f1hy button').forEach(b => { [...b.childNodes].forEach(n => { if (n.nodeType === 3 && n.textContent.trim()) { const sp = document.createElement('span'); sp.className = 'tnud'; n.replaceWith(sp); sp.appendChild(n); } }); }); }
+/* wide tables: a sideways scroll always stops on a column edge right after the sticky first column – never half a column hidden under it */
+function twSnap(root) { (root || $app).querySelectorAll('.tw').forEach(tw => { const tb = tw.querySelector('table'), n = tb && tb.querySelector('thead th.n, tbody td.n'); if (!n || tw.scrollWidth <= tw.clientWidth + 2) { tw.classList.remove('snp'); return; }
+  const pl = Math.ceil(n.getBoundingClientRect().right - tw.getBoundingClientRect().left); tw.style.scrollPaddingLeft = pl + 'px'; tw.classList.add('snp'); }); }
 function zebra(root) {
   (root || $app).querySelectorAll('table.nfx, table.fx, table.lbt, table.gst, table.ros, table.sch').forEach(tb => { const bd = tb.tBodies[0]; if (!bd) return; let z = false, last = false;
     [...bd.rows].forEach(r => { if (r.classList.contains('tot')) { r.classList.remove('zb'); return; } if (r.classList.contains('csub')) { r.classList.toggle('zb', last); return; } if (r.classList.contains('hid')) return; r.classList.toggle('zb', z); last = z; z = !z; }); });
@@ -1368,7 +1374,7 @@ function tabHTML(k) {
   document.addEventListener('touchcancel', () => { const st = S; S = null; if (!st || !st.hz) return; if (raf) { cancelAnimationFrame(raf); raf = 0; } anim(st, 0, 200, () => cleanup(st)); }, { passive: true });
   document.addEventListener('touchstart', e => { if (S && S.hz) { try { cleanup(S); } catch (er) {} } S = null; $app.querySelectorAll('.ghost').forEach(g => g.remove()); if (e.touches.length !== 1 || pop()) return; const t = e.target; if (!t.closest) return;
     if (window.isSAm && isSAm() && e.touches[0].clientX <= 24 && topView() !== 'list') return;
-    const v = topView(), x = e.touches[0].clientX, y = e.touches[0].clientY, base = { x0: x, y0: y, t0: Date.now(), x: 0, hz: false, gh: [] };
+    const v = topView(), x = e.touches[0].clientX, y = e.touches[0].clientY, base = { x0: x, y0: y, t0: Date.now(), x: 0, hz: false, gh: [], sy0: window.scrollY };
     if (v === 'list') { if (state.league === 'fav' || state.league === 'f1' || t.closest('header, #fhome, #ptr')) return; const items = [...$app.querySelectorAll('.dy')], cur = items.findIndex(b => b.classList.contains('on')); if (cur < 0) return;
       S = Object.assign(base, { mode: 'day', el: $app.querySelector('main'), cls: '', items, cur }); return; }
     const pe = t.closest('.pane') || (!t.closest('.stkw, header, .hpill, input') ? $app.querySelector(':scope > main > .pane') : null);
@@ -1377,8 +1383,10 @@ function tabHTML(k) {
     const tw = t.closest('.tw'); S = Object.assign(base, { mode: 'tab', el: pe, cls: 'pane t', items: bs, cur, tw, st0: tw ? tw.scrollLeft : 0 }); }, { passive: true });
   document.addEventListener('touchmove', e => { if (!S) return; const t = e.touches[0], dx = t.clientX - S.x0, dy = t.clientY - S.y0;
     if (!S.hz) {
-      if (Math.abs(dy) > 10 && Math.abs(dy) > Math.abs(dx)) { S = null; return; }
-      if (Math.abs(dx) < 8) return;
+      /* only a clearly sideways drag swipes days/tabs; a vertical scroll (or one already moving the page) never does */
+      if (Math.abs(dy) > 8 && Math.abs(dy) * 1.5 > Math.abs(dx)) { S = null; return; }
+      if (Math.abs(window.scrollY - (S.sy0 == null ? window.scrollY : S.sy0)) > 2) { S = null; return; }
+      if (Math.abs(dx) < 12 || Math.abs(dx) < Math.abs(dy) * 2) return;
       if (S.tw && S.tw.scrollWidth > S.tw.clientWidth + 2) { const atL = S.st0 <= 1, atR = S.st0 >= S.tw.scrollWidth - S.tw.clientWidth - 1; if (!((dx > 0 && atL) || (dx < 0 && atR))) { S = null; return; } }
       { const ap = document.querySelector('#artpop .artbox'); if (ap && S.mode === 'tab') S.ap = ap; }
       S.hz = true; S.W = S.el.offsetWidth; S.P = S.W + (S.mode === 'tab' ? 18 : 0); S.el.parentNode.style.position = 'relative';
@@ -1391,8 +1399,9 @@ function tabHTML(k) {
       if (S.mode === 'day') { S.strip = document.getElementById('strip'); if (S.strip) { S.iw = (S.items[1] ? S.items[1].offsetLeft - S.items[0].offsetLeft : 70); S.sl0 = S.strip.scrollLeft; S.onk = S.cur; S.strip.style.scrollSnapType = 'none'; } }
       return;
     }
+    if (e.cancelable) e.preventDefault(); /* swiping sideways: the page must not scroll up/down at the same time */
     let x = t.clientX - S.x0; if ((x > 0 && S.cur === 0) || (x < 0 && S.cur === S.items.length - 1)) x *= .3;
-    S.lx = S.x; S.lt = S.tt || S.t0; S.tt = Date.now(); S.x = x; if (!raf) raf = requestAnimationFrame(apply); }, { passive: true });
+    S.lx = S.x; S.lt = S.tt || S.t0; S.tt = Date.now(); S.x = x; if (!raf) raf = requestAnimationFrame(apply); }, { passive: false });
   document.addEventListener('touchend', () => { const st = S; S = null; if (!st || !st.hz) return; if (raf) { cancelAnimationFrame(raf); raf = 0; }
     const vel = (st.x - (st.lx || 0)) / Math.max(1, (st.tt || 0) - (st.lt || 0)), dir = st.x < 0 ? 1 : -1, j = st.cur + dir;
     const go = j >= 0 && j < st.items.length && (Math.abs(st.x) > st.W * .22 || (Math.abs(vel) > .45 && Math.sign(vel) === Math.sign(st.x)));
@@ -1882,6 +1891,7 @@ function render() {
   try { glDash(); } catch (e) {}
   try { stnFit(); } catch (e) {}
   try { tblAlign(); } catch (e) {}
+  try { twSnap(); } catch (e) {}
   try { stickTop(v); } catch (e) {}
   try { const pn = $app.querySelector('.pane'); if (pn && v === 'player' && state.player && state.player.tab === 'ov' && state.player.done && pn.querySelector('.ssum') && pn.querySelector('.glsec') && !pn.querySelector('tr.nomore')) { const h = pn.offsetHeight; if (h > 200) { window._ovH = h; try { localStorage.setItem('ovH', String(h)); } catch (e) {} } }
     const nwOn = (v === 'player' && state.player && (state.player.tab === 'news' || (state.player.tab === 'ov' && state.player.done && !(pn && pn.querySelector('.ssum') && pn.querySelector('.glsec') && !pn.querySelector('tr.nomore'))))) || (v === 'team' && state.team && state.team.tab === 'news'); if (pn && nwOn) { const h = window._ovH || +(localStorage.getItem('ovH') || 0) || 415; if (h > 200) pn.style.minHeight = h + 'px'; if (pn.querySelector('.nws')) pn.classList.add('nwp'); } } catch (e) {}
@@ -4470,9 +4480,10 @@ function renderLeaders() {
     const o = document.createElement('div'); o.className = 'lpo';
     const m = document.createElement('div'); m.className = 'lpm';
     m.style.top = (r.bottom + 8) + 'px'; m.style.left = Math.min(r.left, window.innerWidth - 216) + 'px';
-    m.innerHTML = `<button data-cc>Clear cache</button>${(() => { const de = document.documentElement, cur = de.classList.contains('fsg') ? 'sg' : 'bar'; return [['bar', 'Bleacher font'], ['sg', 'Mercedes font']].map(([k, t]) => `<button data-fsw="${k}" class="${k === cur ? 'on' : ''}">${t}${k === cur ? '<span class="lpck">✓</span>' : ''}</button>`).join(''); })()}${[['2', 'Pill menu'], ['3', 'Bar menu']].map(([k, t], i) => `<button data-bmsw="${k}" class="${i ? '' : 'lyf '}${lyMenu() === k ? 'on' : ''}">${t}${lyMenu() === k ? '<span class="lpck">✓</span>' : ''}</button>`).join('')}`;
+    m.innerHTML = `<button data-cc>Clear cache</button>${(() => { const de = document.documentElement, cur = de.classList.contains('fsg') ? 'sg' : 'bar'; return [['bar', 'Bleacher font'], ['sg', 'Mercedes font']].map(([k, t]) => `<button data-fsw="${k}" class="${k === cur ? 'on' : ''}">${t}${k === cur ? '<span class="lpck">✓</span>' : ''}</button>`).join(''); })()}${[['2', 'Pill menu'], ['3', 'Bar menu']].map(([k, t], i) => `<button data-bmsw="${k}" class="${i ? '' : 'lyf '}${lyMenu() === k ? 'on' : ''}">${t}${lyMenu() === k ? '<span class="lpck">✓</span>' : ''}</button>`).join('')}${F1MS.map(([k, t], i) => `<button data-mapsw="${k}" class="${i ? '' : 'lyf '}${f1MapSt() === k ? 'on' : ''}">${t}${f1MapSt() === k ? '<span class="lpck">✓</span>' : ''}</button>`).join('')}`;
     o.addEventListener('click', close);
     m.addEventListener('click', ev => {
+      { const mb = ev.target.closest('[data-mapsw]'); if (mb) { try { localStorage.setItem('f1map', mb.dataset.mapsw); } catch (er) {} close(); render(); return; } }
       { const bmb = ev.target.closest('[data-bmsw]'); if (bmb) { const k = bmb.dataset.bmsw; try { localStorage.setItem('bmenu', k); } catch (er) {} close(); render(); return; } }
       if (ev.target.closest('[data-fsw]')) { const de = document.documentElement, nx = ev.target.closest('[data-fsw]').dataset.fsw; de.classList.toggle('fbar', nx !== 'sg'); de.classList.toggle('fsg', nx === 'sg'); try { localStorage.setItem('font', nx); } catch (er) {} close(); render(); return; }
       if (!ev.target.closest('[data-cc]')) return;
@@ -4536,7 +4547,8 @@ const f1DatesY = ev => f1Dates(ev) + (ev && ev._y && +ev._y !== (f1ShowY() || f1
 const f1Dates = ev => { const a = new Date(ev.date), b = new Date(ev.endDate || ev.date); return a.getMonth() === b.getMonth() ? `${a.getDate()}–${b.getDate()}.${b.getMonth() + 1}.` : `${a.getDate()}.${a.getMonth() + 1}.–${b.getDate()}.${b.getMonth() + 1}.`; };
 const f1TM = y => (F1.team[y || 0] = F1.team[y || 0] || {});
 const f1Comp = (ev, ab) => (ev.competitions || []).find(c => c.type && (c.type.abbreviation === ab || (ab === 'SR' && c.type.abbreviation === 'Sprint')));
-const f1Done = c => !!(c && c.status && c.status.type && c.status.type.completed);
+/* finished: ESPN says so – or the chequered flag has been shown (ESPN keeps "in progress" for a long while after it; the order is re-read on every refresh anyway) */
+const f1Done = c => !!(c && ((c.status && c.status.type && c.status.type.completed) || (typeof f1Chq === 'function' && f1Chq(c) && (c.competitors || []).length)));
 const f1Pos = (c, aid) => { const x = c && (c.competitors || []).find(z => String(z.id) === String(aid)); return x ? x.order : null; };
 const f1Cx = e => /CANCEL/i.test(String((e.status && e.status.type && (e.status.type.name || e.status.type.description)) || '')); /* cancelled GPs disappear (like on formula1.com) → rounds renumber automatically */
 async function f1Season(y) { y = y || f1Year(); if (F1.sb[y]) return F1.sb[y]; const j = await getJson(F1A + 'scoreboard?dates=' + y), cx = f1Cx; if (+y === f1Year()) F1.lastFull = Date.now();
@@ -4638,7 +4650,13 @@ function f1MapSrc(url) {
   im.onerror = () => { const t = new Image(); t.onload = () => done(url); t.onerror = () => done('none'); t.src = url; };
   im.src = url; return 'p';
 }
-const f1MapHTML = url => { const m = f1MapSrc(url); return m === 'p' ? '' : m && m !== 'none' ? `<img src="${m}" alt="">` : '<span class="f1nomap">No map data</span>'; };
+/* map style (hidden menu, for trying ESPN's other drawings of the same circuit): 'circuit' = the one used so far */
+const F1MS = [['circuit', 'Map: classic'], ['circuit-dark', 'Map: circuit dark'], ['day-dark', 'Map: day dark'], ['circuit-info-dark', 'Map: info dark']];
+const f1MapSt = () => { try { const v = localStorage.getItem('f1map'); return F1MS.some(x => x[0] === v) ? v : 'circuit'; } catch (e) { return 'circuit'; } };
+const f1MapVar = (url, st) => st === 'circuit' ? url : String(url || '').replace(/\/i\/venues\/f1\/[a-z-]+\//, '/i/venues/f1/' + st + '/');
+const f1MapHTML = url => { const st = f1MapSt(), u = f1MapVar(url, st); let m = f1MapSrc(u), raw = u !== url;
+  if (raw && m === 'none') { m = f1MapSrc(url); raw = false; } /* that drawing does not exist for this circuit → the classic one */
+  return m === 'p' ? '' : m && m !== 'none' ? `<img src="${m}" alt=""${raw ? ' class="raw"' : ''}>` : '<span class="f1nomap">No map data</span>'; };
 
 /* --- main list --- */
 const f1DayEnd = e => { const d = new Date(e.endDate || e.date); d.setHours(23, 59, 59, 999); return d.getTime() + 864e5; };
@@ -4657,8 +4675,9 @@ const f1WkOn = e => { const ts = (e.competitions || []).map(c => new Date(c.date
 const f1SesLive = e => { const now = Date.now(); return (e.competitions || []).some(c => { if (f1Chq(c)) return false; const st = c.status && c.status.type || {}; if (st.completed || st.state === 'post') return false; if (st.state === 'in') return true;
   const t = new Date(c.date).getTime(), ab = String((c.type && c.type.abbreviation) || ''), dur = /race/i.test(ab) ? 135 : /^(SS|SQ)/i.test(ab) ? 50 : 65; return t > 0 && now >= t && now < t + dur * 6e4; }); };
 /* one session (competition) running right now; null otherwise */
-const f1Chq = c => /cheq|check|finish/i.test(String((c && c._flag) || ''));
-const f1CompLive = c => { if (!c) return false; const st = c.status && c.status.type || {}; if (st.completed || st.state === 'post') return false; if (st.state === 'in') return Date.now() < new Date(c.date).getTime() + 4 * 36e5; /* ESPN sometimes keeps "in progress" long after the end */
+F1.chq = (() => { try { return new Set(JSON.parse(localStorage.getItem('f1chq') || '[]')); } catch (e) { return new Set(); } })();
+const f1Chq = c => !!c && (F1.chq.has(String(c.id)) || /cheq|check|finish/i.test(String(c._flag || '')));
+const f1CompLive = c => { if (!c || f1Chq(c)) return false; const st = c.status && c.status.type || {}; if (st.completed || st.state === 'post') return false; if (st.state === 'in') return Date.now() < new Date(c.date).getTime() + 4 * 36e5; /* ESPN sometimes keeps "in progress" long after the end */
   const t = new Date(c.date).getTime(), ab = String((c.type && c.type.abbreviation) || ''), dur = /race/i.test(ab) ? 135 : /^(SS|SQ)/i.test(ab) ? 50 : 65, now = Date.now(); return t > 0 && now >= t && now < t + dur * 6e4; };
 const f1LiveComp = e => (e.competitions || []).find(f1CompLive) || null;
 const F1AB = { FP1: 'Practice 1', FP2: 'Practice 2', FP3: 'Practice 3', SS: 'Sprint Q', SQ: 'Sprint Q', SR: 'Sprint', Sprint: 'Sprint', Qual: 'Qualifying', Race: 'Race' };
@@ -4691,9 +4710,9 @@ async function f1LiveTick() { if (document.hidden || !Object.keys(F1.sb).length)
   let fin = false;
   try { const j = await netJson(F1A + 'scoreboard', true); (j.events || []).forEach(ne => { const e = F1.ev[ne.id]; if (!e) return; (ne.competitions || []).forEach(nc => { const c = (e.competitions || []).find(x => String(x.id) === String(nc.id)); if (!c) return; const was = f1CompLive(c);
       if (nc.competitors) c.competitors = nc.competitors; if (nc.status) c.status = nc.status; if (was && !f1CompLive(c)) { fin = true; delete F1.rd[c.id]; delete F1.rd[c.id + 's']; if (F1.rdv) { delete F1.rdv[c.id]; delete F1.rdv[c.id + 's']; } if (F1.rdp) { F1.rdp[c.id] = 0; F1.rdp[c.id + 's'] = 0; } } }); }); } catch (e) {}
-  await Promise.all(lev.map(e => { const c = f1LiveComp(e); return c ? netJson(F1C + 'events/' + e.id + '/competitions/' + c.id + '/status', true).then(st => { if (st) { c._flag = st.flag || ''; if (st.period != null) c._lap = st.period; } }).catch(() => {}) : null; }));
+  await Promise.all(lev.map(e => { const c = f1LiveComp(e); return c ? netJson(F1C + 'events/' + e.id + '/competitions/' + c.id + '/status', true).then(st => { if (st) { c._flag = st.flag || ''; if (st.period != null) c._lap = st.period; if (f1Chq(c) && !F1.chq.has(String(c.id))) { F1.chq.add(String(c.id)); try { localStorage.setItem('f1chq', JSON.stringify([...F1.chq].slice(-30))); } catch (e) {} fin = true; delete F1.rd[c.id]; delete F1.rd[c.id + 's']; if (F1.rdv) { delete F1.rdv[c.id]; delete F1.rdv[c.id + 's']; } if (F1.rdp) { F1.rdp[c.id] = 0; F1.rdp[c.id + 's'] = 0; } } } }).catch(() => {}) : null; }));
   if (fin) F1.lastRef = 0;
-  if (topView() === 'list' && state.league === 'f1') f1LivePatch(); else if (topView() === 'lv' && state.lv === v) render(); }
+  if (topView() === 'list' && state.league === 'f1') { if (fin) { F1.scrolled = 1; render(); } else f1LivePatch(); } else if (topView() === 'lv' && state.lv === v) render(); }
 setInterval(() => { f1LiveTick().catch(() => {}); }, 5000);
 document.addEventListener('visibilitychange', () => { if (!document.hidden) { F1.lv.t = 0; f1LiveTick().catch(() => {}); } });
 const f1LSig = () => { const evs = f1ListEvs(); return (evs ? f1Sig(evs) + evs.filter(f1WkOn).map(e => e.id).join() : 'x') + '|' + (F1.listY || '') + '|' + (F1.listY || f1ShowY() || '') + '|' + (F1.err || '') + '|' + (F1.hOpen ? 1 : 0); };
