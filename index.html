@@ -1125,7 +1125,7 @@ tr.f1out td.f1rk,tr.f1out .f1dn b{color:var(--live)}
 .seg > button{flex:1 1 auto;padding-left:6px !important;padding-right:6px !important}
 
 /* close buttons (news, shot chart, win probability): red ball, white X dead centre */
-.artx,/* full-screen charts: filter rows centred (close button out of the flow), play text gets more room than the graph */
+/* full-screen charts: filter rows centred (close button out of the flow), play text gets more room than the graph */
 #wpov.scov .wptop{position:relative;justify-content:center;padding:0 48px}
 #wpov.scov .wpclose{position:absolute;right:0;top:0;margin:0}
 #wpov .scfw{flex:none;display:flex;flex-direction:column;align-items:center;gap:6px}
@@ -1134,7 +1134,7 @@ tr.f1out td.f1rk,tr.f1out .f1dn b{color:var(--live)}
 #wpov .scf button{flex:none;min-width:54px;padding:5px 12px}
 #wpov:not(.scov) .wpi{min-height:104px}
 #wpov:not(.scov) .wpx{-webkit-line-clamp:3;font-size:15px}
-#wpov .wpclose{display:flex;align-items:center;justify-content:center;padding:0;border:0;border-radius:50% !important;background:#e5484d !important;color:#fff;box-shadow:0 3px 10px rgba(0,0,0,.4)}
+.artx,#wpov .wpclose{display:flex;align-items:center;justify-content:center;padding:0;border:0;border-radius:50% !important;background:#e5484d !important;color:#fff;box-shadow:0 3px 10px rgba(0,0,0,.4)}
 .artx svg,#wpov .wpclose svg{display:block;flex:none}
 
 /* today / current week / current GP in the top strip: red text (black when it is the selected bubble) */
@@ -1225,6 +1225,7 @@ html:has(.lybar.bm3) #app{padding-bottom:calc(max(env(safe-area-inset-bottom), 1
 <div id="app"></div>
 
 <script>
+const HDR_BH = '<button class="back" data-back aria-label="Back"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></button><button class="home" data-home aria-label="Home"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"><path d="M3 10.5 12 3l9 7.5"/><path d="M5.5 9v11h13V9"/><path d="M10 20v-6h4v6"/></svg></button>', HDR_BHR = HDR_BH + '<button class="home" data-refresh aria-label="Refresh"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12a8 8 0 1 1-2.34-5.66"/><path d="M20 4v5h-5"/></svg></button>';
 try { localStorage.removeItem('design'); const f = localStorage.getItem('font'); document.documentElement.classList.add(f === 'sg' ? 'fsg' : 'fbar'); localStorage.removeItem('d2'); localStorage.removeItem('f12'); } catch (e) { document.documentElement.classList.add('fbar'); }
 const API = 'https://site.api.espn.com/apis/site/v2/sports/';
 const WEB = 'https://site.web.api.espn.com/apis/common/v3/sports/';
@@ -1895,7 +1896,7 @@ function render() {
   try { stickTop(v); } catch (e) {}
   try { const pn = $app.querySelector('.pane'); if (pn && v === 'player' && state.player && state.player.tab === 'ov' && state.player.done && pn.querySelector('.ssum') && pn.querySelector('.glsec') && !pn.querySelector('tr.nomore')) { const h = pn.offsetHeight; if (h > 200) { window._ovH = h; try { localStorage.setItem('ovH', String(h)); } catch (e) {} } }
     const nwOn = (v === 'player' && state.player && (state.player.tab === 'news' || (state.player.tab === 'ov' && state.player.done && !(pn && pn.querySelector('.ssum') && pn.querySelector('.glsec') && !pn.querySelector('tr.nomore'))))) || (v === 'team' && state.team && state.team.tab === 'news'); if (pn && nwOn) { const h = window._ovH || +(localStorage.getItem('ovH') || 0) || 415; if (h > 200) pn.style.minHeight = h + 'px'; if (pn.querySelector('.nws')) pn.classList.add('nwp'); } } catch (e) {}
-  { const ov = v === 'player' && state.player && state.player.tab === 'ov'; document.documentElement.classList.remove('lock1'); requestAnimationFrame(detLock); if (v === 'list') requestAnimationFrame(listLock); if (false) requestAnimationFrame(() => { const extra = document.documentElement.scrollHeight - window.innerHeight; if (extra < 140) { document.documentElement.classList.add('one'); window.scrollTo(0, 0); } }); }
+  { const ov = v === 'player' && state.player && state.player.tab === 'ov'; document.documentElement.classList.remove('lock1'); requestAnimationFrame(detLock); if (v === 'list') requestAnimationFrame(listLock);  }
   if (window._noSlide) window._noSlide = 0;
   if (window._slide) { const p = window._slideSel ? $app.querySelector('main') : $app.querySelector('.pane'), d = window._slide; window._slide = 0; window._slideSel = null; if (p && p.animate) p.animate([{ transform: `translateX(${d * 70}px)`, opacity: .3 }, { transform: 'none', opacity: 1 }], { duration: 230, easing: 'cubic-bezier(.2,.7,.3,1)' }); }
   const fh = document.getElementById('fhome'); if (fh) fh.hidden = true;
@@ -1915,9 +1916,6 @@ const logoImg = src => src ? `<img src="${esc(src)}" alt="" onerror="this.style.
 
 function listBody(evs, lg) {
   const fv = e => isFav(e.league || lg, e.home.id) || isFav(e.league || lg, e.away.id), favs = evs.filter(fv);
-  if (false) {
-    const dl = e => { const d = new Date(e.date); return DAYS[d.getDay()] + ' ' + d.getDate() + '.' + (d.getMonth() + 1) + '.'; };
-    return `<button class="favh" data-favh="1">★ Favorites <small>${favs.length}</small><i class="chev ${state.favOpen ? 'up' : ''}"></i></button>` + (state.favOpen ? `<div class="favb">${favs.sort((a, b) => new Date(a.date) - new Date(b.date)).map(e => (lg === 'nfl' ? `<div class="fdl">${esc(dl(e))}</div>` : '') + cardHTML(e)).join('')}</div>` : '') + listBody(evs, lg + '_'); }
   lg = String(lg).replace(/_$/, '');
   if (lg === 'nfl') {
     let last = '';
@@ -2045,7 +2043,7 @@ function renderGame() {
       ${side(e.home, true)}${srs ? `<div class="srs">${esc(srs)}</div>` : ''}</div>`;
   }
   $app.innerHTML = `
-    <header class="d"><div class="tabs"><button class="back" data-back aria-label="Back"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></button><button class="home" data-home aria-label="Home"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"><path d="M3 10.5 12 3l9 7.5"/><path d="M5.5 9v11h13V9"/><path d="M10 20v-6h4v6"/></svg></button><button class="home" data-refresh aria-label="Refresh"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12a8 8 0 1 1-2.34-5.66"/><path d="M20 4v5h-5"/></svg></button></div></header>
+    <header class="d"><div class="tabs">${HDR_BHR}</div></header>
     <main>${hero}
       ${g.tabInit ? `<div class="dtabs sm ${gTabs(g).length > 4 ? 'five' : 'even'}">${gTabs(g).map(([k, l]) => `<button data-tab="${k}" class="${g.tab === k ? 'on' : ''}">${l}</button>`).join('')}</div>` : '<div class="dtabs sm"></div>'}
       <div class="pane t">${body}</div></main>`;
@@ -2944,7 +2942,7 @@ function renderPlayer() {
   const ptm = p.bio && p.bio.team, plogo = ptm && !(p.bio.active === false) ? dk((ptm.logos && ptm.logos[0] && ptm.logos[0].href) || ptm.logo || ((state.teamList[p.league] || []).find(x => x.id === String(ptm.id)) || {}).logo || '') : '';
   const tab = (k, l) => `<button data-ptab="${k}" class="${p.tab === k ? 'on' : ''}">${l}</button>`;
   $app.innerHTML = `
-    <header class="d"><div class="tabs"><button class="back" data-back aria-label="Back"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></button><button class="home" data-home aria-label="Home"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"><path d="M3 10.5 12 3l9 7.5"/><path d="M5.5 9v11h13V9"/><path d="M10 20v-6h4v6"/></svg></button><button class="home" data-refresh aria-label="Refresh"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12a8 8 0 1 1-2.34-5.66"/><path d="M20 4v5h-5"/></svg></button></div></header>
+    <header class="d"><div class="tabs">${HDR_BHR}</div></header>
     <main><div class="phero pp"><span class="phw"><img class="hs${p.league === 'nfl' && String(p.id) === '3915511' && window._hearts.has('b') ? ' heart' : ''}"${p.league === 'nfl' && String(p.id) === '3915511' ? ' data-heart="b"' : ''} src="https://a.espncdn.com/i/headshots/${p.league}/players/full/${esc(p.id)}.png" alt="" onerror="this.onerror=null;this.src=SIL">${plogo ? `<img class="ptl" data-topen="${esc(ptm.id)}" data-tl="${p.league}" data-tn="${esc(ptm.displayName || '')}" data-tlogo="${esc(plogo)}" src="${esc(plogo)}" alt="" onerror="this.remove()">` : ''}</span>
       <div><div class="pname">${esc(p.name || 'Player')}</div><div class="psub">${esc(sub)}</div></div></div>
       <div class="dtabs sm even"><button data-ptab="${p.infoSub || 'ov'}" class="${p.tab === 'ov' || p.tab === 'news' ? 'on' : ''}">Info</button>${tab('stats', 'Career')}${tab('gl', 'Gamelog')}${tab('bio', 'Bio')}</div>
@@ -3399,7 +3397,7 @@ function renderTeam() {
   const body0 = !t.done ? msg('Loading…') : (t.tab === 'roster' || t.tab === 'news') ? teamInfoHTML(t) : t.tab === 'sched' ? scheduleHTML(t) : t.tab === 'tstats' ? teamTabStatsHTML(t) : t.tab === 'inj' ? teamInjHTML(t) : teamStatsHTML(t);
   const body = t.done && (t.tab === 'stats' || t.tab === 'tstats') ? sseg + body0 : body0;
   $app.innerHTML = `
-    <header class="d"><div class="tabs"><button class="back" data-back aria-label="Back"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></button><button class="home" data-home aria-label="Home"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"><path d="M3 10.5 12 3l9 7.5"/><path d="M5.5 9v11h13V9"/><path d="M10 20v-6h4v6"/></svg></button><button class="home" data-refresh aria-label="Refresh"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12a8 8 0 1 1-2.34-5.66"/><path d="M20 4v5h-5"/></svg></button><span class="grow"></span>${(() => { const Y = brYears(t.league), y = t.sy || Y[0], ty = t.stype || 2, yl = yy => t.league === 'nfl' ? yy + '-' + String(yy + 1).slice(2) : (yy - 1) + '-' + String(yy).slice(2), lab = (yy, tt) => yl(yy) + (tt === 3 ? ' Postseason' : ' Reg. Season');
+    <header class="d"><div class="tabs">${HDR_BHR}<span class="grow"></span>${(() => { const Y = brYears(t.league), y = t.sy || Y[0], ty = t.stype || 2, yl = yy => t.league === 'nfl' ? yy + '-' + String(yy + 1).slice(2) : (yy - 1) + '-' + String(yy).slice(2), lab = (yy, tt) => yl(yy) + (tt === 3 ? ' Postseason' : ' Reg. Season');
       const opts = []; Y.forEach((x, i) => { if (i > 0) opts.push([x, 3]); opts.push([x, 2]); });
       return `<div class="ysel tys"><button class="ybtn" data-tyo="1">${esc(lab(y, ty))}<i class="chev ${t.yOpen ? 'up' : ''}"></i></button>${t.yOpen ? `<div class="ylist">${opts.map(([x, tt]) => `<button data-ty="${x}|${tt}" class="${x === y && tt === ty ? 'on' : ''}">${esc(lab(x, tt))}</button>`).join('')}</div>` : ''}</div>`; })()}</div></header>
     <main><div class="phero">${h.logo ? `<img class="tl" src="${esc(h.logo)}" alt="" onerror="this.style.visibility='hidden'">` : ''}
@@ -4085,7 +4083,7 @@ function renderCompare() {
   const c = state.cmp;
   if (!document.getElementById('cmpw')) {
     const inp = i => `<div class="cmpi"><input id="cq${i}" class="sinp" type="search" autocomplete="off" placeholder="Player ${i + 1}" value="${esc(c.q[i])}"><button class="cmpx" data-cmpx="${i}" aria-label="Clear">×</button><div class="cmpr" id="cr${i}"></div></div>`;
-    $app.innerHTML = `<header class="d"><div class="tabs"><button class="back" data-back aria-label="Back"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></button><button class="home" data-home aria-label="Home"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"><path d="M3 10.5 12 3l9 7.5"/><path d="M5.5 9v11h13V9"/><path d="M10 20v-6h4v6"/></svg></button></div></header>
+    $app.innerHTML = `<header class="d"><div class="tabs">${HDR_BH}</div></header>
     <main id="cmpw"><div class="cmptl"><div class="lvt">Compare players</div><button class="cmpclr" data-cmpclr="1">Clear</button></div><div class="cmpin">${inp(0)}${inp(1)}</div><div class="pane t" id="cmpbody"></div></main>`;
   }
   paintCompare();
@@ -4152,7 +4150,7 @@ function renderLV() {
       return `<div class="ysel tys"><button class="ybtn" ${ls ? 'data-lsyo' : 'data-bryo'}="1">${esc(yl(y))}<i class="chev ${op ? 'up' : ''}"></i></button>${op ? `<div class="ylist">${Y.map(x => `<button ${ls ? 'data-lsy' : 'data-bry'}="${x}" class="${x === y ? 'on' : ''}">${esc(yl(x))}</button>`).join('')}</div>` : ''}</div>`; })();
   const top = ls ? `<div class="seg pseg lvseg"><button data-lvtm="players" class="${tm ? '' : 'on'}">Players</button><button data-lvtm="teams" class="${tm ? 'on' : ''}">Teams</button></div>` : `<div class="lvt">${esc(title)}</div>`;
   $app.innerHTML = `
-    <header class="d"><div class="tabs"><button class="back" data-back aria-label="Back"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></button><button class="home" data-home aria-label="Home"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"><path d="M3 10.5 12 3l9 7.5"/><path d="M5.5 9v11h13V9"/><path d="M10 20v-6h4v6"/></svg></button><button class="home" data-refresh aria-label="Refresh"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12a8 8 0 1 1-2.34-5.66"/><path d="M20 4v5h-5"/></svg></button><span class="grow"></span>${ysel}</div></header>
+    <header class="d"><div class="tabs">${HDR_BHR}<span class="grow"></span>${ysel}</div></header>
     <main>${top}<div class="pane t">${body}</div></main>`;
   const pn = $app.querySelector('main > .pane'), sg = pn && pn.querySelector(':scope > .seg'); if (sg && v.kind === 'standings') { sg.classList.add('lvseg'); pn.before(sg); }
 }
@@ -4285,7 +4283,7 @@ function renderDraft() {
     body = `<div class="mstrip tgs">${v.dd.map(r => `<button class="mo ${r.n === v.rd ? 'on' : ''}" data-drr="${r.n}"><span>Rd ${r.n}</span></button>`).join('')}</div>` + (!rd.done ? msg('Loading picks…') : '') + (!rd.done ? [] : rd.picks).map(p => { const tm = (state.teamList[v.league] || []).find(x => p.tid && x.id === p.tid[1]) || {}, a = p.a || {};
       return `<div class="drw" ${a.name ? `data-drp="${esc(a.id)}" data-drr2="${a.real ? 1 : 0}" data-pn="${esc(a.name)}" data-pp="${esc(a.pos)}"` : ''}><span class="dpk">${esc(p.overall || p.pick)}</span>${tm.logo ? logoImg(tm.logo) : '<span style="width:28px"></span>'}<div class="dnm">${esc(a.name || (rd.loading || !rd.done ? '…' : '–'))}<small>${esc([a.pos, tm.name, 'Pick ' + p.pick].filter(Boolean).join(' · '))}</small></div></div>`; }).join(''); }
   $app.innerHTML = `
-    <header class="d"><div class="tabs"><button class="back" data-back aria-label="Back"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></button><button class="home" data-home aria-label="Home"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"><path d="M3 10.5 12 3l9 7.5"/><path d="M5.5 9v11h13V9"/><path d="M10 20v-6h4v6"/></svg></button></div></header>
+    <header class="d"><div class="tabs">${HDR_BH}</div></header>
     <main><div class="lvt">${esc(LEAGUES[v.league].name + ' Draft ' + v.y)}</div><div class="pane t">${body}</div></main>`;
 }
 function renderTLeaders() {
@@ -4319,7 +4317,7 @@ function renderTLeaders() {
     if (gl.length) body += `<div class="gloss tgloss"><h4>Glossary</h4><div class="gg">${gl.map(x => `<div class="${scol && x[0] === scol.label ? 'gon' : ''}"><b>${esc(x[0])}:</b> ${esc(x[1])}</div>`).join('')}</div></div>`;
   }
   $app.innerHTML = `
-    <header class="d"><div class="tabs"><button class="back" data-back aria-label="Back"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></button><button class="home" data-home aria-label="Home"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"><path d="M3 10.5 12 3l9 7.5"/><path d="M5.5 9v11h13V9"/><path d="M10 20v-6h4v6"/></svg></button>${lySel(v)}</div></header>
+    <header class="d"><div class="tabs">${HDR_BH}${lySel(v)}</div></header>
     <main><div class="lvt">${esc(LEAGUES[v.league].name + ' · Team Stats')}</div><div class="pane t">${seg}${body}</div></main>`;
   const tw = $app.querySelector('.lbt') && $app.querySelector('.lbt').parentElement;
   if (tw && v.forceL) { v.forceL = 0; v.sl = 0; v._slk = v.tk; }
@@ -4414,7 +4412,7 @@ async function loadLeaders() {
       if (qi >= 0) rows.forEach(r => { const q = QM[String(r.a.id)]; r.vals[qi] = q != null ? q : ''; });
       else if (v._qbr) { cols.push({ label: 'QBR', name: 'qbr', ci: '', k: -1 }); qi = cols.length - 1; rows.forEach(r => r.vals.push(QM[String(r.a.id)] != null ? QM[String(r.a.id)] : '')); }
       if (v._qbr) { for (let i = rows.length - 1; i >= 0; i--) if (rows[i].vals[qi] === '' || rows[i].vals[qi] == null) rows.splice(i, 1); v.data = { cols, rows }; v.sk = qi; v.loading = false; if (state.lv === v) render(); return; } }
-    if (false) try { const TG = await teamGP('nba', v.sy), gi = cols.findIndex(c => c.name === 'gamesPlayed'); if (gi >= 0) { const mx = Math.max(0, ...rows.map(r => parseFloat(r.vals[gi]) || 0)); for (let i = rows.length - 1; i >= 0; i--) { const t = TG[athTid(rows[i].a || {}, 'nba')] || mx; if ((parseFloat(rows[i].vals[gi]) || 0) < Math.ceil(t * NBA_MIN)) rows.splice(i, 1); } } } catch (e) {}
+    
     if (cg !== 'goaltending' && v.league !== 'nba') try { const lc = state.lvC['lstats' + v.league + (v.sy || '')], cc = lc && lc.cats && lc.cats.find(c => c.name === v.cat), top = cc ? cc.rows.map(r => r.a && String(r.a.id)).filter(Boolean) : [];
       const have = new Set(rows.map(r => String(r.a.id))), miss = top.filter(id => !have.has(id));
       if (miss.length) { const j2 = await getJson(u.replace('isqualified=true', 'isqualified=false').replace('limit=100', 'limit=1000'));
@@ -4464,7 +4462,7 @@ function renderLeaders() {
     body = `<section class="blk"><div class="tw"><table class="nfx sep lbt" style="width:max(100%, ${tw}px)"><colgroup><col>${D.cols.map(c => `<col style="width:${w(c.label)}px">`).join('')}</colgroup><thead><tr><th class="n">Name</th>${D.cols.map((c, k) => `<th data-lsort="${k}" class="${k === v.sk ? 'on' : ''}">${esc(c.label)}</th>`).join('')}</tr></thead><tbody>${trs}</tbody></table></div></section>`;
   }
   $app.innerHTML = `
-    <header class="d"><div class="tabs"><button class="back" data-back aria-label="Back"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></button><button class="home" data-home aria-label="Home"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"><path d="M3 10.5 12 3l9 7.5"/><path d="M5.5 9v11h13V9"/><path d="M10 20v-6h4v6"/></svg></button><button class="home" data-refresh aria-label="Refresh"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12a8 8 0 1 1-2.34-5.66"/><path d="M20 4v5h-5"/></svg></button>${lySel(v)}</div></header>
+    <header class="d"><div class="tabs">${HDR_BHR}${lySel(v)}</div></header>
     <main><div class="lvt">${esc(LEAGUES[v.league].name + ' · ' + title + ylab)}</div><div class="pane t">${body}</div></main>`;
   const tw = document.querySelector('.lbt') && document.querySelector('.lbt').parentElement;
   if (D && tw) { if (v.sl == null) { const th = tw.querySelector('th.on'), n = tw.querySelector('th.n'); if (th && n) v.sl = Math.max(0, th.offsetLeft - n.offsetWidth); } tw.scrollLeft = v.sl || 0; tw.addEventListener('scroll', () => { v.sl = tw.scrollLeft; }, { passive: true }); }
@@ -4499,7 +4497,7 @@ function renderLeaders() {
 })();
 function renderSearch() {
   if (!document.getElementById('sq')) {
-    $app.innerHTML = `<header class="d"><div class="tabs"><button class="back" data-back aria-label="Back"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></button><button class="home" data-home aria-label="Home"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"><path d="M3 10.5 12 3l9 7.5"/><path d="M5.5 9v11h13V9"/><path d="M10 20v-6h4v6"/></svg></button><button class="home" data-refresh aria-label="Refresh"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12a8 8 0 1 1-2.34-5.66"/><path d="M20 4v5h-5"/></svg></button><input id="sq" class="sinp" type="search" placeholder="Search team or player" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" enterkeyhint="search" value="${esc(state.sq)}"><button class="sqx" data-sqx="1" aria-label="Clear">×</button></div></header><main><div id="sres"></div></main>`;
+    $app.innerHTML = `<header class="d"><div class="tabs">${HDR_BHR}<input id="sq" class="sinp" type="search" placeholder="Search team or player" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" enterkeyhint="search" value="${esc(state.sq)}"><button class="sqx" data-sqx="1" aria-label="Clear">×</button></div></header><main><div id="sres"></div></main>`;
     if (!state.sq) { const el = document.getElementById('sq'); setTimeout(() => el && el.focus(), 80); }
   }
   paintSearch();
@@ -4602,7 +4600,7 @@ async function f1Circ(ev) { const id = ev && ev.circuit && ev.circuit.id; if (!i
   try { const j = await getJson(F1C + 'circuits/' + id); const hs = []; const walk = o => { if (!o || typeof o !== 'object') return; if (Array.isArray(o)) return o.forEach(walk); Object.entries(o).forEach(([k, v]) => { if (typeof v === 'string' && /^https?:.*\.(png|svg|jpe?g)/i.test(v)) hs.push([k, v]); else walk(v); }); }; walk(j);
     const pick = hs.find(([k, v]) => /diagram|map|track|layout|circuit/i.test(k + v) && !/logo|flag/i.test(v)) || hs.find(([k, v]) => !/logo|flag/i.test(v)); F1.circ[id] = pick ? pick[1].replace(/^http:/, 'https:') : null; if (F1.circ[id]) F1.pSave(); } catch (e) { F1.circ[id] = null; }
   return F1.circ[id]; }
-const f1Hdr = (extra) => `<header class="d"><div class="tabs"><button class="back" data-back aria-label="Back"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></button><button class="home" data-home aria-label="Home"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"><path d="M3 10.5 12 3l9 7.5"/><path d="M5.5 9v11h13V9"/><path d="M10 20v-6h4v6"/></svg></button><button class="home" data-refresh aria-label="Refresh"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12a8 8 0 1 1-2.34-5.66"/><path d="M20 4v5h-5"/></svg></button><span class="grow"></span>${extra || ''}</div></header>`;
+const f1Hdr = (extra) => `<header class="d"><div class="tabs">${HDR_BHR}<span class="grow"></span>${extra || ''}</div></header>`;
 const f1YSel = (v, cur, list, lab) => `<div class="ysel tys"><button class="ybtn" data-f1yo="1">${esc(lab ? lab(cur) : String(cur))}<i class="chev ${v.yOpen ? 'up' : ''}"></i></button>${v.yOpen ? `<div class="ylist">${list.map(x => `<button data-f1y="${x}" class="${String(x) === String(cur) ? 'on' : ''}">${esc(lab ? lab(x) : String(x))}</button>`).join('')}</div>` : ''}</div>`;
 const f1Drv = (id, name, team) => `<div class="f1d"><img class="hs" src="${esc(f1Hs(id))}" alt="" onerror="this.onerror=null;this.src=SIL"><div class="f1dn"><b>${esc(name)}</b>${team ? `<small>${esc(team)}</small>` : ''}</div></div>`;
 const f1Con = name => `<div class="f1d"><div class="f1dn"><b>${esc(name)}</b></div></div>`;
