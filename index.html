@@ -2615,6 +2615,10 @@ const PV_STATS = {
   nfl: [['Pts Scored per Game', /^(avg)?(total)?points ?per ?game|^points ?per ?game|avgpoints$/i], ['Pts Allowed per Game', /(opp|against|allowed).*points ?per ?game|pointsAgainstPerGame|pointsAllowed/i, true], ['Yds per Game', /total ?yards ?per ?game|^yards ?per ?game|avg.*total ?yards/i], ['Pass Yds per Game', /passing ?yards ?per ?game|net passing yards per game/i], ['Rush Yds per Game', /rushing ?yards ?per ?game/i], ['3rd Down Efficiency Percentage', /third ?down.*(pct|percent|conv)|3rd down/i], ['Sacks', /^sacks$/i, false, /defens/i], ['Interceptions', /^interceptions$/i, false, /defens|intercept/i]],
   nba: [['Points per Game', /avgpoints$|points ?per ?game|^points$/i], ['Rebounds per Game', /avgrebounds$|rebounds ?per ?game/i], ['Assists per Game', /avgassists$|assists ?per ?game/i], ['FG %', /fieldgoalpct|field goal (pct|percent)|fg ?%/i], ['3P %', /threepointfieldgoalpct|three point (pct|percent)|3p ?%/i], ['FT %', /freethrowpct|free throw (pct|percent)/i], ['Turnovers per Game', /avgturnovers$|turnovers ?per ?game/i, true]]
 };
+/* NBA team page: more rows than the game preview; 'std:' rows come from the standings (points allowed, differential) */
+const NBA_TEAM = (() => { const P = Object.fromEntries(PV_STATS.nba.map(r => [r[0], r]));
+  return [P['Points per Game'], ['Points allowed per Game', null, true, null, 'std:apa'], ['Point differential', null, false, null, 'std:dif'], P['Rebounds per Game'], P['Assists per Game'],
+    ['Steals per Game', /avgsteals$|steals ?per ?game/i], ['Blocks per Game', /avgblocks$|blocks ?per ?game/i], P['FG %'], P['3P %'], P['FT %'], P['Turnovers per Game']]; })();
 const NFL_TEAM = {
   Offensive: [['Pts Scored per Game', /^(avg)?(total)?points ?per ?game|^points ?per ?game|avgpoints$/i], ['Yds per Game', /total ?yards ?per ?game|^yards ?per ?game|avg.*total ?yards/i], ['Pass Yds per Game', /passing ?yards ?per ?game|net passing yards per game/i], ['Rush Yds per Game', /rushing ?yards ?per ?game/i], ['3rd Down Efficiency Percentage', /third ?down.*(pct|percent|conv)|3rd down/i], ['4th Down Efficiency Percentage', /fourth ?down.*(pct|percent|conv)|4th down/i]],
   Defensive: [['Pts Allowed per Game', /(opp|against|allowed).*points ?per ?game|pointsAgainstPerGame|pointsAllowed/i, true], ['Pass Yds Allowed per Game', /^netPassingYardsPerGame$|^passingYardsPerGame$|net passing yards per game/i, true, null, true], ['Rush Yds Allowed per Game', /^rushingYardsPerGame$|rushing yards per game/i, true, null, true], ['Sacks', /^sacks$/i, false, /defens/i], ['Interceptions', /^interceptions$/i, false, /defens|intercept/i], ['Forced Fumbles', /fumblesForced|forcedFumbles|^forced fumbles$/i]]
@@ -2656,7 +2660,7 @@ const findStat = (list, re, cre) => { if (cre) list = list.filter(x => cre.test(
 const numOf = st => { if (!st) return NaN; const v = st.value != null && st.value !== '' ? +st.value : parseFloat(String(st.displayValue).replace(/,/g, '')); return v; };
 function compactLeague(list, league, opp) {
   const o = {};
-  [...(PV_STATS[league] || []), ...(league === 'nfl' ? [...NFL_TEAM.Offensive, ...NFL_TEAM.Defensive] : [])].forEach(([t, re, low, cre, isOpp]) => { if (o[t] != null) return; const st = findStat(isOpp ? (opp || []) : list, re, cre); if (st) o[t] = numOf(st); });
+  [...(PV_STATS[league] || []), ...(league === 'nfl' ? [...NFL_TEAM.Offensive, ...NFL_TEAM.Defensive] : league === 'nba' ? NBA_TEAM.filter(r => r[1]) : [])].forEach(([t, re, low, cre, isOpp]) => { if (o[t] != null) return; const st = findStat(isOpp ? (opp || []) : list, re, cre); if (st) o[t] = numOf(st); });
   return o;
 }
 state.lgs = {};
@@ -2676,7 +2680,7 @@ function ensureLeagueStats(league, cb) {
   if (ex) { if (ex.data) { if (cb) setTimeout(cb, 0); } else if (cb) ex.cbs.push(cb); return; }
   const ent = state.lgs[league] = { data: null, cbs: cb ? [cb] : [] };
   const done = () => { const c = ent.cbs; ent.cbs = []; c.forEach(f => { try { f(); } catch (e) {} }); lgsRerender(league); };
-  try { const st = JSON.parse(localStorage.getItem('lgs4_' + league) || 'null'); if (st && Object.keys(st.d || {}).length > 10) { ent.data = st.d; setTimeout(done, 0); if (Date.now() - st.t < 12 * 3600e3) return; } } catch (e) {}
+  try { const st = JSON.parse(localStorage.getItem('lgs5_' + league) || 'null'); if (st && Object.keys(st.d || {}).length > 10) { ent.data = st.d; setTimeout(done, 0); if (Date.now() - st.t < 12 * 3600e3) return; } } catch (e) {}
   (async () => {
     try {
       await ensureTeams(league);
@@ -2691,7 +2695,7 @@ function ensureLeagueStats(league, cb) {
       await Promise.all(Array.from({ length: 8 }, worker));
       if (league === 'nfl') { const sd = await ensureStandings(league); Object.keys(d).forEach(id => { if (d[id]['Pts Allowed per Game'] == null && sd[id] && sd[id].gp) d[id]['Pts Allowed per Game'] = sd[id].pa / sd[id].gp; }); }
       ent.data = d;
-      try { localStorage.setItem('lgs4_' + league, JSON.stringify({ t: Date.now(), d })); } catch (e) {}
+      try { localStorage.setItem('lgs5_' + league, JSON.stringify({ t: Date.now(), d })); } catch (e) {}
       done();
     } catch (e) { if (!ent.data) delete state.lgs[league]; }
   })();
@@ -2703,14 +2707,14 @@ function ensureStandings(league) {
     const m = {};
     try {
       const j = await getJson('https://site.api.espn.com/apis/v2/sports/' + LEAGUES[league].path + '/standings');
-      const walk = n => { (n.standings && n.standings.entries || []).forEach(en => { const g = k => { const x = (en.stats || []).find(y => y.name === k || y.type === k); return x ? +x.value : NaN; }; const w = g('wins'), l = g('losses'), t = g('ties') || 0, pa = g('pointsAgainst'); if (en.team && !isNaN(pa)) m[String(en.team.id)] = { pa, gp: (w || 0) + (l || 0) + (t || 0) }; }); (n.children || []).forEach(walk); };
+      const walk = n => { (n.standings && n.standings.entries || []).forEach(en => { const g = k => { const x = (en.stats || []).find(y => y.name === k || y.type === k); return x ? +x.value : NaN; }; const w = g('wins'), l = g('losses'), t = g('ties') || 0, pa = g('pointsAgainst'), apa = g('avgPointsAgainst'), apf = g('avgPointsFor'); if (en.team && (!isNaN(pa) || !isNaN(apa))) m[String(en.team.id)] = { pa, gp: (w || 0) + (l || 0) + (t || 0), apa, dif: !isNaN(apa) && !isNaN(apf) ? apf - apa : NaN }; }); (n.children || []).forEach(walk); };
       walk(j);
     } catch (e) {}
     return m;
   })();
 }
 function tstTable(title, heads, rows) {
-  return `<section class="blk"><div class="tw"><table class="ros sep tst"><thead><tr><th class="n">${esc(title)}</th>${heads.map(h => `<th>${h}</th>`).join('')}</tr></thead><tbody>${rows.map(r => `<tr><td class="n"><span class="pn">${esc(r[0])}</span></td>${r.slice(1).map((v, i) => `<td class="${r.rk && i === r.length - 2 ? 'rk' : ''}">${esc(v != null && v !== '' ? v : '-')}</td>`).join('')}</tr>`).join('')}</tbody></table></div></section>`;
+  return `<section class="blk"><div class="tw"><table class="ros sep tst"><thead><tr><th class="n">${esc(title)}</th>${heads.map(h => `<th>${h}</th>`).join('')}</tr></thead><tbody>${rows.map(r => `<tr><td class="n"><span class="pn">${esc(String(r[0]).replace(/ per Game$/, ' per game'))}</span></td>${r.slice(1).map((v, i) => `<td class="${r.rk && i === r.length - 2 ? 'rk' : ''}">${esc(v != null && v !== '' ? v : '-')}</td>`).join('')}</tr>`).join('')}</tbody></table></div></section>`;
 }
 const NHL_RANK = [['Goals For per Game'], ['Goals Against Average', true], ['Shots per Game'], ['Shots Against per Game', true], ['Power Play Percentage'], ['Penalty Kill Percentage'], ['Penalty Minutes', true]];
 function pvStats(g) {
@@ -3605,8 +3609,10 @@ function teamTabStatsHTML(t) {
     if (!lg || !lg.data) ensureLeagueStats(t.league, () => { if (state.team === t && t.tab === 'tstats' && topView() === 'team') render(); });
     const data = lg && lg.data;
     const OL = oppList(t.stats);
-    if (t.league === 'nfl' && !t.std) { t.std = 1; ensureStandings('nfl').then(m => { t.std = m; if (state.team === t && t.tab === 'tstats' && topView() === 'team') render(); }); }
+    if ((t.league === 'nfl' || t.league === 'nba') && !t.std) { t.std = 1; ensureStandings(t.league).then(m => { t.std = m; if (state.team === t && t.tab === 'tstats' && topView() === 'team') render(); }); }
     const mk = list => list.map(([n, re, low, cre, isOpp]) => {
+      if (typeof isOpp === 'string') { const k = isOpp.slice(4), S = t.std && typeof t.std === 'object' ? t.std : null, me = S && S[t.id] && S[t.id][k]; if (me == null || isNaN(me)) return [n, '', ''];
+        const vals = Object.values(S).map(o => o[k]).filter(v => v != null && !isNaN(v)); return [n, (k === 'dif' && me > 0 ? '+' : '') + me.toFixed(1), ordinal(1 + vals.filter(v => low ? v < me : v > me).length)]; }
       let st = findStat(isOpp ? OL : L, re, cre);
       if (!st && n === 'Pts Allowed per Game' && t.std && t.std[t.id] && t.std[t.id].gp) st = { value: t.std[t.id].pa / t.std[t.id].gp, displayValue: (t.std[t.id].pa / t.std[t.id].gp).toFixed(1) };
       let rk = '';
@@ -3616,7 +3622,7 @@ function teamTabStatsHTML(t) {
     });
     const out = r => { r.rk = true; return r; };
     if (t.league === 'nfl') return ['Offensive', 'Defensive'].map(sec => tstTable(sec, ['Value', 'Rank'], mk(NFL_TEAM[sec]).map(out))).join('');
-    rows = mk(PV_STATS[t.league] || []).filter(r => r[1] !== '');
+    rows = mk(t.league === 'nba' ? NBA_TEAM : PV_STATS[t.league] || []).filter(r => r[1] !== '');
     if (!rows.length) return msg('Team stats not available.');
     return tstTable('Team stats', ['Value', 'Rank'], rows.map(out));
   }
