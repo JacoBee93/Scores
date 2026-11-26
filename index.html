@@ -1233,7 +1233,7 @@ html:has(.lybar.bm3) #app{padding-bottom:calc(max(env(safe-area-inset-bottom), 1
 
 /* live status: period on top (with the red dot), clock underneath */
 .card[data-game] > .top .live em{display:block;font-style:normal;font-size:17px;font-weight:700;margin-top:3px;font-variant-numeric:tabular-nums}
-/* ===== home styles (Classic / Kick / A / B / C / I) ===== */
+/* ===== home styles (Classic / Kick / A / B) ===== */
 .hsh .hics{display:flex;gap:8px;flex:none}
 .hic{width:38px;height:38px;border-radius:50%;background:var(--card);display:flex;align-items:center;justify-content:center;color:#fff}
 main[class^="hs"] .hsec{font-family:var(--wide);font-stretch:112%;font-weight:800;font-size:12.5px;letter-spacing:.8px;text-transform:uppercase;color:var(--mut);margin:16px 6px 7px}
@@ -1275,31 +1275,6 @@ main[class^="hs"] .lose{color:var(--mut)}
 .hwk button::after{content:'';width:5px;height:5px;border-radius:50%;margin-top:1px;background:transparent}.hwk button.hg::after{background:var(--mut)}.hwk button.hg.on::after{background:var(--brand)}
 html.kick{--brand:#53fc18}
 html.kick .hwk .on b,html.kick .artx,html.kick #wpov .wpclose{color:#000 !important}.hwk .tdy:not(.on) b{color:var(--brand)}
-/* C */
-.hhero{border-radius:26px;padding:15px 18px 18px;margin-bottom:6px;cursor:pointer;background:radial-gradient(120% 140% at 0% 0%,var(--hc) 0%,color-mix(in srgb,var(--hc) 40%,#000) 40%,#0b0b0c 80%)}
-.hhk{display:inline-block;font-family:var(--num);font-weight:700;font-size:12.5px;letter-spacing:1.4px;background:rgba(255,255,255,.85);color:#000;padding:2px 8px;border-radius:6px}
-.hhm{display:flex;align-items:center;justify-content:space-between;margin-top:12px}
-.hhm > div:not(.hhs){display:flex;flex-direction:column;align-items:center;gap:6px;width:88px;text-align:center}
-.hhm img,.hhm .ph{width:56px;height:56px}.hhm b{font-family:var(--num);font-weight:700;font-size:17px}
-.hhs{font-family:var(--num);font-weight:800;font-size:56px;line-height:1;text-align:center;font-variant-numeric:tabular-nums}.hhs i{font-style:normal;color:rgba(255,255,255,.4);margin:0 6px}.hhs small{display:block;font-size:14px;margin-top:4px}
-.hbox{background:var(--card);border-radius:20px;overflow:hidden;margin-bottom:6px}
-.hcC{display:flex;align-items:center;gap:8px;padding:10px 14px;cursor:pointer}.hcC + .hcC{border-top:1px solid var(--line)}
-.hcC img,.hcC .ph{width:26px;height:26px}
-.hcC .hab{font-family:var(--num);font-weight:700;font-size:18px;width:46px}.hcC .hab.r{text-align:right}
-.hcC .hsc{font-family:var(--num);font-weight:700;font-size:22px;min-width:24px;text-align:center;font-variant-numeric:tabular-nums}
-.hcC .hst{flex:1;text-align:center;font-family:var(--num);font-weight:600;font-size:13.5px;color:var(--mut)}.hcC[data-pre] .hst{color:#fff;font-size:17px;font-weight:700}
-/* I */
-.hlive{height:38px;padding:0 12px;border-radius:19px;align-self:center;background:rgba(255,69,58,.14);color:#ff6b6b;font-family:var(--num);font-weight:700;font-size:16px;white-space:nowrap}.hlive.on{background:#ff453a;color:#fff}
-.hcI{display:flex;align-items:center;cursor:pointer;position:relative}.hcI + .hcI{border-top:1px solid var(--line)}
-.hcI .hst{width:62px;flex:none;text-align:center;font-family:var(--num);font-weight:700;font-size:13.5px;color:var(--mut);border-right:1px solid var(--line);align-self:stretch;display:flex;align-items:center;justify-content:center;line-height:1.15}
-.hcI[data-pre] .hst{color:#fff}.hcI.live .hst,.hcI.live .hs2{color:var(--live)}
-.hcI .hrs{flex:1;min-width:0;padding:7px 14px}.hcI .hr{height:27px}.hcI .hr .hn{font-size:18px}
-.hcI .hlgt{position:absolute;right:14px;top:4px;font-size:10px}
-/* More sheet (C) */
-#hmore{position:fixed;inset:0;z-index:200}
-#hmore .hmbg{position:absolute;inset:0;background:rgba(0,0,0,.45)}
-#hmore .hmsh{position:absolute;left:12px;right:12px;bottom:calc(max(env(safe-area-inset-bottom), 12px) + 76px);background:#1c1c1d;border-radius:22px;padding:8px;display:grid;grid-template-columns:1fr 1fr;gap:8px;box-shadow:0 14px 40px rgba(0,0,0,.6)}
-#hmore button{display:flex;align-items:center;gap:10px;padding:14px;border-radius:16px;background:#0e0e10;font-family:var(--num);font-weight:700;font-size:18px;color:#fff}
 </style>
 </head>
 <body>
@@ -1322,7 +1297,7 @@ function d2Trim(img) { const w = img.parentNode, u = w && w.dataset.u; if (!u ||
 const THC = (() => { try { return JSON.parse(localStorage.getItem('thc') || '{}'); } catch (e) { return {}; } })();
 const thcPut = (k, o) => { const c = THC[k] || {}; if (Object.keys(o).every(x => !o[x] || c[x] === o[x])) return; THC[k] = Object.assign(c, Object.fromEntries(Object.entries(o).filter(([, v]) => v))); try { localStorage.setItem('thc', JSON.stringify(THC)); } catch (e) {} };
 const HDR_BH = '<button class="back" data-back aria-label="Back"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></button><button class="home" data-home aria-label="Home"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"><path d="M3 10.5 12 3l9 7.5"/><path d="M5.5 9v11h13V9"/><path d="M10 20v-6h4v6"/></svg></button>', HDR_BHR = HDR_BH + '<button class="home" data-refresh aria-label="Refresh"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12a8 8 0 1 1-2.34-5.66"/><path d="M20 4v5h-5"/></svg></button>';
-try { localStorage.removeItem('design'); const f = localStorage.getItem('font'); document.documentElement.classList.add(f === 'sg' ? 'fsg' : 'fbar'); localStorage.removeItem('d2'); localStorage.removeItem('f12'); localStorage.removeItem('design2'); localStorage.removeItem('design3'); { const hs = localStorage.getItem('hstyle'); if (hs === 'M' || hs === 'D' || hs === 'J') localStorage.removeItem('hstyle'); if (hs === 'K') document.documentElement.classList.add('kick'); } Object.keys(localStorage).filter(k => /^tps[234]?_/.test(k)).forEach(k => localStorage.removeItem(k)); } catch (e) { document.documentElement.classList.add('fbar'); }
+try { localStorage.removeItem('design'); const f = localStorage.getItem('font'); document.documentElement.classList.add(f === 'sg' ? 'fsg' : 'fbar'); localStorage.removeItem('d2'); localStorage.removeItem('f12'); localStorage.removeItem('design2'); localStorage.removeItem('design3'); { const hs = localStorage.getItem('hstyle'); if (/^[MDJCI]$/.test(hs || '')) localStorage.removeItem('hstyle'); if (hs === 'K') document.documentElement.classList.add('kick'); } Object.keys(localStorage).filter(k => /^tps[234]?_/.test(k)).forEach(k => localStorage.removeItem(k)); } catch (e) { document.documentElement.classList.add('fbar'); }
 const API = 'https://site.api.espn.com/apis/site/v2/sports/';
 const WEB = 'https://site.web.api.espn.com/apis/common/v3/sports/';
 const LEAGUES = {
@@ -2041,8 +2016,8 @@ const LY_FB = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke
 const LY_BB = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3v18M5.6 5.6c3 3 3 9.8 0 12.8M18.4 5.6c-3 3-3 9.8 0 12.8"/></svg>';
 const LY_PK = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><ellipse cx="12" cy="9.5" rx="8" ry="3.5"/><path d="M4 9.5v4c0 2 3.6 3.5 8 3.5s8-1.5 8-3.5v-4"/></svg>';
 const LY_FLG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M5 21V4M5 4h13l-2.5 4.5L18 13H5"/></svg>';
-/* ===== home styles (hidden menu): Classic & Classic Alt (B header + classic cards), A colour cards · B big day · C your team + groups · I status column ===== */
-const HSTY = [['', 'Classic'], ['K', 'Classic Alt (Kick green)'], ['A', 'Home A · Colour cards'], ['B', 'Home B · Big day'], ['C', 'Home C · Your team'], ['I', 'Home I · Status column']];
+/* ===== home styles (hidden menu): Classic & Classic Alt (B header + classic cards), A colour cards · B big day ===== */
+const HSTY = [['', 'Classic'], ['K', 'Classic Alt (Kick green)'], ['A', 'Home A · Colour cards'], ['B', 'Home B · Big day']];
 const hKick = () => document.documentElement.classList.toggle('kick', hStyle() === 'K');
 const hStyle = () => { try { const v = localStorage.getItem('hstyle') || ''; return HSTY.some(x => x[0] === v) ? v : ''; } catch (e) { return ''; } };
 /* team colour for the home styles: primary, or the secondary one when the primary is near-black (it would vanish on the dark cards) */
@@ -2060,11 +2035,7 @@ const HCARD = {
     <div class="hA2">${e.state === 'pre' ? '' : `<b><span class="${hLose(e, a) ? 'lose' : ''}">${esc(a.score)}</span><i>-</i><span class="${hLose(e, h) ? 'lose' : ''}">${esc(h.score)}</span></b>`}<small>${hSt(e)}</small>${hLg(e)}</div>
     <div class="hA3"><div><b class="${hLose(e, h) ? 'lose' : ''}">${esc(h.name)}</b><small>${hRec(h)}</small></div>${logoImg(h.logo)}</div></div>`; },
   B: e => { const lg = e.league || state.league; return `<div class="hcB" ${hAttr(e)} style="--ca:${hCol(lg, e.away)};--ch:${hCol(lg, e.home)}"><i class="hbar"></i><div class="hrs">${hRow(e, e.away)}${hRow(e, e.home)}</div><div class="hst">${hSt(e)}${hLg(e)}</div></div>`; },
-  I: e => { const s = statusText(e), m = /^\s*(\d{1,2}:\d{2}(?:\.\d)?)\s*-\s*(.+?)\s*$/.exec(s), st = e.state === 'in' ? (m ? `${esc(m[2])}<br>${esc(m[1])}` : esc(s)) : e.state === 'post' ? esc(String(e.short || 'Final').replace(/^Final\/?/i, '') || 'FT') : esc(s);
-    return `<div class="hcI ${e.state === 'in' ? 'live' : ''}" ${hAttr(e)}><div class="hst">${st}</div><div class="hrs">${hRow(e, e.away)}${hRow(e, e.home)}</div>${hLg(e)}</div>`; },
-  C: e => { const a = e.away, h = e.home; return `<div class="hcC" ${hAttr(e)}>${logoImg(a.logo)}<b class="hab ${hLose(e, a) ? 'lose' : ''}">${esc(a.abbr)}</b><b class="hsc ${hLose(e, a) ? 'lose' : ''}">${e.state === 'pre' ? '' : esc(a.score)}</b><span class="hst">${hSt(e)}</span><b class="hsc ${hLose(e, h) ? 'lose' : ''}">${e.state === 'pre' ? '' : esc(h.score)}</b><b class="hab r ${hLose(e, h) ? 'lose' : ''}">${esc(h.abbr)}</b>${logoImg(h.logo)}</div>`; }
 };
-const HWRAP = { I: 'hbox', C: 'hbox' };
 function hGroups(evs, lg) {
   const byDay = lg === 'fav' || String(lg).replace(/_$/, '') === 'nfl';
   if (!byDay) return [{ t: '', evs }];
@@ -2075,44 +2046,38 @@ function hGroups(evs, lg) {
   return G;
 }
 function hBody(HS, evs, lg) {
-  const card = HCARD[HS], wrap = HWRAP[HS], box = list => wrap ? `<div class="${wrap}">${list.map(card).join('')}</div>` : list.map(card).join('');
-  let pre = '';
-  if (HS === 'C' && lg !== 'fav') {
-    const fv = e => isFav(e.league || lg, e.home.id) || isFav(e.league || lg, e.away.id), hero = evs.find(fv) || evs.find(e => e.state === 'in');
-    if (hero) { const a = hero.away, h = hero.home, L = hero.league || lg, c = hCol(L, fv(hero) ? (isFav(L, h.id) ? h : a) : h);
-      pre = `<div class="hhero" data-game="${hero.id}" data-gl="${L}" style="--hc:${c}"><div class="hhk">${fv(hero) ? 'YOUR TEAM · ' + (hero.state === 'post' ? 'FINAL' : hero.state === 'in' ? 'LIVE' : 'UPCOMING') : 'LIVE NOW'}</div>
-        <div class="hhm"><div>${logoImg(a.logo)}<b>${esc(a.name)}</b></div><div class="hhs">${hero.state === 'pre' ? esc(statusText(hero)) : `<span class="${hLose(hero, a) ? 'lose' : ''}">${esc(a.score)}</span><i>–</i><span class="${hLose(hero, h) ? 'lose' : ''}">${esc(h.score)}</span>`}${hero.state === 'in' ? `<small>${hSt(hero)}</small>` : ''}</div><div>${logoImg(h.logo)}<b>${esc(h.name)}</b></div></div></div>`;
-      evs = evs.filter(e => e !== hero); }
-    const S = [['Live', evs.filter(e => e.state === 'in')], ['Final', evs.filter(e => e.state === 'post')], ['Later', evs.filter(e => e.state === 'pre')]].filter(x => x[1].length);
-    return pre + S.map(([t, l]) => `<div class="hsec">${t}</div>${box(l)}`).join('');
-  }
+  const card = HCARD[HS], box = list => list.map(card).join('');
   return hGroups(evs, lg).map(g => (g.t ? `<div class="hsec">${esc(g.t)}</div>` : '') + box(g.evs)).join('');
 }
 const hDayLab = d => { const t = ymd(d), n = new Date(); return t === ymd(n) ? 'Today' : t === ymd(addDays(n, -1)) ? 'Yesterday' : t === ymd(addDays(n, 1)) ? 'Tomorrow' : DAYS[d.getDay()]; };
 const H_WD = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'], H_MO = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 /* game-day dots for the 7-day strip: one range request for the visible window, done in the background */
-const HDOT = {};
+/* remembered across launches: past days for good, today / future for 30 min */
+const HDOT = (() => { try { const o = JSON.parse(localStorage.getItem('hdot') || '{}'), now = Date.now(), t = ymd(new Date()); Object.values(o).forEach(M => Object.keys(M).forEach(k => { const v = M[k]; if (!Array.isArray(v) || (k >= t && now - v[1] > 18e5) || now - v[1] > 60 * 864e5) delete M[k]; else M[k] = v; })); return o; } catch (e) { return {}; } })();
+const hdSave = () => { clearTimeout(hdSave.t); hdSave.t = setTimeout(() => { try { localStorage.setItem('hdot', JSON.stringify(HDOT)); } catch (e) {} }, 300); };
 function hDots(lg, days) {
-  const M = HDOT[lg] = HDOT[lg] || {};
+  const M = HDOT[lg] = HDOT[lg] || {}, now = Date.now(), put = (k, n) => { M[k] = [n, now]; }, has = k => Array.isArray(M[k]);
   /* what the app already knows: the loaded day and the cached neighbours */
-  if (state.league === lg && Array.isArray(state.events) && state.date) M[ymd(state.date)] = state.events.length;
-  Object.entries(state.dayC || {}).forEach(([k, v]) => { const m = /(\d{8})/.exec(k); if (Array.isArray(v) && m && k.indexOf(lg) === 0) M[m[1]] = v.length; });
-  const miss = days.filter(d => M[ymd(d)] == null);
-  const paint = () => document.querySelectorAll('.hwk button[data-date]').forEach(b => { const k = String(b.dataset.date).replace(/-/g, ''); b.classList.toggle('hg', !!M[k]); });
+  if (state.league === lg && Array.isArray(state.events) && state.date) put(ymd(state.date), state.events.length);
+  Object.entries(state.dayC || {}).forEach(([k, v]) => { const m = /\|(\d{8})$/.exec(k); if (Array.isArray(v) && m && k.indexOf(lg + '|') === 0) put(m[1], v.length); });
+  const miss = days.filter(d => !has(ymd(d)));
+  const paint = () => document.querySelectorAll('.hwk button[data-date]').forEach(b => { const k = String(b.dataset.date).replace(/-/g, ''); b.classList.toggle('hg', has(k) && M[k][0] > 0); });
   paint();
-  if (!miss.length || !LEAGUES[lg] || hDots.busy === lg + ymd(days[0])) return;
-  hDots.busy = lg + ymd(days[0]);
-  const base = API + LEAGUES[lg].path + '/scoreboard?dates=', cnt = (j, list) => { list.forEach(d => { if (M[ymd(d)] == null) M[ymd(d)] = 0; }); (j.events || []).forEach(ev => { const k = ymd(new Date(ev.date)); if (list.some(d => ymd(d) === k)) M[k] = (M[k] || 0) + 1; }); };
-  const a = new Date(miss[0]); a.setDate(a.getDate() - 1);
-  getJson(base + ymd(a) + '-' + ymd(miss[miss.length - 1])).then(j => { if (!j || !Array.isArray(j.events)) throw 0; const seen = new Set(); j.events = j.events.filter(e => !seen.has(e.id) && seen.add(e.id)); cnt(j, miss); })
-    /* range not accepted → one request per missing day */
-    .catch(() => Promise.all(miss.map(d => { const p = new Date(d); p.setDate(p.getDate() - 1); return Promise.all([getJson(base + ymd(p)).catch(() => ({})), getJson(base + ymd(d)).catch(() => ({}))]).then(([x, y]) => { const seen = new Set(); cnt({ events: [].concat(x.events || [], y.events || []).filter(e => !seen.has(e.id) && seen.add(e.id)) }, [d]); }); })))
-    .then(() => { if (state.league === lg) paint(); }).finally(() => { hDots.busy = null; });
+  if (!miss.length || !LEAGUES[lg] || hDots.busy === lg + ymd(miss[0])) return;
+  hDots.busy = lg + ymd(miss[0]);
+  const base = API + LEAGUES[lg].path + '/scoreboard?dates=';
+  const tally = evs => { const seen = new Set(), c = {}; miss.forEach(d => { c[ymd(d)] = 0; }); evs.forEach(ev => { if (!ev || seen.has(ev.id)) return; seen.add(ev.id); const k = ymd(new Date(ev.date)); if (k in c) c[k]++; }); Object.entries(c).forEach(([k, n]) => put(k, n)); hdSave(); if (state.league === lg) paint(); };
+  /* ESPN dates are US days: local day d = ESPN day d-1 (late games) + d. Range request if it works here, else one request per ESPN day – same URLs the day view uses, so they come from cache */
+  const a = new Date(miss[0]); a.setDate(a.getDate() - 1), spanDays = [a].concat(miss);
+  const perDay = () => Promise.all(spanDays.map(d => getJson(base + ymd(d)).then(j => (j && j.events) || [], () => []))).then(L => tally([].concat(...L)));
+  let mode = ''; try { mode = localStorage.getItem('hdotMode') || ''; } catch (e) {}
+  (mode === 'day' ? perDay() : getJson(base + ymd(a) + '-' + ymd(miss[miss.length - 1])).then(j => { if (!j || !Array.isArray(j.events)) throw 0; tally(j.events); },
+    () => { try { localStorage.setItem('hdotMode', 'day'); } catch (e) {} return perDay(); })).finally(() => { hDots.busy = null; });
 }
 function hHead(HS, items, onIdx, fav) {
   const lg = state.league, nfl = lg === 'nfl', d = state.date, cur = items[onIdx], quick = !fav && LEAGUES[lg];
   const ic = (a, t, svg) => `<button class="hic" ${a} aria-label="${t}">${svg}</button>`;
-  const icons = HS === 'C' ? '' : (quick ? ic('data-go2="standings"', 'Table', LY_TROPHY) + ic('data-go2="lstats"', 'Stats', LY_CHART) : '') + ic('data-search', 'Search', LY_SRCH);
+  const icons = (quick ? ic('data-go2="standings"', 'Table', LY_TROPHY) + ic('data-go2="lstats"', 'Stats', LY_CHART) : '') + ic('data-search', 'Search', LY_SRCH);
   const win = (k, f) => items.slice(Math.max(0, onIdx - k), onIdx + k + 1).map(f).join('');
   const dOf = x => { const m = /data-date="(\d{4})(\d{2})(\d{2})"/.exec(x[1]) || /data-date="(\d{4})-(\d{2})-(\d{2})"/.exec(x[1]); return m ? new Date(+m[1], +m[2] - 1, +m[3]) : null; };
   /* one header for every style: small line = full date for Yesterday / Today / Tomorrow, otherwise just the date; big line = Today… or the full weekday */
@@ -2120,27 +2085,16 @@ function hHead(HS, items, onIdx, fav) {
   const wk = cur ? cur[2].replace(/<small>(.*?)<\/small>/, '$1 ') : '';
   const small = fav ? 'FAVORITES' : nfl ? esc(LEAGUES.nfl.name) : (isRel ? H_WD[d.getDay()] + ', ' + dt : dt).toUpperCase();
   const big = fav ? 'Your teams' : nfl ? wk : isRel ? rel : H_WD[d.getDay()];
-  const nl = HS === 'I' ? (state.events || []).filter(e => e.state === 'in').length : 0;
-  const live = nl ? `<button class="hlive ${state.hLive ? 'on' : ''}" data-hlive="1">● LIVE ${nl}</button>` : '';
   if (!nfl && !fav && items.length) { const ds = items.slice(Math.max(0, onIdx - 3), onIdx + 4).map(dOf).filter(Boolean); setTimeout(() => hDots(lg, ds), 0); }
-  return `<header class="lyc hsh hB"><div class="hBt"><div><small>${small}</small><b>${big}</b></div><div class="hics">${live}${icons}</div></div>
-    ${items.length ? `<div class="hwk${nfl ? ' hwk5' : ''}">${win(nfl ? 2 : 3, x => { const dd = dOf(x), m = /<small>(.*?)<\/small>(.*)/.exec(x[2]); return `<button ${x[1]} class="${x[0] ? 'on' : ''}${x[3] ? ' tdy' : ''}${dd && (HDOT[lg] || {})[ymd(dd)] ? ' hg' : ''}">${dd ? `<small>${DAYS[dd.getDay()].slice(0, 1)}</small><b>${dd.getDate()}</b>` : m ? `<small>${m[1]}</small><b class="${m[2].length > 3 ? 'wl' : ''}">${m[2]}</b>` : x[2]}</button>`; })}</div>` : ''}</header>`;
+  return `<header class="lyc hsh hB"><div class="hBt"><div><small>${small}</small><b>${big}</b></div><div class="hics">${icons}</div></div>
+    ${items.length ? `<div class="hwk${nfl ? ' hwk5' : ''}">${win(nfl ? 2 : 3, x => { const dd = dOf(x), m = /<small>(.*?)<\/small>(.*)/.exec(x[2]); return `<button ${x[1]} class="${x[0] ? 'on' : ''}${x[3] ? ' tdy' : ''}${dd && ((HDOT[lg] || {})[ymd(dd)] || [0])[0] > 0 ? ' hg' : ''}">${dd ? `<small>${DAYS[dd.getDay()].slice(0, 1)}</small><b>${dd.getDate()}</b>` : m ? `<small>${m[1]}</small><b class="${m[2].length > 3 ? 'wl' : ''}">${m[2]}</b>` : x[2]}</button>`; })}</div>` : ''}</header>`;
 }
-/* C: "More" sheet replaces Favorites in the bottom bar */
-document.addEventListener('click', ev => {
-  const mb = ev.target.closest && ev.target.closest('[data-hmore]');
-  if (mb) { ev.preventDefault(); ev.stopPropagation(); if (Date.now() - (window._lpAt || 0) < 1500) return; const ex = document.getElementById('hmore'); if (ex) { ex.remove(); return; } const lg = state.league, q = LEAGUES[lg];
-    const sh = document.createElement('div'); sh.id = 'hmore'; sh.innerHTML = `<div class="hmbg"></div><div class="hmsh"><button data-league="fav">${LY_STAR}<span>Favorites</span></button>${q ? `<button data-go2="standings">${LY_TROPHY}<span>Table</span></button><button data-go2="lstats">${LY_CHART}<span>Stats</span></button>` : ''}<button data-search>${LY_SRCH}<span>Search</span></button></div>`;
-    $app.appendChild(sh); sh.querySelector('.hmbg').addEventListener('click', () => sh.remove()); return; }
-  const hl = ev.target.closest && ev.target.closest('[data-hlive]');
-  if (hl) { ev.preventDefault(); ev.stopPropagation(); state.hLive = !state.hLive; render(); }
-}, true);
 function lyHead(o) { const lg = state.league, fav = lg === 'fav';
   const ic = (a, t, svg, on) => `<div class="lyic${on ? ' on' : ''}"><button ${a} aria-label="${t}">${svg}</button><small>${t}</small></div>`;
   const quick = (o.quick || []).map(q => ic(q[0], q[1], q[2])).join('');
   const lgs = [...Object.entries(LEAGUES).map(([id, v]) => [`data-league="${id}"`, v.name, id === lg, id === 'nfl' ? 'Football' : id === 'nba' ? 'Basketball' : id === 'nhl' ? 'Hockey' : v.name]), ['data-f1="1"', 'F1', lg === 'f1', 'Racing']];
   const bm = lyMenu(), sic = { 'data-league="nfl"': LY_FB, 'data-league="nba"': LY_BB, 'data-league="nhl"': LY_PK, 'data-f1="1"': LY_FLG };
-  const nav = `<nav class="lybar bm${bm}">${lgs.map(x => `<button ${x[0]} class="${x[2] ? 'on' : ''}">${sic[x[0]] || ''}<span>${x[1]}</span></button>`).join('')}${o.more ? `<button data-hmore="1" class="${fav ? 'on' : ''}"><svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/></svg><span>More</span></button>` : `<button data-league="fav" class="${fav ? 'on' : ''}">${LY_STAR}<span>${bm === '2' ? 'Favs' : 'Favorites'}</span></button>`}</nav>`;
+  const nav = `<nav class="lybar bm${bm}">${lgs.map(x => `<button ${x[0]} class="${x[2] ? 'on' : ''}">${sic[x[0]] || ''}<span>${x[1]}</span></button>`).join('')}<button data-league="fav" class="${fav ? 'on' : ''}">${LY_STAR}<span>${bm === '2' ? 'Favs' : 'Favorites'}</span></button></nav>`;
   if (o.hs != null) return hHead(o.hs, o.items, o.onIdx, fav) + nav;
   return `<header class="lyc"><div class="lyh"><h1>SCORE<i></i>BOARD</h1><div class="lyics">${quick}${ic('data-search', 'Search', LY_SRCH)}</div></div>${o.strip ? `<div class="strip" id="strip">${o.strip}</div>` : ''}</header>${nav}`; }
 function renderList() {
@@ -2163,7 +2117,7 @@ function renderList() {
   }
   else body = listBody(state.events, state.league);
   const HS = hStyle();
-  if (HS && HCARD[HS] && state.events.length && !(fav && !getFavs().length)) body = hBody(HS, state.hLive && HS === 'I' ? state.events.filter(e => e.state === 'in').concat(state.events.some(e => e.state === 'in') ? [] : state.events) : state.events, state.league);
+  if (HS && HCARD[HS] && state.events.length && !(fav && !getFavs().length)) body = hBody(HS, state.events, state.league);
   const items = []; let onIdx = 0, skey = '';
   if (!fav && state.league === 'nfl' && state.nflw && state.nflw.cal.length) {
     const W = state.nflw; skey = 'nfl' + W.year;
@@ -2184,7 +2138,7 @@ function renderList() {
   const os = document.getElementById('strip'), prev = os && state.stripKey === skey ? os.scrollLeft : null;
   state.stripKey = skey;
   $app.innerHTML = `
-    ${lyHead({ strip, fav, hs: HS, items, onIdx, more: HS === 'C', quick: !fav && LEAGUES[state.league] ? [['data-go2="standings"', 'Table', LY_TROPHY], ['data-go2="lstats"', 'Stats', LY_CHART]] : [] })}
+    ${lyHead({ strip, fav, hs: HS, items, onIdx, quick: !fav && LEAGUES[state.league] ? [['data-go2="standings"', 'Table', LY_TROPHY], ['data-go2="lstats"', 'Stats', LY_CHART]] : [] })}
     <main class="${HS ? 'hs' + HS : ''}">${body}</main>`;
   const s = document.getElementById('strip'), on = s && s.querySelector('.on');
   if (on) {
@@ -4725,7 +4679,7 @@ function renderLeaders() {
 (function () {
   let tmr = null, sx = 0, sy = 0;
   const close = () => { document.querySelectorAll('.lpo,.lpm').forEach(x => x.remove()); };
-  const pill = e => { const p = e.target.closest && e.target.closest('.lybar [data-league], .lybar [data-hmore]'); return p && (LEAGUES[p.dataset.league] || p.dataset.league === 'fav' || p.dataset.hmore) ? p : null; };
+  const pill = e => { const p = e.target.closest && e.target.closest('.lybar [data-league]'); return p && (LEAGUES[p.dataset.league] || p.dataset.league === 'fav') ? p : null; };
   const openCache = el => {
     window._lpAt = Date.now(); close();
     const r = el.getBoundingClientRect();
@@ -4741,17 +4695,17 @@ function renderLeaders() {
       { const bmb = ev.target.closest('[data-bmsw]'); if (bmb) { const k = bmb.dataset.bmsw; try { localStorage.setItem('bmenu', k); } catch (er) {} close(); render(); return; } }
       if (ev.target.closest('[data-fsw]')) { const de = document.documentElement, nx = ev.target.closest('[data-fsw]').dataset.fsw; de.classList.toggle('fbar', nx !== 'sg'); de.classList.toggle('fsg', nx === 'sg'); try { localStorage.setItem('font', nx); } catch (er) {} close(); render(); return; }
       if (!ev.target.closest('[data-cc]')) return;
-      try { Object.keys(localStorage).forEach(k => { if (/^(lgs\d*_|lgsy_|tps\d*_|athc$|thc$|d2g$|yhas$)/.test(k)) localStorage.removeItem(k); }); } catch (e) {}
-      IDB.clear(); JC.clear(); [THC, D2G, YHAS].forEach(o => Object.keys(o).forEach(k => delete o[k]));
+      try { Object.keys(localStorage).forEach(k => { if (/^(lgs\d*_|lgsy_|tps\d*_|athc$|thc$|d2g$|yhas$|hdot$|hdotMode$)/.test(k)) localStorage.removeItem(k); }); } catch (e) {}
+      IDB.clear(); JC.clear(); [THC, D2G, YHAS, HDOT].forEach(o => Object.keys(o).forEach(k => delete o[k]));
       state.lgs = {}; state.athC = {}; state.lvC = {}; state.std = {}; _prefetched = {};
       m.innerHTML = '<button>Cache cleared ✓</button>'; setTimeout(close, 900);
     });
     document.body.append(o, m); try { tNudge(m); } catch (e) {} if (r.top > window.innerHeight / 2) m.style.top = Math.max(8, r.top - 8 - m.offsetHeight) + 'px'; { const up = r.top > window.innerHeight / 2, room = up ? r.top - 16 : window.innerHeight - r.bottom - 16; if (m.offsetHeight > room) { m.style.maxHeight = room + 'px'; m.style.overflowY = 'auto'; if (up) m.style.top = '8px'; } } /* pressed in the bottom bar → menu opens upwards */
   };
-  document.addEventListener('touchstart', e => { const p = pill(e); if (!p) return; sx = e.touches[0].clientX; sy = e.touches[0].clientY; clearTimeout(tmr); tmr = p.dataset.league === 'fav' || p.dataset.hmore ? setTimeout(() => openCache(p), 2000) : null; }, { passive: true });
+  document.addEventListener('touchstart', e => { const p = pill(e); if (!p) return; sx = e.touches[0].clientX; sy = e.touches[0].clientY; clearTimeout(tmr); tmr = p.dataset.league === 'fav' ? setTimeout(() => openCache(p), 2000) : null; }, { passive: true });
   document.addEventListener('touchmove', e => { if (tmr && (Math.abs(e.touches[0].clientX - sx) > 8 || Math.abs(e.touches[0].clientY - sy) > 8)) { clearTimeout(tmr); tmr = null; } }, { passive: true });
   document.addEventListener('touchend', () => { clearTimeout(tmr); tmr = null; });
-  document.addEventListener('contextmenu', e => { const p = pill(e); if (p) { e.preventDefault(); if (p.dataset.league === 'fav' || p.dataset.hmore) openCache(p); } });
+  document.addEventListener('contextmenu', e => { const p = pill(e); if (p) { e.preventDefault(); if (p.dataset.league === 'fav') openCache(p); } });
 })();
 function renderSearch() {
   if (!document.getElementById('sq')) {
