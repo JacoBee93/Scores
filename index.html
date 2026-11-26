@@ -1464,7 +1464,7 @@ const msg = t => `<div class="msg${/^Loading/.test(t) ? ' ld' : ''}">${esc(t)}</
 const JC = new Map(), JIN = new Map(), MIN = 6e4, HR = 36e5;
 const IDB = (() => { let pr = null; const open = () => pr || (pr = new Promise(res => { try { const q = indexedDB.open('scorecache', 1); q.onupgradeneeded = () => q.result.createObjectStore('j'); q.onsuccess = () => res(q.result); q.onerror = () => res(null); } catch (e) { res(null); } }));
   const tx = async (mode, fn) => { const db = await open(); if (!db) return null; return new Promise(res => { try { const t = db.transaction('j', mode), st = t.objectStore('j'), r = fn(st); t.oncomplete = () => res(r && r.result); t.onerror = t.onabort = () => res(null); } catch (e) { res(null); } }); };
-  return { get: k => tx('readonly', st => st.get(k)), put: (k, v) => tx('readwrite', st => st.put(v, k)),
+  return { get: k => tx('readonly', st => st.get(k)), put: (k, v) => tx('readwrite', st => st.put(v, k)), clear: () => tx('readwrite', st => st.clear()),
     prune: () => tx('readwrite', st => { const all = []; const c = st.openCursor(); c.onsuccess = () => { const cu = c.result; if (cu) { const v = cu.value || {}; if (!v.t || Date.now() - v.t > Math.max(v.ttl * 4, 2 * 864e5)) cu.delete(); else all.push([cu.key, v.t]); cu.continue(); } else if (all.length > 400) all.sort((a, b) => a[1] - b[1]).slice(0, all.length - 400).forEach(x => st.delete(x[0])); }; return null; }) };
 })();
 setTimeout(() => IDB.prune(), 4000);
@@ -1480,6 +1480,8 @@ const F1TK = /^(fastestLap|totalTime|behindTime|qual[123]TimeMS)$/;
 function f1StNoTime(j) { try { const cs = (j && j.splits && j.splits.categories) || []; return !cs.some(c => (c.stats || []).some(x => F1TK.test(x.name) && +x.value > 0)); } catch (e) { return false; } }
 function ttlFor(u, j) {
   const sm = u.match(/[?&]season=(\d{4})/) || u.match(/\/seasons\/(\d{4})\//); if (sm && +sm[1] < new Date().getFullYear() - 1) return 30 * 24 * HR;
+  /* any finished season of NBA / NHL / NFL (older than the league's current one) never changes */
+  if (sm) { const lg = /basketball\/(leagues\/)?nba/.test(u) ? 'nba' : /hockey\/(leagues\/)?nhl/.test(u) ? 'nhl' : /football\/(leagues\/)?nfl/.test(u) ? 'nfl' : ''; if (lg && +sm[1] < seasonYear(lg)) return 30 * 24 * HR; }
   if (/\/summary\?event=/.test(u)) { const c = j && j.header && j.header.competitions && j.header.competitions[0], t = c && c.status && c.status.type; return t && t.completed ? 7 * 24 * HR : t && t.state === 'pre' ? 2 * MIN : 15e3; }
   if (/\/scoreboard/.test(u)) { const ev = (j && j.events) || [], st = ev.map(stOf); if (st.includes('in')) return 15e3; if (st.includes('pre')) return 2 * MIN; return ev.length ? 12 * HR : 30 * MIN; }
   if (/\/plays\?|\/competitions\/\d+\?/.test(u)) return 30e3;
@@ -4559,12 +4561,15 @@ function renderLeaders() {
     const m = document.createElement('div'); m.className = 'lpm';
     m.style.top = (r.bottom + 8) + 'px'; m.style.left = Math.min(r.left, window.innerWidth - 216) + 'px';
     m.innerHTML = `<button data-cc>Clear cache</button>${(() => { const de = document.documentElement, cur = de.classList.contains('fsg') ? 'sg' : 'bar'; return [['bar', 'Bleacher font'], ['sg', 'Mercedes font']].map(([k, t]) => `<button data-fsw="${k}" class="${k === cur ? 'on' : ''}">${t}${k === cur ? '<span class="lpck">✓</span>' : ''}</button>`).join(''); })()}${[['2', 'Pill menu'], ['3', 'Bar menu']].map(([k, t], i) => `<button data-bmsw="${k}" class="${i ? '' : 'lyf '}${lyMenu() === k ? 'on' : ''}">${t}${lyMenu() === k ? '<span class="lpck">✓</span>' : ''}</button>`).join('')}`;
+    /* show how much the cache takes (IndexedDB + localStorage) */
+    (async () => { let b = 0; try { const e = navigator.storage && navigator.storage.estimate && await navigator.storage.estimate(); b = (e && e.usage) || 0; } catch (er) {} try { Object.keys(localStorage).forEach(k => { b += (k.length + String(localStorage.getItem(k) || '').length) * 2; }); } catch (er) {} const cb = m.querySelector('[data-cc]'); if (cb && b) cb.textContent = 'Clear cache · ' + (b > 1e6 ? (b / 1048576).toFixed(1) + ' MB' : Math.round(b / 1024) + ' KB'); })();
     o.addEventListener('click', close);
     m.addEventListener('click', ev => {
       { const bmb = ev.target.closest('[data-bmsw]'); if (bmb) { const k = bmb.dataset.bmsw; try { localStorage.setItem('bmenu', k); } catch (er) {} close(); render(); return; } }
       if (ev.target.closest('[data-fsw]')) { const de = document.documentElement, nx = ev.target.closest('[data-fsw]').dataset.fsw; de.classList.toggle('fbar', nx !== 'sg'); de.classList.toggle('fsg', nx === 'sg'); try { localStorage.setItem('font', nx); } catch (er) {} close(); render(); return; }
       if (!ev.target.closest('[data-cc]')) return;
-      try { Object.keys(localStorage).forEach(k => { if (/^(lgs\d*_|tps_|athc$)/.test(k)) localStorage.removeItem(k); }); } catch (e) {}
+      try { Object.keys(localStorage).forEach(k => { if (/^(lgs\d*_|lgsy_|tps\d*_|athc$|thc$|d2g$|yhas$)/.test(k)) localStorage.removeItem(k); }); } catch (e) {}
+      IDB.clear(); JC.clear(); [THC, D2G, YHAS].forEach(o => Object.keys(o).forEach(k => delete o[k]));
       state.lgs = {}; state.athC = {}; state.lvC = {}; state.std = {}; _prefetched = {};
       m.innerHTML = '<button>Cache cleared ✓</button>'; setTimeout(close, 900);
     });
