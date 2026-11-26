@@ -2703,38 +2703,40 @@ function lgsRerender(league) {
   const v = topView();
   if ((v === 'game' && state.game && state.game.league === league && state.game.tab === 'preview') || (v === 'team' && state.team && state.team.league === league && state.team.tab === 'tstats')) render();
 }
-function ensureLeagueStats(league, cb) {
-  const ex = state.lgs[league];
+/* league-wide team stats for ranks: current season (refreshed every 12 h) or a past season y (kept for good – it never changes) */
+const lgsKey = (league, y) => y ? league + '@' + y : league;
+function ensureLeagueStats(league, cb, y) {
+  const K = lgsKey(league, y), ex = state.lgs[K];
   if (ex) { if (ex.data) { if (cb) setTimeout(cb, 0); } else if (cb) ex.cbs.push(cb); return; }
-  const ent = state.lgs[league] = { data: null, cbs: cb ? [cb] : [] };
+  const ent = state.lgs[K] = { data: null, cbs: cb ? [cb] : [] }, LK = y ? 'lgsy_' + league + '_' + y : 'lgs5_' + league;
   const done = () => { const c = ent.cbs; ent.cbs = []; c.forEach(f => { try { f(); } catch (e) {} }); lgsRerender(league); };
-  try { const st = JSON.parse(localStorage.getItem('lgs5_' + league) || 'null'); if (st && Object.keys(st.d || {}).length > 10) { ent.data = st.d; setTimeout(done, 0); if (Date.now() - st.t < 12 * 3600e3) return; } } catch (e) {}
+  try { const st = JSON.parse(localStorage.getItem(LK) || 'null'); if (st && Object.keys(st.d || {}).length > 10) { ent.data = st.d; setTimeout(done, 0); if (y || Date.now() - st.t < 12 * 3600e3) return; } } catch (e) {}
   (async () => {
     try {
       await ensureTeams(league);
       const ids = (state.teamList[league] || []).map(t => t.id), d = {};
       let i = 0;
       const base = API + LEAGUES[league].path + '/teams/';
-      const yr = seasonYear(league);
+      const yr = y || seasonYear(league), qs = y ? '?season=' + y : '';
       const worker = async () => { while (i < ids.length) { const id = ids[i++]; try {
-        if (league === 'nhl') { const [j, c] = await Promise.all([getJson(base + id + '/statistics').catch(() => ({})), coreTeamStats('nhl', id, yr)]); const o = {}; nhlRows(flatStats(Object.assign({}, j, { _core: c }))).forEach(([t, v]) => { const n = parseFloat(String(v == null ? '' : v).replace(/,/g, '')); if (!isNaN(n)) o[t] = n; }); d[id] = o; }
-        else { const j = await getJson(base + id + '/statistics'); d[id] = compactLeague(flatStats(j), league, oppList(j)); }
+        if (league === 'nhl') { const [j, c] = await Promise.all([getJson(base + id + '/statistics' + qs).catch(() => ({})), coreTeamStats('nhl', id, yr)]); const o = {}; nhlRows(flatStats(Object.assign({}, j, { _core: c }))).forEach(([t, v]) => { const n = parseFloat(String(v == null ? '' : v).replace(/,/g, '')); if (!isNaN(n)) o[t] = n; }); d[id] = o; }
+        else { const j = await getJson(base + id + '/statistics' + qs); d[id] = compactLeague(flatStats(j), league, oppList(j)); }
       } catch (e) {} } };
       await Promise.all(Array.from({ length: 8 }, worker));
-      if (league === 'nfl') { const sd = await ensureStandings(league); Object.keys(d).forEach(id => { if (d[id]['Pts Allowed per Game'] == null && sd[id] && sd[id].gp) d[id]['Pts Allowed per Game'] = sd[id].pa / sd[id].gp; }); }
+      if (league === 'nfl') { const sd = await ensureStandings(league, y); Object.keys(d).forEach(id => { if (d[id]['Pts Allowed per Game'] == null && sd[id] && sd[id].gp) d[id]['Pts Allowed per Game'] = sd[id].pa / sd[id].gp; }); }
       ent.data = d;
-      try { localStorage.setItem('lgs5_' + league, JSON.stringify({ t: Date.now(), d })); } catch (e) {}
+      try { localStorage.setItem(LK, JSON.stringify({ t: Date.now(), d })); } catch (e) {}
       done();
-    } catch (e) { if (!ent.data) delete state.lgs[league]; }
+    } catch (e) { if (!ent.data) delete state.lgs[K]; }
   })();
 }
 state.std = {};
-function ensureStandings(league) {
-  if (state.std[league]) return state.std[league];
-  return state.std[league] = (async () => {
+function ensureStandings(league, y) {
+  const K = lgsKey(league, y); if (state.std[K]) return state.std[K];
+  return state.std[K] = (async () => {
     const m = {};
     try {
-      const j = await getJson('https://site.api.espn.com/apis/v2/sports/' + LEAGUES[league].path + '/standings');
+      const j = await getJson('https://site.api.espn.com/apis/v2/sports/' + LEAGUES[league].path + '/standings' + (y ? '?season=' + y : ''));
       const walk = n => { (n.standings && n.standings.entries || []).forEach(en => { const g = k => { const x = (en.stats || []).find(y => y.name === k || y.type === k); return x ? +x.value : NaN; }; const w = g('wins'), l = g('losses'), t = g('ties') || 0, pa = g('pointsAgainst'), apa = g('avgPointsAgainst'), apf = g('avgPointsFor'); if (en.team && (!isNaN(pa) || !isNaN(apa))) m[String(en.team.id)] = { pa, gp: (w || 0) + (l || 0) + (t || 0), apa, dif: !isNaN(apa) && !isNaN(apf) ? apf - apa : NaN }; }); (n.children || []).forEach(walk); };
       walk(j);
     } catch (e) {}
@@ -3664,32 +3666,35 @@ function teamTabStatsHTML(t) {
   let rows;
   if (t.league === 'nhl') {
     rows = nhlRows(L).filter(r => r[1] != null);
-    if (!t.sy && (t.stype || 2) === 2 && rows.length) { const lg = state.lgs.nhl; if (!lg || !lg.data) { ensureLeagueStats('nhl', () => { if (state.team === t && t.tab === 'tstats' && topView() === 'team') render(); }); return msg('Loading…'); }
+    if (t.stype !== 3 && rows.length) { const lg = state.lgs[lgsKey('nhl', t.sy)]; if (!lg || !lg.data) { ensureLeagueStats('nhl', () => { if (state.team === t && t.tab === 'tstats' && topView() === 'team') render(); }, t.sy); return msg('Loading…'); }
       const LOW = /against|penalty minutes/i, num = x => parseFloat(String(x == null ? '' : x).replace(/,/g, ''));
       return tstTable('Team stats', ['Value', 'Rank'], rows.map(([n, v]) => { const me = num(v), vals = Object.values(lg.data).map(o => o[n]).filter(x => x != null && !isNaN(x)), low = LOW.test(n) && !/percentage/i.test(n), r = [n, v, vals.length && !isNaN(me) ? ordinal(1 + vals.filter(x => low ? x < me : x > me).length) : '']; r.rk = true; return r; })); }
     rows = rows.map(r => [r[0], { displayValue: r[1] }]);
   }
   else {
-    const lg = state.lgs[t.league];
-    if (!lg || !lg.data) ensureLeagueStats(t.league, () => { if (state.team === t && t.tab === 'tstats' && topView() === 'team') render(); });
+    const po = t.stype === 3, rr = () => { if (state.team === t && t.tab === 'tstats' && topView() === 'team') render(); }, lg = po ? null : state.lgs[lgsKey(t.league, t.sy)];
+    /* ranks need every team's numbers for that season – wait for them (no ranks popping in); postseason has no league ranks */
+    if (!po && (!lg || !lg.data)) { ensureLeagueStats(t.league, rr, t.sy); return msg('Loading…'); }
     const data = lg && lg.data;
     const OL = oppList(t.stats);
-    if ((t.league === 'nfl' || t.league === 'nba') && !t.std) { t.std = 1; ensureStandings(t.league).then(m => { t.std = m; if (state.team === t && t.tab === 'tstats' && topView() === 'team') render(); }); }
+    if (!po && (t.league === 'nfl' || t.league === 'nba') && (!t.std || t.stdY !== (t.sy || 0))) { const sy = t.sy || 0; t.std = 1; t.stdY = sy; ensureStandings(t.league, t.sy).then(m => { if (t.stdY === sy) { t.std = m; rr(); } }); }
+    if (!po && t.std === 1) return msg('Loading…');
     const mk = list => list.map(([n, re, low, cre, isOpp]) => {
-      if (typeof isOpp === 'string') { const k = isOpp.slice(4), S = t.std && typeof t.std === 'object' ? t.std : null, me = S && S[t.id] && S[t.id][k]; if (me == null || isNaN(me)) return [n, '', ''];
+      if (typeof isOpp === 'string') { const k = isOpp.slice(4), S = !po && t.std && typeof t.std === 'object' ? t.std : null, me = S && S[t.id] && S[t.id][k]; if (me == null || isNaN(me)) return [n, '', ''];
         const vals = Object.values(S).map(o => o[k]).filter(v => v != null && !isNaN(v)); return [n, (k === 'dif' && me > 0 ? '+' : '') + me.toFixed(1), ordinal(1 + vals.filter(v => low ? v < me : v > me).length)]; }
       let st = findStat(isOpp ? OL : L, re, cre);
-      if (!st && n === 'Pts Allowed per Game' && t.std && t.std[t.id] && t.std[t.id].gp) st = { value: t.std[t.id].pa / t.std[t.id].gp, displayValue: (t.std[t.id].pa / t.std[t.id].gp).toFixed(1) };
+      if (!st && !po && n === 'Pts Allowed per Game' && t.std && t.std[t.id] && t.std[t.id].gp) st = { value: t.std[t.id].pa / t.std[t.id].gp, displayValue: (t.std[t.id].pa / t.std[t.id].gp).toFixed(1) };
       let rk = '';
-      if (st && st.rank != null && !isNaN(+st.rank) && +st.rank > 0) rk = ordinal(+st.rank);
+      if (po) rk = '';
+      else if (st && st.rank != null && !isNaN(+st.rank) && +st.rank > 0) rk = ordinal(+st.rank);
       else if (st && data) { const mine = numOf(st), vals = Object.values(data).map(o => o[n]).filter(v => v != null && !isNaN(v)); if (vals.length && !isNaN(mine)) rk = ordinal(1 + vals.filter(v => low ? v < mine : v > mine).length); }
       return [n, st ? (st.displayValue != null ? st.displayValue : st.value) : '', rk];
     });
-    const out = r => { r.rk = true; return r; };
-    if (t.league === 'nfl') return ['Offensive', 'Defensive'].map(sec => tstTable(sec, ['Value', 'Rank'], mk(NFL_TEAM[sec]).map(out))).join('');
+    const out = r => { if (po) return r.slice(0, 2); r.rk = true; return r; }, HD = po ? ['Value'] : ['Value', 'Rank'];
+    if (t.league === 'nfl') return ['Offensive', 'Defensive'].map(sec => tstTable(sec, HD, mk(NFL_TEAM[sec]).map(out))).join('');
     rows = mk(t.league === 'nba' ? NBA_TEAM : PV_STATS[t.league] || []).filter(r => r[1] !== '');
     if (!rows.length) return msg('Team stats not available.');
-    return tstTable('Team stats', ['Value', 'Rank'], rows.map(out));
+    return tstTable('Team stats', HD, rows.map(out));
   }
   if (!rows.length) return msg('Team stats not available.');
   return tstTable('Team stats', ['Value'], rows.map(r => [r[0], r[1].displayValue != null ? r[1].displayValue : r[1].value]));
@@ -5261,7 +5266,7 @@ $app.addEventListener('click', ev => {
     state.team.yOpen = !state.team.yOpen; render();
   } else if (d.ty) {
     const t = state.team, [ys, ts] = String(d.ty).split('|'), y = +ys, tt = +ts || 2, ny = y === seasonYear(t.league) ? null : y; t.yOpen = false;
-    if (ny !== (t.sy || null) || tt !== (t.stype || 2)) { t.sy = ny; t.stype = tt; t.tab = 'stats'; t.done = false; t.ps = null; t.month = null; t.roster = null; t.events = []; render(); loadTeam(); } else render();
+    if (ny !== (t.sy || null) || tt !== (t.stype || 2)) { t.sy = ny; t.stype = tt; t.done = false; t.ps = null; t.month = null; t.roster = null; t.events = []; render(); loadTeam(); } else render();
   } else if (d.lsyo) {
     state.lv.syOpen = !state.lv.syOpen; render();
   } else if (d.tlc) {
