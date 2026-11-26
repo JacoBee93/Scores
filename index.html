@@ -925,7 +925,7 @@ body{background:#000 !important}
 .stkw.det .phero.pp .hs{width:140px;height:118px;margin:-20px -30px 0 0}
 .stkw.v-team .phero > .grow{padding-left:20px}
 .stkw.v-player .d2bg{pointer-events:auto;cursor:pointer}
-.stkw.v-player .d2bg[data-lglogo]{pointer-events:none;cursor:default}
+.stkw.v-player .d2bg[data-lglogo]{pointer-events:none;cursor:default;width:130px;height:130px;top:calc(env(safe-area-inset-top) + 27px);right:124px}
 .stkw.v-player .phw{pointer-events:none;filter:drop-shadow(0 0 14px rgba(0,0,0,.75)) drop-shadow(0 0 4px rgba(0,0,0,.5))}
 .stkw.det.v-team,.stkw.det.v-player{background-size:100% calc(100% - 10px);background-repeat:no-repeat}
 .stkw.fx0{position:fixed;left:0;right:0;top:-2px;border-top:2px solid var(--pbg,#000);box-shadow:0 -40px 0 var(--pbg,#000)}
@@ -3261,7 +3261,8 @@ function seasonLogo(league, r) {
   const ab = /^[A-Z]{2,4}$/.test(String(r.sub || '')) ? r.sub : '';
   const u = teamLogoOf(league, { id: r.tid, abbr: ab });
   if (!r.tid && !ab) return `<small class="tot2">TOT</small>`;
-  return u ? `<img class="slg" src="${esc(u)}" alt="" onerror="this.replaceWith(Object.assign(document.createElement('small'),{textContent:'${esc(ab)}'}))">` : (ab ? `<small>${esc(ab)}</small>` : '');
+  const tm = (state.teamList[league] || []).find(x => (r.tid && x.id === String(r.tid)) || (ab && x.abbr === ab)), op = tm ? ` data-topen="${esc(tm.id)}" data-tl="${league}" data-tn="${esc(tm.name || '')}" data-tlogo="${esc(tm.logo || u || '')}"` : '';
+  return u ? `<img class="slg"${op} src="${esc(u)}" alt="" onerror="this.replaceWith(Object.assign(document.createElement('small'),{textContent:'${esc(ab)}'}))">` : (ab ? `<small>${esc(ab)}</small>` : '');
 }
 function bioHTML(p) {
   const a = p.bio || {};
