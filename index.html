@@ -925,6 +925,7 @@ body{background:#000 !important}
 .stkw.det .phero.pp .hs{width:140px;height:118px;margin:-20px -30px 0 0}
 .stkw.v-team .phero > .grow{padding-left:20px}
 .stkw.v-player .d2bg{pointer-events:auto;cursor:pointer}
+.stkw.v-player .d2bg[data-lglogo]{pointer-events:none;cursor:default}
 .stkw.v-player .phw{pointer-events:none;filter:drop-shadow(0 0 14px rgba(0,0,0,.75)) drop-shadow(0 0 4px rgba(0,0,0,.5))}
 .stkw.det.v-team,.stkw.det.v-player{background-size:100% calc(100% - 10px);background-repeat:no-repeat}
 .stkw.fx0{position:fixed;left:0;right:0;top:-2px;border-top:2px solid var(--pbg,#000);box-shadow:0 -40px 0 var(--pbg,#000)}
@@ -1254,7 +1255,7 @@ function d2Trim(img) { const w = img.parentNode, u = w && w.dataset.u; if (!u ||
 const THC = (() => { try { return JSON.parse(localStorage.getItem('thc') || '{}'); } catch (e) { return {}; } })();
 const thcPut = (k, o) => { const c = THC[k] || {}; if (Object.keys(o).every(x => !o[x] || c[x] === o[x])) return; THC[k] = Object.assign(c, Object.fromEntries(Object.entries(o).filter(([, v]) => v))); try { localStorage.setItem('thc', JSON.stringify(THC)); } catch (e) {} };
 const HDR_BH = '<button class="back" data-back aria-label="Back"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></button><button class="home" data-home aria-label="Home"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"><path d="M3 10.5 12 3l9 7.5"/><path d="M5.5 9v11h13V9"/><path d="M10 20v-6h4v6"/></svg></button>', HDR_BHR = HDR_BH + '<button class="home" data-refresh aria-label="Refresh"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12a8 8 0 1 1-2.34-5.66"/><path d="M20 4v5h-5"/></svg></button>';
-try { localStorage.removeItem('design'); const f = localStorage.getItem('font'); document.documentElement.classList.add(f === 'sg' ? 'fsg' : 'fbar'); localStorage.removeItem('d2'); localStorage.removeItem('f12'); localStorage.removeItem('design2'); localStorage.removeItem('design3'); Object.keys(localStorage).filter(k => /^tps[23]?_/.test(k)).forEach(k => localStorage.removeItem(k)); } catch (e) { document.documentElement.classList.add('fbar'); }
+try { localStorage.removeItem('design'); const f = localStorage.getItem('font'); document.documentElement.classList.add(f === 'sg' ? 'fsg' : 'fbar'); localStorage.removeItem('d2'); localStorage.removeItem('f12'); localStorage.removeItem('design2'); localStorage.removeItem('design3'); Object.keys(localStorage).filter(k => /^tps[234]?_/.test(k)).forEach(k => localStorage.removeItem(k)); } catch (e) { document.documentElement.classList.add('fbar'); }
 const API = 'https://site.api.espn.com/apis/site/v2/sports/';
 const WEB = 'https://site.web.api.espn.com/apis/common/v3/sports/';
 const LEAGUES = {
@@ -1895,7 +1896,7 @@ function render() {
   else if (v === 'lv') renderLV(); else if (v === 'cmp') renderCompare(); else if (v === 'search') renderSearch(); else renderList();
   state.lastView = key;
   (() => { let c = '', alt = '';
-    if (v === 'player') { const bio = state.player && state.player.bio, tm = bio && bio.team, ret = bio && (bio.active === false || /retired/i.test(String((bio.status && (bio.status.type || bio.status.name)) || ''))); if (!ret) { c = tm && tm.color; alt = tm && tm.alternateColor; } }
+    if (v === 'player') { const bio = state.player && state.player.bio, tm = bio && bio.team, ret = athNoTeam(bio); if (!ret) { c = tm && tm.color; alt = tm && tm.alternateColor; } }
     else if (v === 'team') { const t = state.team, os = [(state.teamList[t.league] || []).find(x => x.id === t.id), t.info && t.info.team, t.roster && t.roster.team, t.sched && t.sched.team, THC[t.league + '/' + t.id]].filter(Boolean); c = os.map(o => o.color).find(Boolean); alt = os.map(o => o.alternateColor || o.alt).find(Boolean); }
     { const ab = v === 'team' ? (((state.team.info && state.team.info.team) || {}).abbreviation || ((state.teamList[state.team.league] || []).find(x => x.id === state.team.id) || {}).abbr || (THC[state.team.league + '/' + state.team.id] || {}).abbr) : v === 'player' && state.player && state.player.bio && state.player.bio.team ? state.player.bio.team.abbreviation : '', lg = v === 'team' ? state.team.league : state.player && state.player.league;
       const tc = tcol(lg, ab || (v === 'team' && state.tmeta && state.tmeta.id === state.team.id ? '' : '')); if (tc && (c || v === 'team')) { c = tc[0]; alt = ''; } }
@@ -2656,6 +2657,8 @@ const NFL_TEAM = {
   Offensive: [['Pts Scored per Game', /^(avg)?(total)?points ?per ?game|^points ?per ?game|avgpoints$/i], ['Yds per Game', /total ?yards ?per ?game|^yards ?per ?game|avg.*total ?yards/i], ['Pass Yds per Game', /passing ?yards ?per ?game|net passing yards per game/i], ['Rush Yds per Game', /rushing ?yards ?per ?game/i], ['3rd Down Efficiency Percentage', /third ?down.*(pct|percent|conv)|3rd down/i], ['4th Down Efficiency Percentage', /fourth ?down.*(pct|percent|conv)|4th down/i]],
   Defensive: [['Pts Allowed per Game', /(opp|against|allowed).*points ?per ?game|pointsAgainstPerGame|pointsAllowed/i, true], ['Pass Yds Allowed per Game', /^netPassingYardsPerGame$|^passingYardsPerGame$|net passing yards per game/i, true, null, true], ['Rush Yds Allowed per Game', /^rushingYardsPerGame$|rushing yards per game/i, true, null, true], ['Sacks', /^sacks$/i, false, /defens/i], ['Interceptions', /^interceptions$/i, false, /defens|intercept/i], ['Forced Fumbles', /fumblesForced|forcedFumbles|^forced fumbles$/i]]
 };
+/* athlete without a team: retired or released (free agent) – ESPN still lists his last team */
+const athNoTeam = a => !!a && (a.active === false || (st => /retired|free[ _-]?agent|\bfa\b|released|waived|unsigned/i.test(st))(a.status ? [a.status.type, a.status.name, a.status.abbreviation, a.status.id].filter(x => typeof x === 'string').join(' ') : ''));
 const seasonYear = (league, d) => { d = d ? new Date(d) : new Date(); const y = d.getFullYear(), m = d.getMonth(); return league === 'nfl' ? (m < 2 ? y - 1 : y) : (m >= 7 ? y + 1 : y); };
 async function coreTeamStats(league, id, year) {
   const parts = LEAGUES[league].path.split('/');
@@ -2978,11 +2981,11 @@ function renderPlayer() {
   const p = state.player;
   const body = !p.done ? msg('Loading…') : (p.tab === 'ov' || p.tab === 'news') ? playerInfoHTML(p) : p.tab === 'gl' ? gamelogFull(p) : p.tab === 'bio' ? bioHTML(p) : statsTabHTML(p);
   const sub = [p.jersey ? '#' + p.jersey : '', p.pos].filter(Boolean).join(' · ');
-  const ptm = p.bio && p.bio.team, plogo = ptm && !(p.bio.active === false) ? dk((ptm.logos && ptm.logos[0] && ptm.logos[0].href) || ptm.logo || ((state.teamList[p.league] || []).find(x => x.id === String(ptm.id)) || {}).logo || '') : '';
+  const ptm = p.bio && p.bio.team, plogo = ptm && !athNoTeam(p.bio) ? dk((ptm.logos && ptm.logos[0] && ptm.logos[0].href) || ptm.logo || ((state.teamList[p.league] || []).find(x => x.id === String(ptm.id)) || {}).logo || '') : '';
   const tab = (k, l) => `<button data-ptab="${k}" class="${p.tab === k ? 'on' : ''}">${l}</button>`;
   $app.innerHTML = `
     <header class="d"><div class="tabs">${HDR_BHR}</div></header>
-    <main><div class="phero pp${p.bio || p.done ? '' : ' ld'}">${plogo ? d2Html(plogo, ` data-topen="${esc(ptm.id)}" data-tl="${p.league}" data-tn="${esc(ptm.displayName || '')}" data-tlogo="${esc(plogo)}"`) : ''}<span class="phw"><img class="hs" src="https://a.espncdn.com/i/headshots/${p.league}/players/full/${esc(p.id)}.png" alt="" onerror="this.onerror=null;this.src=SIL"></span>
+    <main><div class="phero pp${p.bio || p.done ? '' : ' ld'}">${plogo ? d2Html(plogo, ` data-topen="${esc(ptm.id)}" data-tl="${p.league}" data-tn="${esc(ptm.displayName || '')}" data-tlogo="${esc(plogo)}"`) : p.bio ? d2Html(dk('https://a.espncdn.com/i/teamlogos/leagues/500/' + p.league + '.png'), ' data-lglogo="1"') : ''}<span class="phw"><img class="hs" src="https://a.espncdn.com/i/headshots/${p.league}/players/full/${esc(p.id)}.png" alt="" onerror="this.onerror=null;this.src=SIL"></span>
       <div><div class="pname">${esc(p.name || 'Player')}</div><div class="psub">${esc(sub)}</div></div></div>
       <div class="dtabs sm even"><button data-ptab="${p.infoSub || 'ov'}" class="${p.tab === 'ov' || p.tab === 'news' ? 'on' : ''}">Info</button>${tab('stats', 'Career')}${tab('gl', 'Gamelog')}${tab('bio', 'Bio')}</div>
       <div class="pane t">${body}</div></main>`;
@@ -3272,7 +3275,7 @@ function bioHTML(p) {
   const ijd = ij ? ((ij.details && (ij.details.type || ij.details.detail)) || '') : '';
   const st = ijs && !/^active$/i.test(ijs) ? ijs + (ijd ? ' (' + ijd + ')' : '') : st0;
   const draft = a.displayDraft || (a.draft && (a.draft.displayText || [a.draft.year, a.draft.round ? 'Rd ' + a.draft.round : '', a.draft.selection ? 'Pk ' + a.draft.selection : ''].filter(Boolean).join(', '))) || '';
-  const rows = [['Team', (a.team && a.team.displayName) || p.team], ['Position', (a.position && (a.position.displayName || a.position.name)) || p.pos], ['HT/WT', hw], ['Birthdate', dob + (a.age ? ' (' + a.age + ')' : '')], ['College', (a.college && (a.college.name || a.college.shortName)) || ''], ['Draft Info', draft], ['Status', st ? `<span class="bdot ${/^active/i.test(st) ? 'on' : /out|^ir|injured|suspen/i.test(st) ? 'out' : 'dtd'}"></span>${esc(st)}` : ''], ['Experience', exp], ['Birthplace', place]].filter(r => r[1]);
+  const rows = [['Team', athNoTeam(a) && a.active !== false && !/retired/i.test(String((a.status && (a.status.type || a.status.name)) || '')) ? 'Free Agent' : (a.team && a.team.displayName) || p.team], ['Position', (a.position && (a.position.displayName || a.position.name)) || p.pos], ['HT/WT', hw], ['Birthdate', dob + (a.age ? ' (' + a.age + ')' : '')], ['College', (a.college && (a.college.name || a.college.shortName)) || ''], ['Draft Info', draft], ['Status', st ? `<span class="bdot ${/^active/i.test(st) ? 'on' : /out|^ir|injured|suspen/i.test(st) ? 'out' : 'dtd'}"></span>${esc(st)}` : ''], ['Experience', exp], ['Birthplace', place]].filter(r => r[1]);
   const teams = [];
   { const E = [], sk = new Set(); (statCats(p.st, p.league)[0] ? [statCats(p.st, p.league)[0]] : []).forEach(c => c.rows.forEach((r, i) => { if (!r.year || !r.sub || !/^[A-Z]{2,4}$/.test(r.sub)) return; const k = r.year + r.sub; if (sk.has(k)) return; sk.add(k); E.push({ y: +r.year, ab: r.sub, tid: r.tid, i }); }));
     if (!E.length) statCats(p.st, p.league).forEach(c => c.rows.forEach((r, i) => { if (!r.year || !r.sub || !/^[A-Z]{2,4}$/.test(r.sub)) return; const k = r.year + r.sub; if (sk.has(k)) return; sk.add(k); E.push({ y: +r.year, ab: r.sub, tid: r.tid, i }); }));
@@ -3617,7 +3620,7 @@ async function teamPsFast(t, all0, base, catNm) {
 }
 async function loadTeamPlayers(t) {
   if (t.ps || t.rosterLoading) return;
-  const past = !!(t.sy || t.stype === 3), ck = 'tps4_' + t.league + '_' + t.id + (t.sy ? '_' + t.sy : '') + (t.stype === 3 ? '_p' : ''), cached = lsGet(ck, past ? 30 * 864e5 : 6 * 3600e3);
+  const past = !!(t.sy || t.stype === 3), ck = 'tps5_' + t.league + '_' + t.id + (t.sy ? '_' + t.sy : '') + (t.stype === 3 ? '_p' : ''), cached = lsGet(ck, past ? 30 * 864e5 : 6 * 3600e3);
   const lastEnd = Math.max(0, ...(t.events || []).filter(e => e.state === 'post' || e.state === 'in').map(e => new Date(e.date).getTime() + 3.5 * 36e5).filter(x => x < Date.now()));
   if (cached && cached.ts && lastEnd > cached.ts) { /* od ulozeni se dohral zapas -> stahnout znovu */ }
   else if (cached && cached.rows && cached.rows.length) { t.ps = { loading: false, cats: psFromRows(cached.rows), season: cached.season }; if (state.team === t && t.tab === 'stats' && topView() === 'team') render(); return; }
@@ -3628,9 +3631,10 @@ async function loadTeamPlayers(t) {
   let i = 0;
   let rows = [];
   const catNm = c => { const L = c.labels; return (L.includes('GAA') || L.includes('SV%')) ? 'Goalies' : (L.includes('PTS') && L.includes('PIM')) ? 'Skaters' : (CAT_NAME[String(c.title).toLowerCase()] || c.title); };
-  if (past) try { const fr = await teamPsFast(t, all, base, catNm); if (fr && fr.length) { rows = fr; i = all.length; } } catch (e) {}
+  /* players' stats from ESPN's season list (like ESPN's team stats page: includes players who have since been released) – the per-player route is only a fallback for the current season */
+  try { const fr = await teamPsFast(t, all, base, catNm); if (fr && fr.length) { rows = fr; i = all.length; } } catch (e) {}
   /* NHL past seasons: ESPN's season list lacks goaltending numbers – take each goalie's line for that season (and season type) from the core API */
-  if (past && t.league === 'nhl' && rows.length && !rows.some(r => r.name === 'Goalies')) try {
+  if (i >= all.length && t.league === 'nhl' && rows.length && !rows.some(r => r.name === 'Goalies')) try {
     const isG = a => String((a.position && a.position.abbreviation) || '').toUpperCase() === 'G', y = t.sy || seasonYear('nhl'), ty = t.stype === 3 ? 3 : 2;
     let G = [...new Map(rows.filter(r => isG(r.a)).map(r => r.a).concat(rows.goalies || []).map(a => [String(a.id), a])).values()];
     if (!G.length) { const ro = await coreRoster(Object.assign({}, t, { sy: y })).catch(() => null); G = ((ro && ro.athletes) || []).filter(isG); }
@@ -3813,7 +3817,7 @@ function runPlayerSearch() {
       else my.errs.push(order[i]);
     });
     /* look up team / retired status from the athlete record before showing the list (max 3 s) – no text popping in afterwards */
-    const look = my.items.slice(0, 12).map(x => getJson(WEB + LEAGUES[x.league].path + '/athletes/' + x.id).then(j => { const a = (j && j.athlete) || {}, ret = a.active === false || /retired/i.test(String((a.status && (a.status.type || a.status.name)) || '')), tn = a.team && (a.team.displayName || a.team.name); if (ret) x.sub = 'Retired'; else if (!x.sub && tn) x.sub = tn; }, () => {}));
+    const look = my.items.slice(0, 12).map(x => getJson(WEB + LEAGUES[x.league].path + '/athletes/' + x.id).then(j => { const a = (j && j.athlete) || {}, ret = a.active === false || /retired/i.test(String((a.status && (a.status.type || a.status.name)) || '')), fa = !ret && athNoTeam(a), tn = a.team && (a.team.displayName || a.team.name); if (ret) x.sub = 'Retired'; else if (fa) x.sub = 'Free Agent'; else if (!x.sub && tn) x.sub = tn; }, () => {}));
     await Promise.race([Promise.all(look), new Promise(r => setTimeout(r, 3000))]);
     my.loading = false;
     if (state.sp === my) paintSearch();
@@ -5347,7 +5351,7 @@ $app.addEventListener('click', ev => {
     const rb = ev.target.closest('[data-refresh]'); if (rb) { rb.classList.add('spin'); setTimeout(() => rb.classList.remove('spin'), 800); }
     if (v === 'player') { const p = state.player; p.done = false; p.loaded = false; p.post = null; p.news = null; render(); loadPlayer(); }
     else if (v === 'game') { const g = state.game; g.ts = null; g.sl = null; g.l5x = null; loadGame(); }
-    else if (v === 'team') { const t = state.team; t.done = false; t.ps = null; t.news = null; if (!t.sy) { const K = lgsKey(t.league); delete state.lgs[K]; delete state.std[K]; t.std = null; try { localStorage.removeItem('lgs5_' + t.league); } catch (e) {} } try { localStorage.removeItem('tps4_' + t.league + '_' + t.id); } catch (e) {} render(); loadTeam(); }
+    else if (v === 'team') { const t = state.team; t.done = false; t.ps = null; t.news = null; if (!t.sy) { const K = lgsKey(t.league); delete state.lgs[K]; delete state.std[K]; t.std = null; try { localStorage.removeItem('lgs5_' + t.league); } catch (e) {} } try { localStorage.removeItem('tps5_' + t.league + '_' + t.id); } catch (e) {} render(); loadTeam(); }
     else if (v === 'lv') { const lv = state.lv; if (lv.kind === 'leaders') { lv.data = null; lv.loading = false; render(); loadLeaders(); } else { Object.keys(state.lvC).forEach(k => { if (k.indexOf(lv.kind + lv.league) === 0) delete state.lvC[k]; }); render(); loadLV(); } }
     else if (v === 'list') loadList();
   } else if (d.csort !== undefined) {
