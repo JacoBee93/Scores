@@ -916,6 +916,7 @@ body{background:#000 !important}
 .stkw.v-team > header,.stkw.v-player > header{z-index:5}
 .ylist{overscroll-behavior:contain}
 .ybtn.ld{opacity:.45;pointer-events:none}
+.phero.ld > *{visibility:hidden}
 .stkw .phero{position:static}
 .stkw .d2bg{display:block;position:absolute;z-index:0;right:101px;top:calc(env(safe-area-inset-top) + 4px);width:176px;height:176px;opacity:.2;pointer-events:none;filter:saturate(1.2)}
 .stkw .phero > :not(.d2bg){position:relative;z-index:1}
@@ -2974,7 +2975,7 @@ function renderPlayer() {
   const tab = (k, l) => `<button data-ptab="${k}" class="${p.tab === k ? 'on' : ''}">${l}</button>`;
   $app.innerHTML = `
     <header class="d"><div class="tabs">${HDR_BHR}</div></header>
-    <main><div class="phero pp">${plogo ? d2Html(plogo, ` data-topen="${esc(ptm.id)}" data-tl="${p.league}" data-tn="${esc(ptm.displayName || '')}" data-tlogo="${esc(plogo)}"`) : ''}<span class="phw"><img class="hs" src="https://a.espncdn.com/i/headshots/${p.league}/players/full/${esc(p.id)}.png" alt="" onerror="this.onerror=null;this.src=SIL"></span>
+    <main><div class="phero pp${p.bio || p.done ? '' : ' ld'}">${plogo ? d2Html(plogo, ` data-topen="${esc(ptm.id)}" data-tl="${p.league}" data-tn="${esc(ptm.displayName || '')}" data-tlogo="${esc(plogo)}"`) : ''}<span class="phw"><img class="hs" src="https://a.espncdn.com/i/headshots/${p.league}/players/full/${esc(p.id)}.png" alt="" onerror="this.onerror=null;this.src=SIL"></span>
       <div><div class="pname">${esc(p.name || 'Player')}</div><div class="psub">${esc(sub)}</div></div></div>
       <div class="dtabs sm even"><button data-ptab="${p.infoSub || 'ov'}" class="${p.tab === 'ov' || p.tab === 'news' ? 'on' : ''}">Info</button>${tab('stats', 'Career')}${tab('gl', 'Gamelog')}${tab('bio', 'Bio')}</div>
       <div class="pane t">${body}</div></main>`;
@@ -3449,7 +3450,7 @@ function renderTeam() {
       const pk = 'po/' + t.league + '/' + t.id, PM = YHAS[pk] || {}, opts = []; Y.forEach((x, i) => { if (i > 0 && (PM[x] !== 0 || (x === y && ty === 3))) opts.push([x, 3]); opts.push([x, 2]); });
       yhProbe(pk, Y.slice(1), yy => API + LEAGUES[t.league].path + '/teams/' + t.id + '/schedule?season=' + yy + '&seasontype=3', j => ((j && j.events) || []).some(ev => { const st = ev.seasonType || (ev.season && { type: ev.season.type }) || {}; return st.id == null && st.type == null ? true : String(st.id != null ? st.id : st.type) === '3'; }), () => { if (state.team === t && topView() === 'team') ylKeep(render); });
       return `<div class="ysel tys"><button class="ybtn${yhBusy(pk) ? ' ld' : ''}" data-tyo="1">${esc(lab(y, ty))}<i class="chev ${t.yOpen ? 'up' : ''}"></i></button>${t.yOpen ? `<div class="ylist">${opts.map(([x, tt]) => `<button data-ty="${x}|${tt}" class="${x === y && tt === ty ? 'on' : ''}">${esc(lab(x, tt))}</button>`).join('')}</div>` : ''}</div>`; })()}</div></header>
-    <main><div class="phero">${h.logo ? d2Html(dk(h.logo)) : ''}
+    <main><div class="phero${t.done || (THC[t.league + '/' + t.id] || {}).sub ? '' : ' ld'}">${h.logo ? d2Html(dk(h.logo)) : ''}
       <div class="grow"><div class="pname up">${esc(h.name)}</div><div class="psub">${esc(h.sub)}</div></div>
       <button class="fstar ${isFav(t.league, t.id) ? 'on' : ''}" data-fav="${esc(t.id)}" data-fl="${t.league}" data-fn="${esc(h.name)}" data-flogo="${esc(h.logo)}" aria-label="Favorite team">${STAR_SVG}</button></div>
       <div class="dtabs sm even">${tab(t.infoSub || 'news', 'Info', t.tab === 'roster' || t.tab === 'news')}${tab('sched', 'Schedule')}${tab('stats', 'Stats', t.tab === 'tstats')}${tab('inj', 'Injuries')}</div>
