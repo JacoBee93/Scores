@@ -917,13 +917,13 @@ html.d2x body{background:#000 !important}
 html.d2x .stkw.v-team,html.d2x .stkw.v-player{background:linear-gradient(180deg,var(--pbg) 0%,var(--pbg) 40%,color-mix(in srgb,var(--pbg) 80%,#000) 56%,color-mix(in srgb,var(--pbg) 50%,#000) 72%,color-mix(in srgb,var(--pbg) 20%,#000) 88%,#000 100%);overflow:hidden}
 html.d2x .stkw.v-team > *,html.d2x .stkw.v-player > *{position:relative;z-index:1}
 html.d2x .stkw .phero{position:static}
-html.d2x .stkw .d2bg{display:block;position:absolute;z-index:0;right:52px;top:calc(env(safe-area-inset-top) + 4px);width:176px;height:176px;object-fit:contain;object-position:50% 50%;opacity:.2;pointer-events:none;filter:saturate(1.2)}
+html.d2x .stkw .d2bg{display:block;position:absolute;z-index:0;right:101px;top:calc(env(safe-area-inset-top) + 4px);width:176px;height:176px;object-fit:contain;object-position:50% 50%;opacity:.2;pointer-events:none;filter:saturate(1.2)}
 html.d2x .stkw .phero .tl,html.d2x .stkw .phero .ptl{display:none}
 html.d2x .stkw .phero > :not(.d2bg){position:relative;z-index:1}
 html.d2x .stkw .phero.pp .hs{width:200px;height:146px;border-radius:0;background:none;object-fit:cover;object-position:top;-webkit-mask-image:linear-gradient(180deg,#000 86%,transparent);mask-image:linear-gradient(180deg,#000 86%,transparent);margin:-30px -18px -16px 0}
 html.d2x .stkw.det .phero.pp .hs{width:140px;height:118px;margin:-20px -30px 0 0}
 html.d2x .stkw.v-team .phero > .grow{padding-left:20px}
-html.d2x .stkw.v-player .d2bg{pointer-events:auto;cursor:pointer;right:101px}
+html.d2x .stkw.v-player .d2bg{pointer-events:auto;cursor:pointer}
 html.d2x .stkw.v-player .phw{pointer-events:none;filter:drop-shadow(0 0 14px rgba(0,0,0,.75)) drop-shadow(0 0 4px rgba(0,0,0,.5))}
 html.d2x .stkw.det.v-team,html.d2x .stkw.det.v-player{background-size:100% calc(100% - 10px);background-repeat:no-repeat}
 .stkw.fx0{position:fixed;left:0;right:0;top:-2px;border-top:2px solid var(--pbg,#000);box-shadow:0 -40px 0 var(--pbg,#000)}
@@ -1244,7 +1244,7 @@ function d2Trim(img) { const u = img.dataset.u; if (!u || img.dataset.t) return;
       for (let y = 0; y < H; y++) for (let i = 0; i < W; i++) if (d[(y * W + i) * 4 + 3] > 16) { if (y < t) t = y; if (y > b) b = y; if (i < l) l = i; if (i > r) r = i; }
       if (b < 0) { D2C.set(u, 1); return; } const k = im.naturalWidth / W, sx = Math.max(0, Math.floor(l * k)), sy = Math.max(0, Math.floor(t * k)), sw = Math.min(im.naturalWidth - sx, Math.ceil((r - l + 1) * k)), sh = Math.min(im.naturalHeight - sy, Math.ceil((b - t + 1) * k));
       const o = document.createElement('canvas'); o.width = sw; o.height = sh; o.getContext('2d').drawImage(im, sx, sy, sw, sh, 0, 0, sw, sh); const du = o.toDataURL('image/png'); D2C.set(u, du); document.querySelectorAll('img.d2bg').forEach(e => { if (e.dataset.u === u) e.src = du; }); } catch (e) { D2C.set(u, 1); } };
-  im.onerror = () => D2C.set(u, 1); im.src = u; }
+  im.onerror = () => { if (/\/500-dark\//.test(im.src)) im.src = im.src.replace('/500-dark/', '/500/'); else D2C.set(u, 1); }; im.src = u; }
 const HDR_BH = '<button class="back" data-back aria-label="Back"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></button><button class="home" data-home aria-label="Home"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"><path d="M3 10.5 12 3l9 7.5"/><path d="M5.5 9v11h13V9"/><path d="M10 20v-6h4v6"/></svg></button>', HDR_BHR = HDR_BH + '<button class="home" data-refresh aria-label="Refresh"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12a8 8 0 1 1-2.34-5.66"/><path d="M20 4v5h-5"/></svg></button>';
 /* Design 3.0: darker cards – every dark grey in the stylesheet is remapped toward black (card #1c1c1e → #0e0e10), offsets between shades kept */
 function d3Apply(on) { const de = document.documentElement, st = document.querySelector('style'); if (!st) return; if (st._o == null) st._o = st.textContent; de.classList.toggle('d3x', !!on);
@@ -3428,7 +3428,7 @@ function renderTeam() {
     <header class="d"><div class="tabs">${HDR_BHR}<span class="grow"></span>${(() => { const Y = brYears(t.league), y = t.sy || Y[0], ty = t.stype || 2, yl = yy => t.league === 'nfl' ? yy + '-' + String(yy + 1).slice(2) : (yy - 1) + '-' + String(yy).slice(2), lab = (yy, tt) => yl(yy) + (tt === 3 ? ' Postseason' : ' Reg. Season');
       const opts = []; Y.forEach((x, i) => { if (i > 0) opts.push([x, 3]); opts.push([x, 2]); });
       return `<div class="ysel tys"><button class="ybtn" data-tyo="1">${esc(lab(y, ty))}<i class="chev ${t.yOpen ? 'up' : ''}"></i></button>${t.yOpen ? `<div class="ylist">${opts.map(([x, tt]) => `<button data-ty="${x}|${tt}" class="${x === y && tt === ty ? 'on' : ''}">${esc(lab(x, tt))}</button>`).join('')}</div>` : ''}</div>`; })()}</div></header>
-    <main><div class="phero">${h.logo ? `<img class="d2bg" data-u="${esc(h.logo)}" src="${esc(typeof D2C.get(h.logo) === 'string' ? D2C.get(h.logo) : h.logo)}" alt="" onload="d2Trim(this)" onerror="this.remove()">` : ''}${h.logo ? `<img class="tl" src="${esc(h.logo)}" alt="" onerror="this.style.visibility='hidden'">` : ''}
+    <main><div class="phero">${h.logo ? `<img class="d2bg" data-u="${esc(dk(h.logo))}" src="${esc(typeof D2C.get(dk(h.logo)) === 'string' ? D2C.get(dk(h.logo)) : dk(h.logo))}" alt="" onload="d2Trim(this)" onerror="this.remove()">` : ''}${h.logo ? `<img class="tl" src="${esc(h.logo)}" alt="" onerror="this.style.visibility='hidden'">` : ''}
       <div class="grow"><div class="pname up">${esc(h.name)}</div><div class="psub">${esc(h.sub)}</div></div>
       <button class="fstar ${isFav(t.league, t.id) ? 'on' : ''}" data-fav="${esc(t.id)}" data-fl="${t.league}" data-fn="${esc(h.name)}" data-flogo="${esc(h.logo)}" aria-label="Favorite team">${STAR_SVG}</button></div>
       <div class="dtabs sm even">${tab(t.infoSub || 'news', 'Info', t.tab === 'roster' || t.tab === 'news')}${tab('sched', 'Schedule')}${tab('stats', 'Stats', t.tab === 'tstats')}${tab('inj', 'Injuries')}</div>
