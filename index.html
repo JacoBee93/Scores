@@ -589,6 +589,7 @@ tr.zb > td{background:#17171a !important}
 .phero.pp .hs{width:104px;height:104px;margin-right:28px}
 .pname{font-family:var(--num);font-weight:700;font-size:28px;line-height:1.05}
 .psub{color:rgba(255,255,255,.6);font-size:15.5px;margin-top:4px;font-weight:500}
+.psub:empty::before{content:'\00a0'}
 .grow{flex:1}
 
 
@@ -4623,7 +4624,7 @@ async function f1Circ(ev) { const id = ev && ev.circuit && ev.circuit.id; if (!i
   return F1.circ[id]; }
 const f1Hdr = (extra) => `<header class="d"><div class="tabs">${HDR_BHR}<span class="grow"></span>${extra || ''}</div></header>`;
 const f1YSel = (v, cur, list, lab) => `<div class="ysel tys"><button class="ybtn" data-f1yo="1">${esc(lab ? lab(cur) : String(cur))}<i class="chev ${v.yOpen ? 'up' : ''}"></i></button>${v.yOpen ? `<div class="ylist">${list.map(x => `<button data-f1y="${x}" class="${String(x) === String(cur) ? 'on' : ''}">${esc(lab ? lab(x) : String(x))}</button>`).join('')}</div>` : ''}</div>`;
-const f1Drv = (id, name, team) => `<div class="f1d"><img class="hs" src="${esc(f1Hs(id))}" alt="" onerror="this.onerror=null;this.src=SIL"><div class="f1dn"><b>${esc(name)}</b>${team ? `<small>${esc(team)}</small>` : ''}</div></div>`;
+const f1Drv = (id, name, team) => `<div class="f1d"><img class="hs" src="${esc(f1Hs(id))}" alt="" onerror="this.onerror=null;this.src=SIL"><div class="f1dn"><b>${esc(name)}</b><small>${team ? esc(team) : '&nbsp;'}</small></div></div>`;
 const f1Con = name => `<div class="f1d"><div class="f1dn"><b>${esc(name)}</b></div></div>`;
 /* auto refresh: race weekend every 3 min, otherwise every 30 min (pull-to-refresh / refresh button force it) */
 const f1Sig = evs => (evs || []).map(e => e.id + (e.competitions || []).map(c => f1Done(c) ? 1 : 0).join('')).join('|');
@@ -4957,7 +4958,7 @@ function f1StatsHTML(v, y) {
     Object.entries(A.drv).forEach(([id, s]) => { const tn = (A.teamOf[id] || {}).team; const c = tn && (C[tn] || Object.values(C).find(x => x.name && (x.name.toLowerCase().includes(tn.toLowerCase()) || tn.toLowerCase().includes(x.name.toLowerCase())))); if (!c) return; Object.keys(c.s).forEach(k => { c.s[k] += s[k] || 0; }); }); list = Object.values(C); }
   v.exp = v.exp || {};
   return F1CATS.map(([k, t]) => { const rows = [...list].sort((a, b) => (b.s[k] || 0) - (a.s[k] || 0) || String(a.name).localeCompare(String(b.name))), ex = v.exp[k], show = ex ? rows : rows.slice(0, 5), wait = (k === 'fl' || k === 'dnf') && !A.fin;
-    return `<section class="lcat" data-f1sec="${k}"><div class="lh2">${esc(t)}</div>${show.map((r, i) => `<div class="ldr ${i === 0 ? 'top' : ''} ${con ? 'f1nc' : ''}" ${con ? `data-f1con="${esc(r.id)}"` : `data-f1drv="${esc(r.id)}"`}><span class="rk">${i + 1}</span>${con ? '' : `<span class="hsw"><img class="hs" src="${esc(f1Hs(r.id))}" alt="" onerror="this.onerror=null;this.src=SIL"></span>`}<div class="ln"><span class="pn">${esc(r.name)}</span>${!con && r.team ? `<small>${esc(r.team)}</small>` : ''}</div><span class="lv2">${wait ? '…' : esc(String(r.s[k] || 0))}</span></div>`).join('')}<button class="cl" data-f1exp="${k}">${ex ? 'Close' : 'Complete leaders'}</button></section>`; }).join('');
+    return `<section class="lcat" data-f1sec="${k}"><div class="lh2">${esc(t)}</div>${show.map((r, i) => `<div class="ldr ${i === 0 ? 'top' : ''} ${con ? 'f1nc' : ''}" ${con ? `data-f1con="${esc(r.id)}"` : `data-f1drv="${esc(r.id)}"`}><span class="rk">${i + 1}</span>${con ? '' : `<span class="hsw"><img class="hs" src="${esc(f1Hs(r.id))}" alt="" onerror="this.onerror=null;this.src=SIL"></span>`}<div class="ln"><span class="pn">${esc(r.name)}</span>${!con ? `<small>${r.team ? esc(r.team) : '&nbsp;'}</small>` : ''}</div><span class="lv2">${wait ? '…' : esc(String(r.s[k] || 0))}</span></div>`).join('')}<button class="cl" data-f1exp="${k}">${ex ? 'Close' : 'Complete leaders'}</button></section>`; }).join('');
 }
 /* race page */
 const F1SES = { FP1: 'Free Practice 1', FP2: 'Free Practice 2', FP3: 'Free Practice 3', SS: 'Sprint Qualifying', SR: 'Sprint Race', Qual: 'Qualifying', Race: 'Race' };
