@@ -895,11 +895,6 @@ td{font-variant-numeric:tabular-nums}
 .sor .som.y{color:#30d158}
 .sor .som.n{color:#ff453a}
 .sor .son{font-size:14.5px;font-weight:500}
-.fdl{color:var(--mut);font-size:12px;font-weight:700;letter-spacing:.4px;text-transform:uppercase;margin:6px 4px 4px}
-.favh{display:flex;align-items:center;gap:8px;width:100%;background:var(--card);border-radius:12px;padding:10px 14px;margin:2px 0 10px;font-weight:700;font-size:15px;color:#ffd60a}
-.favh small{color:var(--mut);font-weight:600}
-.favh .chev{margin-left:auto}
-.favb{margin-bottom:14px;padding-bottom:4px;border-bottom:1px solid #1c1c1d}
 .ssv.lng{font-size:23px;font-weight:600;line-height:1;height:34.5px;display:flex;align-items:center;justify-content:center;white-space:nowrap}
 .ssg > div{display:flex;flex-direction:column;align-items:center;justify-content:flex-start}
 .pmh{position:relative;display:inline-block}
@@ -907,7 +902,7 @@ td{font-variant-numeric:tabular-nums}
 
 
 .gst td,.gst th{padding-left:6px !important;padding-right:6px !important}
-.stkw + main > .sec.dh:first-child,.stkw + main > .favh:first-child,.stksp + main > .sec.dh:first-child,.stksp + main > .favh:first-child,.ghost > .sec.dh:first-child,.ghost > .favh:first-child{margin-top:-4px !important}
+.stkw + main > .sec.dh:first-child,.stksp + main > .sec.dh:first-child,.ghost > .sec.dh:first-child{margin-top:-4px !important}
 .stkw{position:sticky;top:0;z-index:40;background:var(--pbg,#000)}
 /* Design 2.0 (hidden menu): team / player header – team colour fading to black, big team logo in the back, player photo in front */
 body{background:#000 !important}
@@ -991,36 +986,17 @@ html,body{overflow-anchor:none}
 
 .f1list{padding-bottom:0}
 #app:has(> main.f1list) > .hpw{margin-top:0}
-.f1card.f1hist{height:auto;min-height:112px;flex-direction:column;justify-content:center;align-items:stretch}
-.f1hh{display:flex;align-items:center;justify-content:space-between;gap:10px;min-height:86px}
-.f1hh .f1ct{padding-left:0;margin-top:3px;font-size:13px}
-.f1hy{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;padding:4px 0 6px}
-.f1hy button{background:#1c1c1d;color:#fff;border:0;border-radius:10px;padding:10px 0;font-family:var(--num);font-weight:700;font-size:16px}
-.f1hy button.on{background:#fff;color:#000}
-.f1hy button[data-f1ly="0"]{grid-column:1/-1;font-family:inherit;font-size:14px}
 .f1card{display:flex;align-items:stretch;gap:10px;height:112px;box-sizing:border-box;padding:12px 16px;overflow:hidden}
-.f1cl1{flex:1 1 55%;min-width:0;display:flex;flex-direction:column;justify-content:center;gap:2px}
 .f1fl{display:inline-block;width:38px;height:38px;border-radius:50%;overflow:hidden;background:#282829;box-shadow:inset 0 0 0 1px rgba(255,255,255,.18);position:relative;flex:none;vertical-align:middle}
 .f1fl img{display:block;width:100%;height:100%;object-fit:cover;border-radius:50%}
 .f1fl::after{content:'';position:absolute;inset:0;border-radius:50%;box-shadow:inset 0 0 0 1px rgba(255,255,255,.18);pointer-events:none}
-.f1tt{display:flex;align-items:center;gap:8px;min-width:0;margin-bottom:0}
-.f1tt .f1fl{display:block}
-.f1card.f1up .f1big{padding-left:46px}
 .f1rh .lvt{padding-bottom:6px;margin-bottom:-6px}
-.f1tt .f1nm{position:relative;top:-2px}
-html.fsg .f1tt .f1nm{top:.5px}
 /* names centred on photos / flags (Barlow renders ~1 px low on iOS, hence the same −2 px as the cards) */
 html.fbar .f1d .f1dn{position:relative;top:-2px}
 html.fbar .f1gp > span:not(.f1fl){position:relative;top:-2px}
 html.fsg .f1gp > span:not(.f1fl){position:relative;top:.75px}
 .f1nm{font-family:var(--num);font-weight:700;font-size:18px;line-height:1.1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.f1big{font-family:var(--num);font-weight:700;font-size:18px;line-height:1;letter-spacing:.2px;padding-left:var(--fo,0px);margin:5.5px 0 4.5px}
-.f1ct{padding-left:var(--fo,0px);color:var(--mut);font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.f1map{flex:0 0 40%;display:flex;align-items:center;justify-content:flex-end}
 .f1pen{display:block;color:var(--mut);font-family:-apple-system,sans-serif;font-size:11.5px;font-weight:600;line-height:1.25}
-.f1nomap{flex:0 0 120px;text-align:center;color:var(--mut);font-size:13px;font-weight:600}
-.f1map img{filter:none !important;opacity:1 !important}
-.f1map img{display:block;width:auto;height:auto;max-width:100%;max-height:84px;filter:invert(1) brightness(1.6);opacity:.85;-webkit-user-drag:none}
 .f1d{display:flex;align-items:center;gap:10px;min-width:0}
 .f1d .hs{width:36px;height:36px;border-radius:50%;object-fit:cover;background:#1c1c1d;flex:none}
 .f1dn{display:flex;flex-direction:column;align-items:flex-start;text-align:left;min-width:0;overflow:hidden;flex:0 1 auto}
@@ -1098,37 +1074,22 @@ html.fsg td.n .slg{top:.75px}
 .gl2 .glr,.sch .rs .rg{position:relative;top:-1.5px}
 /* descenders (g, p, y) in clipped one-line texts */
 .f1nm,.f1dn b{padding-bottom:6px;margin-bottom:-6px}
-.f1card.f1up .f1cl1{justify-content:flex-start}
-.f1card.f1up .f1ct{padding-left:46px}
 
 /* F1 list cards (Kuba's layout): ROUND label, small flag next to the GP name, cut-out driver photo */
-.f1card:not(.f1hist){padding-top:0;padding-bottom:0}
-.f1card:not(.f1hist) .f1cl1{justify-content:flex-start;gap:0}
-.f1rd .rdl,.f1big .rdl{color:var(--live)}
-.f1big .f1fl{position:relative;display:inline-block;width:9px;height:9px;border-radius:50%;margin-left:7px;vertical-align:calc(var(--capc, .405em) - 4.5px)}
-.f1ct .f1t3n{color:#fff}
+
+.f1rd .rdl{color:var(--live)}
 .f1fl.chq,.f1lvh .f1ld.chq{background:repeating-conic-gradient(#fff 0 25%, #0e0e10 0 50%) 0 0/3px 3px !important;animation:none !important;box-shadow:0 0 0 .5px rgba(255,255,255,.6)}
 tr.f1out td.f1rk,tr.f1out .f1dn b{color:var(--live)}
-.f1big{white-space:nowrap}
-.f1big .f1in{font-size:.78em;color:var(--mut)}
-.f1big .f1in.rdl{color:var(--live)}
-.f1big .f1in.hid{display:none}
 .f1lvh{color:#fff !important;font-weight:600;position:relative;white-space:nowrap}
 .f1lvh .f1ld{position:relative;display:inline-block;border-radius:50%;background:var(--live);animation:blink 1.4s infinite;margin:0 7px 0 0 !important;width:7px !important;height:7px !important;vertical-align:calc(var(--capc, .405em) - 3.5px) !important}
 .f1lvh .flg{margin-left:2px}
 .f1rd .f1ld{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--live);margin-left:6px;vertical-align:calc(var(--capc, .405em) - 3px);animation:blink 1.4s infinite}
 .f1rd{font-family:var(--num);font-weight:700;font-size:12px;letter-spacing:.6px;text-transform:uppercase;color:#fff;line-height:1.2;white-space:nowrap}
-.f1list .f1tt{gap:6px}
-.f1list .f1tt .f1fl{width:22px;height:22px}
-.f1card.f1up .f1big,.f1card.f1up .f1ct{padding-left:28px;margin:0}
-.f1card .f1ct{padding-bottom:4px;margin-bottom:-4px}
 
-@supports (overflow:clip){.f1ct,.f1nm,.f1rh .lvt,.f1dn b,.stn td.n .pn,.brt b{overflow-x:clip;overflow-y:visible}}
+@supports (overflow:clip){.f1nm,.f1rh .lvt,.f1dn b,.stn td.n .pn,.brt b{overflow-x:clip;overflow-y:visible}}
 
 /* finished GP: podium balls with gold / silver / bronze rings (same colours as positions 1–3) */
-.f1pod{display:flex;align-items:center;gap:10px;padding-left:30px}
-.f1pod .hs{width:34px;height:34px;border-radius:50%;object-fit:cover;background:#1c1c1d;flex:none;box-shadow:0 0 0 2px var(--rc)}
-.f1pod .p1{--rc:#ffd60a}.f1pod .p2{--rc:#d1d1d6}.f1pod .p3{--rc:#d0894a}
+
 
 /* switches + quick buttons: same text as the table names (16.5 px bold); line-height trimmed so every pill keeps its height */
 .seg button,.sseg4 button{font-size:16.5px !important;font-weight:700 !important;line-height:1.02 !important;white-space:nowrap}
@@ -1164,13 +1125,6 @@ tr.f1out td.f1rk,tr.f1out .f1dn b{color:var(--live)}
 /* ===== alternative home layouts ===== */
 .lpm button.lyf{border-top:6px solid #0e0e10}
 header.lyc{padding-top:calc(env(safe-area-inset-top) + 30px)}
-.lyh{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;padding:0 0 0 0}
-.lyh h1{font-family:var(--num);font-weight:700;font-size:28px;line-height:38px;white-space:nowrap}
-.lyics{display:flex;gap:8px;flex:none}
-.lyic{display:flex;flex-direction:column;align-items:center;gap:3px}
-.lyic button{width:calc(10px + 25.5px * 1.15);height:calc(10px + 25.5px * 1.15);border-radius:50%;background:var(--card);display:flex;align-items:center;justify-content:center;color:#fff}
-.lyic small{font-family:var(--num);font-size:11px;font-weight:700;color:var(--mut);line-height:1}
-.lyic.on button{background:#fff;color:#000}
 .lybar{position:fixed;left:16px;right:16px;bottom:calc(max(env(safe-area-inset-bottom), 12px) + 20px);height:56px;border-radius:18px;background:var(--card);display:flex;z-index:60;box-shadow:0 10px 30px rgba(0,0,0,.6),inset 0 1px 0 rgba(255,255,255,.08)}
 .lybar button{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;color:var(--mut);font-family:var(--num)}
 
@@ -1185,15 +1139,11 @@ html:has(.lybar) #app{padding-bottom:calc(max(env(safe-area-inset-bottom), 12px)
 html:has(.lybar.bm2) #app{padding-bottom:calc(max(env(safe-area-inset-bottom), 12px) + 4px + 58px)}
 html:has(.lybar) #app > .hpw{padding:0;margin:0}
 /* C2: the bottom bar already takes you 'home' (tap the league) → no Home pill on the list */
-html:has(.lybar) #app > .hpw .hpill{display:none}
-.lyc .lyh h1{font-size:34px;letter-spacing:.3px;line-height:calc(10px + 25.5px * 1.15);margin:0;padding:0}
-html.fbar .lyc .lyh h1{position:relative;top:-2.5px}
-html.fsg .lyc .lyh h1{position:relative;top:1.6px}
-.lyc .lyh h1 i{display:inline-block;width:.19em;height:.19em;border-radius:50%;background:var(--brand);margin:0 .09em;vertical-align:calc(var(--capc) - .095em)} /* red dot centred on the capitals */
+html:has(.lybar) #app > .hpw .hpill{display:none} /* red dot centred on the capitals */
 header.lyc .strip{margin-top:12px}
 
 /* glossy top edge (as on the bottom bar) on cards, panes and buttons – both layouts, classic design */
-:is(.card,.hcA,.hcB,.pane,.dy,.lyic button,header .back,header .home,.hpill,.ybtn,.lybar){box-shadow:inset 0 1px 0 rgba(255,255,255,.08),0 0 0 .5px rgba(255,255,255,.04)}
+
 .lybar{box-shadow:inset 0 1px 0 rgba(255,255,255,.08),0 0 0 .5px rgba(255,255,255,.04),0 10px 30px rgba(0,0,0,.6)}
 :is(.dy.on){box-shadow:none}
 
@@ -1252,13 +1202,13 @@ main[class^="hs"] .lose{color:var(--mut)}
 .hr .hs2{margin-left:auto;font-family:var(--num);font-weight:700;font-size:21px;font-variant-numeric:tabular-nums;padding-left:8px}
 .hr.lose .hn,.hr.lose .hs2{color:var(--mut)}
 /* A */
-.hcA{min-height:71px;box-sizing:border-box;display:grid;grid-template-columns:1fr 92px 1fr;align-items:center;gap:6px;border-radius:20px;padding:12px 14px;margin-bottom:9px;cursor:pointer;background:linear-gradient(100deg,color-mix(in srgb,var(--ca) 80%,transparent) 0%,var(--card) 44%,var(--card) 56%,color-mix(in srgb,var(--ch) 80%,transparent) 100%)}
+.hcA{min-height:71px;box-sizing:border-box;display:grid;grid-template-columns:minmax(0,1fr) 128px minmax(0,1fr);align-items:center;gap:6px;border-radius:20px;padding:12px 14px;margin-bottom:9px;cursor:pointer;background:linear-gradient(100deg,color-mix(in srgb,var(--ca) 80%,transparent) 0%,var(--card) 44%,var(--card) 56%,color-mix(in srgb,var(--ch) 80%,transparent) 100%)}
 .hcA img,.hcA .ph{width:34px;height:34px}
 .hA1,.hA3{display:flex;align-items:center;justify-content:center;gap:10px;min-width:0}.hA1 > div,.hA3 > div{text-align:center}
 .hA1 b,.hA3 b{display:block;font-family:var(--num);font-weight:700;font-size:22px;line-height:1.1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .hA1 small,.hA3 small{font-size:12px;color:rgba(255,255,255,.7)}
 .hA1 > div,.hA3 > div{min-width:0}
-.hA2{text-align:center;min-width:80px}.hA2 b{display:block;font-family:var(--num);font-weight:700;font-size:29px;line-height:1;font-variant-numeric:tabular-nums}.hA2 b i{font-style:normal;color:var(--mut);margin:0 5px}
+.hA2{text-align:center;min-width:80px;white-space:nowrap}.hA2 b{display:block;font-family:var(--num);font-weight:700;font-size:29px;line-height:1;font-variant-numeric:tabular-nums}.hA2 b i{font-style:normal;color:var(--mut);margin:0 5px}
 .hA2 small{display:block;font-size:12.5px;color:rgba(255,255,255,.75);margin-top:3px;font-family:var(--num);font-weight:600}
 /* B / J */
 .hcB{display:flex;align-items:stretch;background:var(--card);border-radius:18px;margin-bottom:8px;padding:8px 0;overflow:hidden;cursor:pointer}
@@ -1419,7 +1369,7 @@ function glDash(root) { (root || $app).querySelectorAll('table.gl2').forEach(tb 
   /* the RESULT header starts exactly where the scores start */
   const h = tb.querySelector('th.grh'); if (h && h.firstChild) { h.style.setProperty('padding-left', (23 + sh) + 'px', 'important'); const sl = Math.min(...rows.map(r => { const b = r.querySelector('.glr b'); return b && b.textContent.trim() ? tx(b).left : 1e9; })), hl = tx(h).left; if (sl < 1e8) h.style.setProperty('padding-left', Math.max(0, 23 + sh + sl - hl) + 'px', 'important'); } }); }
 function tNudge(root) { if (!document.documentElement.classList.contains('fbar')) return;
-  (root || document).querySelectorAll('.seg button, .dtabs button, .ybtn, .hpill, .cl, .lpm button, .msg button, .favh, .cmpclr, .ylist button, .f1hy button').forEach(b => { [...b.childNodes].forEach(n => { if (n.nodeType === 3 && n.textContent.trim()) { const sp = document.createElement('span'); sp.className = 'tnud'; n.replaceWith(sp); sp.appendChild(n); } }); }); }
+  (root || document).querySelectorAll('.seg button, .dtabs button, .ybtn, .hpill, .cl, .lpm button, .msg button, .cmpclr, .ylist button').forEach(b => { [...b.childNodes].forEach(n => { if (n.nodeType === 3 && n.textContent.trim()) { const sp = document.createElement('span'); sp.className = 'tnud'; n.replaceWith(sp); sp.appendChild(n); } }); }); }
 /* wide tables: a sideways scroll always stops on a column edge right after the sticky first column – never half a column hidden under it */
 function twSnap(root) { (root || $app).querySelectorAll('.tw').forEach(tw => { const tb = tw.querySelector('table'), n = tb && tb.querySelector('thead th.n, tbody td.n'); if (!n || tw.scrollWidth <= tw.clientWidth + 2) { tw.classList.remove('snp'); return; }
   const pl = Math.ceil(n.getBoundingClientRect().right - tw.getBoundingClientRect().left); tw.style.scrollPaddingLeft = pl + 'px'; tw.classList.add('snp'); }); }
@@ -1535,11 +1485,11 @@ const msg = t => `<div class="msg${/^Loading/.test(t) ? ' ld' : ''}">${esc(t)}</
 const JC = new Map(), JIN = new Map(), MIN = 6e4, HR = 36e5;
 const IDB = (() => { let pr = null; const open = () => pr || (pr = new Promise(res => { try { const q = indexedDB.open('scorecache', 1); q.onupgradeneeded = () => q.result.createObjectStore('j'); q.onsuccess = () => res(q.result); q.onerror = () => res(null); } catch (e) { res(null); } }));
   const tx = async (mode, fn) => { const db = await open(); if (!db) return null; return new Promise(res => { try { const t = db.transaction('j', mode), st = t.objectStore('j'), r = fn(st); t.oncomplete = () => res(r && r.result); t.onerror = t.onabort = () => res(null); } catch (e) { res(null); } }); };
-  return { get: k => tx('readonly', st => st.get(k)), put: (k, v) => tx('readwrite', st => st.put(v, k)), clear: () => tx('readwrite', st => st.clear()),
+  return { del: k => tx('readwrite', st => st.delete(k)), get: k => tx('readonly', st => st.get(k)), put: (k, v) => tx('readwrite', st => st.put(v, k)), clear: () => tx('readwrite', st => st.clear()),
     prune: () => tx('readwrite', st => { const all = []; const c = st.openCursor(); c.onsuccess = () => { const cu = c.result; if (cu) { const v = cu.value || {}; if (!v.t || Date.now() - v.t > Math.max(v.ttl * 4, 2 * 864e5)) cu.delete(); else if (!(v.ttl >= 1e12)) all.push([cu.key, v.t, v.sz || 0]); cu.continue(); } else { all.sort((a, b) => b[1] - a[1]); let sum = 0; all.forEach((x, i) => { sum += x[2] || 60e3; if (i >= 800 || sum > 50e6) st.delete(x[0]); }); } }; return null; }) };
 })();
 /* tidy the disk cache once a day (the pass reads every entry, so not on every launch) */
-setTimeout(() => { try { if (Date.now() - (+localStorage.getItem('idbPr') || 0) < 864e5) return; localStorage.setItem('idbPr', Date.now()); } catch (e) {} IDB.prune(); }, 4000);
+setTimeout(() => { IDB.del('f1persist9'); try { if (Date.now() - (+localStorage.getItem('idbPr') || 0) < 864e5) return; localStorage.setItem('idbPr', Date.now()); } catch (e) {} IDB.prune(); }, 4000);
 document.addEventListener('touchstart', e => { const t = e.target && e.target.closest && e.target.closest('[data-player],[data-game],[data-topen]'); if (!t) return; const d = t.dataset, pre = u => getJson(u).catch(() => null);
   try {
     if (d.player && LEAGUES[d.pl]) { const b = WEB + LEAGUES[d.pl].path + '/athletes/' + d.player; pre(b); pre(b + '/gamelog'); pre(b + '/stats'); }
@@ -2115,14 +2065,11 @@ function hHead(HS, items, onIdx, fav) {
     ${items.length ? `<div class="hwk${nfl ? ' hwk5' : ''}">${win(nfl ? 2 : 3, x => { const dd = dOf(x), m = /<small>(.*?)<\/small>(.*)/.exec(x[2]); return `<button ${x[1]} class="${x[0] ? 'on' : ''}${x[3] ? ' tdy' : ''}${dd && ((HDOT[lg] || {})[ymd(dd)] || [0])[0] > 0 ? ' hg' : ''}">${dd ? `<small>${DAYS[dd.getDay()].slice(0, 1)}</small><b>${dd.getDate()}</b>` : m ? `<small>${m[1]}</small><b class="${m[2].length > 3 ? 'wl' : ''}">${m[2]}</b>` : x[2]}</button>`; })}</div>` : ''}</header>`;
 }
 function lyHead(o) { const lg = state.league, fav = lg === 'fav';
-  const ic = (a, t, svg, on) => `<div class="lyic${on ? ' on' : ''}"><button ${a} aria-label="${t}">${svg}</button><small>${t}</small></div>`;
-  const quick = (o.quick || []).map(q => ic(q[0], q[1], q[2])).join('');
   const lgs = [...Object.entries(LEAGUES).map(([id, v]) => [`data-league="${id}"`, v.name, id === lg, id === 'nfl' ? 'Football' : id === 'nba' ? 'Basketball' : id === 'nhl' ? 'Hockey' : v.name]), ['data-f1="1"', 'F1', lg === 'f1', 'Racing']];
   const bm = lyMenu(), sic = { 'data-league="nfl"': LY_FB, 'data-league="nba"': LY_BB, 'data-league="nhl"': LY_PK, 'data-f1="1"': LY_FLG };
   const nav = `<nav class="lybar bm${bm}">${lgs.map(x => `<button ${x[0]} class="${x[2] ? 'on' : ''}">${sic[x[0]] || ''}<span>${x[1]}</span></button>`).join('')}<button data-league="fav" class="${fav ? 'on' : ''}">${LY_STAR}<span>${bm === '2' ? 'Favs' : 'Favorites'}</span></button></nav>`;
   if (o.f1h) return f1HeadHTML(o) + nav;
-  if (o.hs != null) return hHead(o.hs, o.items, o.onIdx, fav) + nav;
-  return `<header class="lyc"><div class="lyh"><h1>SCORE<i></i>BOARD</h1><div class="lyics">${quick}${ic('data-search', 'Search', LY_SRCH)}</div></div>${o.strip ? `<div class="strip" id="strip">${o.strip}</div>` : ''}</header>${nav}`; }
+  return hHead(o.hs || '', o.items || [], o.onIdx || 0, fav) + nav; }
 function renderList() {
   const fav = state.league === 'fav';
   if (state.league === 'f1') return renderF1List();
@@ -4834,10 +4781,6 @@ async function f1Detail(eid, c, withStatus, fresh) {
 async function f1Teams(evs) { const done = evs.filter(e => f1Done(f1Comp(e, 'Race'))); const last = done[done.length - 1]; if (!last) return {}; if (F1.tm && F1.tm[last.id]) return F1.tm[last.id];
   const rc = f1Comp(last, 'Race'), m = {}; try { const L = await getJson(F1C + 'events/' + last.id + '/competitions/' + rc.id + '/competitors?limit=40'); (L.items || []).forEach(it => { const TM = f1TM(last._y); if (it.vehicle && it.vehicle.manufacturer && !TM[String(it.id)]) TM[String(it.id)] = it.vehicle.manufacturer; m[String(it.id)] = { team: (it.vehicle && it.vehicle.manufacturer) || '', color: (it.vehicle && it.vehicle.teamColor) || '' }; }); } catch (e) {}
   F1.tm = F1.tm || {}; F1.tm[last.id] = m; return m; }
-async function f1Circ(ev) { const id = ev && ev.circuit && ev.circuit.id; if (!id) return null; if (!F1.pReady) await F1.pLoad; if (F1.circ[id] !== undefined) return F1.circ[id] === 'p' ? null : F1.circ[id]; F1.circ[id] = 'p';
-  try { const j = await getJson(F1C + 'circuits/' + id); const hs = []; const walk = o => { if (!o || typeof o !== 'object') return; if (Array.isArray(o)) return o.forEach(walk); Object.entries(o).forEach(([k, v]) => { if (typeof v === 'string' && /^https?:.*\.(png|svg|jpe?g)/i.test(v)) hs.push([k, v]); else walk(v); }); }; walk(j);
-    const pick = hs.find(([k, v]) => /diagram|map|track|layout|circuit/i.test(k + v) && !/logo|flag/i.test(v)) || hs.find(([k, v]) => !/logo|flag/i.test(v)); F1.circ[id] = pick ? pick[1].replace(/^http:/, 'https:') : null; if (F1.circ[id]) F1.pSave(); } catch (e) { F1.circ[id] = null; }
-  return F1.circ[id]; }
 const f1Hdr = (extra) => `<header class="d"><div class="tabs">${HDR_BHR}<span class="grow"></span>${extra || ''}</div></header>`;
 const f1YSel = (v, cur, list, lab) => `<div class="ysel tys"><button class="ybtn" data-f1yo="1">${esc(lab ? lab(cur) : String(cur))}<i class="chev ${v.yOpen ? 'up' : ''}"></i></button>${v.yOpen ? `<div class="ylist">${list.map(x => `<button data-f1y="${x}" class="${String(x) === String(cur) ? 'on' : ''}">${esc(lab ? lab(x) : String(x))}</button>`).join('')}</div>` : ''}</div>`;
 const f1Drv = (id, name, team) => `<div class="f1d"><img class="hs" src="${esc(f1Hs(id))}" alt="" onerror="this.onerror=null;this.src=SIL"><div class="f1dn"><b>${esc(name)}</b><small>${team ? esc(team) : '&nbsp;'}</small></div></div>`;
@@ -4884,51 +4827,6 @@ function f1YearsFor(v, cur) { const I = f1Idx(); let L; if (!I) L = f1Years(); e
 async function f1ResolveY() { if (F1.curY) return F1.curY; const Y = f1Year(); let evs = []; try { evs = await f1Season(Y); } catch (e) {} F1.curY = evs.some(f1RaceDone) ? Y : Y - 1; return F1.curY; }
 /* points */
 function f1PtsTable(y, sprint) { if (sprint) return y === 2021 ? [3, 2, 1] : y >= 2022 ? [8, 7, 6, 5, 4, 3, 2, 1] : []; return y >= 2010 ? [25, 18, 15, 12, 10, 8, 6, 4, 2, 1] : y >= 2003 ? [10, 8, 6, 5, 4, 3, 2, 1] : [10, 6, 4, 3, 2, 1]; }
-/* circuit map → white track only */
-F1.map = {};
-/* circuit links + processed maps are kept in IndexedDB, so opening F1 never re-downloads / re-processes them */
-F1.pReady = false;
-F1.pLoad = (async () => { try { const v = await IDB.get('f1persist9'), d = v && v.d; if (d) { Object.entries(d.circ || {}).forEach(([k, x]) => { if (typeof x === 'string' && F1.circ[k] === undefined) F1.circ[k] = x; }); Object.entries(d.map || {}).forEach(([k, x]) => { if (!F1.map[k] || F1.map[k] === 'p') F1.map[k] = x; }); if (Date.now() - v.t > 3 * 864e5) F1.pSave(); } } catch (e) {} F1.pReady = true; })();
-F1.pSave = () => { clearTimeout(F1._ps); F1._ps = setTimeout(() => { const circ = {}, map = {}; Object.entries(F1.circ).forEach(([k, x]) => { if (typeof x === 'string' && x !== 'p') circ[k] = x; }); Object.entries(F1.map).forEach(([k, x]) => { if (x && x !== 'p' && (x === 'none' || /^data:/.test(x))) map[k] = x; }); IDB.put('f1persist9', { t: Date.now(), ttl: 1e13, d: { circ, map } }); }, 1500); };
-/* one list re-render for a burst of finished maps / circuits */
-/* finished maps / circuits are put into the cards already on screen – no list re-render, so nothing can jump */
-const f1MapCell = e => { try { f1FixCid(e); } catch (er) {} const cid = e.circuit && e.circuit.id, cu = F1.circ[cid]; return cu && cu !== 'p' ? f1MapHTML(cu) : cu === null || !cid ? '<span class="f1nomap">No map data</span>' : ''; };
-const f1Rr = () => { clearTimeout(F1._rr); F1._rr = setTimeout(() => { if (topView() !== 'list' || state.league !== 'f1') return; let ch = 0;
-  $app.querySelectorAll('.f1list > .f1card[data-f1race]').forEach(c => { const e = F1.ev && F1.ev[c.dataset.f1race], mp = c.querySelector('.f1map'); if (!e || !mp) return; const h = f1MapCell(e);
-    if (mp.dataset.mh === h) return; const cur = mp.querySelector('img'), nw = /src="([^"]*)"/.exec(h); mp.dataset.mh = h; if (cur && nw && cur.getAttribute('src') === nw[1]) return; mp.innerHTML = h; ch = 1; f1NameFit(c); });
-  if (ch) { try { f1UpAlign(); } catch (e) {} } }, 60); };
-/* circuit map: trim empty margins (and a solid background if the image has one) so the track can sit flush right */
-function f1MapSrc(url) {
-  if (!url) return null; const m = F1.map[url]; if (m) return m; if (!F1.pReady) { F1.pLoad.then(f1Rr); return 'p'; } F1.map[url] = 'p';
-  const im = new Image(); im.crossOrigin = 'anonymous';
-  const done = r => { F1.map[url] = r; if (r === 'none' || /^data:/.test(r)) F1.pSave(); f1Rr(); };
-  /* heavy pixel work: one map at a time, each in its own task, so scrolling/taps stay smooth */
-  im.onload = () => { F1.mq = (F1.mq || Promise.resolve()).then(() => new Promise(r => setTimeout(r, 16))).then(() => proc()); };
-  const proc = () => { try { const W0 = im.naturalWidth, H0 = im.naturalHeight, sc = 900 / W0, W = Math.round(W0 * sc), H = Math.round(H0 * sc), cv = document.createElement('canvas'); cv.width = W; cv.height = H; const x = cv.getContext('2d'); x.imageSmoothingEnabled = true; x.imageSmoothingQuality = 'high'; x.drawImage(im, 0, 0, W, H); const d = x.getImageData(0, 0, W, H), p = d.data;
-      const px = (X, Y) => { const i = (Y * W + X) * 4; return [p[i], p[i + 1], p[i + 2], p[i + 3]]; }, cs = [px(0, 0), px(W - 1, 0), px(0, H - 1), px(W - 1, H - 1)];
-      if (cs.every(c => c[3] > 200)) { const bg = cs[0]; for (let i = 0; i < p.length; i += 4) { const dd = Math.abs(p[i] - bg[0]) + Math.abs(p[i + 1] - bg[1]) + Math.abs(p[i + 2] - bg[2]); if (dd < 90) p[i + 3] = Math.round(p[i + 3] * Math.max(0, (dd - 18) / 72)); } }
-      /* dark ESPN drawings: the sector labels (and other captions) are grey – the track itself is coloured → drop grey pixels */
-      const O = new Uint8Array(W * H); for (let k = 0; k < W * H; k++) O[k] = p[k * 4 + 3] > 40 ? 1 : 0; /* what the drawing itself covered */
-      /* one simple outline: grey/black/white bits (labels, shadows, captions) go, the coloured track becomes one grey line (the colour of the circuit name) */
-      for (let i = 0; i < p.length; i += 4) { if (!p[i + 3]) continue; const r = p[i], g = p[i + 1], b = p[i + 2], mx = Math.max(r, g, b), sat = mx - Math.min(r, g, b);
-        if (sat < 45) { p[i + 3] = 0; continue; } p[i] = 142; p[i + 1] = 142; p[i + 2] = 147; p[i + 3] = Math.round(p[i + 3] * Math.min(1, sat / 110)); }
-      /* markers drawn on the track (start line, sector dots) leave gaps → close a gap when track continues on both sides of it */
-      { const A0 = new Uint8Array(W * H); for (let k = 0; k < W * H; k++) A0[k] = p[k * 4 + 3] > 60 ? 1 : 0; const R = Math.max(5, Math.round(W / 75)), D = [[1, 0], [0, 1], [1, 1], [1, -1]];
-        for (let Y = R; Y < H - R; Y++) for (let X = R; X < W - R; X++) { const k = Y * W + X; if (A0[k] || !O[k]) continue; /* only where something was drawn (a marker) – never the empty space between two close bits of track */
-          for (const [dx, dy] of D) { let a = 0, b = 0; for (let t = 1; t <= R && !(a && b); t++) { if (!a && A0[(Y + dy * t) * W + X + dx * t]) a = t; if (!b && A0[(Y - dy * t) * W + X - dx * t]) b = t; }
-            if (a && b && a + b <= R + 1) { const i = k * 4; p[i] = 142; p[i + 1] = 142; p[i + 2] = 147; p[i + 3] = 255; break; } } } }
-      let x0 = W, y0 = H, x1 = -1, y1 = -1; for (let Y = 0; Y < H; Y++) for (let X = 0; X < W; X++) if (p[(Y * W + X) * 4 + 3] > 24) { if (X < x0) x0 = X; if (X > x1) x1 = X; if (Y < y0) y0 = Y; if (Y > y1) y1 = Y; }
-      if (x1 < 0) return done('none'); x.putImageData(d, 0, 0); const tw = x1 - x0 + 1, th = y1 - y0 + 1, k = Math.min(1, 460 / tw, 260 / th), o = document.createElement('canvas'); o.width = Math.round(tw * k); o.height = Math.round(th * k); const ox = o.getContext('2d'); ox.imageSmoothingEnabled = true; ox.imageSmoothingQuality = 'high'; ox.drawImage(cv, x0, y0, tw, th, 0, 0, o.width, o.height); done(o.toDataURL()); } catch (e) { done(url); } };
-  im.onerror = () => { const t = new Image(); t.onload = () => done(url); t.onerror = () => done('none'); t.src = url; };
-  /* ESPN's SVG drawings: drop the sector labels (S1 / Sector 1 …) before drawing */
-  if (/\.svg(\?|$)/i.test(url)) fetch(url).then(r => r.ok ? r.text() : Promise.reject()).then(t => { t = t.replace(/<text[\s\S]*?<\/text>/gi, '').replace(/<tspan[\s\S]*?<\/tspan>/gi, ''); im.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(t); }).catch(() => { im.src = url; });
-  else im.src = url; return 'p';
-}
-/* circuit drawing: ESPN's dark 'circuit-info' one (sector labels removed); the classic one where it does not exist */
-const f1MapVar = url => String(url || '').replace(/\/i\/venues\/f1\/[a-z-]+\//, '/i/venues/f1/circuit-info-dark/');
-const f1MapHTML = url => { const u = f1MapVar(url); let m = f1MapSrc(u), raw = u !== url;
-  if (raw && m === 'none') { m = f1MapSrc(url); raw = false; } /* that drawing does not exist for this circuit → the classic one */
-  return m === 'p' ? '' : m && m !== 'none' ? `<img src="${m}" alt=""${raw ? ' class="raw"' : ''}>` : '<span class="f1nomap">No map data</span>'; };
 
 /* --- main list --- */
 const f1DayEnd = e => { const d = new Date(e.endDate || e.date); d.setHours(23, 59, 59, 999); return d.getTime() + 864e5; };
@@ -4947,9 +4845,6 @@ function f1HeadHTML(o) { const sy = f1ShowY(), y = F1.listY || sy || f1Year(), I
     <div class="hics">${(o.quick || []).map(q => ic(q[0], q[1], q[2])).join('')}${ic('data-search', 'Search', LY_SRCH)}</div></div>${o.strip ? `<div class="strip hwk f1wk" id="strip">${o.strip}</div>` : ''}</header>`; }
 /* race weekend under way: from the start of the first session (FP1) until the race is over */
 const f1WkOn = e => { const ts = (e.competitions || []).map(c => new Date(c.date).getTime()).filter(t => t > 0); return !!ts.length && Date.now() >= Math.min(...ts); };
-/* a session running right now (ESPN says so, or by the clock: start → start + its usual length) */
-const f1SesLive = e => { const now = Date.now(); return (e.competitions || []).some(c => { if (f1Chq(c)) return false; const st = c.status && c.status.type || {}; if (st.completed || st.state === 'post') return false; if (st.state === 'in') return true;
-  const t = new Date(c.date).getTime(), ab = String((c.type && c.type.abbreviation) || ''), dur = /race/i.test(ab) ? 135 : /^(SS|SQ)/i.test(ab) ? 50 : 65; return t > 0 && now >= t && now < t + dur * 6e4; }); };
 /* one session (competition) running right now; null otherwise */
 F1.chq = (() => { try { return new Set(JSON.parse(localStorage.getItem('f1chq') || '[]')); } catch (e) { return new Set(); } })();
 const f1Chq = c => !!c && (F1.chq.has(String(c.id)) || /cheq|check|finish/i.test(String(c._flag || '')));
@@ -4960,14 +4855,9 @@ const F1AB = { FP1: 'Practice 1', FP2: 'Practice 2', FP3: 'Practice 3', SS: 'Spr
 const f1Lap = c => { if (/^(Qual|SS|SQ)/.test(String((c.type && c.type.abbreviation) || ''))) return 0; /* a lap count means nothing in qualifying */ const n = c._lap != null ? c._lap : c.status && c.status.period; return n > 0 ? n : 0; };
 const f1FlagC = f => { f = String(f || '').toLowerCase(); return !f ? '' : /green/.test(f) ? '#30d158' : /red/.test(f) ? 'var(--live)' : /yellow|safety|vsc|sc\b/.test(f) ? '#ffd60a' : /cheq|check|finish/.test(f) ? '#fff' : '#8e8e93'; };
 const f1FlagT = f => { f = String(f || '').trim(); if (!f) return ''; const t = f.toLowerCase().replace(/_/g, ' ').replace(/\b\w/g, x => x.toUpperCase()); return /flag|safety|car/i.test(t) ? t : t + ' flag'; };
-const f1Top3 = c => [1, 2, 3].map(o => (c.competitors || []).find(x => x.order === o)).filter(Boolean).map(x => { const n = (x.athlete && (x.athlete.fullName || x.athlete.displayName)) || ''; return `<span class="f1t3n">${x.order}</span> ${esc(n.split(' ').slice(1).join(' ') || n)}`; }).join(' · ');
 /* card lines while a session is running: "FP3 · Lap 10 ●(flag)" and the current top 3 */
-const f1LiveBig = c => `<span class="rdl">${esc(F1AB[c.type && c.type.abbreviation] || (c.type && c.type.abbreviation) || 'Live')}</span>${f1Lap(c) ? ' · Lap ' + f1Lap(c) : ''}${f1Chq(c) ? '<i class="f1fl chq"></i>' : f1FlagC(c._flag) ? `<i class="f1fl" style="background:${f1FlagC(c._flag)}"></i>` : ''}`;
 /* between sessions of a race weekend: the next session with a countdown (last hour in red) and its day/time */
 const F1NX = { FP1: 'Practice 1', FP2: 'Practice 2', FP3: 'Practice 3', SS: 'Sprint Q', SQ: 'Sprint Q', SR: 'Sprint', Sprint: 'Sprint', Qual: 'Qualifying', Race: 'Race' };
-function f1WkLines(e) { const now = Date.now(), nx = (e.competitions || []).filter(c => { const st = c.status && c.status.type || {}; return !st.completed && st.state !== 'in' && new Date(c.date).getTime() > now; }).sort((a, b) => new Date(a.date) - new Date(b.date))[0]; if (!nx) return null;
-  const t = new Date(nx.date), m = Math.max(1, Math.round((t - now) / 6e4)), cd = m < 60 ? m + 'm' : m < 1440 ? Math.floor(m / 60) + 'h ' + (m % 60) + 'm' : Math.floor(m / 1440) + 'd ' + Math.floor((m % 1440) / 60) + 'h', ab = nx.type && nx.type.abbreviation;
-  return [`${esc(F1NX[ab] || (nx.type && nx.type.text) || ab || 'Next')} <span class="f1in${m < 60 ? ' rdl' : ''}">in ${cd}</span>`, `${DAYS[t.getDay()]} ${t.getDate()}.${t.getMonth() + 1}. · ${String(t.getHours()).padStart(2, '0')}:${String(t.getMinutes()).padStart(2, '0')}`]; }
 const f1RdHTML = (e, k, done) => { const lc = !done && f1LiveComp(e); return '<b>R' + (k + 1) + '</b>' + (lc ? '<span class="rdl"><i class="f1ld"></i>' + esc(F1AB[lc.type && lc.type.abbreviation] || 'Live') + (f1Lap(lc) ? ' · Lap ' + f1Lap(lc) : '') + '</span>' : !done && f1WkOn(e) ? '<span class="rdl">Race weekend</span>' : done ? '<span>Finished</span>' : '<span class="f1dt">' + esc(f1DatesY(e)) + '</span>'); };
 /* bottom row of every F1 card: three equal tiles – session times / live order / podium */
 const f1Ab = c => { const a = (c && c.athlete) || {}; return a.abbreviation || String(a.lastName || (a.displayName || '').split(' ').slice(-1)[0] || '').slice(0, 3).toUpperCase(); };
@@ -4985,7 +4875,8 @@ function f1Tiles(e, done) { const y = e._y || F1.listY || f1ShowY(), rc = f1Comp
   if (f1WkOn(e)) { let i = C.findIndex(c => !fin(c) && new Date(c.date).getTime() > now - 3 * 36e5); if (i < 0) i = C.length - 1; const st = Math.max(0, Math.min(i - 1, C.length - 3)); pick = C.slice(st, st + 3).map(c => [c, C.indexOf(c) < i ? 'dn' : C.indexOf(c) === i ? 'nx' : '']); }
   else pick = [C[0]].concat(C.filter(c => /^(Qual|Race)$/.test(ab(c)))).filter((c, i, A) => A.indexOf(c) === i).slice(-3).map(c => [c, '']);
   const cd = c => { const m = Math.max(1, Math.round((new Date(c.date) - now) / 6e4)); return 'in ' + (m < 60 ? m + 'm' : m < 1440 ? Math.floor(m / 60) + 'h ' + String(m % 60).padStart(2, '0') + 'm' : Math.floor(m / 1440) + 'd ' + Math.floor((m % 1440) / 60) + 'h'); };
-  return `<div class="f1tl">${pick.map(([c, k]) => `<div class="s ${k}"><small>${nm(c)}</small><b>${k === 'dn' ? 'Done' : k === 'nx' ? cd(c) : tm(c)}</b></div>`).join('')}</div>`; }
+  const lv = c => f1CompLive(c);
+  return `<div class="f1tl">${pick.map(([c, k]) => lv(c) ? `<div class="s nx"><small>${nm(c)}</small><b>● Live</b></div>` : `<div class="s ${k}"><small>${nm(c)}</small><b>${k === 'dn' ? 'Done' : k === 'nx' ? cd(c) : tm(c)}</b></div>`).join('')}</div>`; }
 /* team colours (driver bars) and host-country colours (A / B card tint) */
 const F1TCOL = [[/mclaren/i, '#ff8000'], [/red ?bull(?! ?racing bulls)/i, '#3671c6'], [/ferrari/i, '#e80020'], [/mercedes/i, '#27f4d2'], [/aston/i, '#229971'], [/alpine/i, '#0093cc'], [/williams/i, '#64c4ff'], [/racing bulls|\brb\b|alphatauri|toro rosso|visa/i, '#6692ff'], [/haas/i, '#b6babd'], [/audi/i, '#f50537'], [/sauber|kick|alfa/i, '#52e252'], [/cadillac/i, '#c8a64b'], [/renault/i, '#fff500'], [/racing point|force india/i, '#f596c8']];
 const f1TCol = n => { for (const [re, c] of F1TCOL) if (re.test(String(n || ''))) return c; return '#3a3a3c'; };
@@ -4996,11 +4887,8 @@ setInterval(() => { if (document.hidden || typeof topView !== 'function' || topV
   f1LivePatch(); }, 20000);
 function f1LivePatch() { if (topView() !== 'list' || state.league !== 'f1') return; const evs = f1ListEvs(); if (!evs) return; let ch = 0;
   evs.forEach((e, k) => { const c = document.getElementById('f1c' + e.id), rd = c && c.querySelector('.f1rd'); if (!rd || !c.classList.contains('f1up')) return; const h = f1RdHTML(e, k, false); if (rd.innerHTML !== h) { rd.innerHTML = h; ch = 1; }
-    { const tl = c.querySelector('.f1tl'); if (c.classList.contains('f1n')) { const h2 = f1Tiles(e, false); if (tl ? tl.outerHTML !== h2 : h2) { if (tl) tl.outerHTML = h2 || ''; else c.insertAdjacentHTML('beforeend', h2); ch = 1; } return; } }
-    const lc = f1LiveComp(e), big = c.querySelector('.f1big'), ct = c.querySelector('.f1ct'); if (!big || !ct) return;
-    const W = !lc && f1WkOn(e) ? f1WkLines(e) : null, hb = lc ? f1LiveBig(lc) : W ? W[0] : esc(f1DatesY(e)), hc = lc ? (f1Top3(lc) || esc((e.circuit && e.circuit.fullName) || '')) : W ? W[1] : esc((e.circuit && e.circuit.fullName) || '');
-    if (big.innerHTML !== hb) { big.innerHTML = hb; ch = 1; f1NameFit(c); } if (ct.innerHTML !== hc) { ct.innerHTML = hc; ch = 1; } });
-  if (ch) { try { f1UpAlign(); f1LvAlign(); } catch (e) {} } }
+    const tl = c.querySelector('.f1tl'), h2 = f1Tiles(e, false); if (tl ? tl.outerHTML !== h2 : h2) { if (tl) tl.outerHTML = h2 || ''; else c.insertAdjacentHTML('beforeend', h2); ch = 1; } });
+}
 /* live: while a session runs, the current GP (small scoreboard) every 25 s + the session flag; the open session's driver table every 60 s */
 F1.lv = { t: 0, d: 0 };
 async function f1LiveTick() { if (document.hidden || !Object.keys(F1.sb).length) return; const all = [].concat(...Object.values(F1.sb).map(x => x || [])), lev = all.filter(e => f1LiveComp(e)); if (!lev.length) return;
@@ -5050,37 +4938,10 @@ function f1LvAlign() { const cv = (f1LvAlign.c = f1LvAlign.c || document.createE
   $app.querySelectorAll('.f1sh').forEach(sh => { const sp = sh.querySelector('.f1lvh'); if (!sp) return; sp.style.top = '0px'; const d = sp.querySelector('.f1ld'); if (d) d.style.top = '0px';
     const tC = base(sh) - asc(sh) / 2, sC = base(sp) - asc(sp) / 2, dy = Math.round((tC - sC) * 2) / 2; sp.style.top = dy + 'px';
     if (d) { const r = d.getBoundingClientRect(), dc = (r.top + r.bottom) / 2; d.style.top = Math.round((tC - dc) * 2) / 2 + 'px'; } });
-  /* card: flag dot centred on the capitals of "Qualifying · Lap 3" */
-  const capc = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--capc')) || .405;
-  $app.querySelectorAll('.f1big .f1fl').forEach(d => { const bg = d.parentElement; d.style.top = '0px'; const cC = base(bg) - capc * parseFloat(getComputedStyle(bg).fontSize), /* app fonts: the tuned cap-centre (--capc) */ r = d.getBoundingClientRect(); d.style.top = Math.round((cC - (r.top + r.bottom) / 2) * 2) / 2 + 'px'; }); }
-function f1Fit() { requestAnimationFrame(() => { try { f1LvAlign(); } catch (e) {} { const fl = $app.querySelector('.f1list .f1tt .f1fl'); if (fl) { const r = document.createRange(); r.selectNodeContents(fl); const g = r.getBoundingClientRect(), b = fl.getBoundingClientRect(); if (g.width) $app.querySelector('.f1list').style.setProperty('--fo', Math.max(0, g.left - b.left).toFixed(1) + 'px'); } } $app.querySelectorAll('.f1nm,.f1gp span,.f1rh .lvt').forEach(el => { if (el.scrollWidth > el.clientWidth + 1 && /Grand Prix/.test(el.textContent)) el.textContent = el.textContent.replace(/Grand Prix/, 'GP'); });
+}
+function f1Fit() { requestAnimationFrame(() => { try { f1LvAlign(); } catch (e) {} $app.querySelectorAll('.f1nm,.f1gp span,.f1rh .lvt').forEach(el => { if (el.scrollWidth > el.clientWidth + 1 && /Grand Prix/.test(el.textContent)) el.textContent = el.textContent.replace(/Grand Prix/, 'GP'); });
   $app.querySelectorAll('.f1dn b').forEach(el => { if (el.scrollWidth > el.clientWidth + 1) { const w = el.textContent.trim().split(/\s+/); if (w.length > 1 && !/\.$/.test(w[0])) el.textContent = w[0][0] + '. ' + w.slice(1).join(' '); } });
-  $app.querySelectorAll('.f1list .f1card:not(.f1hist)').forEach(f1NameFit); f1UpAlign(); try { f1Spacer(); } catch (e) {} }); }
-/* list card: the GP name must end before the track map starts (14 px air) – first 'Grand Prix' → 'GP', then cut with … */
-function f1NameFit(c) { if (c.classList.contains('f1n')) return; const nm = c.querySelector('.f1nm'), mp = c.querySelector('.f1map'); if (!nm || !mp) return; const im = mp.querySelector('img');
-  if (im && !im.dataset.nf) { im.dataset.nf = 1; const again = () => { if (c.isConnected) { f1NameFit(c); try { f1UpAlign(); } catch (e) {} } }; if (im.decode) im.decode().then(again, () => {}); im.addEventListener('load', again, { once: true }); }
-  /* limit: where the drawn track starts; until the picture is ready, the start of the map column */
-  const lim = () => { const ir = im && im.naturalWidth ? im.getBoundingClientRect() : null; return (ir && ir.width > 4 ? ir.left : mp.getBoundingClientRect().left) - 14; };
-  const tr = () => { const r = document.createRange(); r.selectNodeContents(nm); return r.getBoundingClientRect().right; };
-  nm.style.maxWidth = ''; if (tr() > lim() && /Grand Prix/.test(nm.textContent)) nm.textContent = nm.textContent.replace(/Grand Prix/, 'GP');
-  if (tr() > lim()) nm.style.maxWidth = Math.max(40, lim() - nm.getBoundingClientRect().left) + 'px';
-  { const bg = c.querySelector('.f1big'), fi = bg && bg.querySelector('.f1in'); if (fi) { fi.classList.remove('hid'); const r = document.createRange(); r.selectNodeContents(bg); if (r.getBoundingClientRect().right > lim()) fi.classList.add('hid'); } } }
-/* upcoming GP card: GP name's capitals start as far from the card top as the track map, the circuit name's baseline sits as far from the bottom as the map */
-/* F1 list cards: ROUND label and GP name at the same spots on every card (gap = what an evenly spaced upcoming card gets);
-   upcoming: date + circuit evenly spaced down to the bottom edge; finished: podium (P1–P3 balls) centred between the flag and the card bottom */
-function f1UpAlign() { const capc = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--capc')) || .405;
-  const base = el => { const z = document.createElement('i'); z.style.cssText = 'display:inline-block;width:0;height:0;vertical-align:baseline'; el.appendChild(z); const y = z.getBoundingClientRect().bottom; z.remove(); return y; };
-  let S = 1; const fsz = el => parseFloat(getComputedStyle(el).fontSize), txt = el => { const b = base(el); return [b - 2 * capc * fsz(el) * S, b]; };
-  $app.querySelectorAll('.f1list .f1card:not(.f1hist):not(.f1n)').forEach(c => { const q = x => c.querySelector(x), rd = q('.f1rd'), nm = q('.f1nm'); if (!rd || !nm || !c.offsetHeight) return;
-    [...c.querySelectorAll('.f1cl1 > *')].forEach(m => { m.style.marginTop = ''; });
-    const R = c.getBoundingClientRect(); S = R.height / c.offsetHeight || 1; const cr = { top: 0, height: c.offsetHeight, bottom: c.offsetHeight }, rel = f => el => f(el).map(v => (v - R.top) / S);
-    const mEl = x => x.closest('.f1cl1 > *'), put = (el, f, y) => { f = rel(f); const m = mEl(el), m0 = parseFloat(getComputedStyle(m).marginTop) || 0; m.style.marginTop = Math.round((m0 + y - f(el)[0]) * 2) / 2 + 'px'; return f(el)[1]; };
-    const gT = (cr.height - 2 * capc * (fsz(rd) + 2 * fsz(nm) + 12)) / 5; if (!(gT > 0)) return;
-    let y = put(rd, txt, cr.top + gT); y = put(nm, txt, y + gT);
-    if (c.classList.contains('f1up')) { const dt = q('.f1big'), ct = q('.f1ct'); if (!dt || !ct) return; const H = ((a => a[1] - a[0])(txt(dt)) + (a => a[1] - a[0])(txt(ct))) / S, g = (cr.bottom - y - H) / 3; y = put(dt, txt, y + g); put(ct, txt, y + g); return; }
-    const pd = q('.f1pod'), fl = q('.f1tt .f1fl'); if (!pd || !fl) return;
-    const fb = (fl.getBoundingClientRect().bottom - R.top) / S, h = pd.offsetHeight;
-    put(pd, e => { const r = e.getBoundingClientRect(); return [r.top, r.bottom]; }, (fb + cr.bottom) / 2 - h / 2); }); }
+  try { f1Spacer(); } catch (e) {} }); }
 function heroSrs() { const E = 11; const capc = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--capc')) || .405;
   const base = el => { const z = document.createElement('i'); z.style.cssText = 'display:inline-block;width:0;height:0;vertical-align:baseline'; el.appendChild(z); const y = z.getBoundingClientRect().bottom; z.remove(); return y; };
   /* playoff card = same size and layout as any card; round label (top) and series state (bottom) sit E px from the card edges */
@@ -5344,8 +5205,7 @@ window._forceY = y => { const t0 = Date.now(), de = document.documentElement, go
 window._scrollMem = {}; window._hstack = [location.hash];
 window.addEventListener('scroll', () => { if (!window._stAnim) window._scrollMem[location.hash] = window.scrollY; }, { passive: true });
 window._snap = {}; window._curH = location.hash;
-try { document.fonts.ready.then(() => { try { glDash(); } catch (e) {} try { stnFit(); } catch (e) {} try { if ($app.querySelector('.f1list')) { $app.querySelectorAll('.f1list .f1card:not(.f1hist)').forEach(f1NameFit); f1UpAlign(); } } catch (e) {} }); } catch (e) {}
-window.addEventListener('resize', () => { try { if ($app.querySelector('.f1list')) f1UpAlign(); } catch (e) {} });
+try { document.fonts.ready.then(() => { try { glDash(); } catch (e) {} try { stnFit(); } catch (e) {} }); } catch (e) {}
 window.goHome = () => { const st = window._hstack || [], d = st.length - 1; window._fromList = false;
   const rt = d > 0 && (st[0] === '' || st[0] === '#'), sn0 = rt && window._snap[st[0]], keep = state.league === 'f1' && typeof F1 !== 'undefined' && !F1.listY && sn0 && Date.now() - sn0.t < 30 * 60e3 && sn0.f && sn0.f.querySelector && sn0.f.querySelector('.f1list');
   if (keep) { F1.hOpen = false; window._f1Home = 1; setTimeout(() => { window._f1Home = 0; }, 1500); history.go(-d); return; }
@@ -5398,7 +5258,7 @@ $app.addEventListener('click', ev => {
 }, true);
 $app.addEventListener('click', ev => {
   if (window._lpAt && Date.now() - window._lpAt < 900) { const lb = ev.target.closest('[data-league]'); if (lb) { ev.preventDefault(); return; } }
-  const b = ev.target.closest('[data-ssort],[data-rclear],[data-go2],[data-home],[data-csort],[data-glm],[data-glyo],[data-cexp],[data-glsort],[data-cmpcar],[data-brpg],[data-cmpclr],[data-spm],[data-cmpyo],[data-cmpy],[data-scf],[data-bryo],[data-lsyo],[data-lsy],[data-favh],[data-draft],[data-drr],[data-drp],[data-f1],[data-sqx],[data-lvtm],[data-ltx],[data-lyo],[data-ly],[data-tlc],[data-tgrp],[data-tlsort],[data-tyo],[data-ty],[data-bry],[data-cmpgo],[data-cmpl],[data-cmpp],[data-cmpx],[data-gsort],[data-glsrc],[data-ncy],[data-sstat],[data-gly],[data-league],[data-game],[data-date],[data-wk],[data-pst],[data-smode],[data-cl],[data-lsort],[data-drv],[data-pm],[data-tab],[data-ptab],[data-xp],[data-ttab],[data-pvt],[data-sort],[data-fav],[data-team],[data-player],[data-topen],[data-search],[data-month],[data-refresh],[data-back]');
+  const b = ev.target.closest('[data-ssort],[data-rclear],[data-go2],[data-home],[data-csort],[data-glm],[data-glyo],[data-cexp],[data-glsort],[data-cmpcar],[data-brpg],[data-cmpclr],[data-spm],[data-cmpyo],[data-cmpy],[data-scf],[data-bryo],[data-lsyo],[data-lsy],[data-draft],[data-drr],[data-drp],[data-f1],[data-sqx],[data-lvtm],[data-ltx],[data-lyo],[data-ly],[data-tlc],[data-tgrp],[data-tlsort],[data-tyo],[data-ty],[data-bry],[data-cmpgo],[data-cmpl],[data-cmpp],[data-cmpx],[data-gsort],[data-glsrc],[data-ncy],[data-sstat],[data-gly],[data-league],[data-game],[data-date],[data-wk],[data-pst],[data-smode],[data-cl],[data-lsort],[data-drv],[data-pm],[data-tab],[data-ptab],[data-xp],[data-ttab],[data-pvt],[data-sort],[data-fav],[data-team],[data-player],[data-topen],[data-search],[data-month],[data-refresh],[data-back]');
   if (!b) return;
   const d = b.dataset;
   if (topView() === 'search' && !ev.target.closest('.fstar')) { if (d.topen) addRecent({ k: 't', l: d.tl, id: d.topen, name: d.tn || '', logo: d.tlogo || '' }); else if (d.player) addRecent({ k: 'p', l: d.pl, id: d.player, name: d.pn || '', sub: d.pt || '' }); }
@@ -5408,8 +5268,6 @@ $app.addEventListener('click', ev => {
     if (topView() === 'search') paintSearch(); else render();
   } else if (d.sqx) {
     const sq = document.getElementById('sq'); if (sq) { sq.value = ''; sq.focus(); } state.sq = ''; runPlayerSearch(); paintSearch();
-  } else if (d.favh) {
-    state.favOpen = !state.favOpen; render();
   } else if (d.f1) {
     if (state.league === 'f1' && topView() === 'list' && F1.listY) { F1.listY = null; F1.hOpen = false; F1.selId = null; F1.scrolled = 0; state.stripKey = null; render(); return; }
     if (state.league === 'f1' && topView() === 'list') { F1.selId = F1.curId; $app.querySelectorAll('.strip .dy').forEach(x => x.classList.toggle('on', x.dataset.f1go === F1.curId)); f1CenterStrip(true); f1ScrollTo(F1.curId, true); return; }
