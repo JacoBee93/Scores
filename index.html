@@ -1254,7 +1254,7 @@ function d2Trim(img) { const w = img.parentNode, u = w && w.dataset.u; if (!u ||
 const THC = (() => { try { return JSON.parse(localStorage.getItem('thc') || '{}'); } catch (e) { return {}; } })();
 const thcPut = (k, o) => { const c = THC[k] || {}; if (Object.keys(o).every(x => !o[x] || c[x] === o[x])) return; THC[k] = Object.assign(c, Object.fromEntries(Object.entries(o).filter(([, v]) => v))); try { localStorage.setItem('thc', JSON.stringify(THC)); } catch (e) {} };
 const HDR_BH = '<button class="back" data-back aria-label="Back"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></button><button class="home" data-home aria-label="Home"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"><path d="M3 10.5 12 3l9 7.5"/><path d="M5.5 9v11h13V9"/><path d="M10 20v-6h4v6"/></svg></button>', HDR_BHR = HDR_BH + '<button class="home" data-refresh aria-label="Refresh"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12a8 8 0 1 1-2.34-5.66"/><path d="M20 4v5h-5"/></svg></button>';
-try { localStorage.removeItem('design'); const f = localStorage.getItem('font'); document.documentElement.classList.add(f === 'sg' ? 'fsg' : 'fbar'); localStorage.removeItem('d2'); localStorage.removeItem('f12'); localStorage.removeItem('design2'); localStorage.removeItem('design3'); Object.keys(localStorage).filter(k => k.startsWith('tps_')).forEach(k => localStorage.removeItem(k)); } catch (e) { document.documentElement.classList.add('fbar'); }
+try { localStorage.removeItem('design'); const f = localStorage.getItem('font'); document.documentElement.classList.add(f === 'sg' ? 'fsg' : 'fbar'); localStorage.removeItem('d2'); localStorage.removeItem('f12'); localStorage.removeItem('design2'); localStorage.removeItem('design3'); Object.keys(localStorage).filter(k => (k.startsWith('tps_') || k.startsWith('tps2_'))).forEach(k => localStorage.removeItem(k)); } catch (e) { document.documentElement.classList.add('fbar'); }
 const API = 'https://site.api.espn.com/apis/site/v2/sports/';
 const WEB = 'https://site.web.api.espn.com/apis/common/v3/sports/';
 const LEAGUES = {
@@ -3606,14 +3606,14 @@ async function teamPsFast(t, all0, base, catNm) {
       hit.add(c.title); const nm = catNm(c);
       out.push({ a, cat: nm + '|' + c.labels.join(','), name: nm, labels: c.labels, names: c.names, season: seasonN, vals: vals.map(v => v == null ? '' : String(v)) }); }); });
   if (!out.length) return null;
-  return out;
+  out.goalies = all.filter(a => posOf(a) === 'G'); return out;
 }
 async function loadTeamPlayers(t) {
   if (t.ps || t.rosterLoading) return;
-  const past = !!(t.sy || t.stype === 3), ck = 'tps2_' + t.league + '_' + t.id + (t.sy ? '_' + t.sy : '') + (t.stype === 3 ? '_p' : ''), cached = lsGet(ck, past ? 30 * 864e5 : 6 * 3600e3);
+  const past = !!(t.sy || t.stype === 3), ck = 'tps3_' + t.league + '_' + t.id + (t.sy ? '_' + t.sy : '') + (t.stype === 3 ? '_p' : ''), cached = lsGet(ck, past ? 30 * 864e5 : 6 * 3600e3);
   const lastEnd = Math.max(0, ...(t.events || []).filter(e => e.state === 'post' || e.state === 'in').map(e => new Date(e.date).getTime() + 3.5 * 36e5).filter(x => x < Date.now()));
   if (cached && cached.ts && lastEnd > cached.ts) { /* od ulozeni se dohral zapas -> stahnout znovu */ }
-  else if (cached && cached.rows && cached.rows.length) { t.ps = { loading: false, cats: psFromRows(cached.rows), season: cached.season }; return; }
+  else if (cached && cached.rows && cached.rows.length) { t.ps = { loading: false, cats: psFromRows(cached.rows), season: cached.season }; if (state.team === t && t.tab === 'stats' && topView() === 'team') render(); return; }
   const ps = t.ps = { loading: true, cats: new Map() };
   const all = [];
   ((t.roster && t.roster.athletes) || []).forEach(a => { if (!a) return; if (Array.isArray(a.items)) a.items.forEach(x => all.push(x)); else all.push(a); });
@@ -3624,7 +3624,7 @@ async function loadTeamPlayers(t) {
   if (past) try { const fr = await teamPsFast(t, all, base, catNm); if (fr && fr.length) { rows = fr; i = all.length; } } catch (e) {}
   /* NHL past seasons: ESPN's season list often lacks goaltending numbers – take the goalies' own season line instead */
   if (past && t.league === 'nhl' && rows.length && !rows.some(r => r.name === 'Goalies')) try {
-    const G = [...new Map(rows.filter(r => String((r.a.position && r.a.position.abbreviation) || '').toUpperCase() === 'G').map(r => [String(r.a.id), r.a])).values()], gr = [];
+    const G = [...new Map(rows.filter(r => String((r.a.position && r.a.position.abbreviation) || '').toUpperCase() === 'G').map(r => r.a).concat(rows.goalies || []).map(a => [String(a.id), a])).values()], gr = [];
     const po = t.stype === 3, gRow = (j, sy) => { let o = null; statCats(j, t.league).forEach(c => { const L = c.labels; if (o || !(L.includes('GAA') || L.includes('SV%'))) return; const r = sy ? c.rows.find(x => +x.year === sy) : c.rows[c.rows.length - 1]; if (r) o = { c, r }; }); return o; };
     await Promise.all(G.map(async a => { try { const rg = gRow(await getJson(base + a.id + '/stats'), t.sy); let h = rg;
       /* playoffs: the goalie's postseason table – used only when it really differs from his regular-season line */
@@ -5325,7 +5325,7 @@ $app.addEventListener('click', ev => {
     const rb = ev.target.closest('[data-refresh]'); if (rb) { rb.classList.add('spin'); setTimeout(() => rb.classList.remove('spin'), 800); }
     if (v === 'player') { const p = state.player; p.done = false; p.loaded = false; p.post = null; p.news = null; render(); loadPlayer(); }
     else if (v === 'game') { const g = state.game; g.ts = null; g.sl = null; g.l5x = null; loadGame(); }
-    else if (v === 'team') { const t = state.team; t.done = false; t.ps = null; t.news = null; try { localStorage.removeItem('tps2_' + t.league + '_' + t.id); } catch (e) {} render(); loadTeam(); }
+    else if (v === 'team') { const t = state.team; t.done = false; t.ps = null; t.news = null; try { localStorage.removeItem('tps3_' + t.league + '_' + t.id); } catch (e) {} render(); loadTeam(); }
     else if (v === 'lv') { const lv = state.lv; if (lv.kind === 'leaders') { lv.data = null; lv.loading = false; render(); loadLeaders(); } else { Object.keys(state.lvC).forEach(k => { if (k.indexOf(lv.kind + lv.league) === 0) delete state.lvC[k]; }); render(); loadLV(); } }
     else if (v === 'list') loadList();
   } else if (d.csort !== undefined) {
