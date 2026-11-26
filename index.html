@@ -1193,7 +1193,7 @@ html.fsg .lyc .lyh h1{position:relative;top:1.6px}
 header.lyc .strip{margin-top:12px}
 
 /* glossy top edge (as on the bottom bar) on cards, panes and buttons – both layouts, classic design */
-:is(.card,.pane,.dy,.lyic button,header .back,header .home,.hpill,.ybtn,.lybar){box-shadow:inset 0 1px 0 rgba(255,255,255,.08),0 0 0 .5px rgba(255,255,255,.04)}
+:is(.card,.hcA,.hcB,.pane,.dy,.lyic button,header .back,header .home,.hpill,.ybtn,.lybar){box-shadow:inset 0 1px 0 rgba(255,255,255,.08),0 0 0 .5px rgba(255,255,255,.04)}
 .lybar{box-shadow:inset 0 1px 0 rgba(255,255,255,.08),0 0 0 .5px rgba(255,255,255,.04),0 10px 30px rgba(0,0,0,.6)}
 :is(.dy.on){box-shadow:none}
 
@@ -1252,10 +1252,10 @@ main[class^="hs"] .lose{color:var(--mut)}
 .hr .hs2{margin-left:auto;font-family:var(--num);font-weight:700;font-size:21px;font-variant-numeric:tabular-nums;padding-left:8px}
 .hr.lose .hn,.hr.lose .hs2{color:var(--mut)}
 /* A */
-.hcA{min-height:71px;box-sizing:border-box;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:6px;border-radius:20px;padding:12px 14px;margin-bottom:9px;cursor:pointer;background:linear-gradient(100deg,color-mix(in srgb,var(--ca) 80%,transparent) 0%,var(--card) 44%,var(--card) 56%,color-mix(in srgb,var(--ch) 80%,transparent) 100%)}
+.hcA{min-height:71px;box-sizing:border-box;display:grid;grid-template-columns:1fr 92px 1fr;align-items:center;gap:6px;border-radius:20px;padding:12px 14px;margin-bottom:9px;cursor:pointer;background:linear-gradient(100deg,color-mix(in srgb,var(--ca) 80%,transparent) 0%,var(--card) 44%,var(--card) 56%,color-mix(in srgb,var(--ch) 80%,transparent) 100%)}
 .hcA img,.hcA .ph{width:34px;height:34px}
-.hA1,.hA3{display:flex;align-items:center;gap:9px;min-width:0}.hA3{justify-content:flex-end;text-align:right}
-.hA1 b,.hA3 b{display:block;font-family:var(--num);font-weight:700;font-size:19px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hA1,.hA3{display:flex;align-items:center;justify-content:center;gap:10px;min-width:0}.hA1 > div,.hA3 > div{text-align:center}
+.hA1 b,.hA3 b{display:block;font-family:var(--num);font-weight:700;font-size:22px;line-height:1.1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .hA1 small,.hA3 small{font-size:12px;color:rgba(255,255,255,.7)}
 .hA1 > div,.hA3 > div{min-width:0}
 .hA2{text-align:center;min-width:80px}.hA2 b{display:block;font-family:var(--num);font-weight:700;font-size:29px;line-height:1;font-variant-numeric:tabular-nums}.hA2 b i{font-style:normal;color:var(--mut);margin:0 5px}
@@ -1275,16 +1275,16 @@ main[class^="hs"] .lose{color:var(--mut)}
 .hwk button{width:auto !important;flex:1;min-width:0}
 .hwk5 b.wl{width:auto !important;padding:0 10px;border-radius:19px !important;font-size:15px !important}.hwk b{font-size:19px;font-weight:700;width:38px;height:38px;line-height:38px;border-radius:50%}
 .hwk .on b{background:var(--brand)}
+html.fbar .hwk b,html.fbar .f1wk .dy b{line-height:37px !important;padding-bottom:1px;box-sizing:border-box}
+html.fsg .hwk b,html.fsg .f1wk .dy b{line-height:40px !important;box-sizing:border-box;overflow:hidden}
 .f1ys{position:relative}.f1yb{display:block;text-align:left;cursor:pointer}.f1yb small{white-space:nowrap}.f1yb .chev{display:inline-block;width:12px;height:12px;border-width:0 3.5px 3.5px 0;margin-left:12px;vertical-align:.32em}.f1yb .chev.up{vertical-align:.12em}
 .f1ys .ylist{z-index:80;min-width:200px;max-height:55vh}
 header .f1wk.strip{display:flex;gap:0;overflow-x:auto;margin:14px -16px 2px;padding:0 16px;scroll-snap-type:none}
 .f1wk .dy{flex:none;width:calc((100vw - 32px) / 7) !important;min-width:0 !important;background:none !important;border-radius:0;padding:0 !important;box-shadow:none !important;height:auto;display:flex;flex-direction:column;align-items:center;gap:3px;color:#fff;overflow:visible}
 .f1wk .dy small{font-family:var(--num);font-size:13px;font-weight:700;color:var(--mut)}
 .f1wk .dy b{font-family:var(--num);font-size:19px;font-weight:700;width:38px;height:38px;line-height:38px;border-radius:50%;text-align:center}
-.f1wk .dy.on{background:none;color:#fff}.f1wk .dy.on b{background:var(--brand);color:#fff}.f1wk .dy.tdy:not(.on) b{color:var(--brand)}html.kick .f1wk .dy.on b{color:#000}
+.f1wk .dy.on{background:none;color:#fff}.f1wk .dy.on b{background:var(--brand);color:#fff}.f1wk .dy.tdy:not(.on) b{color:var(--brand)}
 .hwk button::after{content:'';width:5px;height:5px;border-radius:50%;margin-top:1px;background:transparent}.hwk button.hg::after{background:var(--mut)}.hwk button.hg.on::after{background:var(--brand)}
-html.kick{--brand:#53fc18}
-html.kick .hwk .on b,html.kick .artx,html.kick #wpov .wpclose{color:#000 !important}.hwk .tdy:not(.on) b{color:var(--brand)}
 
 /* F1 list cards (new) – same height as the game cards */
 .f1card.f1n{display:flex;flex-direction:column;justify-content:space-between;height:95px !important;box-sizing:border-box;padding:10px 14px 10px !important;position:relative}
@@ -1325,7 +1325,7 @@ function d2Trim(img) { const w = img.parentNode, u = w && w.dataset.u; if (!u ||
 const THC = (() => { try { return JSON.parse(localStorage.getItem('thc') || '{}'); } catch (e) { return {}; } })();
 const thcPut = (k, o) => { const c = THC[k] || {}; if (Object.keys(o).every(x => !o[x] || c[x] === o[x])) return; THC[k] = Object.assign(c, Object.fromEntries(Object.entries(o).filter(([, v]) => v))); try { localStorage.setItem('thc', JSON.stringify(THC)); } catch (e) {} };
 const HDR_BH = '<button class="back" data-back aria-label="Back"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></button><button class="home" data-home aria-label="Home"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"><path d="M3 10.5 12 3l9 7.5"/><path d="M5.5 9v11h13V9"/><path d="M10 20v-6h4v6"/></svg></button>', HDR_BHR = HDR_BH + '<button class="home" data-refresh aria-label="Refresh"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12a8 8 0 1 1-2.34-5.66"/><path d="M20 4v5h-5"/></svg></button>';
-try { localStorage.removeItem('design'); const f = localStorage.getItem('font'); document.documentElement.classList.add(f === 'sg' ? 'fsg' : 'fbar'); localStorage.removeItem('d2'); localStorage.removeItem('f12'); localStorage.removeItem('design2'); localStorage.removeItem('design3'); { const hs = localStorage.getItem('hstyle'); if (/^[MDJCI]$/.test(hs || '')) localStorage.removeItem('hstyle'); if (hs === 'K') document.documentElement.classList.add('kick'); } Object.keys(localStorage).filter(k => /^tps[234]?_/.test(k)).forEach(k => localStorage.removeItem(k)); } catch (e) { document.documentElement.classList.add('fbar'); }
+try { localStorage.removeItem('design'); const f = localStorage.getItem('font'); document.documentElement.classList.add(f === 'sg' ? 'fsg' : 'fbar'); localStorage.removeItem('d2'); localStorage.removeItem('f12'); localStorage.removeItem('design2'); localStorage.removeItem('design3'); { const hs = localStorage.getItem('hstyle'); if (/^[MDJCIK]$/.test(hs || '')) localStorage.removeItem('hstyle'); } Object.keys(localStorage).filter(k => /^tps[234]?_/.test(k)).forEach(k => localStorage.removeItem(k)); } catch (e) { document.documentElement.classList.add('fbar'); }
 const API = 'https://site.api.espn.com/apis/site/v2/sports/';
 const WEB = 'https://site.web.api.espn.com/apis/common/v3/sports/';
 const LEAGUES = {
@@ -2040,8 +2040,7 @@ const LY_BB = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke
 const LY_PK = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><ellipse cx="12" cy="9.5" rx="8" ry="3.5"/><path d="M4 9.5v4c0 2 3.6 3.5 8 3.5s8-1.5 8-3.5v-4"/></svg>';
 const LY_FLG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M5 21V4M5 4h13l-2.5 4.5L18 13H5"/></svg>';
 /* ===== home styles (hidden menu): Classic & Classic Alt (B header + classic cards), A colour cards · B big day ===== */
-const HSTY = [['', 'Classic'], ['K', 'Classic Alt (Kick green)'], ['A', 'Home A · Colour cards'], ['B', 'Home B · Big day']];
-const hKick = () => document.documentElement.classList.toggle('kick', hStyle() === 'K');
+const HSTY = [['', 'Classic'], ['A', 'Home A · Colour cards'], ['B', 'Home B · Big day']];
 const hStyle = () => { try { const v = localStorage.getItem('hstyle') || ''; return HSTY.some(x => x[0] === v) ? v : ''; } catch (e) { return ''; } };
 /* team colour for the home styles: primary, or the secondary one when the primary is near-black (it would vanish on the dark cards) */
 const hCol = (lg, t) => { const P = tcol(lg, t.abbr) || [t.color, t.alt], ok = c => /^[0-9a-f]{6}$/i.test(String(c || '').replace('#', '')), lum = c => { const n = parseInt(String(c).replace('#', ''), 16); return (0.299 * (n >> 16) + 0.587 * (n >> 8 & 255) + 0.114 * (n & 255)) / 255; };
@@ -2054,9 +2053,9 @@ const hLg = e => e.league && state.league === 'fav' ? `<span class="hlgt">${e.le
 const hRow = (e, t, ab) => `<div class="hr ${hLose(e, t) ? 'lose' : ''}">${logoImg(t.logo)}<span class="hn">${esc(ab ? t.abbr || t.name : t.name)}</span>${!ab && t.record ? `<span class="hrc">${hRec(t)}</span>` : ''}<span class="hs2">${e.state === 'pre' ? '' : esc(t.score)}</span></div>`;
 const HCARD = {
   A: e => { const a = e.away, h = e.home, lg = e.league || state.league; return `<div class="hcA" ${hAttr(e)} style="--ca:${hCol(lg, a)};--ch:${hCol(lg, h)}">
-    <div class="hA1">${logoImg(a.logo)}<div><b class="${hLose(e, a) ? 'lose' : ''}">${esc(a.name)}</b><small>${hRec(a)}</small></div></div>
+    <div class="hA1">${logoImg(a.logo)}<div><b class="${hLose(e, a) ? 'lose' : ''}">${esc(a.abbr || a.name)}</b><small>${hRec(a)}</small></div></div>
     <div class="hA2">${e.state === 'pre' ? '' : `<b><span class="${hLose(e, a) ? 'lose' : ''}">${esc(a.score)}</span><i>-</i><span class="${hLose(e, h) ? 'lose' : ''}">${esc(h.score)}</span></b>`}<small>${hSt(e)}</small>${hLg(e)}</div>
-    <div class="hA3"><div><b class="${hLose(e, h) ? 'lose' : ''}">${esc(h.name)}</b><small>${hRec(h)}</small></div>${logoImg(h.logo)}</div></div>`; },
+    <div class="hA3"><div><b class="${hLose(e, h) ? 'lose' : ''}">${esc(h.abbr || h.name)}</b><small>${hRec(h)}</small></div>${logoImg(h.logo)}</div></div>`; },
   B: e => { const lg = e.league || state.league; return `<div class="hcB" ${hAttr(e)} style="--ca:${hCol(lg, e.away)};--ch:${hCol(lg, e.home)}"><i class="hbar"></i><div class="hrs">${hRow(e, e.away)}${hRow(e, e.home)}</div><div class="hst">${hSt(e)}${hLg(e)}</div></div>`; },
 };
 function hGroups(evs, lg) {
@@ -4718,7 +4717,7 @@ function renderLeaders() {
     (async () => { let b = 0; try { const e = navigator.storage && navigator.storage.estimate && await navigator.storage.estimate(); b = (e && e.usage) || 0; } catch (er) {} try { Object.keys(localStorage).forEach(k => { b += (k.length + String(localStorage.getItem(k) || '').length) * 2; }); } catch (er) {} const cb = m.querySelector('[data-cc]'); if (cb && b) cb.textContent = 'Clear cache · ' + (b > 1e6 ? (b / 1048576).toFixed(1) + ' MB' : Math.round(b / 1024) + ' KB'); })();
     o.addEventListener('click', close);
     m.addEventListener('click', ev => {
-      { const hb = ev.target.closest('[data-hsw]'); if (hb) { try { localStorage.setItem('hstyle', hb.dataset.hsw); } catch (er) {} hKick(); close(); render(); return; } }
+      { const hb = ev.target.closest('[data-hsw]'); if (hb) { try { localStorage.setItem('hstyle', hb.dataset.hsw); } catch (er) {} close(); render(); return; } }
       { const bmb = ev.target.closest('[data-bmsw]'); if (bmb) { const k = bmb.dataset.bmsw; try { localStorage.setItem('bmenu', k); } catch (er) {} close(); render(); return; } }
       if (ev.target.closest('[data-fsw]')) { const de = document.documentElement, nx = ev.target.closest('[data-fsw]').dataset.fsw; de.classList.toggle('fbar', nx !== 'sg'); de.classList.toggle('fsg', nx === 'sg'); try { localStorage.setItem('font', nx); } catch (er) {} close(); render(); return; }
       if (!ev.target.closest('[data-cc]')) return;
@@ -4973,7 +4972,8 @@ const f1RdHTML = (e, k, done) => { const lc = !done && f1LiveComp(e); return '<b
 /* bottom row of every F1 card: three equal tiles – session times / live order / podium */
 const f1Ab = c => { const a = (c && c.athlete) || {}; return a.abbreviation || String(a.lastName || (a.displayName || '').split(' ').slice(-1)[0] || '').slice(0, 3).toUpperCase(); };
 function f1Tiles(e, done) { const y = e._y || F1.listY || f1ShowY(), rc = f1Comp(e, 'Race'), lc = !done && f1LiveComp(e), TM = f1TM(y);
-  const pos = (c, gap) => `<div><em>${c.order}</em><i style="background:${f1TCol(TM[String(c.id)] || '')}"></i><b>${esc(f1Ab(c))}</b>${gap ? `<span class="f1gp">${esc(gap)}</span>` : ''}</div>`;
+  const MED = ['', '#d4af37', '#c0c0c0', '#cd7f32'], pc = c => TM[String(c.id)] ? f1TCol(TM[String(c.id)]) : MED[c.order] || '#3a3a3c';
+  const pos = (c, gap) => `<div><em>${c.order}</em><i style="background:${pc(c)}"></i><b>${esc(f1Ab(c))}</b>${gap ? `<span class="f1gp">${esc(gap)}</span>` : ''}</div>`;
   const top3 = comp => [1, 2, 3].map(o => ((comp && comp.competitors) || []).find(c => c.order === o)).filter(Boolean);
   if (done) { const P = top3(rc); return P.length ? `<div class="f1tl">${P.map(c => pos(c)).join('')}</div>` : ''; }
   if (lc) { const P = top3(lc); if (P.length) return `<div class="f1tl">${P.map(c => pos(c, c.order > 1 && c.gap ? c.gap : '')).join('')}</div>`; }
@@ -5030,7 +5030,7 @@ function renderF1List() {
     body = evs.map((e, k) => {
       try { f1FixCid(e); } catch (er) {} const rc = f1Comp(e, 'Race'), done = f1Done(rc) || !!(rc && rc.date && new Date(rc.date) < Date.now() - 3 * 36e5 && (rc.competitors || []).some(c => c.order === 1)), w = done && rc && (rc.competitors || []).find(c => c.order === 1), cid = e.circuit && e.circuit.id, cu = F1.circ[cid];
       const lc = !done && f1LiveComp(e), y = e._y || F1.listY || f1ShowY();
-      const c1 = done && w ? f1TCol(f1TM(y)[String(w.id)] || '') : f1CCol(e), c2 = c1;
+      const c1 = done && w ? (f1TM(y)[String(w.id)] ? f1TCol(f1TM(y)[String(w.id)]) : '#d4af37') : f1CCol(e), c2 = c1;
       const tr = esc((e.circuit && e.circuit.fullName) || '');
       const body = f1Tiles(e, done);
       return `<div class="card f1card f1n${done ? '' : ' f1up'}" data-f1race="${esc(e.id)}" data-f1ry="${esc(e._y || '')}" id="f1c${esc(e.id)}" style="--c1:${c1};--c2:${c2}">
