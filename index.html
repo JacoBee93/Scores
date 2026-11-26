@@ -1272,7 +1272,7 @@ main[class^="hs"] .lose{color:var(--mut)}
 .hwk button{width:auto !important;flex:1;min-width:0}
 .hwk5 b.wl{width:auto !important;padding:0 10px;border-radius:19px !important;font-size:15px !important}.hwk b{font-size:19px;font-weight:700;width:38px;height:38px;line-height:38px;border-radius:50%}
 .hwk .on b{background:var(--brand)}
-.f1ys{position:relative}.f1yb{display:block;text-align:left;cursor:pointer}.f1yb small{white-space:nowrap}.f1yb .chev{display:inline-block;margin-left:7px;vertical-align:2px}
+.f1ys{position:relative}.f1yb{display:block;text-align:left;cursor:pointer}.f1yb small{white-space:nowrap}.f1yb .chev{display:inline-block;width:12px;height:12px;border-width:0 3.5px 3.5px 0;margin-left:12px;vertical-align:.32em}.f1yb .chev.up{vertical-align:.12em}
 .f1ys .ylist{z-index:80;min-width:200px;max-height:55vh}
 header .f1wk.strip{display:flex;gap:0;overflow-x:auto;margin:14px -16px 2px;padding:0 16px;scroll-snap-type:none}
 .f1wk .dy{flex:none;width:calc((100vw - 32px) / 7) !important;min-width:0 !important;background:none !important;border-radius:0;padding:0 !important;box-shadow:none !important;height:auto;display:flex;flex-direction:column;align-items:center;gap:3px;color:#fff;overflow:visible}
@@ -1282,6 +1282,30 @@ header .f1wk.strip{display:flex;gap:0;overflow-x:auto;margin:14px -16px 2px;padd
 .hwk button::after{content:'';width:5px;height:5px;border-radius:50%;margin-top:1px;background:transparent}.hwk button.hg::after{background:var(--mut)}.hwk button.hg.on::after{background:var(--brand)}
 html.kick{--brand:#53fc18}
 html.kick .hwk .on b,html.kick .artx,html.kick #wpov .wpclose{color:#000 !important}.hwk .tdy:not(.on) b{color:var(--brand)}
+
+/* F1 list cards (new) */
+.f1card.f1n{display:block;height:auto !important;padding:12px 15px 12px !important;position:relative}
+.f1n .f1nt{display:flex;align-items:center;gap:12px}
+.f1n .f1map{width:62px;height:44px;flex:none;margin:0;display:flex;align-items:center;justify-content:center}
+.f1n .f1map img{max-width:62px;max-height:44px;width:auto;height:auto;object-fit:contain}
+.f1n .f1nomap{font-size:10px;color:var(--mut);text-align:center;line-height:1.1}
+.f1n .f1nh{flex:1;min-width:0}
+.f1n .f1nm{font-family:var(--num);font-weight:700;font-size:21px;line-height:1.05;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:none !important;padding:0;margin:0}
+.f1n .f1tr{font-size:13px;color:var(--mut);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px}
+.f1n .f1rd{flex:none;text-align:right;text-transform:none;letter-spacing:0;font-family:var(--num);font-weight:700;font-size:14px;color:var(--mut);display:flex;flex-direction:column;align-items:flex-end;gap:1px;margin:0;padding:0}
+.f1n .f1rd b{font-size:14px}.f1n .f1rd .f1dt{color:#fff}.f1n .f1rd .rdl{color:var(--live);display:flex;align-items:center;gap:5px}
+.f1n .f1rd .f1ld{position:static !important;margin:0 !important}
+.f1n .f1big,.f1n .f1ct{padding:0 !important;margin:0 !important}
+.f1n .f1big{display:flex;align-items:center;gap:6px;font-family:var(--num);font-weight:700;font-size:17px;margin-top:10px !important;padding-top:8px !important;border-top:1px solid var(--line)}
+.f1n .f1ct{font-family:var(--num);font-weight:600;font-size:15px;color:var(--mut);margin-top:3px !important}
+.f1n .f1ses{margin-top:9px}
+.f1n .f1ses div{display:flex;justify-content:space-between;font-family:var(--num);font-weight:600;font-size:16px;padding:5px 0;border-top:1px solid var(--line)}
+.f1n .f1ses span + span{color:var(--mut)}
+.f1n .f1pd{display:flex;gap:7px;margin-top:11px}
+.f1n .f1pd div{flex:1;background:rgba(255,255,255,.06);border-radius:12px;padding:7px 9px;display:flex;align-items:center;gap:7px}
+.f1n .f1pd em{font-style:normal;font-family:var(--num);font-weight:800;font-size:15px;color:var(--mut)}.f1n .f1pd i{display:block;width:4px;height:22px;border-radius:2px}.f1n .f1pd b{font-family:var(--num);font-size:17px;font-weight:700}
+main.hsA .f1n,.hsA .f1n{background:linear-gradient(100deg,color-mix(in srgb,var(--c1) 75%,transparent) 0%,var(--card) 58%)}
+.hsB .f1n{padding-left:21px !important;overflow:hidden}.hsB .f1n::before{content:'';position:absolute;left:0;top:0;bottom:0;width:5px;background:linear-gradient(var(--c1),var(--c2))}
 </style>
 </head>
 <body>
@@ -4925,8 +4949,8 @@ function f1CurEv(evs) { if (F1.listY) return evs[0]; const now = Date.now(); ret
 /* F1 home header (all styles): tappable season line (season picker), big "Formula 1", rounds strip */
 function f1HeadHTML(o) { const sy = f1ShowY(), y = F1.listY || sy || f1Year(), I = F1.idx && F1.idx.ready ? F1.idx : null, ys = (I && I.years.length ? I.years : (F1.seasons && F1.seasons.length ? F1.seasons : f1Years())).filter(x => x !== sy && x <= f1Year()).sort((a, b) => b - a), r = F1._rnd;
   const ic = (a, t, svg) => `<button class="hic" ${a} aria-label="${t}">${svg}</button>`;
-  const line = (F1.listY ? y + ' SEASON' : y) + (!F1.listY && r && r[0] ? ' · ROUND ' + r[0] + ' OF ' + r[1] : '');
-  return `<header class="lyc hsh hB"><div class="hBt"><div class="f1ys"><div class="f1yb" data-f1hist="1" role="button"><small>${esc(line)}<i class="chev ${F1.hOpen ? 'up' : ''}"></i></small><b>Formula 1</b></div>
+  const line = !F1.listY && r && r[0] ? 'ROUND ' + r[0] + ' OF ' + r[1] : r && r[1] ? r[1] + ' ROUNDS' : 'SEASON';
+  return `<header class="lyc hsh hB"><div class="hBt"><div class="f1ys"><div class="f1yb" data-f1hist="1" role="button"><small>${esc(line)}</small><b>F1 ${y}<i class="chev ${F1.hOpen ? 'up' : ''}"></i></b></div>
     ${F1.hOpen ? `<div class="ylist">${F1.listY ? `<button data-f1ly="0">Current season (${sy || f1Year()})</button>` : ''}${ys.map(x => `<button data-f1ly="${x}" class="${F1.listY === x ? 'on' : ''}">${x}</button>`).join('')}</div>` : ''}</div>
     <div class="hics">${(o.quick || []).map(q => ic(q[0], q[1], q[2])).join('')}${ic('data-search', 'Search', LY_SRCH)}</div></div>${o.strip ? `<div class="strip hwk f1wk" id="strip">${o.strip}</div>` : ''}</header>`; }
 /* race weekend under way: from the start of the first session (FP1) until the race is over */
@@ -4952,7 +4976,16 @@ const F1NX = { FP1: 'Practice 1', FP2: 'Practice 2', FP3: 'Practice 3', SS: 'Spr
 function f1WkLines(e) { const now = Date.now(), nx = (e.competitions || []).filter(c => { const st = c.status && c.status.type || {}; return !st.completed && st.state !== 'in' && new Date(c.date).getTime() > now; }).sort((a, b) => new Date(a.date) - new Date(b.date))[0]; if (!nx) return null;
   const t = new Date(nx.date), m = Math.max(1, Math.round((t - now) / 6e4)), cd = m < 60 ? m + 'm' : m < 1440 ? Math.floor(m / 60) + 'h ' + (m % 60) + 'm' : Math.floor(m / 1440) + 'd ' + Math.floor((m % 1440) / 60) + 'h', ab = nx.type && nx.type.abbreviation;
   return [`${esc(F1NX[ab] || (nx.type && nx.type.text) || ab || 'Next')} <span class="f1in${m < 60 ? ' rdl' : ''}">in ${cd}</span>`, `${DAYS[t.getDay()]} ${t.getDate()}.${t.getMonth() + 1}. · ${String(t.getHours()).padStart(2, '0')}:${String(t.getMinutes()).padStart(2, '0')}`]; }
-const f1RdHTML = (e, k, done) => 'Round ' + (k + 1) + (!done && f1WkOn(e) ? ' · <span class="rdl">Race weekend</span>' + (f1SesLive(e) ? '<i class="f1ld"></i>' : '') : '');
+const f1RdHTML = (e, k, done) => '<b>R' + (k + 1) + '</b>' + (!done && f1WkOn(e) ? '<span class="rdl">' + (f1SesLive(e) ? '<i class="f1ld"></i>' : '') + 'Race weekend</span>' : done ? '<span>Finished</span>' : '<span class="f1dt">' + esc(f1DatesY(e)) + '</span>');
+/* upcoming card: first session, qualifying (+ sprint) and race with local day and time */
+const f1SesHTML = e => { const C = [...(e.competitions || [])].sort((a, b) => new Date(a.date) - new Date(b.date)); if (!C.length) return '';
+  const ab = c => c.type && c.type.abbreviation, pick = [C[0]].concat(C.filter(c => /^(SR|Sprint|Qual|Race)$/.test(ab(c)))).filter((c, i, A) => A.indexOf(c) === i);
+  return `<div class="f1ses">${pick.map(c => { const t = new Date(c.date); return `<div><span>${esc(F1NX[ab(c)] || (c.type && c.type.text) || ab(c) || '')}</span><span>${DAYS[t.getDay()]} ${String(t.getHours()).padStart(2, '0')}:${String(t.getMinutes()).padStart(2, '0')}</span></div>`; }).join('')}</div>`; };
+/* team colours (driver bars) and host-country colours (A / B card tint) */
+const F1TCOL = [[/mclaren/i, '#ff8000'], [/red ?bull(?! ?racing bulls)/i, '#3671c6'], [/ferrari/i, '#e80020'], [/mercedes/i, '#27f4d2'], [/aston/i, '#229971'], [/alpine/i, '#0093cc'], [/williams/i, '#64c4ff'], [/racing bulls|\brb\b|alphatauri|toro rosso|visa/i, '#6692ff'], [/haas/i, '#b6babd'], [/audi/i, '#f50537'], [/sauber|kick|alfa/i, '#52e252'], [/cadillac/i, '#c8a64b'], [/renault/i, '#fff500'], [/racing point|force india/i, '#f596c8']];
+const f1TCol = n => { for (const [re, c] of F1TCOL) if (re.test(String(n || ''))) return c; return '#3a3a3c'; };
+const F1CCOL = { au: '#012169', cn: '#de2910', jp: '#bc002d', bh: '#ce1126', sa: '#006c35', us: '#3c3b6e', it: '#009246', mc: '#ce1126', es: '#c60b1e', ca: '#d80621', at: '#ed2939', gb: '#012169', be: '#c8a400', hu: '#477050', nl: '#ff7f00', az: '#0092bc', sg: '#ef3340', mx: '#006847', br: '#009c3b', qa: '#8a1538', ae: '#00732f', pt: '#006600', fr: '#0055a4', de: '#dd0000', ru: '#0039a6', tr: '#e30a17', vn: '#da251d', in: '#ff9933', kr: '#003478', my: '#cc0001', ar: '#74acdf', za: '#007a4d', th: '#2d2a4a' };
+const f1CCol = e => F1CCOL[String(f1Iso(e) || '').toLowerCase()] || '#3a3a3c';
 /* keep the label / dot current while the list is open (no re-render) */
 setInterval(() => { if (document.hidden || typeof topView !== 'function' || topView() !== 'list' || state.league !== 'f1') return; const evs = f1ListEvs(); if (!evs) return;
   f1LivePatch(); }, 20000);
@@ -4991,14 +5024,20 @@ function renderF1List() {
     body = evs.map((e, k) => {
       try { f1FixCid(e); } catch (er) {} const rc = f1Comp(e, 'Race'), done = f1Done(rc) || !!(rc && rc.date && new Date(rc.date) < Date.now() - 3 * 36e5 && (rc.competitors || []).some(c => c.order === 1)), w = done && rc && (rc.competitors || []).find(c => c.order === 1), cid = e.circuit && e.circuit.id, cu = F1.circ[cid];
       if (cid && cu === undefined) f1Circ(e).then(f1Rr);
-      return `<div class="card f1card${done ? '' : ' f1up'}" data-f1race="${esc(e.id)}" data-f1ry="${esc(e._y || '')}" id="f1c${esc(e.id)}"><div class="f1cl1"><div class="f1rd">${f1RdHTML(e, k, done)}</div><div class="f1tt">${f1Flag(e)}<div class="f1nm">${esc(f1Short(e).replace(/-Catalunya/i, ''))}</div></div>
-        ${!done && !f1LiveComp(e) && f1WkOn(e) && f1WkLines(e) ? (L => `<div class="f1big">${L[0]}</div><div class="f1ct">${L[1]}</div>`)(f1WkLines(e)) : !done && f1LiveComp(e) ? (lc => `<div class="f1big">${f1LiveBig(lc)}</div><div class="f1ct">${f1Top3(lc) || esc((e.circuit && e.circuit.fullName) || '')}</div>`)(f1LiveComp(e)) : done ? (pod => pod.length ? `<div class="f1pod">${pod.map(c => `<img class="hs p${c.order}" src="${esc(f1Hs(c.id))}" alt="" onerror="this.onerror=null;this.src=SIL">`).join('')}</div>` : '')([1, 2, 3].map(o => (rc.competitors || []).find(c => c.order === o)).filter(Boolean)) : `<div class="f1big">${esc(f1DatesY(e))}</div><div class="f1ct">${esc((e.circuit && e.circuit.fullName) || '')}</div>`}</div>
-        <div class="f1map">${f1MapCell(e)}</div></div>`; }).join('');
+      const lc = !done && f1LiveComp(e), W = !done && !lc && f1WkOn(e) && f1WkLines(e), y = e._y || F1.listY || f1ShowY();
+      const c1 = done && w ? f1TCol(f1TM(y)[String(w.id)] || '') : f1CCol(e), c2 = done ? c1 : c1;
+      const tr = esc((e.circuit && e.circuit.fullName) || '');
+      const body = lc ? `<div class="f1big">${f1LiveBig(lc)}</div><div class="f1ct">${f1Top3(lc) || tr}</div>`
+        : W ? `<div class="f1big">${W[0]}</div><div class="f1ct">${W[1]}</div>`
+        : done ? (pod => pod.length ? `<div class="f1pd">${pod.map(c => { const a = c.athlete || {}, ab = a.abbreviation || String(a.lastName || (a.displayName || '').split(' ').slice(-1)[0] || '').slice(0, 3).toUpperCase(); return `<div><em>${c.order}</em><i style="background:${f1TCol(f1TM(y)[String(c.id)] || '')}"></i><b>${esc(ab)}</b></div>`; }).join('')}</div>` : '')([1, 2, 3].map(o => (rc.competitors || []).find(c => c.order === o)).filter(Boolean))
+        : f1SesHTML(e);
+      return `<div class="card f1card f1n${done ? '' : ' f1up'}" data-f1race="${esc(e.id)}" data-f1ry="${esc(e._y || '')}" id="f1c${esc(e.id)}" style="--c1:${c1};--c2:${c2}">
+        <div class="f1nt"><div class="f1map">${f1MapCell(e)}</div><div class="f1nh"><div class="f1nm">${esc(f1Short(e).replace(/-Catalunya/i, ''))}</div><div class="f1tr">${tr}</div></div><div class="f1rd">${f1RdHTML(e, k, done)}</div></div>${body}</div>`; }).join('');
   }
   const os = document.getElementById('strip'), prev = os && state.stripKey === 'f1' ? os.scrollLeft : null; state.stripKey = 'f1';
   $app.innerHTML = `
     ${lyHead({ strip, f1: 1, f1h: 1, quick: [['data-f1v="std"', 'Table', LY_TROPHY], ['data-f1v="stats"', 'Stats', LY_CHART]] })}
-    <main class="f1list" data-sig="${esc(f1LSig())}">${body}</main>`;
+    <main class="f1list${hStyle() ? ' hs' + hStyle() : ''}" data-sig="${esc(f1LSig())}">${body}</main>`;
   const s = document.getElementById('strip'); if (s) f1CenterStrip(false); /* always centred on the chosen GP (a kept scroll position could point elsewhere after the list changed) */
   f1Fit();
   if (evs && evs.length && !F1.scrolled) { F1.scrolled = 1; requestAnimationFrame(() => f1ScrollTo(F1.curId, false)); }
@@ -5016,7 +5055,7 @@ function f1Fit() { requestAnimationFrame(() => { try { f1LvAlign(); } catch (e) 
   $app.querySelectorAll('.f1dn b').forEach(el => { if (el.scrollWidth > el.clientWidth + 1) { const w = el.textContent.trim().split(/\s+/); if (w.length > 1 && !/\.$/.test(w[0])) el.textContent = w[0][0] + '. ' + w.slice(1).join(' '); } });
   $app.querySelectorAll('.f1list .f1card:not(.f1hist)').forEach(f1NameFit); f1UpAlign(); try { f1Spacer(); } catch (e) {} }); }
 /* list card: the GP name must end before the track map starts (14 px air) – first 'Grand Prix' → 'GP', then cut with … */
-function f1NameFit(c) { const nm = c.querySelector('.f1nm'), mp = c.querySelector('.f1map'); if (!nm || !mp) return; const im = mp.querySelector('img');
+function f1NameFit(c) { if (c.classList.contains('f1n')) return; const nm = c.querySelector('.f1nm'), mp = c.querySelector('.f1map'); if (!nm || !mp) return; const im = mp.querySelector('img');
   if (im && !im.dataset.nf) { im.dataset.nf = 1; const again = () => { if (c.isConnected) { f1NameFit(c); try { f1UpAlign(); } catch (e) {} } }; if (im.decode) im.decode().then(again, () => {}); im.addEventListener('load', again, { once: true }); }
   /* limit: where the drawn track starts; until the picture is ready, the start of the map column */
   const lim = () => { const ir = im && im.naturalWidth ? im.getBoundingClientRect() : null; return (ir && ir.width > 4 ? ir.left : mp.getBoundingClientRect().left) - 14; };
@@ -5030,7 +5069,7 @@ function f1NameFit(c) { const nm = c.querySelector('.f1nm'), mp = c.querySelecto
 function f1UpAlign() { const capc = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--capc')) || .405;
   const base = el => { const z = document.createElement('i'); z.style.cssText = 'display:inline-block;width:0;height:0;vertical-align:baseline'; el.appendChild(z); const y = z.getBoundingClientRect().bottom; z.remove(); return y; };
   let S = 1; const fsz = el => parseFloat(getComputedStyle(el).fontSize), txt = el => { const b = base(el); return [b - 2 * capc * fsz(el) * S, b]; };
-  $app.querySelectorAll('.f1list .f1card:not(.f1hist)').forEach(c => { const q = x => c.querySelector(x), rd = q('.f1rd'), nm = q('.f1nm'); if (!rd || !nm || !c.offsetHeight) return;
+  $app.querySelectorAll('.f1list .f1card:not(.f1hist):not(.f1n)').forEach(c => { const q = x => c.querySelector(x), rd = q('.f1rd'), nm = q('.f1nm'); if (!rd || !nm || !c.offsetHeight) return;
     [...c.querySelectorAll('.f1cl1 > *')].forEach(m => { m.style.marginTop = ''; });
     const R = c.getBoundingClientRect(); S = R.height / c.offsetHeight || 1; const cr = { top: 0, height: c.offsetHeight, bottom: c.offsetHeight }, rel = f => el => f(el).map(v => (v - R.top) / S);
     const mEl = x => x.closest('.f1cl1 > *'), put = (el, f, y) => { f = rel(f); const m = mEl(el), m0 = parseFloat(getComputedStyle(m).marginTop) || 0; m.style.marginTop = Math.round((m0 + y - f(el)[0]) * 2) / 2 + 'px'; return f(el)[1]; };
