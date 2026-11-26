@@ -1234,7 +1234,7 @@ header .f1wk.strip{display:flex;gap:0;overflow-x:auto;margin:14px -16px 2px;padd
 .f1wk .dy small{font-family:var(--num);font-size:13px;font-weight:700;color:var(--mut)}
 .f1wk .dy b{font-family:var(--num);font-size:19px;font-weight:700;width:38px;height:38px;line-height:38px;border-radius:50%;text-align:center}
 .f1wk .dy.on{background:none;color:#fff}.f1wk .dy.on b{background:var(--brand);color:#fff}.f1wk .dy.tdy:not(.on) b{color:var(--brand)}
-.hwk button::after{content:'';width:5px;height:5px;border-radius:50%;margin-top:1px;background:transparent}.hwk button.hg::after{background:var(--mut)}.hwk button.hg.on::after{background:var(--brand)}
+.hwk button::after{content:'';width:5px;height:5px;border-radius:50%;margin-top:1px;background:transparent}.hwk button.hg::after{background:var(--mut)}.hwk button.hg.on::after{background:var(--brand)}.hwk button.hw::after{background:var(--live) !important}
 
 /* F1 list cards (new) – same height as the game cards */
 .f1card.f1n{display:flex;flex-direction:column;justify-content:space-between;height:95px !important;box-sizing:border-box;padding:10px 14px 10px !important;position:relative}
@@ -2055,14 +2055,14 @@ function hHead(HS, items, onIdx, fav) {
   const dOf = x => { const m = /data-date="(\d{4})(\d{2})(\d{2})"/.exec(x[1]) || /data-date="(\d{4})-(\d{2})-(\d{2})"/.exec(x[1]); return m ? new Date(+m[1], +m[2] - 1, +m[3]) : null; };
   /* one header for every style: small line = full date for Yesterday / Today / Tomorrow, otherwise just the date; big line = Today… or the full weekday */
   const rel = hDayLab(d), isRel = rel !== DAYS[d.getDay()], dt = H_MO[d.getMonth()] + ' ' + d.getDate();
-  const wk = cur ? cur[2].replace(/<small>(.*?)<\/small>/, '$1 ') : '';
+  const wk = cur ? cur[2].replace(/<small>(.*?)<\/small>/, '$1 ') : '', curWk = items.findIndex(x => x[3]);
   /* NFL: the week's date range from ESPN's calendar (US days: start/end shifted by 12 h so the UTC date is the US one) */
   const wr = nfl && cur && /data-wr="([^|"]+)\|([^"]+)"/.exec(cur[1]), usd = (x, h) => { const t = new Date(new Date(x).getTime() + h * 36e5); return H_MO[t.getUTCMonth()] + ' ' + t.getUTCDate(); };
   const small = fav ? 'FAVORITES' : nfl ? (wr ? (usd(wr[1], 12) + ' – ' + usd(wr[2], -12)).toUpperCase() : esc(LEAGUES.nfl.name)) : (isRel ? H_WD[d.getDay()] + ', ' + dt : dt).toUpperCase();
   const big = fav ? 'Your teams' : nfl ? wk : isRel ? rel : H_WD[d.getDay()];
   if (!nfl && !fav && items.length) { const ds = items.slice(Math.max(0, onIdx - 3), onIdx + 4).map(dOf).filter(Boolean); setTimeout(() => hDots(lg, ds), 0); }
   return `<header class="lyc hsh hB"><div class="hBt"><div><small>${small}</small><b>${big}</b></div><div class="hics">${icons}</div></div>
-    ${items.length ? `<div class="hwk${nfl ? ' hwk5' : ''}">${win(nfl ? 2 : 3, x => { const dd = dOf(x), m = /<small>(.*?)<\/small>(.*)/.exec(x[2]); return `<button ${x[1]} class="${x[0] ? 'on' : ''}${x[3] ? ' tdy' : ''}${dd && ((HDOT[lg] || {})[ymd(dd)] || [0])[0] > 0 ? ' hg' : ''}">${dd ? `<small>${DAYS[dd.getDay()].slice(0, 1)}</small><b>${dd.getDate()}</b>` : m ? `<small>${m[1]}</small><b class="${m[2].length > 3 ? 'wl' : ''}">${m[2]}</b>` : x[2]}</button>`; })}</div>` : ''}</header>`;
+    ${items.length ? `<div class="hwk">${win(3, x => { const dd = dOf(x), m = /<small>(.*?)<\/small>(.*)/.exec(x[2]), ws = /data-wr="([^|"]+)\|/.exec(x[1]), wm = ws ? H_MO[new Date(new Date(ws[1]).getTime() + 12 * 36e5).getUTCMonth()].toUpperCase() : '', past = nfl && curWk >= 0 && items.indexOf(x) < curWk; return `<button ${x[1]} class="${x[0] ? 'on' : ''}${x[3] ? ' tdy' : ''}${(dd && ((HDOT[lg] || {})[ymd(dd)] || [0])[0] > 0) || past ? ' hg' : ''}">${dd ? `<small>${DAYS[dd.getDay()].slice(0, 1)}</small><b>${dd.getDate()}</b>` : m ? `<small>${wm || m[1]}</small><b>${m[2]}</b>` : x[2]}</button>`; })}</div>` : ''}</header>`;
 }
 function lyHead(o) { const lg = state.league, fav = lg === 'fav';
   const lgs = [...Object.entries(LEAGUES).map(([id, v]) => [`data-league="${id}"`, v.name, id === lg, id === 'nfl' ? 'Football' : id === 'nba' ? 'Basketball' : id === 'nhl' ? 'Hockey' : v.name]), ['data-f1="1"', 'F1', lg === 'f1', 'Racing']];
@@ -2097,7 +2097,7 @@ function renderList() {
     W.cal.forEach((c, i) => {
       const on = c.t === W.sel.t && c.w === W.sel.w; if (on) onIdx = i;
       const m = /^week\s*(\d+)/i.exec(c.label);
-      items.push([on, `data-wk="${c.t}-${c.w}" data-wr="${esc(c.s && c.e ? c.s + '|' + c.e : '')}"`, m ? `<small>Week</small>${m[1]}` : `<small>Playoffs</small>${esc(c.alt || c.label)}`, W.cur && c.t === W.cur.t && c.w === W.cur.w]);
+      items.push([on, `data-wk="${c.t}-${c.w}" data-wr="${esc(c.s && c.e ? c.s + '|' + c.e : '')}"`, m ? `<small>Week</small>${m[1]}` : `<small>Playoff Week</small>${W.cal.filter(x => x.t === 3).indexOf(c) + 1}`, W.cur && c.t === W.cur.t && c.w === W.cur.w]);
     });
   } else if (!fav && state.league !== 'nfl') {
     if (!state.stripBase || Math.abs((state.date - state.stripBase) / 864e5) > 50) state.stripBase = state.date;
@@ -4913,7 +4913,7 @@ function renderF1List() {
   else if (!evs.length) body = msg(F1.listY ? 'No races in ' + F1.listY + '.' : 'No races.');
   else {
     const cur = f1CurEv(evs); F1.curId = cur.id; if (!F1.selId || !evs.some(e => e.id === F1.selId)) F1.selId = cur.id;
-    strip = evs.map((e, k) => { const rc = f1Comp(e, 'Race'); return `<button class="dy ${e.id === F1.selId ? 'on' : ''}${e.id === F1.curId ? ' tdy' : ''}${f1Done(rc) ? ' hg' : ''}" data-f1go="${esc(e.id)}"><small>${esc(f1Iso(e) || 'GP')}</small><b>${k + 1}</b></button>`; }).join('');
+    strip = evs.map((e, k) => { const rc = f1Comp(e, 'Race'), dn = f1Done(rc); return `<button class="dy ${e.id === F1.selId ? 'on' : ''}${e.id === F1.curId ? ' tdy' : ''}${dn ? ' hg' : !F1.listY && f1WkOn(e) ? ' hg hw' : ''}" data-f1go="${esc(e.id)}"><small>${esc(f1Iso(e) || 'GP')}</small><b>${k + 1}</b></button>`; }).join('');
     F1._rnd = [evs.findIndex(e => e.id === cur.id) + 1, evs.length];
     body = evs.map((e, k) => {
       try { f1FixCid(e); } catch (er) {} const rc = f1Comp(e, 'Race'), done = f1Done(rc) || !!(rc && rc.date && new Date(rc.date) < Date.now() - 3 * 36e5 && (rc.competitors || []).some(c => c.order === 1)), w = done && rc && (rc.competitors || []).find(c => c.order === 1), cid = e.circuit && e.circuit.id, cu = F1.circ[cid];
