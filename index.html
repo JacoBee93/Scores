@@ -1465,9 +1465,10 @@ const JC = new Map(), JIN = new Map(), MIN = 6e4, HR = 36e5;
 const IDB = (() => { let pr = null; const open = () => pr || (pr = new Promise(res => { try { const q = indexedDB.open('scorecache', 1); q.onupgradeneeded = () => q.result.createObjectStore('j'); q.onsuccess = () => res(q.result); q.onerror = () => res(null); } catch (e) { res(null); } }));
   const tx = async (mode, fn) => { const db = await open(); if (!db) return null; return new Promise(res => { try { const t = db.transaction('j', mode), st = t.objectStore('j'), r = fn(st); t.oncomplete = () => res(r && r.result); t.onerror = t.onabort = () => res(null); } catch (e) { res(null); } }); };
   return { get: k => tx('readonly', st => st.get(k)), put: (k, v) => tx('readwrite', st => st.put(v, k)), clear: () => tx('readwrite', st => st.clear()),
-    prune: () => tx('readwrite', st => { const all = []; const c = st.openCursor(); c.onsuccess = () => { const cu = c.result; if (cu) { const v = cu.value || {}; if (!v.t || Date.now() - v.t > Math.max(v.ttl * 4, 2 * 864e5)) cu.delete(); else all.push([cu.key, v.t]); cu.continue(); } else if (all.length > 400) all.sort((a, b) => a[1] - b[1]).slice(0, all.length - 400).forEach(x => st.delete(x[0])); }; return null; }) };
+    prune: () => tx('readwrite', st => { const all = []; const c = st.openCursor(); c.onsuccess = () => { const cu = c.result; if (cu) { const v = cu.value || {}; if (!v.t || Date.now() - v.t > Math.max(v.ttl * 4, 2 * 864e5)) cu.delete(); else if (!(v.ttl >= 1e12)) all.push([cu.key, v.t, v.sz || 0]); cu.continue(); } else { all.sort((a, b) => b[1] - a[1]); let sum = 0; all.forEach((x, i) => { sum += x[2] || 60e3; if (i >= 800 || sum > 50e6) st.delete(x[0]); }); } }; return null; }) };
 })();
-setTimeout(() => IDB.prune(), 4000);
+/* tidy the disk cache once a day (the pass reads every entry, so not on every launch) */
+setTimeout(() => { try { if (Date.now() - (+localStorage.getItem('idbPr') || 0) < 864e5) return; localStorage.setItem('idbPr', Date.now()); } catch (e) {} IDB.prune(); }, 4000);
 document.addEventListener('touchstart', e => { const t = e.target && e.target.closest && e.target.closest('[data-player],[data-game],[data-topen]'); if (!t) return; const d = t.dataset, pre = u => getJson(u).catch(() => null);
   try {
     if (d.player && LEAGUES[d.pl]) { const b = WEB + LEAGUES[d.pl].path + '/athletes/' + d.player; pre(b); pre(b + '/gamelog'); pre(b + '/stats'); }
@@ -1501,8 +1502,10 @@ function ttlFor(u, j) {
 }
 const forceNow = () => Date.now() - (window._forceT || 0) < 12000;
 async function netJson(url, fresh) { const u = fresh || forceNow() ? url + (url.includes('?') ? '&' : '?') + '_=' + Date.now() : url;
-  const r = await fetch(u, { cache: fresh || forceNow() ? 'no-store' : 'no-cache' }); if (!r.ok) throw new Error('HTTP ' + r.status); const j = await r.json();
-  const ttl = ttlFor(url, j), rec = { t: Date.now(), ttl, d: j }; JC.set(url, rec); if (ttl >= 2 * MIN) IDB.put(url, rec); return j; }
+  const r = await fetch(u, { cache: fresh || forceNow() ? 'no-store' : 'no-cache' }); if (!r.ok) throw new Error('HTTP ' + r.status); const txt = await r.text(), j = JSON.parse(txt);
+  const ttl = ttlFor(url, j), rec = { t: Date.now(), ttl, d: j }; JC.set(url, rec);
+  /* league-wide stat dumps are only raw material for results that are cached on their own – keep them out of the disk cache */
+  if (ttl >= 2 * MIN && !/statistics\/byathlete/.test(url)) { rec.sz = txt.length; IDB.put(url, rec); } return j; }
 async function getJson(url, fresh) {
   const force = forceNow();
   let rec = JC.get(url);
