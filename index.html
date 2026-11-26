@@ -2093,14 +2093,21 @@ const H_WD = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 
 /* game-day dots for the 7-day strip: one range request for the visible window, done in the background */
 const HDOT = {};
 function hDots(lg, days) {
-  const M = HDOT[lg] = HDOT[lg] || {}, miss = days.filter(d => M[ymd(d)] == null);
+  const M = HDOT[lg] = HDOT[lg] || {};
+  /* what the app already knows: the loaded day and the cached neighbours */
+  if (state.league === lg && Array.isArray(state.events) && state.date) M[ymd(state.date)] = state.events.length;
+  Object.entries(state.dayC || {}).forEach(([k, v]) => { const m = /(\d{8})/.exec(k); if (Array.isArray(v) && m && k.indexOf(lg) === 0) M[m[1]] = v.length; });
+  const miss = days.filter(d => M[ymd(d)] == null);
   const paint = () => document.querySelectorAll('.hwk button[data-date]').forEach(b => { const k = String(b.dataset.date).replace(/-/g, ''); b.classList.toggle('hg', !!M[k]); });
-  if (!miss.length || !LEAGUES[lg] || hDots.busy === lg + ymd(days[0])) return paint();
+  paint();
+  if (!miss.length || !LEAGUES[lg] || hDots.busy === lg + ymd(days[0])) return;
   hDots.busy = lg + ymd(days[0]);
-  const a = new Date(days[0]); a.setDate(a.getDate() - 1);
-  getJson(API + LEAGUES[lg].path + '/scoreboard?dates=' + ymd(a) + '-' + ymd(days[days.length - 1]) + '&limit=300').then(j => {
-    days.forEach(d => { M[ymd(d)] = 0; }); (j.events || []).forEach(ev => { const k = ymd(new Date(ev.date)); if (k in M) M[k]++; });
-    if (state.league === lg) paint(); }, () => {}).finally(() => { hDots.busy = null; });
+  const base = API + LEAGUES[lg].path + '/scoreboard?dates=', cnt = (j, list) => { list.forEach(d => { if (M[ymd(d)] == null) M[ymd(d)] = 0; }); (j.events || []).forEach(ev => { const k = ymd(new Date(ev.date)); if (list.some(d => ymd(d) === k)) M[k] = (M[k] || 0) + 1; }); };
+  const a = new Date(miss[0]); a.setDate(a.getDate() - 1);
+  getJson(base + ymd(a) + '-' + ymd(miss[miss.length - 1])).then(j => { if (!j || !Array.isArray(j.events)) throw 0; const seen = new Set(); j.events = j.events.filter(e => !seen.has(e.id) && seen.add(e.id)); cnt(j, miss); })
+    /* range not accepted → one request per missing day */
+    .catch(() => Promise.all(miss.map(d => { const p = new Date(d); p.setDate(p.getDate() - 1); return Promise.all([getJson(base + ymd(p)).catch(() => ({})), getJson(base + ymd(d)).catch(() => ({}))]).then(([x, y]) => { const seen = new Set(); cnt({ events: [].concat(x.events || [], y.events || []).filter(e => !seen.has(e.id) && seen.add(e.id)) }, [d]); }); })))
+    .then(() => { if (state.league === lg) paint(); }).finally(() => { hDots.busy = null; });
 }
 function hHead(HS, items, onIdx, fav) {
   const lg = state.league, nfl = lg === 'nfl', d = state.date, cur = items[onIdx], quick = !fav && LEAGUES[lg];
