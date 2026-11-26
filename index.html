@@ -1497,7 +1497,7 @@ function ttlFor(u, j) {
   if (/\/athletes\/\d+(\?|$)/.test(u)) return 24 * HR;
   return 30 * MIN;
 }
-const forceNow = () => Date.now() - (window._forceT || 0) < 6000;
+const forceNow = () => Date.now() - (window._forceT || 0) < 12000;
 async function netJson(url, fresh) { const u = fresh || forceNow() ? url + (url.includes('?') ? '&' : '?') + '_=' + Date.now() : url;
   const r = await fetch(u, { cache: fresh || forceNow() ? 'no-store' : 'no-cache' }); if (!r.ok) throw new Error('HTTP ' + r.status); const j = await r.json();
   const ttl = ttlFor(url, j), rec = { t: Date.now(), ttl, d: j }; JC.set(url, rec); if (ttl >= 2 * MIN) IDB.put(url, rec); return j; }
@@ -2710,7 +2710,7 @@ function ensureLeagueStats(league, cb, y) {
   if (ex) { if (ex.data) { if (cb) setTimeout(cb, 0); } else if (cb) ex.cbs.push(cb); return; }
   const ent = state.lgs[K] = { data: null, cbs: cb ? [cb] : [] }, LK = y ? 'lgsy_' + league + '_' + y : 'lgs5_' + league;
   const done = () => { const c = ent.cbs; ent.cbs = []; c.forEach(f => { try { f(); } catch (e) {} }); lgsRerender(league); };
-  try { const st = JSON.parse(localStorage.getItem(LK) || 'null'); if (st && Object.keys(st.d || {}).length > 10) { ent.data = st.d; setTimeout(done, 0); if (y || Date.now() - st.t < 12 * 3600e3) return; } } catch (e) {}
+  try { const st = JSON.parse(localStorage.getItem(LK) || 'null'); if (st && Object.keys(st.d || {}).length > 10 && (y || Date.now() - st.t < 12 * 3600e3)) { ent.data = st.d; setTimeout(done, 0); return; } } catch (e) {}
   (async () => {
     try {
       await ensureTeams(league);
@@ -5339,7 +5339,7 @@ $app.addEventListener('click', ev => {
     const rb = ev.target.closest('[data-refresh]'); if (rb) { rb.classList.add('spin'); setTimeout(() => rb.classList.remove('spin'), 800); }
     if (v === 'player') { const p = state.player; p.done = false; p.loaded = false; p.post = null; p.news = null; render(); loadPlayer(); }
     else if (v === 'game') { const g = state.game; g.ts = null; g.sl = null; g.l5x = null; loadGame(); }
-    else if (v === 'team') { const t = state.team; t.done = false; t.ps = null; t.news = null; try { localStorage.removeItem('tps4_' + t.league + '_' + t.id); } catch (e) {} render(); loadTeam(); }
+    else if (v === 'team') { const t = state.team; t.done = false; t.ps = null; t.news = null; if (!t.sy) { const K = lgsKey(t.league); delete state.lgs[K]; delete state.std[K]; t.std = null; try { localStorage.removeItem('lgs5_' + t.league); } catch (e) {} } try { localStorage.removeItem('tps4_' + t.league + '_' + t.id); } catch (e) {} render(); loadTeam(); }
     else if (v === 'lv') { const lv = state.lv; if (lv.kind === 'leaders') { lv.data = null; lv.loading = false; render(); loadLeaders(); } else { Object.keys(state.lvC).forEach(k => { if (k.indexOf(lv.kind + lv.league) === 0) delete state.lvC[k]; }); render(); loadLV(); } }
     else if (v === 'list') loadList();
   } else if (d.csort !== undefined) {
