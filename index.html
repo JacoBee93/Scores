@@ -1254,7 +1254,7 @@ function d2Trim(img) { const w = img.parentNode, u = w && w.dataset.u; if (!u ||
 const THC = (() => { try { return JSON.parse(localStorage.getItem('thc') || '{}'); } catch (e) { return {}; } })();
 const thcPut = (k, o) => { const c = THC[k] || {}; if (Object.keys(o).every(x => !o[x] || c[x] === o[x])) return; THC[k] = Object.assign(c, Object.fromEntries(Object.entries(o).filter(([, v]) => v))); try { localStorage.setItem('thc', JSON.stringify(THC)); } catch (e) {} };
 const HDR_BH = '<button class="back" data-back aria-label="Back"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></button><button class="home" data-home aria-label="Home"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"><path d="M3 10.5 12 3l9 7.5"/><path d="M5.5 9v11h13V9"/><path d="M10 20v-6h4v6"/></svg></button>', HDR_BHR = HDR_BH + '<button class="home" data-refresh aria-label="Refresh"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12a8 8 0 1 1-2.34-5.66"/><path d="M20 4v5h-5"/></svg></button>';
-try { localStorage.removeItem('design'); const f = localStorage.getItem('font'); document.documentElement.classList.add(f === 'sg' ? 'fsg' : 'fbar'); localStorage.removeItem('d2'); localStorage.removeItem('f12'); localStorage.removeItem('design2'); localStorage.removeItem('design3'); Object.keys(localStorage).filter(k => (k.startsWith('tps_') || k.startsWith('tps2_'))).forEach(k => localStorage.removeItem(k)); } catch (e) { document.documentElement.classList.add('fbar'); }
+try { localStorage.removeItem('design'); const f = localStorage.getItem('font'); document.documentElement.classList.add(f === 'sg' ? 'fsg' : 'fbar'); localStorage.removeItem('d2'); localStorage.removeItem('f12'); localStorage.removeItem('design2'); localStorage.removeItem('design3'); Object.keys(localStorage).filter(k => /^tps[23]?_/.test(k)).forEach(k => localStorage.removeItem(k)); } catch (e) { document.documentElement.classList.add('fbar'); }
 const API = 'https://site.api.espn.com/apis/site/v2/sports/';
 const WEB = 'https://site.web.api.espn.com/apis/common/v3/sports/';
 const LEAGUES = {
@@ -3610,7 +3610,7 @@ async function teamPsFast(t, all0, base, catNm) {
 }
 async function loadTeamPlayers(t) {
   if (t.ps || t.rosterLoading) return;
-  const past = !!(t.sy || t.stype === 3), ck = 'tps3_' + t.league + '_' + t.id + (t.sy ? '_' + t.sy : '') + (t.stype === 3 ? '_p' : ''), cached = lsGet(ck, past ? 30 * 864e5 : 6 * 3600e3);
+  const past = !!(t.sy || t.stype === 3), ck = 'tps4_' + t.league + '_' + t.id + (t.sy ? '_' + t.sy : '') + (t.stype === 3 ? '_p' : ''), cached = lsGet(ck, past ? 30 * 864e5 : 6 * 3600e3);
   const lastEnd = Math.max(0, ...(t.events || []).filter(e => e.state === 'post' || e.state === 'in').map(e => new Date(e.date).getTime() + 3.5 * 36e5).filter(x => x < Date.now()));
   if (cached && cached.ts && lastEnd > cached.ts) { /* od ulozeni se dohral zapas -> stahnout znovu */ }
   else if (cached && cached.rows && cached.rows.length) { t.ps = { loading: false, cats: psFromRows(cached.rows), season: cached.season }; if (state.team === t && t.tab === 'stats' && topView() === 'team') render(); return; }
@@ -3622,14 +3622,17 @@ async function loadTeamPlayers(t) {
   let rows = [];
   const catNm = c => { const L = c.labels; return (L.includes('GAA') || L.includes('SV%')) ? 'Goalies' : (L.includes('PTS') && L.includes('PIM')) ? 'Skaters' : (CAT_NAME[String(c.title).toLowerCase()] || c.title); };
   if (past) try { const fr = await teamPsFast(t, all, base, catNm); if (fr && fr.length) { rows = fr; i = all.length; } } catch (e) {}
-  /* NHL past seasons: ESPN's season list often lacks goaltending numbers – take the goalies' own season line instead */
+  /* NHL past seasons: ESPN's season list lacks goaltending numbers – take each goalie's line for that season (and season type) from the core API */
   if (past && t.league === 'nhl' && rows.length && !rows.some(r => r.name === 'Goalies')) try {
-    const G = [...new Map(rows.filter(r => String((r.a.position && r.a.position.abbreviation) || '').toUpperCase() === 'G').map(r => r.a).concat(rows.goalies || []).map(a => [String(a.id), a])).values()], gr = [];
-    const po = t.stype === 3, gRow = (j, sy) => { let o = null; statCats(j, t.league).forEach(c => { const L = c.labels; if (o || !(L.includes('GAA') || L.includes('SV%'))) return; const r = sy ? c.rows.find(x => +x.year === sy) : c.rows[c.rows.length - 1]; if (r) o = { c, r }; }); return o; };
-    await Promise.all(G.map(async a => { try { const rg = gRow(await getJson(base + a.id + '/stats'), t.sy); let h = rg;
-      /* playoffs: the goalie's postseason table – used only when it really differs from his regular-season line */
-      if (po) { h = null; try { const pp = gRow(await getJson(base + a.id + '/stats?seasontype=3'), t.sy); if (pp && !(rg && pp.r.vals.join('|') === rg.r.vals.join('|'))) h = pp; } catch (e) {} }
-      if (h) { const { c, r } = h, L = c.labels; gr.push({ a, cat: 'Goalies|' + L.join(','), name: 'Goalies', labels: L, names: c.names, season: String(r.n), vals: r.vals }); } } catch (e) {} }));
+    const isG = a => String((a.position && a.position.abbreviation) || '').toUpperCase() === 'G', y = t.sy || seasonYear('nhl'), ty = t.stype === 3 ? 3 : 2;
+    let G = [...new Map(rows.filter(r => isG(r.a)).map(r => r.a).concat(rows.goalies || []).map(a => [String(a.id), a])).values()];
+    if (!G.length) { const ro = await coreRoster(Object.assign({}, t, { sy: y })).catch(() => null); G = ((ro && ro.athletes) || []).filter(isG); }
+    const LB = ['GP', 'W', 'L', 'OTL', 'GAA', 'SA', 'GA', 'SV', 'SV%', 'SO', 'TOI'], NM = [['gamesPlayed', 'games'], ['wins'], ['losses'], ['overtimeLosses', 'otLosses'], ['avgGoalsAgainst', 'goalsAgainstAverage'], ['shotsAgainst'], ['goalsAgainst'], ['saves'], ['savePct', 'savePercentage'], ['shutouts'], ['timeOnIce']];
+    const gr = [];
+    await Promise.all(G.map(async a => { try { const j = await getJson('https://sports.core.api.espn.com/v2/sports/hockey/leagues/nhl/seasons/' + y + '/types/' + ty + '/athletes/' + a.id + '/statistics?lang=en&region=us'), m = f1StMap(j);
+      const pick = ns => { for (const n of ns) if (m[n]) return m[n]; return null; }, gp = pick(NM[0]), w = pick(NM[1]), sv = pick(NM[8]);
+      if (!gp || !(+gp.v > 0) || (!w && !sv)) return;
+      gr.push({ a, cat: 'Goalies|' + LB.join(','), name: 'Goalies', labels: LB, names: NM.map(x => x[0]), season: rows[0].season, vals: NM.map(ns => { const x = pick(ns); return x ? String(x.d != null ? x.d : x.v) : ''; }) }); } catch (e) {} }));
     if (gr.length) { const gid = new Set(gr.map(r => String(r.a.id))); rows = rows.filter(r => !gid.has(String(r.a.id))).concat(gr); }
   } catch (e) {}
   if (past) i = all.length;
@@ -3659,7 +3662,13 @@ function teamTabStatsHTML(t) {
   const L = flatStats(t.stats);
   if (!L.length) return msg('Team stats not available.');
   let rows;
-  if (t.league === 'nhl') rows = nhlRows(L).filter(r => r[1] != null).map(r => [r[0], { displayValue: r[1] }]);
+  if (t.league === 'nhl') {
+    rows = nhlRows(L).filter(r => r[1] != null);
+    if (!t.sy && (t.stype || 2) === 2 && rows.length) { const lg = state.lgs.nhl; if (!lg || !lg.data) { ensureLeagueStats('nhl', () => { if (state.team === t && t.tab === 'tstats' && topView() === 'team') render(); }); return msg('Loading…'); }
+      const LOW = /against|penalty minutes/i, num = x => parseFloat(String(x == null ? '' : x).replace(/,/g, ''));
+      return tstTable('Team stats', ['Value', 'Rank'], rows.map(([n, v]) => { const me = num(v), vals = Object.values(lg.data).map(o => o[n]).filter(x => x != null && !isNaN(x)), low = LOW.test(n) && !/percentage/i.test(n), r = [n, v, vals.length && !isNaN(me) ? ordinal(1 + vals.filter(x => low ? x < me : x > me).length) : '']; r.rk = true; return r; })); }
+    rows = rows.map(r => [r[0], { displayValue: r[1] }]);
+  }
   else {
     const lg = state.lgs[t.league];
     if (!lg || !lg.data) ensureLeagueStats(t.league, () => { if (state.team === t && t.tab === 'tstats' && topView() === 'team') render(); });
@@ -5325,7 +5334,7 @@ $app.addEventListener('click', ev => {
     const rb = ev.target.closest('[data-refresh]'); if (rb) { rb.classList.add('spin'); setTimeout(() => rb.classList.remove('spin'), 800); }
     if (v === 'player') { const p = state.player; p.done = false; p.loaded = false; p.post = null; p.news = null; render(); loadPlayer(); }
     else if (v === 'game') { const g = state.game; g.ts = null; g.sl = null; g.l5x = null; loadGame(); }
-    else if (v === 'team') { const t = state.team; t.done = false; t.ps = null; t.news = null; try { localStorage.removeItem('tps3_' + t.league + '_' + t.id); } catch (e) {} render(); loadTeam(); }
+    else if (v === 'team') { const t = state.team; t.done = false; t.ps = null; t.news = null; try { localStorage.removeItem('tps4_' + t.league + '_' + t.id); } catch (e) {} render(); loadTeam(); }
     else if (v === 'lv') { const lv = state.lv; if (lv.kind === 'leaders') { lv.data = null; lv.loading = false; render(); loadLeaders(); } else { Object.keys(state.lvC).forEach(k => { if (k.indexOf(lv.kind + lv.league) === 0) delete state.lvC[k]; }); render(); loadLV(); } }
     else if (v === 'list') loadList();
   } else if (d.csort !== undefined) {
