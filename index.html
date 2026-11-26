@@ -1236,9 +1236,6 @@ html:has(.lybar.bm3) #app{padding-bottom:calc(max(env(safe-area-inset-bottom), 1
 /* ===== home styles (Classic / Kick / A / B / C / I) ===== */
 .hsh .hics{display:flex;gap:8px;flex:none}
 .hic{width:38px;height:38px;border-radius:50%;background:var(--card);display:flex;align-items:center;justify-content:center;color:#fff}
-.hnav{display:flex;align-items:center;justify-content:space-between;background:var(--card);border-radius:16px;margin:12px 0 2px;padding:0 4px;height:44px}
-.hnav button{width:44px;height:44px;font-size:26px;color:var(--mut);line-height:1}.hnav button[disabled]{opacity:.25}
-.hnav b{font-family:var(--num);font-weight:700;font-size:20px}.hnav b span{color:var(--mut);font-weight:600}
 main[class^="hs"] .hsec{font-family:var(--wide);font-stretch:112%;font-weight:800;font-size:12.5px;letter-spacing:.8px;text-transform:uppercase;color:var(--mut);margin:16px 6px 7px}
 main[class^="hs"] .hsec:first-child{margin-top:6px}
 main[class^="hs"] img{object-fit:contain;flex:none}
@@ -1275,6 +1272,7 @@ main[class^="hs"] .lose{color:var(--mut)}
 .hwk button{width:auto !important;flex:1;min-width:0}
 .hwk5 b.wl{width:auto !important;padding:0 10px;border-radius:19px !important;font-size:15px !important}.hwk b{font-size:19px;font-weight:700;width:38px;height:38px;line-height:38px;border-radius:50%}
 .hwk .on b{background:var(--brand)}
+.hwk button::after{content:'';width:5px;height:5px;border-radius:50%;margin-top:1px;background:transparent}.hwk button.hg::after{background:var(--mut)}.hwk button.hg.on::after{background:var(--brand)}
 html.kick{--brand:#53fc18}
 html.kick .hwk .on b,html.kick .artx,html.kick #wpov .wpclose{color:#000 !important}.hwk .tdy:not(.on) b{color:var(--brand)}
 /* C */
@@ -1291,8 +1289,7 @@ html.kick .hwk .on b,html.kick .artx,html.kick #wpov .wpclose{color:#000 !import
 .hcC .hsc{font-family:var(--num);font-weight:700;font-size:22px;min-width:24px;text-align:center;font-variant-numeric:tabular-nums}
 .hcC .hst{flex:1;text-align:center;font-family:var(--num);font-weight:600;font-size:13.5px;color:var(--mut)}.hcC[data-pre] .hst{color:#fff;font-size:17px;font-weight:700}
 /* I */
-.hIc{display:flex;gap:8px;align-items:center;margin-top:12px}.hIc .hnav{flex:1;margin:0}
-.hlive{height:44px;padding:0 14px;border-radius:14px;background:rgba(255,69,58,.14);color:#ff6b6b;font-family:var(--num);font-weight:700;font-size:16px;white-space:nowrap}.hlive.on{background:#ff453a;color:#fff}
+.hlive{height:38px;padding:0 12px;border-radius:19px;align-self:center;background:rgba(255,69,58,.14);color:#ff6b6b;font-family:var(--num);font-weight:700;font-size:16px;white-space:nowrap}.hlive.on{background:#ff453a;color:#fff}
 .hcI{display:flex;align-items:center;cursor:pointer;position:relative}.hcI + .hcI{border-top:1px solid var(--line)}
 .hcI .hst{width:62px;flex:none;text-align:center;font-family:var(--num);font-weight:700;font-size:13.5px;color:var(--mut);border-right:1px solid var(--line);align-self:stretch;display:flex;align-items:center;justify-content:center;line-height:1.15}
 .hcI[data-pre] .hst{color:#fff}.hcI.live .hst,.hcI.live .hs2{color:var(--live)}
@@ -2093,22 +2090,34 @@ function hBody(HS, evs, lg) {
 }
 const hDayLab = d => { const t = ymd(d), n = new Date(); return t === ymd(n) ? 'Today' : t === ymd(addDays(n, -1)) ? 'Yesterday' : t === ymd(addDays(n, 1)) ? 'Tomorrow' : DAYS[d.getDay()]; };
 const H_WD = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'], H_MO = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+/* game-day dots for the 7-day strip: one range request for the visible window, done in the background */
+const HDOT = {};
+function hDots(lg, days) {
+  const M = HDOT[lg] = HDOT[lg] || {}, miss = days.filter(d => M[ymd(d)] == null);
+  const paint = () => document.querySelectorAll('.hwk button[data-date]').forEach(b => { const k = String(b.dataset.date).replace(/-/g, ''); b.classList.toggle('hg', !!M[k]); });
+  if (!miss.length || !LEAGUES[lg] || hDots.busy === lg + ymd(days[0])) return paint();
+  hDots.busy = lg + ymd(days[0]);
+  const a = new Date(days[0]); a.setDate(a.getDate() - 1);
+  getJson(API + LEAGUES[lg].path + '/scoreboard?dates=' + ymd(a) + '-' + ymd(days[days.length - 1]) + '&limit=300').then(j => {
+    days.forEach(d => { M[ymd(d)] = 0; }); (j.events || []).forEach(ev => { const k = ymd(new Date(ev.date)); if (k in M) M[k]++; });
+    if (state.league === lg) paint(); }, () => {}).finally(() => { hDots.busy = null; });
+}
 function hHead(HS, items, onIdx, fav) {
   const lg = state.league, nfl = lg === 'nfl', d = state.date, cur = items[onIdx], quick = !fav && LEAGUES[lg];
   const ic = (a, t, svg) => `<button class="hic" ${a} aria-label="${t}">${svg}</button>`;
-  const icons = (quick ? ic('data-go2="standings"', 'Table', LY_TROPHY) + ic('data-go2="lstats"', 'Stats', LY_CHART) : '') + ic('data-search', 'Search', LY_SRCH);
-  const lab = () => nfl ? (cur ? cur[2].replace(/<small>(.*?)<\/small>/, '$1 ') : '') : H_WD[d.getDay()] + ' <span>' + d.getDate() + ' ' + H_MO[d.getMonth()] + '</span>';
-  const nav = () => items.length ? `<div class="hnav"><button ${(items[onIdx - 1] || [])[1] || 'disabled'}>‹</button><b>${lab()}</b><button ${(items[onIdx + 1] || [])[1] || 'disabled'}>›</button></div>` : '';
+  const icons = HS === 'C' ? '' : (quick ? ic('data-go2="standings"', 'Table', LY_TROPHY) + ic('data-go2="lstats"', 'Stats', LY_CHART) : '') + ic('data-search', 'Search', LY_SRCH);
   const win = (k, f) => items.slice(Math.max(0, onIdx - k), onIdx + k + 1).map(f).join('');
   const dOf = x => { const m = /data-date="(\d{4})(\d{2})(\d{2})"/.exec(x[1]) || /data-date="(\d{4})-(\d{2})-(\d{2})"/.exec(x[1]); return m ? new Date(+m[1], +m[2] - 1, +m[3]) : null; };
-  const title = `<h1>SCORE<i></i>BOARD</h1>`;
-  if (HS === 'A') return `<header class="lyc hsh"><div class="lyh">${title}<div class="hics">${icons}</div></div>${nav()}</header>`;
-  if (HS === 'C') return `<header class="lyc hsh"><div class="lyh">${title}</div>${nav()}</header>`;
-  if (HS === 'B' || HS === '' || HS === 'K') return `<header class="lyc hsh hB"><div class="hBt"><div><small>${fav ? 'FAVORITES' : nfl ? esc(LEAGUES.nfl.name) : ((t => t !== DAYS[d.getDay()] ? t + ', ' : '')(hDayLab(d)) + H_MO[d.getMonth()] + ' ' + d.getDate()).toUpperCase()}</small><b>${fav ? 'Your teams' : nfl ? lab() : H_WD[d.getDay()]}</b></div><div class="hics">${icons}</div></div>
-    ${items.length ? `<div class="hwk${nfl ? ' hwk5' : ''}">${win(nfl ? 2 : 3, x => { const dd = dOf(x), m = /<small>(.*?)<\/small>(.*)/.exec(x[2]); return `<button ${x[1]} class="${x[0] ? 'on' : ''}${x[3] ? ' tdy' : ''}">${dd ? `<small>${DAYS[dd.getDay()]}</small><b>${dd.getDate()}</b>` : m ? `<small>${m[1]}</small><b class="${m[2].length > 3 ? 'wl' : ''}">${m[2]}</b>` : x[2]}</button>`; })}</div>` : ''}</header>`;
-  if (HS === 'I') { const nl = (state.events || []).filter(e => e.state === 'in').length;
-    return `<header class="lyc hsh"><div class="lyh">${title}<div class="hics">${icons}</div></div><div class="hIc">${nav()}${nl ? `<button class="hlive ${state.hLive ? 'on' : ''}" data-hlive="1">● LIVE ${nl}</button>` : ''}</div></header>`; }
-  return '';
+  /* one header for every style: small line = full date for Yesterday / Today / Tomorrow, otherwise just the date; big line = Today… or the full weekday */
+  const rel = hDayLab(d), isRel = rel !== DAYS[d.getDay()], dt = H_MO[d.getMonth()] + ' ' + d.getDate();
+  const wk = cur ? cur[2].replace(/<small>(.*?)<\/small>/, '$1 ') : '';
+  const small = fav ? 'FAVORITES' : nfl ? esc(LEAGUES.nfl.name) : (isRel ? H_WD[d.getDay()] + ', ' + dt : dt).toUpperCase();
+  const big = fav ? 'Your teams' : nfl ? wk : isRel ? rel : H_WD[d.getDay()];
+  const nl = HS === 'I' ? (state.events || []).filter(e => e.state === 'in').length : 0;
+  const live = nl ? `<button class="hlive ${state.hLive ? 'on' : ''}" data-hlive="1">● LIVE ${nl}</button>` : '';
+  if (!nfl && !fav && items.length) { const ds = items.slice(Math.max(0, onIdx - 3), onIdx + 4).map(dOf).filter(Boolean); setTimeout(() => hDots(lg, ds), 0); }
+  return `<header class="lyc hsh hB"><div class="hBt"><div><small>${small}</small><b>${big}</b></div><div class="hics">${live}${icons}</div></div>
+    ${items.length ? `<div class="hwk${nfl ? ' hwk5' : ''}">${win(nfl ? 2 : 3, x => { const dd = dOf(x), m = /<small>(.*?)<\/small>(.*)/.exec(x[2]); return `<button ${x[1]} class="${x[0] ? 'on' : ''}${x[3] ? ' tdy' : ''}${dd && (HDOT[lg] || {})[ymd(dd)] ? ' hg' : ''}">${dd ? `<small>${DAYS[dd.getDay()].slice(0, 1)}</small><b>${dd.getDate()}</b>` : m ? `<small>${m[1]}</small><b class="${m[2].length > 3 ? 'wl' : ''}">${m[2]}</b>` : x[2]}</button>`; })}</div>` : ''}</header>`;
 }
 /* C: "More" sheet replaces Favorites in the bottom bar */
 document.addEventListener('click', ev => {
