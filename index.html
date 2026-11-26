@@ -1265,6 +1265,7 @@ main[class^="hs"] .lose{color:var(--mut)}
 .hcB .hbar{width:5px;border-radius:0 4px 4px 0;background:linear-gradient(var(--ca),var(--ch));margin:-8px 13px -8px 0;flex:none}
 .hcB .hst{width:76px;flex:none;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;border-left:1px solid var(--line);margin-left:10px;font-family:var(--num);font-weight:600;font-size:14px;color:var(--mut);text-align:center}
 .hcB[data-pre] .hst{color:#fff;font-size:16px;font-weight:700}
+.hcB .hrs{flex:1;min-width:0}
 .hB{padding-bottom:4px}.hBt{display:flex;justify-content:space-between;align-items:flex-start}
 .hBt small{display:block;font-family:var(--num);font-weight:700;font-size:14px;letter-spacing:1.4px;color:var(--mut)}
 .hBt b{display:block;font-family:var(--num);font-weight:800;font-size:44px;line-height:1}
@@ -2103,8 +2104,8 @@ function hHead(HS, items, onIdx, fav) {
   const title = `<h1>SCORE<i></i>BOARD</h1>`;
   if (HS === 'A') return `<header class="lyc hsh"><div class="lyh">${title}<div class="hics">${icons}</div></div>${nav()}</header>`;
   if (HS === 'C') return `<header class="lyc hsh"><div class="lyh">${title}</div>${nav()}</header>`;
-  if (HS === 'B' || HS === '' || HS === 'K') return `<header class="lyc hsh hB"><div class="hBt"><div><small>${fav ? 'FAVORITES' : nfl ? esc(LEAGUES.nfl.name) : (H_WD[d.getDay()] + ', ' + H_MO[d.getMonth()] + ' ' + d.getDate()).toUpperCase()}</small><b>${fav ? 'Your teams' : nfl ? lab() : hDayLab(d)}</b></div><div class="hics">${icons}</div></div>
-    ${items.length ? `<div class="hwk${nfl ? ' hwk5' : ''}">${win(2, x => { const dd = dOf(x), m = /<small>(.*?)<\/small>(.*)/.exec(x[2]); return `<button ${x[1]} class="${x[0] ? 'on' : ''}${x[3] ? ' tdy' : ''}">${dd ? `<small>${H_WD[dd.getDay()]}</small><b>${dd.getDate()}</b>` : m ? `<small>${m[1]}</small><b class="${m[2].length > 3 ? 'wl' : ''}">${m[2]}</b>` : x[2]}</button>`; })}</div>` : ''}</header>`;
+  if (HS === 'B' || HS === '' || HS === 'K') return `<header class="lyc hsh hB"><div class="hBt"><div><small>${fav ? 'FAVORITES' : nfl ? esc(LEAGUES.nfl.name) : ((t => t !== DAYS[d.getDay()] ? t + ', ' : '')(hDayLab(d)) + H_MO[d.getMonth()] + ' ' + d.getDate()).toUpperCase()}</small><b>${fav ? 'Your teams' : nfl ? lab() : H_WD[d.getDay()]}</b></div><div class="hics">${icons}</div></div>
+    ${items.length ? `<div class="hwk${nfl ? ' hwk5' : ''}">${win(nfl ? 2 : 3, x => { const dd = dOf(x), m = /<small>(.*?)<\/small>(.*)/.exec(x[2]); return `<button ${x[1]} class="${x[0] ? 'on' : ''}${x[3] ? ' tdy' : ''}">${dd ? `<small>${DAYS[dd.getDay()]}</small><b>${dd.getDate()}</b>` : m ? `<small>${m[1]}</small><b class="${m[2].length > 3 ? 'wl' : ''}">${m[2]}</b>` : x[2]}</button>`; })}</div>` : ''}</header>`;
   if (HS === 'I') { const nl = (state.events || []).filter(e => e.state === 'in').length;
     return `<header class="lyc hsh"><div class="lyh">${title}<div class="hics">${icons}</div></div><div class="hIc">${nav()}${nl ? `<button class="hlive ${state.hLive ? 'on' : ''}" data-hlive="1">● LIVE ${nl}</button>` : ''}</div></header>`; }
   return '';
