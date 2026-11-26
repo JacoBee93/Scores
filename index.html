@@ -914,15 +914,14 @@ td{font-variant-numeric:tabular-nums}
 /* Design 2.0 (hidden menu): team / player header – team colour fading to black, big team logo in the back, player photo in front */
 .d2bg{display:none}
 html.d2x body{background:#000 !important}
-html.d2x .stkw.v-team,html.d2x .stkw.v-player{background:linear-gradient(180deg,var(--pbg) 0%,color-mix(in srgb,var(--pbg) 55%,#000) 45%,#000 100%);overflow:hidden}
+html.d2x .stkw.v-team,html.d2x .stkw.v-player{background:linear-gradient(180deg,var(--pbg) 0%,var(--pbg) 18%,color-mix(in srgb,var(--pbg) 82%,#000) 34%,color-mix(in srgb,var(--pbg) 55%,#000) 52%,color-mix(in srgb,var(--pbg) 25%,#000) 74%,#000 100%);overflow:hidden}
 html.d2x .stkw.v-team > *,html.d2x .stkw.v-player > *{position:relative;z-index:1}
 html.d2x .stkw .phero{position:static}
-html.d2x .stkw .d2bg{display:block;position:absolute;z-index:0;right:-56px;top:-40px;width:290px;height:290px;object-fit:contain;opacity:.22;pointer-events:none;filter:saturate(1.2)}
-html.d2x .stkw.v-player .d2bg{right:-10px;top:-30px;width:250px;height:250px}
+html.d2x .stkw .d2bg{display:block;position:absolute;z-index:0;right:14px;top:calc(env(safe-area-inset-top) + 34px);width:176px;height:176px;object-fit:contain;opacity:.2;pointer-events:none;filter:saturate(1.2)}
 html.d2x .stkw .phero .tl,html.d2x .stkw .phero .ptl{display:none}
 html.d2x .stkw .phero > :not(.d2bg){position:relative;z-index:1}
-html.d2x .stkw .phero.pp .hs{width:150px;height:150px;border-radius:0;background:none;object-fit:contain;object-position:bottom;-webkit-mask-image:linear-gradient(180deg,#000 70%,transparent);mask-image:linear-gradient(180deg,#000 70%,transparent);margin:-24px -8px -14px 0}
-html.d2x .stkw.det .phero.pp .hs{width:100px;height:100px;margin:-8px -4px -6px 0}
+html.d2x .stkw .phero.pp .hs{width:200px;height:146px;border-radius:0;background:none;object-fit:cover;object-position:top;-webkit-mask-image:linear-gradient(180deg,#000 72%,transparent);mask-image:linear-gradient(180deg,#000 72%,transparent);margin:-30px -18px -16px 0}
+html.d2x .stkw.det .phero.pp .hs{width:172px;height:140px;margin:-40px -14px 0 0}
 .stkw.fx0{position:fixed;left:0;right:0;top:-2px;border-top:2px solid var(--pbg,#000);box-shadow:0 -40px 0 var(--pbg,#000)}
 .stksp{flex:none}
 .stkw.det{padding:0 16px 12px}
