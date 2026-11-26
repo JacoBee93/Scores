@@ -911,8 +911,9 @@ td{font-variant-numeric:tabular-nums}
 .stkw{position:sticky;top:0;z-index:40;background:var(--pbg,#000)}
 /* Design 2.0 (hidden menu): team / player header – team colour fading to black, big team logo in the back, player photo in front */
 body{background:#000 !important}
-.stkw.v-team,.stkw.v-player{background:linear-gradient(180deg,var(--pbg) 0%,var(--pbg) 40%,color-mix(in srgb,var(--pbg) 80%,#000) 56%,color-mix(in srgb,var(--pbg) 50%,#000) 72%,color-mix(in srgb,var(--pbg) 20%,#000) 88%,#000 100%);overflow:hidden}
+.stkw.v-team,.stkw.v-player{background:linear-gradient(180deg,var(--pbg) 0%,var(--pbg) 40%,color-mix(in srgb,var(--pbg) 80%,#000) 56%,color-mix(in srgb,var(--pbg) 50%,#000) 72%,color-mix(in srgb,var(--pbg) 20%,#000) 88%,#000 100%)}
 .stkw.v-team > *,.stkw.v-player > *{position:relative;z-index:1}
+.stkw.v-team > header,.stkw.v-player > header{z-index:5}
 .stkw .phero{position:static}
 .stkw .d2bg{display:block;position:absolute;z-index:0;right:101px;top:calc(env(safe-area-inset-top) + 4px);width:176px;height:176px;opacity:.2;pointer-events:none;filter:saturate(1.2)}
 .stkw .phero > :not(.d2bg){position:relative;z-index:1}
@@ -3062,6 +3063,12 @@ function gamelogHTML(p, o) {
   return H + secs.map(x => { const tl = o.limit ? [] : secTeams(x); return table((x.name || 'Games') + (tl.length ? ' (' + tl.join(', ') + ')' : ''), x.rows, x.name); }).join('');
 }
 function seasonLbl(p, y) { y = +y; return p.league === 'nfl' ? y + '-' + String(y + 1).slice(2) : (y - 1) + '-' + String(y).slice(2); }
+/* seasons that turned out to have no data are remembered (past seasons never change), so the year pickers only list seasons with data */
+const YHAS = (() => { try { return JSON.parse(localStorage.getItem('yhas') || '{}'); } catch (e) { return {}; } })();
+const yhSave = () => { try { localStorage.setItem('yhas', JSON.stringify(YHAS)); } catch (e) {} };
+function yhProbe(key, ys, url, ok, done) { const P = yhProbe.run = yhProbe.run || {}; if (P[key]) return; const M = YHAS[key] = YHAS[key] || {}, todo = ys.filter(y => M[y] == null); if (!todo.length) return; P[key] = 1; let i = 0, ch = 0;
+  const w = async () => { while (i < todo.length) { const y = todo[i++]; try { const j = await getJson(url(y)); M[y] = ok(j) ? 1 : 0; ch = 1; } catch (e) {} } };
+  Promise.all([w(), w(), w(), w()]).then(() => { delete P[key]; if (ch) { yhSave(); done(); } }); }
 function glSeasons(p, J) {
   const G = J !== undefined ? J : p.gl;
   const f = ((G && G.filters) || []).find(x => x && /season$/i.test(x.name || '') && Array.isArray(x.options));
@@ -3070,6 +3077,7 @@ function glSeasons(p, J) {
   let cur = f && f.value ? String(f.value) : (L[0] && L[0].y); const real = cur;
   /* NBA/NHL: list only seasons the player actually played (injuries, gaps) – based on his career stats */
   if ((p.league === 'nba' || p.league === 'nhl') && J === undefined && p.st) { const yrs = new Set(statCats(p.st, p.league).flatMap(c => c.rows.map(r => String(r.year))).filter(Boolean)); if (yrs.size) { const F = L.filter(x => yrs.has(x.y)); if (F.length) { L = F; if (!L.some(x => x.y === cur)) cur = null; } } }
+  if (J === undefined) { const M = YHAS['gl/' + p.league + '/' + p.id] || {}, F = L.filter(x => M[x.y] !== 0 || x.y === p.glY); if (F.length) L = F; }
   L.sort((a, b) => b.y - a.y);
   if (!cur && L[0]) cur = L[0].y;
   return { L, cur, real };
@@ -3123,6 +3131,7 @@ function gamelogFull(p) {
   if (p.glSrc === 'ncaa') return ncaaGamelog(p, seg);
   const { L, cur, real } = glSeasons(p), sel = p.glY || cur;
   const lbl = (L.find(x => x.y === sel) || {}).t || (sel ? seasonLbl(p, sel) : '');
+  if (p.glYOpen) { const cy = String(seasonYear(p.league)); yhProbe('gl/' + p.league + '/' + p.id, L.map(x => x.y).filter(y => y < cy), y => WEB + LEAGUES[p.league].path + '/athletes/' + p.id + '/gamelog?season=' + y, j => j && Object.keys(j.events || {}).length > 0, () => { if (state.player === p && topView() === 'player') render(); }); }
   const head = seg + (L.length ? `<div class="ysel"><button class="ybtn" data-glyo="1">${esc(lbl)}<i class="chev ${p.glYOpen ? 'up' : ''}"></i></button>${p.glYOpen ? `<div class="ylist">${L.map(x => `<button data-gly="${x.y}" class="${x.y === sel ? 'on' : ''}">${esc(x.t)}</button>`).join('')}</div>` : ''}</div>` : '');
   if (!sel || sel === real) return gamelogHTML(p, { head });
   const g = (p.glBy || {})[sel];
@@ -3428,7 +3437,8 @@ function renderTeam() {
   const body = t.done && (t.tab === 'stats' || t.tab === 'tstats') ? sseg + body0 : body0;
   $app.innerHTML = `
     <header class="d"><div class="tabs">${HDR_BHR}<span class="grow"></span>${(() => { const Y = brYears(t.league), y = t.sy || Y[0], ty = t.stype || 2, yl = yy => t.league === 'nfl' ? yy + '-' + String(yy + 1).slice(2) : (yy - 1) + '-' + String(yy).slice(2), lab = (yy, tt) => yl(yy) + (tt === 3 ? ' Postseason' : ' Reg. Season');
-      const opts = []; Y.forEach((x, i) => { if (i > 0) opts.push([x, 3]); opts.push([x, 2]); });
+      const pk = 'po/' + t.league + '/' + t.id, PM = YHAS[pk] || {}, opts = []; Y.forEach((x, i) => { if (i > 0 && (PM[x] !== 0 || (x === y && ty === 3))) opts.push([x, 3]); opts.push([x, 2]); });
+      if (t.yOpen) yhProbe(pk, Y.slice(1), yy => API + LEAGUES[t.league].path + '/teams/' + t.id + '/schedule?season=' + yy + '&seasontype=3', j => ((j && j.events) || []).some(ev => { const st = ev.seasonType || (ev.season && { type: ev.season.type }) || {}; return st.id == null && st.type == null ? true : String(st.id != null ? st.id : st.type) === '3'; }), () => { if (state.team === t && topView() === 'team') render(); });
       return `<div class="ysel tys"><button class="ybtn" data-tyo="1">${esc(lab(y, ty))}<i class="chev ${t.yOpen ? 'up' : ''}"></i></button>${t.yOpen ? `<div class="ylist">${opts.map(([x, tt]) => `<button data-ty="${x}|${tt}" class="${x === y && tt === ty ? 'on' : ''}">${esc(lab(x, tt))}</button>`).join('')}</div>` : ''}</div>`; })()}</div></header>
     <main><div class="phero">${h.logo ? d2Html(dk(h.logo)) : ''}
       <div class="grow"><div class="pname up">${esc(h.name)}</div><div class="psub">${esc(h.sub)}</div></div>
