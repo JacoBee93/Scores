@@ -601,8 +601,8 @@ tr.zb > td{background:#17171a !important}
 .res-row:active{opacity:.6}
 .res-row img{width:34px;height:34px;object-fit:contain;flex:none}
 .res-row img.hs{border-radius:50%;background:#1c1c1d;object-fit:cover}
-.res-row .rn{font-family:var(--num);font-weight:700;font-size:21px;line-height:1.1}
-.res-row .rs{color:var(--mut);font-size:13px}
+.res-row .rn{font-family:var(--num);font-weight:700;font-size:21px;line-height:1.22}
+.res-row .rs{color:var(--mut);font-size:13px;margin-top:2px}
 .hero .t{cursor:pointer}
 
 .pane > .blk:first-child{margin-top:6px}
@@ -3741,7 +3741,8 @@ async function searchPlayers(q, league) {
       const words = name.toLowerCase().split(/[\s.\-]+/);
       if (!toks.every(k => words.some(w => w.startsWith(k)))) return;
       seen.add(id);
-      out.push({ id, name, sub: (typeof i.subtitle === 'string' && i.subtitle) || (typeof i.description === 'string' ? i.description : '') || (i.isActive === false ? 'Retired' : '') });
+      const tr = (Array.isArray(i.teamRelationships) && i.teamRelationships[0]) || i.team || {}, tnm = (tr.core && tr.core.displayName) || tr.displayName || tr.name || '';
+      out.push({ id, name, sub: (typeof i.subtitle === 'string' && i.subtitle) || (typeof i.description === 'string' ? i.description : '') || tnm || (i.isActive === false ? 'Retired' : '') });
     });
   });
   if (!ok && lastErr) throw lastErr;
@@ -3764,6 +3765,8 @@ function runPlayerSearch() {
     });
     my.loading = false;
     if (state.sp === my) paintSearch();
+    /* active players often come without their team – look it up from the athlete record (also warms the cache for opening the player) */
+    my.items.filter(x => !x.sub).slice(0, 12).forEach(x => getJson(WEB + LEAGUES[x.league].path + '/athletes/' + x.id).then(j => { const a = (j && j.athlete) || {}, tn = a.team && (a.team.displayName || a.team.name); if (tn && !x.sub) { x.sub = tn; if (state.sp === my) { clearTimeout(my.pt); my.pt = setTimeout(() => { if (state.sp === my) paintSearch(); }, 150); } } }, () => {}));
   }, 350);
 }
 const getRecent = () => { try { return JSON.parse(localStorage.getItem('recent') || '[]'); } catch (e) { return []; } };
