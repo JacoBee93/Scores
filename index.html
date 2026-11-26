@@ -582,7 +582,6 @@ tr.zb > td{background:#26262a !important}
 .ylist button{display:block;width:100%;text-align:left;padding:10px 16px;font-size:15px;border-bottom:1px solid #3a3a3c}
 .ylist button.on{color:#fff;font-weight:700}
 .phero{display:flex;align-items:center;gap:14px;margin:4px 4px 14px}
-.phero .hs.heart{border-radius:0;background:#c8102e;-webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath d='M50 92C18 69 3 52 3 31 3 15 15 4 29 4c9 0 17 5 21 13 4-8 12-13 21-13 14 0 26 11 26 27 0 21-15 38-47 61z'/%3E%3C/svg%3E") center/100% 100% no-repeat;mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath d='M50 92C18 69 3 52 3 31 3 15 15 4 29 4c9 0 17 5 21 13 4-8 12-13 21-13 14 0 26 11 26 27 0 21-15 38-47 61z'/%3E%3C/svg%3E") center/100% 100% no-repeat;width:112px !important;height:104px !important;padding-top:16px;box-sizing:border-box;object-fit:cover;object-position:50% 0}
 .phero .hs{width:68px;height:68px;border-radius:50%;background:var(--card);object-fit:cover;flex:none}
 .phero.pp{flex-direction:row-reverse;justify-content:space-between;margin-left:0}
 .phero.pp > div{flex:1;min-width:0;padding-left:20px}
@@ -920,11 +919,11 @@ html.d2x .stkw .phero{position:static}
 html.d2x .stkw .d2bg{display:block;position:absolute;z-index:0;right:52px;top:calc(env(safe-area-inset-top) + 6px);width:176px;height:176px;object-fit:contain;opacity:.2;pointer-events:none;filter:saturate(1.2)}
 html.d2x .stkw .phero .tl,html.d2x .stkw .phero .ptl{display:none}
 html.d2x .stkw .phero > :not(.d2bg){position:relative;z-index:1}
-html.d2x .stkw .phero.pp .hs{width:200px;height:146px;border-radius:0;background:none;object-fit:cover;object-position:top;-webkit-mask-image:linear-gradient(180deg,#000 72%,transparent);mask-image:linear-gradient(180deg,#000 72%,transparent);margin:-30px -18px -16px 0}
+html.d2x .stkw .phero.pp .hs{width:200px;height:146px;border-radius:0;background:none;object-fit:cover;object-position:top;-webkit-mask-image:linear-gradient(180deg,#000 86%,transparent);mask-image:linear-gradient(180deg,#000 86%,transparent);margin:-30px -18px -16px 0}
 html.d2x .stkw.det .phero.pp .hs{width:140px;height:118px;margin:-20px -30px 0 0}
+html.d2x .stkw.v-team .phero > .grow{padding-left:20px}
 html.d2x .stkw.v-player .d2bg{pointer-events:auto;cursor:pointer}
 html.d2x .stkw.v-player .phw{pointer-events:none}
-html.d2x .stkw.v-player .phw .hs[data-heart]{pointer-events:auto}
 html.d2x .stkw.det.v-team,html.d2x .stkw.det.v-player{background-size:100% calc(100% - 10px);background-repeat:no-repeat}
 .stkw.fx0{position:fixed;left:0;right:0;top:-2px;border-top:2px solid var(--pbg,#000);box-shadow:0 -40px 0 var(--pbg,#000)}
 .stksp{flex:none}
@@ -1070,9 +1069,6 @@ html.fsg .f1gp > span:not(.f1fl){position:relative;top:.75px}
 .f1st .ldr .pn{font-family:var(--num);font-weight:700;font-size:18px}
 .f1ys{margin-left:6px}
 
-.f1ph .hs.heart{border-radius:0;background:#c8102e;-webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath d='M50 92C18 69 3 52 3 31 3 15 15 4 29 4c9 0 17 5 21 13 4-8 12-13 21-13 14 0 26 11 26 27 0 21-15 38-47 61z'/%3E%3C/svg%3E") center/100% 100% no-repeat;mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath d='M50 92C18 69 3 52 3 31 3 15 15 4 29 4c9 0 17 5 21 13 4-8 12-13 21-13 14 0 26 11 26 27 0 21-15 38-47 61z'/%3E%3C/svg%3E") center/100% 100% no-repeat;width:64px !important;height:60px !important;padding-top:8px;box-sizing:border-box;object-fit:cover;object-position:50% 0}
-.hs.hpop{animation:hpop .45s cubic-bezier(.3,1.6,.5,1)}
-@keyframes hpop{0%{transform:scale(.6)}100%{transform:scale(1)}}
 
 /* ===== alignment pass ===== */
 :root{--capc:.405em}
@@ -2962,7 +2958,7 @@ function renderPlayer() {
   const tab = (k, l) => `<button data-ptab="${k}" class="${p.tab === k ? 'on' : ''}">${l}</button>`;
   $app.innerHTML = `
     <header class="d"><div class="tabs">${HDR_BHR}</div></header>
-    <main><div class="phero pp">${plogo ? `<img class="d2bg" data-topen="${esc(ptm.id)}" data-tl="${p.league}" data-tn="${esc(ptm.displayName || '')}" data-tlogo="${esc(plogo)}" src="${esc(plogo)}" alt="" onerror="this.remove()">` : ''}<span class="phw"><img class="hs${p.league === 'nfl' && String(p.id) === '3915511' && window._hearts.has('b') ? ' heart' : ''}"${p.league === 'nfl' && String(p.id) === '3915511' ? ' data-heart="b"' : ''} src="https://a.espncdn.com/i/headshots/${p.league}/players/full/${esc(p.id)}.png" alt="" onerror="this.onerror=null;this.src=SIL">${plogo ? `<img class="ptl" data-topen="${esc(ptm.id)}" data-tl="${p.league}" data-tn="${esc(ptm.displayName || '')}" data-tlogo="${esc(plogo)}" src="${esc(plogo)}" alt="" onerror="this.remove()">` : ''}</span>
+    <main><div class="phero pp">${plogo ? `<img class="d2bg" data-topen="${esc(ptm.id)}" data-tl="${p.league}" data-tn="${esc(ptm.displayName || '')}" data-tlogo="${esc(plogo)}" src="${esc(plogo)}" alt="" onerror="this.remove()">` : ''}<span class="phw"><img class="hs" src="https://a.espncdn.com/i/headshots/${p.league}/players/full/${esc(p.id)}.png" alt="" onerror="this.onerror=null;this.src=SIL">${plogo ? `<img class="ptl" data-topen="${esc(ptm.id)}" data-tl="${p.league}" data-tn="${esc(ptm.displayName || '')}" data-tlogo="${esc(plogo)}" src="${esc(plogo)}" alt="" onerror="this.remove()">` : ''}</span>
       <div><div class="pname">${esc(p.name || 'Player')}</div><div class="psub">${esc(sub)}</div></div></div>
       <div class="dtabs sm even"><button data-ptab="${p.infoSub || 'ov'}" class="${p.tab === 'ov' || p.tab === 'news' ? 'on' : ''}">Info</button>${tab('stats', 'Career')}${tab('gl', 'Gamelog')}${tab('bio', 'Bio')}</div>
       <div class="pane t">${body}</div></main>`;
@@ -4917,8 +4913,7 @@ function f1PartHTML(v, y) {
   if (!en) return msg('Not available.');
   const a = en.athlete || {}, t = en.team || {}, tm = F1.tmY && F1.tmY[y] && F1.tmY[y][String(a.id)];
   if (!con && !(F1.tmY && F1.tmY[y])) { F1.tmY = F1.tmY || {}; F1.tmY[y] = {}; f1Teams(evs).then(m => { F1.tmY[y] = m; if (state.lv === v) render(); }); }
-  const gr = !con && /^george russell$/i.test(String(a.displayName || a.name || '').trim());
-  const head = `<div class="f1ph ${con ? 'con' : ''}">${con ? f1Con(t.displayName || t.name) : f1Drv(a.id, a.displayName || a.name, tm && tm.team).replace('<img class="hs"', gr ? `<img data-heart="r" class="hs${window._hearts.has('r') ? ' heart' : ''}"` : '<img class="hs"')}<div class="f1pp"><b>${esc(String(f1SV(en, 'championshipPts') ?? f1SV(en, 'points') ?? '-'))}</b><small>PTS · P${esc(String(f1SV(en, 'rank') || '-'))}</small></div></div>`;
+  const head = `<div class="f1ph ${con ? 'con' : ''}">${con ? f1Con(t.displayName || t.name) : f1Drv(a.id, a.displayName || a.name, tm && tm.team)}<div class="f1pp"><b>${esc(String(f1SV(en, 'championshipPts') ?? f1SV(en, 'points') ?? '-'))}</b><small>PTS · P${esc(String(f1SV(en, 'rank') || '-'))}</small></div></div>`;
   const races = (en.stats || []).filter(s => s.id && !/overall|total/i.test(String(s.displayName || s.name || '')));
   const rows = races.map(s => { const ev = (F1.ev || {})[s.id] || evs.find(e => e.id === s.id) || { name: s.displayName, id: s.id };
     let main = '-', sub = '';
@@ -5120,17 +5115,6 @@ window.addEventListener('hashchange', () => { const h = location.hash, st = wind
 window.addEventListener('hashchange', route);
 
 const $app = document.getElementById('app');
-
-/* easter egg: hold a photo (Burrow, George Russell) for 2 s → heart */
-window._hearts = new Set();
-(() => { let tm = null, sx = 0, sy = 0;
-  const fire = el => { const k = el.dataset.heart; if (window._hearts.has(k)) window._hearts.delete(k); else window._hearts.add(k); el.classList.toggle('heart', window._hearts.has(k)); el.classList.remove('hpop'); void el.offsetWidth; el.classList.add('hpop'); try { navigator.vibrate && navigator.vibrate(15); } catch (e) {} };
-  document.addEventListener('touchstart', e => { const el = e.target.closest && e.target.closest('[data-heart]'); clearTimeout(tm); tm = null; if (!el) return; sx = e.touches[0].clientX; sy = e.touches[0].clientY; tm = setTimeout(() => { tm = null; fire(el); }, 2000); }, { passive: true });
-  document.addEventListener('touchmove', e => { if (tm && (Math.abs(e.touches[0].clientX - sx) > 10 || Math.abs(e.touches[0].clientY - sy) > 10)) { clearTimeout(tm); tm = null; } }, { passive: true });
-  ['touchend', 'touchcancel'].forEach(t => document.addEventListener(t, () => { clearTimeout(tm); tm = null; }, { passive: true }));
-  document.addEventListener('mousedown', e => { const el = e.target.closest && e.target.closest('[data-heart]'); if (!el) return; clearTimeout(tm); tm = setTimeout(() => { tm = null; fire(el); }, 2000); });
-  document.addEventListener('mouseup', () => { clearTimeout(tm); tm = null; });
-})();
 
 $app.addEventListener('click', ev => {
   const b = ev.target.closest('[data-f1ly],[data-f1hist],[data-f1go],[data-f1race],[data-f1v],[data-f1m],[data-f1yo],[data-f1y],[data-f1drv],[data-f1con],[data-f1exp],[data-f1so],[data-f1s],[data-f1sub],[data-f1q],[data-f1ry2]'); if (!b) return;
