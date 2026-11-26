@@ -1451,7 +1451,7 @@ function tabHTML(k) {
 (() => { let x0 = 0, y0 = 0; document.addEventListener('touchstart', e => { x0 = e.touches[0].clientX; y0 = e.touches[0].clientY; }, { passive: true });
   document.addEventListener('touchmove', e => { if (!document.documentElement.classList.contains('lock1') || e.touches.length !== 1) return; const dx = Math.abs(e.touches[0].clientX - x0), dy = Math.abs(e.touches[0].clientY - y0); if (dy > dx && !e.target.closest('#artpop, .ylist')) e.preventDefault(); }, { passive: false });
   window.addEventListener('scroll', () => { if (document.documentElement.classList.contains('lock1') && !window._stAnim && window.scrollY !== 0 && !document.getElementById('artpop')) window.scrollTo(0, 0); }, { passive: true }); })();
-window.SIL = 'data:image/svg+xml,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" fill="#2c2c2e"/><circle cx="50" cy="38" r="18" fill="#0d0d0f"/><path d="M14 100c2-22 17-34 36-34s34 12 36 34z" fill="#0d0d0f"/></svg>');
+window.SIL = 'data:image/svg+xml,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="38" r="18" fill="#48484a"/><path d="M14 100c2-22 17-34 36-34s34 12 36 34z" fill="#48484a"/></svg>');
 const STAR_SVG = '<svg viewBox="0 0 24 24"><path d="M12 3.2l2.7 5.6 6.1.8-4.5 4.2 1.1 6.1L12 17l-5.4 2.9 1.1-6.1L3.2 9.6l6.1-.8z"/></svg>';
 const store = { get(k){ try { return localStorage.getItem(k); } catch(e){ return null; } }, set(k,v){ try { localStorage.setItem(k,v); } catch(e){} } };
 const nv = v => /^-\d/.test(String(v)) ? `<span class="neg">-</span>${esc(String(v).slice(1))}` : esc(v);
@@ -3742,7 +3742,7 @@ async function searchPlayers(q, league) {
       if (!toks.every(k => words.some(w => w.startsWith(k)))) return;
       seen.add(id);
       const tr = (Array.isArray(i.teamRelationships) && i.teamRelationships[0]) || i.team || {}, tnm = (tr.core && tr.core.displayName) || tr.displayName || tr.name || '';
-      out.push({ id, name, sub: (typeof i.subtitle === 'string' && i.subtitle) || (typeof i.description === 'string' ? i.description : '') || tnm || (i.isActive === false ? 'Retired' : '') });
+      out.push({ id, name, sub: i.isActive === false ? 'Retired' : (typeof i.subtitle === 'string' && i.subtitle) || (typeof i.description === 'string' ? i.description : '') || tnm });
     });
   });
   if (!ok && lastErr) throw lastErr;
@@ -3766,7 +3766,7 @@ function runPlayerSearch() {
     my.loading = false;
     if (state.sp === my) paintSearch();
     /* active players often come without their team – look it up from the athlete record (also warms the cache for opening the player) */
-    my.items.filter(x => !x.sub).slice(0, 12).forEach(x => getJson(WEB + LEAGUES[x.league].path + '/athletes/' + x.id).then(j => { const a = (j && j.athlete) || {}, tn = a.team && (a.team.displayName || a.team.name); if (tn && !x.sub) { x.sub = tn; if (state.sp === my) { clearTimeout(my.pt); my.pt = setTimeout(() => { if (state.sp === my) paintSearch(); }, 150); } } }, () => {}));
+    my.items.slice(0, 12).forEach(x => getJson(WEB + LEAGUES[x.league].path + '/athletes/' + x.id).then(j => { const a = (j && j.athlete) || {}, ret = a.active === false || /retired/i.test(String((a.status && (a.status.type || a.status.name)) || '')), tn = a.team && (a.team.displayName || a.team.name), nv = ret ? 'Retired' : (x.sub || tn); if (nv && nv !== x.sub) { x.sub = nv; if (state.sp === my) { clearTimeout(my.pt); my.pt = setTimeout(() => { if (state.sp === my) paintSearch(); }, 150); } } }, () => {}));
   }, 350);
 }
 const getRecent = () => { try { return JSON.parse(localStorage.getItem('recent') || '[]'); } catch (e) { return []; } };
