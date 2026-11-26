@@ -1227,6 +1227,7 @@ html:has(.lybar.bm3) #app{padding-bottom:calc(max(env(safe-area-inset-bottom), 1
 .card[data-game][data-pre] > .row .sc,.card[data-game][data-pre] > .row .arr{display:none}
 .card[data-game] > .row:nth-of-type(2){grid-row:1}
 .card[data-game] > .top{grid-column:2;grid-row:1 / span 2;flex-direction:column;align-items:center;justify-content:center;gap:4px;width:76px;margin:6px 0;padding:0 6px;border-left:1px solid rgba(255,255,255,.1);text-align:center;line-height:1.15}
+.card[data-game] .ndt{order:-1;font-family:var(--num);font-weight:700;font-size:13px;color:var(--mut);line-height:1;margin-bottom:-1px;white-space:nowrap}
 .card[data-game] > .top > span:first-child{font-family:var(--num);font-weight:600;font-size:14.5px}
 .card[data-game][data-pre] > .top > span:first-child{color:#fff;font-size:17px;font-weight:700}
 .card[data-game] > .top .live{display:flex;flex-direction:column;align-items:center;line-height:1.05}
@@ -1239,6 +1240,7 @@ html:has(.lybar.bm3) #app{padding-bottom:calc(max(env(safe-area-inset-bottom), 1
 main[class^="hs"] .hsec{font-family:var(--wide);font-stretch:112%;font-weight:800;font-size:12.5px;letter-spacing:.8px;text-transform:uppercase;color:var(--mut);margin:16px 6px 7px}
 main[class^="hs"] .hsec:first-child{margin-top:6px}
 main[class^="hs"] img{object-fit:contain;flex:none}
+.hdt{display:block;font-family:var(--num);font-size:12.5px;font-weight:700;color:var(--mut);line-height:1.1}
 .hlgt{font-family:var(--num);font-size:11px;font-weight:700;color:var(--mut);letter-spacing:.5px}
 main[class^="hs"] .lose{color:var(--mut)}
 .hlv{color:var(--live);font-weight:700}
@@ -1295,15 +1297,14 @@ html.kick .hwk .on b,html.kick .artx,html.kick #wpov .wpclose{color:#000 !import
 .f1n .f1rd{flex:none;text-align:right;text-transform:none;letter-spacing:0;font-family:var(--num);font-weight:700;font-size:14px;color:var(--mut);display:flex;flex-direction:column;align-items:flex-end;gap:1px;margin:0;padding:0}
 .f1n .f1rd b{font-size:14px}.f1n .f1rd .f1dt{color:#fff}.f1n .f1rd .rdl{color:var(--live);display:flex;align-items:center;gap:5px}
 .f1n .f1rd .f1ld{position:static !important;margin:0 !important}
-.f1n .f1big,.f1n .f1ct{padding:0 !important;margin:0 !important}
+.f1n .f1tl{display:flex;gap:7px;margin-top:11px}
+.f1n .f1tl > div{flex:1;min-width:0;height:44px;box-sizing:border-box;background:rgba(255,255,255,.06);border-radius:12px;padding:0 9px;display:flex;align-items:center;gap:7px;font-family:var(--num)}
+.f1n .f1tl em{font-style:normal;font-weight:800;font-size:15px;color:var(--mut)}.f1n .f1tl i{display:block;width:4px;height:22px;border-radius:2px;flex:none}.f1n .f1tl b{font-size:17px;font-weight:700;white-space:nowrap}
+.f1n .f1tl .f1gp{margin-left:auto;font-size:13.5px;font-weight:600;color:var(--mut)}
+.f1n .f1tl .s{flex-direction:column;align-items:flex-start;justify-content:center;gap:0;padding:0 10px}.f1n .f1tl .s small{font-size:12.5px;font-weight:700;color:var(--mut);line-height:1.15;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}.f1n .f1tl .s b{font-size:16px;line-height:1.15}
+.f1n .f1tl .s.nx{background:color-mix(in srgb,var(--live) 16%,transparent)}.f1n .f1tl .s.nx small,.f1n .f1tl .s.nx b{color:#ff6b6b}.f1n .f1tl .s.dn{opacity:.45}
 .f1n .f1big{display:flex;align-items:center;gap:6px;font-family:var(--num);font-weight:700;font-size:17px;margin-top:10px !important;padding-top:8px !important;border-top:1px solid var(--line)}
 .f1n .f1ct{font-family:var(--num);font-weight:600;font-size:15px;color:var(--mut);margin-top:3px !important}
-.f1n .f1ses{margin-top:9px}
-.f1n .f1ses div{display:flex;justify-content:space-between;font-family:var(--num);font-weight:600;font-size:16px;padding:5px 0;border-top:1px solid var(--line)}
-.f1n .f1ses span + span{color:var(--mut)}
-.f1n .f1pd{display:flex;gap:7px;margin-top:11px}
-.f1n .f1pd div{flex:1;background:rgba(255,255,255,.06);border-radius:12px;padding:7px 9px;display:flex;align-items:center;gap:7px}
-.f1n .f1pd em{font-style:normal;font-family:var(--num);font-weight:800;font-size:15px;color:var(--mut)}.f1n .f1pd i{display:block;width:4px;height:22px;border-radius:2px}.f1n .f1pd b{font-family:var(--num);font-size:17px;font-weight:700}
 main.hsA .f1n,.hsA .f1n{background:linear-gradient(100deg,color-mix(in srgb,var(--c1) 75%,transparent) 0%,var(--card) 58%)}
 .hsB .f1n{padding-left:21px !important;overflow:hidden}.hsB .f1n::before{content:'';position:absolute;left:0;top:0;bottom:0;width:5px;background:linear-gradient(var(--c1),var(--c2))}
 </style>
@@ -2021,18 +2022,13 @@ function render() {
 const dk = u => String(u || '').replace(/(\/teamlogos\/\w+\/)500\/(?:scoreboard\/)?([\w-]+\.png)/, '$1500-dark/$2');
 const logoImg = src => src ? `<img src="${esc(src)}" alt="" onerror="this.style.visibility='hidden'">` : '<span class="ph"></span>';
 
+/* NFL week: live first, then upcoming by kick-off, then finished – the day is shown inside each card */
+const nflOrder = evs => evs.filter(e => e.state === 'in').concat(evs.filter(e => e.state !== 'in').sort((a, b) => ((a.state === 'post') - (b.state === 'post')) || (new Date(a.date) - new Date(b.date))));
+const nflDay = e => { const d = new Date(e.date); return DAYS[d.getDay()] + ' ' + d.getDate() + '.' + (d.getMonth() + 1) + '.'; };
 function listBody(evs, lg) {
   const fv = e => isFav(e.league || lg, e.home.id) || isFav(e.league || lg, e.away.id), favs = evs.filter(fv);
   lg = String(lg).replace(/_$/, '');
-  if (lg === 'nfl') {
-    let last = '';
-    const lv = evs.filter(e => e.state === 'in');
-    return (lv.length ? `<div class="sec dh">Live</div>` + lv.map(cardHTML).join('') : '') + evs.filter(e => e.state !== 'in').sort((a, b) => ((a.state === 'post') - (b.state === 'post')) || (new Date(a.date) - new Date(b.date))).map(e => {
-      const d = new Date(e.date), day = DAYS[d.getDay()] + ' ' + d.getDate() + '.' + (d.getMonth() + 1) + '.';
-      let h = ''; if (day !== last) { h = `<div class="sec dh">${day}</div>`; last = day; }
-      return h + cardHTML(e);
-    }).join('');
-  }
+  if (lg === 'nfl') return nflOrder(evs).map(cardHTML).join('');
   return evs.map(cardHTML).join('');
 }
 /* ===== alternative home layout (hidden menu) C2: title + icons (Table / Stats / Search) + day strip, leagues + Favorites in a floating bottom bar ===== */
@@ -2054,7 +2050,7 @@ const hStyle = () => { try { const v = localStorage.getItem('hstyle') || ''; ret
 /* team colour for the home styles: primary, or the secondary one when the primary is near-black (it would vanish on the dark cards) */
 const hCol = (lg, t) => { const P = tcol(lg, t.abbr) || [t.color, t.alt], ok = c => /^[0-9a-f]{6}$/i.test(String(c || '').replace('#', '')), lum = c => { const n = parseInt(String(c).replace('#', ''), 16); return (0.299 * (n >> 16) + 0.587 * (n >> 8 & 255) + 0.114 * (n & 255)) / 255; };
   let c = P.filter(ok).map(x => String(x).replace('#', '')).find(x => lum(x) > .12 && lum(x) < .92) || P.filter(ok).map(x => String(x).replace('#', ''))[0]; return c ? '#' + c : '#3a3a3c'; };
-const hSt = e => { const s = statusText(e), m = /^\s*(\d{1,2}:\d{2}(?:\.\d)?)\s*-\s*(.+?)\s*$/.exec(s); return e.state === 'in' && m ? `<span class="hlv">${esc(m[2])} ${esc(m[1])}</span>` : e.state === 'in' ? `<span class="hlv">${esc(s)}</span>` : esc(s); };
+const hSt = e => { if ((e.league || state.league) === 'nfl' && state.league !== 'fav' && e.state !== 'in') return `<small class="hdt">${nflDay(e)}</small>` + esc(statusText(e)); const s = statusText(e), m = /^\s*(\d{1,2}:\d{2}(?:\.\d)?)\s*-\s*(.+?)\s*$/.exec(s); return e.state === 'in' && m ? `<span class="hlv">${esc(m[2])} ${esc(m[1])}</span>` : e.state === 'in' ? `<span class="hlv">${esc(s)}</span>` : esc(s); };
 const hLose = (e, t) => e.state === 'post' && !t.winner;
 const hRec = t => t.record ? esc(String(t.record).replace(/,\s*\d+\s*pts?\b/i, '')) : '';
 const hAttr = e => `data-game="${e.id}" data-gl="${e.league || state.league}"${e.state === 'pre' ? ' data-pre' : ''}`;
@@ -2068,7 +2064,8 @@ const HCARD = {
   B: e => { const lg = e.league || state.league; return `<div class="hcB" ${hAttr(e)} style="--ca:${hCol(lg, e.away)};--ch:${hCol(lg, e.home)}"><i class="hbar"></i><div class="hrs">${hRow(e, e.away)}${hRow(e, e.home)}</div><div class="hst">${hSt(e)}${hLg(e)}</div></div>`; },
 };
 function hGroups(evs, lg) {
-  const byDay = lg === 'fav' || String(lg).replace(/_$/, '') === 'nfl';
+  const byDay = lg === 'fav';
+  if (String(lg).replace(/_$/, '') === 'nfl') return [{ t: '', evs: nflOrder(evs) }];
   if (!byDay) return [{ t: '', evs }];
   const G = [], lv = lg === 'fav' ? [] : evs.filter(e => e.state === 'in');
   if (lv.length) G.push({ t: 'Live', evs: lv });
@@ -2188,7 +2185,7 @@ function cardHTML(e) {
     return `<div class="row ${lose ? 'lose' : ''}">${logoImg(t.logo)}<span class="nm ${state.league !== 'fav' && isFav(e.league || state.league, t.id) ? 'fv' : ''}">${esc(t.name)}${t.record ? `<span class="rec">(${esc(String(t.record).replace(/,\s*\d+\s*pts?\b/i, ''))})</span>` : ''}</span>
       <span class="sc">${e.state === 'pre' ? '' : esc(t.score)}</span><span class="arr">${e.state === 'post' && t.winner ? '◀' : ''}</span></div>`;
   };
-  return `<div class="card" data-game="${e.id}" data-gl="${e.league || state.league}"${e.state === 'pre' ? ' data-pre' : ''}><div class="top"><span class="${e.state === 'in' ? 'live' : ''}">${(m => e.state === 'in' && m ? `${esc(m[2])}<em>${esc(m[1])}</em>` : esc(statusText(e)))(/^\s*(\d{1,2}:\d{2}(?:\.\d)?)\s*-\s*(.+?)\s*$/.exec(statusText(e)))}</span>${e.league && state.league === 'fav' ? `<span class="lgt">${e.league.toUpperCase()}</span>` : ''}</div>${row(e.away)}${row(e.home)}</div>`;
+  return `<div class="card" data-game="${e.id}" data-gl="${e.league || state.league}"${e.state === 'pre' ? ' data-pre' : ''}><div class="top"><span class="${e.state === 'in' ? 'live' : ''}">${(m => e.state === 'in' && m ? `${esc(m[2])}<em>${esc(m[1])}</em>` : esc(statusText(e)))(/^\s*(\d{1,2}:\d{2}(?:\.\d)?)\s*-\s*(.+?)\s*$/.exec(statusText(e)))}</span>${(e.league || state.league) === 'nfl' && e.state !== 'in' && state.league !== 'fav' ? `<small class="ndt">${nflDay(e)}</small>` : ''}${e.league && state.league === 'fav' ? `<span class="lgt">${e.league.toUpperCase()}</span>` : ''}</div>${row(e.away)}${row(e.home)}</div>`;
 }
 
 function renderGame() {
@@ -4976,11 +4973,23 @@ const F1NX = { FP1: 'Practice 1', FP2: 'Practice 2', FP3: 'Practice 3', SS: 'Spr
 function f1WkLines(e) { const now = Date.now(), nx = (e.competitions || []).filter(c => { const st = c.status && c.status.type || {}; return !st.completed && st.state !== 'in' && new Date(c.date).getTime() > now; }).sort((a, b) => new Date(a.date) - new Date(b.date))[0]; if (!nx) return null;
   const t = new Date(nx.date), m = Math.max(1, Math.round((t - now) / 6e4)), cd = m < 60 ? m + 'm' : m < 1440 ? Math.floor(m / 60) + 'h ' + (m % 60) + 'm' : Math.floor(m / 1440) + 'd ' + Math.floor((m % 1440) / 60) + 'h', ab = nx.type && nx.type.abbreviation;
   return [`${esc(F1NX[ab] || (nx.type && nx.type.text) || ab || 'Next')} <span class="f1in${m < 60 ? ' rdl' : ''}">in ${cd}</span>`, `${DAYS[t.getDay()]} ${t.getDate()}.${t.getMonth() + 1}. · ${String(t.getHours()).padStart(2, '0')}:${String(t.getMinutes()).padStart(2, '0')}`]; }
-const f1RdHTML = (e, k, done) => '<b>R' + (k + 1) + '</b>' + (!done && f1WkOn(e) ? '<span class="rdl">' + (f1SesLive(e) ? '<i class="f1ld"></i>' : '') + 'Race weekend</span>' : done ? '<span>Finished</span>' : '<span class="f1dt">' + esc(f1DatesY(e)) + '</span>');
-/* upcoming card: first session, qualifying (+ sprint) and race with local day and time */
-const f1SesHTML = e => { const C = [...(e.competitions || [])].sort((a, b) => new Date(a.date) - new Date(b.date)); if (!C.length) return '';
-  const ab = c => c.type && c.type.abbreviation, pick = [C[0]].concat(C.filter(c => /^(SR|Sprint|Qual|Race)$/.test(ab(c)))).filter((c, i, A) => A.indexOf(c) === i);
-  return `<div class="f1ses">${pick.map(c => { const t = new Date(c.date); return `<div><span>${esc(F1NX[ab(c)] || (c.type && c.type.text) || ab(c) || '')}</span><span>${DAYS[t.getDay()]} ${String(t.getHours()).padStart(2, '0')}:${String(t.getMinutes()).padStart(2, '0')}</span></div>`; }).join('')}</div>`; };
+const f1RdHTML = (e, k, done) => { const lc = !done && f1LiveComp(e); return '<b>R' + (k + 1) + '</b>' + (lc ? '<span class="rdl"><i class="f1ld"></i>' + esc(F1AB[lc.type && lc.type.abbreviation] || 'Live') + (f1Lap(lc) ? ' · Lap ' + f1Lap(lc) : '') + '</span>' : !done && f1WkOn(e) ? '<span class="rdl">Race weekend</span>' : done ? '<span>Finished</span>' : '<span class="f1dt">' + esc(f1DatesY(e)) + '</span>'); };
+/* bottom row of every F1 card: three equal tiles – session times / live order / podium */
+const f1Ab = c => { const a = (c && c.athlete) || {}; return a.abbreviation || String(a.lastName || (a.displayName || '').split(' ').slice(-1)[0] || '').slice(0, 3).toUpperCase(); };
+function f1Tiles(e, done) { const y = e._y || F1.listY || f1ShowY(), rc = f1Comp(e, 'Race'), lc = !done && f1LiveComp(e), TM = f1TM(y);
+  const pos = (c, gap) => `<div><em>${c.order}</em><i style="background:${f1TCol(TM[String(c.id)] || '')}"></i><b>${esc(f1Ab(c))}</b>${gap ? `<span class="f1gp">${esc(gap)}</span>` : ''}</div>`;
+  const top3 = comp => [1, 2, 3].map(o => ((comp && comp.competitors) || []).find(c => c.order === o)).filter(Boolean);
+  if (done) { const P = top3(rc); return P.length ? `<div class="f1tl">${P.map(c => pos(c)).join('')}</div>` : ''; }
+  if (lc) { const P = top3(lc); if (P.length) return `<div class="f1tl">${P.map(c => pos(c, c.order > 1 && c.gap ? c.gap : '')).join('')}</div>`; }
+  const C = [...(e.competitions || [])].sort((a, b) => new Date(a.date) - new Date(b.date)); if (!C.length) return '';
+  const ab = c => c.type && c.type.abbreviation, nm = c => esc(F1NX[ab(c)] || (c.type && c.type.text) || ab(c) || ''), now = Date.now();
+  const tm = c => { const t = new Date(c.date); return DAYS[t.getDay()] + ' ' + String(t.getHours()).padStart(2, '0') + ':' + String(t.getMinutes()).padStart(2, '0'); };
+  const fin = c => { const st = (c.status && c.status.type) || {}; return st.completed || st.state === 'post' || f1Chq(c); };
+  let pick;
+  if (f1WkOn(e)) { let i = C.findIndex(c => !fin(c) && new Date(c.date).getTime() > now - 3 * 36e5); if (i < 0) i = C.length - 1; const st = Math.max(0, Math.min(i - 1, C.length - 3)); pick = C.slice(st, st + 3).map(c => [c, C.indexOf(c) < i ? 'dn' : C.indexOf(c) === i ? 'nx' : '']); }
+  else pick = [C[0]].concat(C.filter(c => /^(Qual|Race)$/.test(ab(c)))).filter((c, i, A) => A.indexOf(c) === i).slice(-3).map(c => [c, '']);
+  const cd = c => { const m = Math.max(1, Math.round((new Date(c.date) - now) / 6e4)); return 'in ' + (m < 60 ? m + 'm' : m < 1440 ? Math.floor(m / 60) + 'h ' + String(m % 60).padStart(2, '0') + 'm' : Math.floor(m / 1440) + 'd ' + Math.floor((m % 1440) / 60) + 'h'); };
+  return `<div class="f1tl">${pick.map(([c, k]) => `<div class="s ${k}"><small>${nm(c)}</small><b>${k === 'dn' ? 'Done' : k === 'nx' ? cd(c) : tm(c)}</b></div>`).join('')}</div>`; }
 /* team colours (driver bars) and host-country colours (A / B card tint) */
 const F1TCOL = [[/mclaren/i, '#ff8000'], [/red ?bull(?! ?racing bulls)/i, '#3671c6'], [/ferrari/i, '#e80020'], [/mercedes/i, '#27f4d2'], [/aston/i, '#229971'], [/alpine/i, '#0093cc'], [/williams/i, '#64c4ff'], [/racing bulls|\brb\b|alphatauri|toro rosso|visa/i, '#6692ff'], [/haas/i, '#b6babd'], [/audi/i, '#f50537'], [/sauber|kick|alfa/i, '#52e252'], [/cadillac/i, '#c8a64b'], [/renault/i, '#fff500'], [/racing point|force india/i, '#f596c8']];
 const f1TCol = n => { for (const [re, c] of F1TCOL) if (re.test(String(n || ''))) return c; return '#3a3a3c'; };
@@ -4991,6 +5000,7 @@ setInterval(() => { if (document.hidden || typeof topView !== 'function' || topV
   f1LivePatch(); }, 20000);
 function f1LivePatch() { if (topView() !== 'list' || state.league !== 'f1') return; const evs = f1ListEvs(); if (!evs) return; let ch = 0;
   evs.forEach((e, k) => { const c = document.getElementById('f1c' + e.id), rd = c && c.querySelector('.f1rd'); if (!rd || !c.classList.contains('f1up')) return; const h = f1RdHTML(e, k, false); if (rd.innerHTML !== h) { rd.innerHTML = h; ch = 1; }
+    { const tl = c.querySelector('.f1tl'); if (c.classList.contains('f1n')) { const h2 = f1Tiles(e, false); if (tl ? tl.outerHTML !== h2 : h2) { if (tl) tl.outerHTML = h2 || ''; else c.insertAdjacentHTML('beforeend', h2); ch = 1; } return; } }
     const lc = f1LiveComp(e), big = c.querySelector('.f1big'), ct = c.querySelector('.f1ct'); if (!big || !ct) return;
     const W = !lc && f1WkOn(e) ? f1WkLines(e) : null, hb = lc ? f1LiveBig(lc) : W ? W[0] : esc(f1DatesY(e)), hc = lc ? (f1Top3(lc) || esc((e.circuit && e.circuit.fullName) || '')) : W ? W[1] : esc((e.circuit && e.circuit.fullName) || '');
     if (big.innerHTML !== hb) { big.innerHTML = hb; ch = 1; f1NameFit(c); } if (ct.innerHTML !== hc) { ct.innerHTML = hc; ch = 1; } });
@@ -5024,13 +5034,10 @@ function renderF1List() {
     body = evs.map((e, k) => {
       try { f1FixCid(e); } catch (er) {} const rc = f1Comp(e, 'Race'), done = f1Done(rc) || !!(rc && rc.date && new Date(rc.date) < Date.now() - 3 * 36e5 && (rc.competitors || []).some(c => c.order === 1)), w = done && rc && (rc.competitors || []).find(c => c.order === 1), cid = e.circuit && e.circuit.id, cu = F1.circ[cid];
       if (cid && cu === undefined) f1Circ(e).then(f1Rr);
-      const lc = !done && f1LiveComp(e), W = !done && !lc && f1WkOn(e) && f1WkLines(e), y = e._y || F1.listY || f1ShowY();
-      const c1 = done && w ? f1TCol(f1TM(y)[String(w.id)] || '') : f1CCol(e), c2 = done ? c1 : c1;
+      const lc = !done && f1LiveComp(e), y = e._y || F1.listY || f1ShowY();
+      const c1 = done && w ? f1TCol(f1TM(y)[String(w.id)] || '') : f1CCol(e), c2 = c1;
       const tr = esc((e.circuit && e.circuit.fullName) || '');
-      const body = lc ? `<div class="f1big">${f1LiveBig(lc)}</div><div class="f1ct">${f1Top3(lc) || tr}</div>`
-        : W ? `<div class="f1big">${W[0]}</div><div class="f1ct">${W[1]}</div>`
-        : done ? (pod => pod.length ? `<div class="f1pd">${pod.map(c => { const a = c.athlete || {}, ab = a.abbreviation || String(a.lastName || (a.displayName || '').split(' ').slice(-1)[0] || '').slice(0, 3).toUpperCase(); return `<div><em>${c.order}</em><i style="background:${f1TCol(f1TM(y)[String(c.id)] || '')}"></i><b>${esc(ab)}</b></div>`; }).join('')}</div>` : '')([1, 2, 3].map(o => (rc.competitors || []).find(c => c.order === o)).filter(Boolean))
-        : f1SesHTML(e);
+      const body = f1Tiles(e, done);
       return `<div class="card f1card f1n${done ? '' : ' f1up'}" data-f1race="${esc(e.id)}" data-f1ry="${esc(e._y || '')}" id="f1c${esc(e.id)}" style="--c1:${c1};--c2:${c2}">
         <div class="f1nt"><div class="f1map">${f1MapCell(e)}</div><div class="f1nh"><div class="f1nm">${esc(f1Short(e).replace(/-Catalunya/i, ''))}</div><div class="f1tr">${tr}</div></div><div class="f1rd">${f1RdHTML(e, k, done)}</div></div>${body}</div>`; }).join('');
   }
