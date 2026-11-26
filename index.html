@@ -1272,6 +1272,13 @@ main[class^="hs"] .lose{color:var(--mut)}
 .hwk button{width:auto !important;flex:1;min-width:0}
 .hwk5 b.wl{width:auto !important;padding:0 10px;border-radius:19px !important;font-size:15px !important}.hwk b{font-size:19px;font-weight:700;width:38px;height:38px;line-height:38px;border-radius:50%}
 .hwk .on b{background:var(--brand)}
+.f1ys{position:relative}.f1yb{display:block;text-align:left;cursor:pointer}.f1yb small{white-space:nowrap}.f1yb .chev{display:inline-block;margin-left:7px;vertical-align:2px}
+.f1ys .ylist{z-index:80;min-width:200px;max-height:55vh}
+header .f1wk.strip{display:flex;gap:0;overflow-x:auto;margin:14px -16px 2px;padding:0 16px;scroll-snap-type:none}
+.f1wk .dy{flex:none;width:calc((100vw - 32px) / 7) !important;min-width:0 !important;background:none !important;border-radius:0;padding:0 !important;box-shadow:none !important;height:auto;display:flex;flex-direction:column;align-items:center;gap:3px;color:#fff;overflow:visible}
+.f1wk .dy small{font-family:var(--num);font-size:13px;font-weight:700;color:var(--mut)}
+.f1wk .dy b{font-family:var(--num);font-size:19px;font-weight:700;width:38px;height:38px;line-height:38px;border-radius:50%;text-align:center}
+.f1wk .dy.on{background:none;color:#fff}.f1wk .dy.on b{background:var(--brand);color:#fff}.f1wk .dy.tdy:not(.on) b{color:var(--brand)}html.kick .f1wk .dy.on b{color:#000}
 .hwk button::after{content:'';width:5px;height:5px;border-radius:50%;margin-top:1px;background:transparent}.hwk button.hg::after{background:var(--mut)}.hwk button.hg.on::after{background:var(--brand)}
 html.kick{--brand:#53fc18}
 html.kick .hwk .on b,html.kick .artx,html.kick #wpov .wpclose{color:#000 !important}.hwk .tdy:not(.on) b{color:var(--brand)}
@@ -1670,7 +1677,7 @@ async function loadList(silent) {
     if (my !== reqId) return;
     if (lg === 'nfl' && !(W && W.cal)) {
       const cal = [];
-      (((j.leagues || [])[0] || {}).calendar || []).forEach(sec => { const t = +sec.value; if (t !== 2 && t !== 3) return; (sec.entries || []).forEach(en => { if (/pro bowl/i.test(en.label || '')) return; cal.push({ t, w: +en.value, label: en.label || '', alt: en.alternateLabel || '' }); }); });
+      (((j.leagues || [])[0] || {}).calendar || []).forEach(sec => { const t = +sec.value; if (t !== 2 && t !== 3) return; (sec.entries || []).forEach(en => { if (/pro bowl/i.test(en.label || '')) return; cal.push({ t, w: +en.value, label: en.label || '', alt: en.alternateLabel || '', s: en.startDate || '', e: en.endDate || '' }); }); });
       state.nflw = { cal, year: (j.season && j.season.year) || new Date().getFullYear(), sel: { t: (j.season && j.season.type) || 2, w: (j.week && j.week.number) || 1 } }; state.nflw.cur = Object.assign({}, state.nflw.sel); state.nflw.t = Date.now();
       /* offseason: keep showing the last postseason week (Super Bowl) until the new season's schedule starts */
       if (![1, 2, 3].includes(state.nflw.sel.t)) { const post = cal.filter(c => c.t === 3), last = post[post.length - 1] || cal[cal.length - 1]; if (last) { state.nflw.sel = { t: last.t, w: last.w }; state.nflw.cur = Object.assign({}, state.nflw.sel); return loadList(silent); } }
@@ -2083,7 +2090,9 @@ function hHead(HS, items, onIdx, fav) {
   /* one header for every style: small line = full date for Yesterday / Today / Tomorrow, otherwise just the date; big line = Today… or the full weekday */
   const rel = hDayLab(d), isRel = rel !== DAYS[d.getDay()], dt = H_MO[d.getMonth()] + ' ' + d.getDate();
   const wk = cur ? cur[2].replace(/<small>(.*?)<\/small>/, '$1 ') : '';
-  const small = fav ? 'FAVORITES' : nfl ? esc(LEAGUES.nfl.name) : (isRel ? H_WD[d.getDay()] + ', ' + dt : dt).toUpperCase();
+  /* NFL: the week's date range from ESPN's calendar (US days: start/end shifted by 12 h so the UTC date is the US one) */
+  const wr = nfl && cur && /data-wr="([^|"]+)\|([^"]+)"/.exec(cur[1]), usd = (x, h) => { const t = new Date(new Date(x).getTime() + h * 36e5); return H_MO[t.getUTCMonth()] + ' ' + t.getUTCDate(); };
+  const small = fav ? 'FAVORITES' : nfl ? (wr ? (usd(wr[1], 12) + ' – ' + usd(wr[2], -12)).toUpperCase() : esc(LEAGUES.nfl.name)) : (isRel ? H_WD[d.getDay()] + ', ' + dt : dt).toUpperCase();
   const big = fav ? 'Your teams' : nfl ? wk : isRel ? rel : H_WD[d.getDay()];
   if (!nfl && !fav && items.length) { const ds = items.slice(Math.max(0, onIdx - 3), onIdx + 4).map(dOf).filter(Boolean); setTimeout(() => hDots(lg, ds), 0); }
   return `<header class="lyc hsh hB"><div class="hBt"><div><small>${small}</small><b>${big}</b></div><div class="hics">${icons}</div></div>
@@ -2095,6 +2104,7 @@ function lyHead(o) { const lg = state.league, fav = lg === 'fav';
   const lgs = [...Object.entries(LEAGUES).map(([id, v]) => [`data-league="${id}"`, v.name, id === lg, id === 'nfl' ? 'Football' : id === 'nba' ? 'Basketball' : id === 'nhl' ? 'Hockey' : v.name]), ['data-f1="1"', 'F1', lg === 'f1', 'Racing']];
   const bm = lyMenu(), sic = { 'data-league="nfl"': LY_FB, 'data-league="nba"': LY_BB, 'data-league="nhl"': LY_PK, 'data-f1="1"': LY_FLG };
   const nav = `<nav class="lybar bm${bm}">${lgs.map(x => `<button ${x[0]} class="${x[2] ? 'on' : ''}">${sic[x[0]] || ''}<span>${x[1]}</span></button>`).join('')}<button data-league="fav" class="${fav ? 'on' : ''}">${LY_STAR}<span>${bm === '2' ? 'Favs' : 'Favorites'}</span></button></nav>`;
+  if (o.f1h) return f1HeadHTML(o) + nav;
   if (o.hs != null) return hHead(o.hs, o.items, o.onIdx, fav) + nav;
   return `<header class="lyc"><div class="lyh"><h1>SCORE<i></i>BOARD</h1><div class="lyics">${quick}${ic('data-search', 'Search', LY_SRCH)}</div></div>${o.strip ? `<div class="strip" id="strip">${o.strip}</div>` : ''}</header>${nav}`; }
 function renderList() {
@@ -2124,7 +2134,7 @@ function renderList() {
     W.cal.forEach((c, i) => {
       const on = c.t === W.sel.t && c.w === W.sel.w; if (on) onIdx = i;
       const m = /^week\s*(\d+)/i.exec(c.label);
-      items.push([on, `data-wk="${c.t}-${c.w}"`, m ? `<small>Week</small>${m[1]}` : `<small>Playoffs</small>${esc(c.alt || c.label)}`, W.cur && c.t === W.cur.t && c.w === W.cur.w]);
+      items.push([on, `data-wk="${c.t}-${c.w}" data-wr="${esc(c.s && c.e ? c.s + '|' + c.e : '')}"`, m ? `<small>Week</small>${m[1]}` : `<small>Playoffs</small>${esc(c.alt || c.label)}`, W.cur && c.t === W.cur.t && c.w === W.cur.w]);
     });
   } else if (!fav && state.league !== 'nfl') {
     if (!state.stripBase || Math.abs((state.date - state.stripBase) / 864e5) > 50) state.stripBase = state.date;
@@ -4912,9 +4922,13 @@ function f1ShowY() { const Y = f1Year(), c = F1.sb[Y]; if (!c) return null; cons
   if (!c.length && F1.sb[Y - 1] && F1.sb[Y - 1].length) return Y - 1; return Y; }
 function f1ListEvs() { const y = F1.listY || f1ShowY(); return y && F1.sb[y] ? F1.sb[y] : null; }
 function f1CurEv(evs) { if (F1.listY) return evs[0]; const now = Date.now(); return evs.find(e => f1DayEnd(e) > now) || evs[evs.length - 1]; }
-function f1HistHTML() { const sy = f1ShowY(), I = F1.idx && F1.idx.ready ? F1.idx : null, ys = (I ? I.years : (F1.seasons || f1Years())).filter(y => y !== sy && y <= f1Year()).sort((a, b) => b - a);
-  return `<div class="card f1card f1hist ${F1.hOpen ? 'open' : ''}" data-f1hist="1"><div class="f1hh"><div><div class="f1nm">Historic results</div><div class="f1ct">${F1.listY ? 'Season ' + F1.listY : 'Choose a season'}</div></div><i class="chev ${F1.hOpen ? 'up' : ''}"></i></div>
-    ${F1.hOpen ? `<div class="f1hy">${F1.listY ? `<button data-f1ly="0">Current season</button>` : ''}${ys.map(y => `<button data-f1ly="${y}" class="${F1.listY === y ? 'on' : ''}">${y}</button>`).join('')}</div>` : ''}</div>`; }
+/* F1 home header (all styles): tappable season line (season picker), big "Formula 1", rounds strip */
+function f1HeadHTML(o) { const sy = f1ShowY(), y = F1.listY || sy || f1Year(), I = F1.idx && F1.idx.ready ? F1.idx : null, ys = (I && I.years.length ? I.years : (F1.seasons && F1.seasons.length ? F1.seasons : f1Years())).filter(x => x !== sy && x <= f1Year()).sort((a, b) => b - a), r = F1._rnd;
+  const ic = (a, t, svg) => `<button class="hic" ${a} aria-label="${t}">${svg}</button>`;
+  const line = (F1.listY ? y + ' SEASON' : y) + (!F1.listY && r && r[0] ? ' · ROUND ' + r[0] + ' OF ' + r[1] : '');
+  return `<header class="lyc hsh hB"><div class="hBt"><div class="f1ys"><div class="f1yb" data-f1hist="1" role="button"><small>${esc(line)}<i class="chev ${F1.hOpen ? 'up' : ''}"></i></small><b>Formula 1</b></div>
+    ${F1.hOpen ? `<div class="ylist">${F1.listY ? `<button data-f1ly="0">Current season (${sy || f1Year()})</button>` : ''}${ys.map(x => `<button data-f1ly="${x}" class="${F1.listY === x ? 'on' : ''}">${x}</button>`).join('')}</div>` : ''}</div>
+    <div class="hics">${(o.quick || []).map(q => ic(q[0], q[1], q[2])).join('')}${ic('data-search', 'Search', LY_SRCH)}</div></div>${o.strip ? `<div class="strip hwk f1wk" id="strip">${o.strip}</div>` : ''}</header>`; }
 /* race weekend under way: from the start of the first session (FP1) until the race is over */
 const f1WkOn = e => { const ts = (e.competitions || []).map(c => new Date(c.date).getTime()).filter(t => t > 0); return !!ts.length && Date.now() >= Math.min(...ts); };
 /* a session running right now (ESPN says so, or by the clock: start → start + its usual length) */
@@ -4968,12 +4982,13 @@ function renderF1List() {
   if (F1._y0 != null && !noAnc) { const he = $app.querySelector(':scope > .stkw, :scope > header'), hb = he ? he.getBoundingClientRect().bottom : 0, c0 = [...$app.querySelectorAll('.f1list > .f1card[data-f1race]')].find(c => c.getBoundingClientRect().bottom > hb + 4); if (c0) F1._anc = [c0.id, c0.getBoundingClientRect().top]; }
   const evs = f1ListEvs();
   let body = '', strip = '';
-  if (!evs) body = F1.listY ? f1HistHTML() + msg('Loading…') : msg(F1.err || 'Loading…');
-  else if (!evs.length) body = F1.listY ? f1HistHTML() + msg('No races in ' + F1.listY + '.') : msg('No races.');
+  if (!evs) body = msg(F1.listY ? 'Loading…' : F1.err || 'Loading…');
+  else if (!evs.length) body = msg(F1.listY ? 'No races in ' + F1.listY + '.' : 'No races.');
   else {
     const cur = f1CurEv(evs); F1.curId = cur.id; if (!F1.selId || !evs.some(e => e.id === F1.selId)) F1.selId = cur.id;
-    strip = evs.map(e => { const d = new Date(e.endDate || e.date); return `<button class="dy ${e.id === F1.selId ? 'on' : ''}${e.id === F1.curId ? ' tdy' : ''}" data-f1go="${esc(e.id)}"><small>${esc(f1Iso(e) || 'GP')}</small>${d.getDate()}.${d.getMonth() + 1}.</button>`; }).join('');
-    body = f1HistHTML() + evs.map((e, k) => {
+    strip = evs.map((e, k) => { const rc = f1Comp(e, 'Race'); return `<button class="dy ${e.id === F1.selId ? 'on' : ''}${e.id === F1.curId ? ' tdy' : ''}${f1Done(rc) ? ' hg' : ''}" data-f1go="${esc(e.id)}"><small>${esc(f1Iso(e) || 'GP')}</small><b>${k + 1}</b></button>`; }).join('');
+    F1._rnd = [evs.findIndex(e => e.id === cur.id) + 1, evs.length];
+    body = evs.map((e, k) => {
       try { f1FixCid(e); } catch (er) {} const rc = f1Comp(e, 'Race'), done = f1Done(rc) || !!(rc && rc.date && new Date(rc.date) < Date.now() - 3 * 36e5 && (rc.competitors || []).some(c => c.order === 1)), w = done && rc && (rc.competitors || []).find(c => c.order === 1), cid = e.circuit && e.circuit.id, cu = F1.circ[cid];
       if (cid && cu === undefined) f1Circ(e).then(f1Rr);
       return `<div class="card f1card${done ? '' : ' f1up'}" data-f1race="${esc(e.id)}" data-f1ry="${esc(e._y || '')}" id="f1c${esc(e.id)}"><div class="f1cl1"><div class="f1rd">${f1RdHTML(e, k, done)}</div><div class="f1tt">${f1Flag(e)}<div class="f1nm">${esc(f1Short(e).replace(/-Catalunya/i, ''))}</div></div>
@@ -4982,7 +4997,7 @@ function renderF1List() {
   }
   const os = document.getElementById('strip'), prev = os && state.stripKey === 'f1' ? os.scrollLeft : null; state.stripKey = 'f1';
   $app.innerHTML = `
-    ${lyHead({ strip, f1: 1, quick: [['data-f1v="std"', 'Table', LY_TROPHY], ['data-f1v="stats"', 'Stats', LY_CHART]] })}
+    ${lyHead({ strip, f1: 1, f1h: 1, quick: [['data-f1v="std"', 'Table', LY_TROPHY], ['data-f1v="stats"', 'Stats', LY_CHART]] })}
     <main class="f1list" data-sig="${esc(f1LSig())}">${body}</main>`;
   const s = document.getElementById('strip'); if (s) f1CenterStrip(false); /* always centred on the chosen GP (a kept scroll position could point elsewhere after the list changed) */
   f1Fit();
@@ -5319,7 +5334,7 @@ $app.addEventListener('click', ev => {
   const b = ev.target.closest('[data-f1ly],[data-f1hist],[data-f1go],[data-f1race],[data-f1v],[data-f1m],[data-f1yo],[data-f1y],[data-f1drv],[data-f1con],[data-f1exp],[data-f1so],[data-f1s],[data-f1sub],[data-f1q],[data-f1ry2]'); if (!b) return;
   ev.stopPropagation(); const d = b.dataset, v = state.lv;
   if (d.f1ly !== undefined) { const y = +d.f1ly || null; F1.hOpen = false; F1.listY = y; F1.selId = null; F1.scrolled = 0; state.stripKey = null; render(); if (y) f1Season(y).then(() => { F1.scrolled = 0; state.stripKey = null; if (topView() === 'list' && state.league === 'f1') render(); }).catch(() => { F1.err = 'Failed to load ' + y; render(); }); return; }
-  if (d.f1hist) { F1.hOpen = !F1.hOpen; F1.noAnc = 1; F1.tok++; f1Idx(); render(); return; } /* the opened card stays where it is; nothing below it is held in place */
+  if (d.f1hist) { F1.hOpen = !F1.hOpen; F1.noAnc = 1; if (F1.hOpen) document.addEventListener('click', function cl(e2) { if (!e2.target.closest('.f1ys')) { document.removeEventListener('click', cl, true); if (F1.hOpen) { F1.hOpen = false; render(); } } }, true); F1.tok++; f1Idx(); render(); return; } /* the opened card stays where it is; nothing below it is held in place */
   if (d.f1go) { F1.selId = d.f1go; $app.querySelectorAll('.strip .dy').forEach(x => x.classList.toggle('on', x === b)); f1ScrollTo(d.f1go, true); return; }
   if (d.f1v) { window._fromList = true; F1.goTop = 1; location.hash = '#/f1/' + d.f1v; return; }
   if (d.f1race) { f1CancelAnim(); F1.goTop = 1; window._f1y = d.f1ry || (v && v.y) || null; location.hash = '#/f1/race/' + d.f1race; return; }
