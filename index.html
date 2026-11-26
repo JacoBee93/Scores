@@ -914,6 +914,8 @@ body{background:#000 !important}
 .stkw.v-team,.stkw.v-player{background:linear-gradient(180deg,var(--pbg) 0%,var(--pbg) 40%,color-mix(in srgb,var(--pbg) 80%,#000) 56%,color-mix(in srgb,var(--pbg) 50%,#000) 72%,color-mix(in srgb,var(--pbg) 20%,#000) 88%,#000 100%)}
 .stkw.v-team > *,.stkw.v-player > *{position:relative;z-index:1}
 .stkw.v-team > header,.stkw.v-player > header{z-index:5}
+.ylist{overscroll-behavior:contain}
+.ybtn.ld{opacity:.45;pointer-events:none}
 .stkw .phero{position:static}
 .stkw .d2bg{display:block;position:absolute;z-index:0;right:101px;top:calc(env(safe-area-inset-top) + 4px);width:176px;height:176px;opacity:.2;pointer-events:none;filter:saturate(1.2)}
 .stkw .phero > :not(.d2bg){position:relative;z-index:1}
@@ -1240,13 +1242,13 @@ html:has(.lybar.bm3) #app{padding-bottom:calc(max(env(safe-area-inset-bottom), 1
 const D2G = (() => { try { return JSON.parse(localStorage.getItem('d2g') || '{}'); } catch (e) { return {}; } })();
 const d2Geo = u => { const g = D2G[u]; if (!g) return ''; const K = Math.min(1 / (g.w * g.ar), 1 / g.h), W = K * g.ar, H = K, f = x => (x * 100).toFixed(2) + '%';
   return `width:${f(W)};height:${f(H)};left:${f(.5 - (g.x + g.w / 2) * W)};top:${f(.5 - (g.y + g.h / 2) * H)};object-fit:fill`; };
-const d2Html = (u, attrs) => `<div class="d2bg" data-u="${esc(u)}"${attrs || ''}><img src="${esc(u)}" style="${d2Geo(u)}" alt="" onload="d2Trim(this)" onerror="this.parentNode.remove()"></div>`;
-function d2Trim(img) { const w = img.parentNode, u = w && w.dataset.u; if (!u || D2G[u] || img.dataset.t) return; img.dataset.t = '1';
+const d2Html = (u, attrs) => `<div class="d2bg" data-u="${esc(u)}"${attrs || ''}><img src="${esc(u)}" style="${D2G[u] ? d2Geo(u) : 'opacity:0'}" alt="" onload="d2Trim(this)" onerror="this.parentNode.remove()"></div>`;
+function d2Trim(img) { const w = img.parentNode, u = w && w.dataset.u; if (!u || D2G[u] || img.dataset.t) return; img.dataset.t = '1'; const show = () => document.querySelectorAll('.d2bg').forEach(e => { if (e.dataset.u === u && e.firstChild && !D2G[u]) e.firstChild.removeAttribute('style'); });
   const im = new Image(); im.crossOrigin = 'anonymous'; im.onload = () => { try { const W = Math.min(256, im.naturalWidth), H = Math.round(im.naturalHeight * W / im.naturalWidth), cv = document.createElement('canvas'); cv.width = W; cv.height = H; const x = cv.getContext('2d'); x.drawImage(im, 0, 0, W, H); const d = x.getImageData(0, 0, W, H).data; let t = H, b = -1, l = W, r = -1;
       for (let y = 0; y < H; y++) for (let i = 0; i < W; i++) if (d[(y * W + i) * 4 + 3] > 16) { if (y < t) t = y; if (y > b) b = y; if (i < l) l = i; if (i > r) r = i; }
-      if (b < 0) return; D2G[u] = { x: +(l / W).toFixed(4), y: +(t / H).toFixed(4), w: +((r - l + 1) / W).toFixed(4), h: +((b - t + 1) / H).toFixed(4), ar: +(im.naturalWidth / im.naturalHeight).toFixed(4) };
-      try { localStorage.setItem('d2g', JSON.stringify(D2G)); } catch (e) {} const st = d2Geo(u); document.querySelectorAll('.d2bg').forEach(e => { if (e.dataset.u === u && e.firstChild) e.firstChild.setAttribute('style', st); }); } catch (e) {} };
-  im.onerror = () => { if (/\/500-dark\//.test(im.src)) im.src = im.src.replace('/500-dark/', '/500/'); }; im.src = img.src; }
+      if (b < 0) return show(); D2G[u] = { x: +(l / W).toFixed(4), y: +(t / H).toFixed(4), w: +((r - l + 1) / W).toFixed(4), h: +((b - t + 1) / H).toFixed(4), ar: +(im.naturalWidth / im.naturalHeight).toFixed(4) };
+      try { localStorage.setItem('d2g', JSON.stringify(D2G)); } catch (e) {} const st = d2Geo(u); document.querySelectorAll('.d2bg').forEach(e => { if (e.dataset.u === u && e.firstChild) e.firstChild.setAttribute('style', st); }); } catch (e) { show(); } };
+  im.onerror = () => { if (/\/500-dark\//.test(im.src)) im.src = im.src.replace('/500-dark/', '/500/'); else show(); }; im.src = img.src; }
 /* team header (name, logo, record line, colours) remembered across launches → no jump while the team data loads */
 const THC = (() => { try { return JSON.parse(localStorage.getItem('thc') || '{}'); } catch (e) { return {}; } })();
 const thcPut = (k, o) => { const c = THC[k] || {}; if (Object.keys(o).every(x => !o[x] || c[x] === o[x])) return; THC[k] = Object.assign(c, Object.fromEntries(Object.entries(o).filter(([, v]) => v))); try { localStorage.setItem('thc', JSON.stringify(THC)); } catch (e) {} };
@@ -3063,12 +3065,19 @@ function gamelogHTML(p, o) {
   return H + secs.map(x => { const tl = o.limit ? [] : secTeams(x); return table((x.name || 'Games') + (tl.length ? ' (' + tl.join(', ') + ')' : ''), x.rows, x.name); }).join('');
 }
 function seasonLbl(p, y) { y = +y; return p.league === 'nfl' ? y + '-' + String(y + 1).slice(2) : (y - 1) + '-' + String(y).slice(2); }
+/* re-render without losing the scroll position of an open year list */
+const ylKeep = f => { const l = document.querySelector('.ylist'), st = l ? l.scrollTop : 0; f(); const n = document.querySelector('.ylist'); if (n && st) n.scrollTop = st; };
+/* a drag inside an open year list never scrolls the page: the list scrolls itself, and at its ends (or when it all fits) the gesture stops there */
+(() => { let y0 = 0; document.addEventListener('touchstart', e => { if (e.touches.length === 1) y0 = e.touches[0].clientY; }, { passive: true });
+  document.addEventListener('touchmove', e => { const l = e.target.closest && e.target.closest('.ylist'); if (!l || e.touches.length !== 1) return; const dy = e.touches[0].clientY - y0;
+    if (l.scrollHeight <= l.clientHeight + 1 || (dy > 0 && l.scrollTop <= 0) || (dy < 0 && l.scrollTop + l.clientHeight >= l.scrollHeight - 1)) e.preventDefault(); y0 = e.touches[0].clientY; }, { passive: false }); })();
 /* seasons that turned out to have no data are remembered (past seasons never change), so the year pickers only list seasons with data */
 const YHAS = (() => { try { return JSON.parse(localStorage.getItem('yhas') || '{}'); } catch (e) { return {}; } })();
 const yhSave = () => { try { localStorage.setItem('yhas', JSON.stringify(YHAS)); } catch (e) {} };
-function yhProbe(key, ys, url, ok, done) { const P = yhProbe.run = yhProbe.run || {}; if (P[key]) return; const M = YHAS[key] = YHAS[key] || {}, todo = ys.filter(y => M[y] == null); if (!todo.length) return; P[key] = 1; let i = 0, ch = 0;
+const yhBusy = key => !!(yhProbe.run || {})[key];
+function yhProbe(key, ys, url, ok, done) { const P = yhProbe.run = yhProbe.run || {}, T = yhProbe.tried = yhProbe.tried || {}; if (P[key] || Date.now() - (T[key] || 0) < 6e4) return; const M = YHAS[key] = YHAS[key] || {}, todo = ys.filter(y => M[y] == null); if (!todo.length) return; P[key] = 1; T[key] = Date.now(); let i = 0, ch = 0;
   const w = async () => { while (i < todo.length) { const y = todo[i++]; try { const j = await getJson(url(y)); M[y] = ok(j) ? 1 : 0; ch = 1; } catch (e) {} } };
-  Promise.all([w(), w(), w(), w()]).then(() => { delete P[key]; if (ch) { yhSave(); done(); } }); }
+  Promise.all([w(), w(), w(), w(), w(), w()]).then(() => { delete P[key]; if (ch) yhSave(); done(); }); }
 function glSeasons(p, J) {
   const G = J !== undefined ? J : p.gl;
   const f = ((G && G.filters) || []).find(x => x && /season$/i.test(x.name || '') && Array.isArray(x.options));
@@ -3131,8 +3140,8 @@ function gamelogFull(p) {
   if (p.glSrc === 'ncaa') return ncaaGamelog(p, seg);
   const { L, cur, real } = glSeasons(p), sel = p.glY || cur;
   const lbl = (L.find(x => x.y === sel) || {}).t || (sel ? seasonLbl(p, sel) : '');
-  if (p.glYOpen) { const cy = String(seasonYear(p.league)); yhProbe('gl/' + p.league + '/' + p.id, L.map(x => x.y).filter(y => y < cy), y => WEB + LEAGUES[p.league].path + '/athletes/' + p.id + '/gamelog?season=' + y, j => j && Object.keys(j.events || {}).length > 0, () => { if (state.player === p && topView() === 'player') render(); }); }
-  const head = seg + (L.length ? `<div class="ysel"><button class="ybtn" data-glyo="1">${esc(lbl)}<i class="chev ${p.glYOpen ? 'up' : ''}"></i></button>${p.glYOpen ? `<div class="ylist">${L.map(x => `<button data-gly="${x.y}" class="${x.y === sel ? 'on' : ''}">${esc(x.t)}</button>`).join('')}</div>` : ''}</div>` : '');
+  { const cy = String(seasonYear(p.league)); yhProbe('gl/' + p.league + '/' + p.id, L.map(x => x.y).filter(y => y < cy), y => WEB + LEAGUES[p.league].path + '/athletes/' + p.id + '/gamelog?season=' + y, j => j && Object.keys(j.events || {}).length > 0, () => { if (state.player === p && topView() === 'player') ylKeep(render); }); }
+  const head = seg + (L.length ? `<div class="ysel"><button class="ybtn${yhBusy('gl/' + p.league + '/' + p.id) ? ' ld' : ''}" data-glyo="1">${esc(lbl)}<i class="chev ${p.glYOpen ? 'up' : ''}"></i></button>${p.glYOpen ? `<div class="ylist">${L.map(x => `<button data-gly="${x.y}" class="${x.y === sel ? 'on' : ''}">${esc(x.t)}</button>`).join('')}</div>` : ''}</div>` : '');
   if (!sel || sel === real) return gamelogHTML(p, { head });
   const g = (p.glBy || {})[sel];
   if (!g) { loadGlSeason(p, sel); return head + msg('Loading…'); }
@@ -3438,8 +3447,8 @@ function renderTeam() {
   $app.innerHTML = `
     <header class="d"><div class="tabs">${HDR_BHR}<span class="grow"></span>${(() => { const Y = brYears(t.league), y = t.sy || Y[0], ty = t.stype || 2, yl = yy => t.league === 'nfl' ? yy + '-' + String(yy + 1).slice(2) : (yy - 1) + '-' + String(yy).slice(2), lab = (yy, tt) => yl(yy) + (tt === 3 ? ' Postseason' : ' Reg. Season');
       const pk = 'po/' + t.league + '/' + t.id, PM = YHAS[pk] || {}, opts = []; Y.forEach((x, i) => { if (i > 0 && (PM[x] !== 0 || (x === y && ty === 3))) opts.push([x, 3]); opts.push([x, 2]); });
-      if (t.yOpen) yhProbe(pk, Y.slice(1), yy => API + LEAGUES[t.league].path + '/teams/' + t.id + '/schedule?season=' + yy + '&seasontype=3', j => ((j && j.events) || []).some(ev => { const st = ev.seasonType || (ev.season && { type: ev.season.type }) || {}; return st.id == null && st.type == null ? true : String(st.id != null ? st.id : st.type) === '3'; }), () => { if (state.team === t && topView() === 'team') render(); });
-      return `<div class="ysel tys"><button class="ybtn" data-tyo="1">${esc(lab(y, ty))}<i class="chev ${t.yOpen ? 'up' : ''}"></i></button>${t.yOpen ? `<div class="ylist">${opts.map(([x, tt]) => `<button data-ty="${x}|${tt}" class="${x === y && tt === ty ? 'on' : ''}">${esc(lab(x, tt))}</button>`).join('')}</div>` : ''}</div>`; })()}</div></header>
+      yhProbe(pk, Y.slice(1), yy => API + LEAGUES[t.league].path + '/teams/' + t.id + '/schedule?season=' + yy + '&seasontype=3', j => ((j && j.events) || []).some(ev => { const st = ev.seasonType || (ev.season && { type: ev.season.type }) || {}; return st.id == null && st.type == null ? true : String(st.id != null ? st.id : st.type) === '3'; }), () => { if (state.team === t && topView() === 'team') ylKeep(render); });
+      return `<div class="ysel tys"><button class="ybtn${yhBusy(pk) ? ' ld' : ''}" data-tyo="1">${esc(lab(y, ty))}<i class="chev ${t.yOpen ? 'up' : ''}"></i></button>${t.yOpen ? `<div class="ylist">${opts.map(([x, tt]) => `<button data-ty="${x}|${tt}" class="${x === y && tt === ty ? 'on' : ''}">${esc(lab(x, tt))}</button>`).join('')}</div>` : ''}</div>`; })()}</div></header>
     <main><div class="phero">${h.logo ? d2Html(dk(h.logo)) : ''}
       <div class="grow"><div class="pname up">${esc(h.name)}</div><div class="psub">${esc(h.sub)}</div></div>
       <button class="fstar ${isFav(t.league, t.id) ? 'on' : ''}" data-fav="${esc(t.id)}" data-fl="${t.league}" data-fn="${esc(h.name)}" data-flogo="${esc(h.logo)}" aria-label="Favorite team">${STAR_SVG}</button></div>
@@ -3773,10 +3782,11 @@ function runPlayerSearch() {
       if (r.status === 'fulfilled') r.value.slice(0, 10).forEach(x => my.items.push(Object.assign({}, x, { league: order[i] })));
       else my.errs.push(order[i]);
     });
+    /* look up team / retired status from the athlete record before showing the list (max 3 s) – no text popping in afterwards */
+    const look = my.items.slice(0, 12).map(x => getJson(WEB + LEAGUES[x.league].path + '/athletes/' + x.id).then(j => { const a = (j && j.athlete) || {}, ret = a.active === false || /retired/i.test(String((a.status && (a.status.type || a.status.name)) || '')), tn = a.team && (a.team.displayName || a.team.name); if (ret) x.sub = 'Retired'; else if (!x.sub && tn) x.sub = tn; }, () => {}));
+    await Promise.race([Promise.all(look), new Promise(r => setTimeout(r, 3000))]);
     my.loading = false;
     if (state.sp === my) paintSearch();
-    /* active players often come without their team – look it up from the athlete record (also warms the cache for opening the player) */
-    my.items.slice(0, 12).forEach(x => getJson(WEB + LEAGUES[x.league].path + '/athletes/' + x.id).then(j => { const a = (j && j.athlete) || {}, ret = a.active === false || /retired/i.test(String((a.status && (a.status.type || a.status.name)) || '')), tn = a.team && (a.team.displayName || a.team.name), nv = ret ? 'Retired' : (x.sub || tn); if (nv && nv !== x.sub) { x.sub = nv; if (state.sp === my) { clearTimeout(my.pt); my.pt = setTimeout(() => { if (state.sp === my) paintSearch(); }, 150); } } }, () => {}));
   }, 350);
 }
 const getRecent = () => { try { return JSON.parse(localStorage.getItem('recent') || '[]'); } catch (e) { return []; } };
@@ -4924,10 +4934,15 @@ function f1Load(v, force) {
 }
 
 /* standings */
+/* driver lists wait until the drivers' teams are known (no team names popping in) */
+function f1TeamsWait(v, y) { F1.tmY = F1.tmY || {}; F1.tmW = F1.tmW || {}; if (F1.tmY[y] && !F1.tmW[y]) return '';
+  if (!F1.tmW[y]) { F1.tmW[y] = 1; const go = () => f1Teams(F1.sb[y]).then(m => { F1.tmY[y] = m; }, () => { F1.tmY[y] = {}; });
+    (F1.sb[y] ? go() : f1Season(y).then(go, () => { F1.tmY[y] = {}; })).then(() => { F1.tmW[y] = 0; if (state.lv === v) render(); }); }
+  return msg('Loading…'); }
 function f1StdHTML(v, y) {
   const S = F1.st[y]; if (!S) return msg(v.err || 'Loading…');
   const con = v.m === 'con', st = con ? S.con : S.drv; if (!st || !(st.entries || []).length) return msg('Standings not available.');
-  const tm = F1.tmY && F1.tmY[y]; if (!con && !tm && F1.sb[y]) { F1.tmY = F1.tmY || {}; F1.tmY[y] = {}; f1Teams(F1.sb[y]).then(m => { F1.tmY[y] = m; if (state.lv === v) render(); }); }
+  if (!con) { const w = f1TeamsWait(v, y); if (w) return w; } const tm = F1.tmY && F1.tmY[y];
   const ents = [...st.entries].sort((a, b) => (f1SV(a, 'rank') || 99) - (f1SV(b, 'rank') || 99));
   const pts = en => { const p = f1SV(en, 'championshipPts'); return p != null ? p : f1SV(en, 'points'); };
   return `<section class="blk"><table class="nfx sep f1t"><colgroup><col style="width:40px"><col><col style="width:62px"></colgroup><thead><tr><th class="n">#</th><th class="l ${con ? '' : 'ph'}">${con ? 'Constructor' : 'Driver'}</th><th>PTS</th></tr></thead><tbody>${ents.map(en => { const a = en.athlete || {}, t = en.team || {}, tt = !con && tm && tm[String(a.id)];
@@ -4939,7 +4954,7 @@ function f1PartHTML(v, y) {
   const con = v.kind === 'f1con', st = con ? S.con : S.drv, en = ((st && st.entries) || []).find(e => String(con ? (e.team || {}).id : (e.athlete || {}).id) === String(v.cat));
   if (!en) return msg('Not available.');
   const a = en.athlete || {}, t = en.team || {}, tm = F1.tmY && F1.tmY[y] && F1.tmY[y][String(a.id)];
-  if (!con && !(F1.tmY && F1.tmY[y])) { F1.tmY = F1.tmY || {}; F1.tmY[y] = {}; f1Teams(evs).then(m => { F1.tmY[y] = m; if (state.lv === v) render(); }); }
+  if (!con) { const w = f1TeamsWait(v, y); if (w) return w; }
   const head = `<div class="f1ph ${con ? 'con' : ''}">${con ? f1Con(t.displayName || t.name) : f1Drv(a.id, a.displayName || a.name, tm && tm.team)}<div class="f1pp"><b>${esc(String(f1SV(en, 'championshipPts') ?? f1SV(en, 'points') ?? '-'))}</b><small>PTS · P${esc(String(f1SV(en, 'rank') || '-'))}</small></div></div>`;
   const races = (en.stats || []).filter(s => s.id && !/overall|total/i.test(String(s.displayName || s.name || '')));
   const rows = races.map(s => { const ev = (F1.ev || {})[s.id] || evs.find(e => e.id === s.id) || { name: s.displayName, id: s.id };
