@@ -1406,6 +1406,9 @@ html.fbar .f2po .pht b{top:-3.5px}html.fsg .f2po .pht b{top:4px}.f2po small{marg
 .f2ch{padding-left:0 !important;padding-right:0 !important}.f2ch .xl{font-size:11px}
 .f2r .f2pen{text-align:right;margin-left:auto;white-space:nowrap}.f2r .f2pen em{font-style:normal;color:#ffb340}.f1big .g span.qp{font-size:13px;color:#ffb340}
 .f2sy{display:flex;align-items:center;gap:10px;margin:18px 0 0;font-family:var(--num)}.f2sy i{flex:1;height:1px;background:rgba(255,255,255,.1)}.f2sy b{font-size:15px;font-weight:700;letter-spacing:2px;color:#fff}.f2sy + .f2ch{margin-top:10px !important}
+.pane .f2l{padding-left:0;padding-right:0}.pane .f2hm{padding-left:0;padding-right:0}
+.f2r .fm{gap:3px}.f2r .f{width:24px;height:22px;border-radius:5px;font-size:11.5px}
+.f2r .f.zd,.f2hm .c.zd{background:#4a1416;color:#ff8a8e;font-family:-apple-system,system-ui,sans-serif !important;font-size:12px;line-height:1;padding:0}
 </style>
 </head>
 <body>
@@ -5248,10 +5251,10 @@ function f12DrvHTML(v, y, ents) { const races = (F1.sb[y] || []).filter(f1RaceDo
   const pts = en => { const p = f1SV(en, 'championshipPts'); return +(p != null ? p : f1SV(en, 'points')) || 0; };
   const lastPts = id => { if (!last) return 0; const p = f1Pos(f1Comp(last, 'Race'), id), sr = f1Comp(last, 'SR'), sp = sr && f1Done(sr) ? f1Pos(sr, id) : null; return (p ? T[p - 1] || 0 : 0) + (sp ? TS[sp - 1] || 0 : 0); };
   const prev = ents.map(en => { const id = String((en.athlete || {}).id); return { id, p: pts(en) - lastPts(id) }; }).sort((a, b) => b.p - a.p), pr = {}; prev.forEach((x, i) => { pr[x.id] = i + 1; });
-  const L5 = races.slice(-3);
+  const L5 = races.slice(-3), AGf = f1Agg(y);
   return `<section class="f2l">${ents.map(en => { const a = en.athlete || {}, id = String(a.id), rk = +f1SV(en, 'rank') || 0, mv = races.length > 1 && pr[id] ? pr[id] - rk : 0, tn = f1DrvTeam(y, id);
     const ar = mv > 0 ? `<u class="up">▲${mv}</u>` : mv < 0 ? `<u class="dn">▼${-mv}</u>` : '<u class="eq">•</u>';
-    const form = L5.map(e => { const p = f1Pos(f1Comp(e, 'Race'), id); return `<i class="f ${F2PC(p)}">${p && p <= 10 ? p : ''}</i>`; }).join('');
+    const form = L5.map(e => { if (AGf && AGf.dnfR && AGf.dnfR[e.id] && AGf.dnfR[e.id][id]) return '<i class="f zd">✕</i>'; const p = f1Pos(f1Comp(e, 'Race'), id); return `<i class="f ${F2PC(p)}">${p || ''}</i>`; }).join('');
     return `<div class="f2r" data-f1drv="${esc(id)}"><em>${rk || ''}</em>${ar}<i class="tb" style="background:${f1TCol(tn)}"></i><div class="n"><b>${esc(a.displayName || a.name || '')}</b><small>${esc(tn)}</small></div><div class="fm">${form}</div><span>${pts(en)}</span></div>`; }).join('')}</section><div class="f2note">▲▼ places vs. the previous round · last 5 races</div>`; }
 function f12ConHTML(v, y, ents) { const pts = en => { const p = f1SV(en, 'championshipPts'); return +(p != null ? p : f1SV(en, 'points')) || 0; }, top = Math.max(1, ...ents.map(pts));
   return `<section class="f2l">${ents.map(en => { const t = en.team || {}, n = t.displayName || t.name || '', p = pts(en);
@@ -5348,7 +5351,7 @@ function f1Agg(y) {
     const races = evs.filter(f1RaceDone);
     races.forEach(e => { const rc = f1Comp(e, 'Race'), q = f1Comp(e, 'Qual'); (rc.competitors || []).forEach(c => { const d = D(String(c.id)); if (c.order === 1) d.wins++; if (c.order <= 3) d.podiums++; }); const p = q && f1Done(q) && (q.competitors || []).find(c => c.order === 1); if (p) D(String(p.id)).poles++; });
     A.tot = races.length; A.teamOf = {}; A.dnfR = {}; A.flR = {};
-    let i = 0, lastR = 0; const rr = () => { const n = Date.now(); if (n - lastR > 400 || A.fin) { lastR = n; if (topView() === 'lv' && state.lv && (state.lv.kind === 'f1stats' || state.lv.kind === 'f1drv') && (A.fin || state.lv.kind === 'f1stats' && !f12()) && (state.lv.y || F1.listY || f1CurY()) === y) render(); } };
+    let i = 0, lastR = 0; const rr = () => { const n = Date.now(); if (n - lastR > 400 || A.fin) { lastR = n; if (topView() === 'lv' && state.lv && (state.lv.kind === 'f1stats' || state.lv.kind === 'f1drv' || state.lv.kind === 'f1std' && f12()) && (A.fin || state.lv.kind === 'f1stats' && !f12()) && (state.lv.y || F1.listY || f1CurY()) === y) render(); } };
     const work = async () => { while (i < races.length) { const e = races[i++]; try { const rows = await f1Detail(e.id, f1Comp(e, 'Race'), true); const lead = rows.find(r => r.order === 1), LL = lead && lead.st.lapsCompleted ? lead.st.lapsCompleted.v : 0;
           let best = null; rows.forEach(r => { A.teamOf[r.id] = { team: r.team, color: r.color }; const fl = r.st.fastestLap && r.st.fastestLap.v; if (fl > 0 && (!best || fl < best.fl)) best = { fl, id: r.id }; if (f1IsDnf(r, LL)) { D(r.id).dnf++; (A.dnfR[e.id] = A.dnfR[e.id] || {})[r.id] = 1; } });
           if (best) { D(best.id).fl++; A.flR[e.id] = best.id; } } catch (er) {} A.done++; rr(); } };
