@@ -1266,7 +1266,7 @@ header .hwk.hsc.stA{background:linear-gradient(#3a3a3c,#3a3a3c) no-repeat 0 calc
 .stA .tlb.idle{transition:transform .25s cubic-bezier(.2,.8,.2,1)}
 
 /* pills: text tabs, centred, the chosen one white with a red bar under it */
-html .seg{border:0 !important;background:none !important;border-radius:0 !important;padding:0 !important;max-width:100% !important;justify-content:center;gap:24px;box-shadow:inset 0 -1px 0 #2c2c2e}
+html .seg{border:0 !important;background:none !important;border-radius:0 !important;padding:0 !important;max-width:100% !important;justify-content:center;gap:24px;box-shadow:none}
 html .seg > button{flex:0 0 auto !important;padding:5px 0 10px !important;border-radius:0 !important;background:none !important;color:#8e8e93 !important;position:relative;font-size:18px !important;box-shadow:none !important}
 html .seg:has(> button:nth-child(4)){gap:18px}
 html.fsg .seg > button{font-size:16px !important}html.fsg .seg:has(> button:nth-child(4)){gap:14px}html .seg:has(> button:nth-child(5)){gap:12px}
@@ -1293,7 +1293,7 @@ html .seg > button.on::after{content:'';position:absolute;left:0;right:0;bottom:
 .f1big .tag.yl{background:rgba(255,214,10,.2);color:#ffd60a}.f1big .btl{margin-bottom:6px}
 @keyframes f1blink{50%{opacity:.25}}
 
-main .hsec.fvh{margin-top:4px !important}main .fvsp{height:10px}
+main .hsec.fvh{margin:8px 6px 14px !important;text-align:left}
 
 .f1big .kv{position:absolute;left:16px;right:16px;bottom:12px;background:none;border-radius:0;padding:0;font-family:var(--num)}.f1big .kv:empty{display:none}.f1big .kv > div{display:flex;align-items:center;gap:10px;height:36px}.f1big .kv > div + div{border-top:1px solid rgba(255,255,255,.07)}
 .f1big .kv small{flex:none;width:86px;font-size:12px;font-weight:700;letter-spacing:1px;color:rgba(255,255,255,.6);white-space:nowrap}.f1big .kv i{width:4px;height:18px;border-radius:2px;flex:none;margin-right:-2px}.f1big .kv b{flex:1;min-width:0;font-size:17px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.3}
@@ -1303,19 +1303,26 @@ main .hsec.fvh{margin-top:4px !important}main .fvsp{height:10px}
 .f2l{background:var(--card);border-radius:20px;padding:4px 12px;font-family:var(--num)}
 .f2r{display:flex;align-items:center;gap:8px;height:52px;border-bottom:1px solid rgba(255,255,255,.06)}.f2r:last-child{border:0}.f2r > em{font-style:normal;width:18px;color:var(--mut);font-weight:700;font-size:16px;flex:none}
 .f2r > em.w1{color:#d4af37}.f2r > em.w2{color:#c0c0c0}.f2r > em.w3{color:#cd7f32}
-.f2r .tb{width:4px;height:26px;border-radius:2px;flex:none}.f2r .n{flex:1;min-width:0}.f2r .n b{display:block;font-size:17px;font-weight:700;line-height:1.25;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.f2r .n small{display:block;font-size:13px;color:var(--mut);font-weight:600;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.f2r .tb{width:4px;height:26px;border-radius:2px;flex:none}.f2r .n{flex:1;min-width:0}.f2r .n b{display:block;font-size:18px;font-weight:700;line-height:1.35;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.f2r .n small{display:block;font-size:13.5px;color:var(--mut);font-weight:500 !important;line-height:1.35;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .f2r > span{flex:none;min-width:34px;text-align:right;font-size:16px;font-weight:700}.f2r.rr > span{min-width:78px;font-weight:600;color:#c7c7cc;font-size:15px}
 .f2r u{text-decoration:none;font-size:14px;font-weight:700;width:28px;flex:none;text-align:center}.f2r u.up{color:#30d158}.f2r u.dn{color:#ff5a5f}.f2r u.eq{color:#5c5c60}
 .f2r .n b .fl,.f2note .fl{display:inline-block;font-style:normal;margin-left:6px;font-size:11px;line-height:15px;font-weight:700;background:#a855f7;color:#fff;border-radius:5px;padding:0 5px;vertical-align:.18em}
 .f2r .fm{display:flex;gap:3px;flex:none}.f2r .f,.f2hm .c{font-style:normal;font-weight:700;display:flex;align-items:center;justify-content:center;color:#000}.f2r .f{width:17px;height:17px;border-radius:5px;font-size:11px}
 .f2note{margin:10px 4px 0;font-family:var(--num);font-size:13px;color:var(--mut);font-weight:600}.f2note .fl{margin:0 2px 0 4px}
 .f2c{display:flex;align-items:center;gap:10px;height:54px;border-bottom:1px solid rgba(255,255,255,.06)}.f2c:last-child{border:0}.f2c > em{font-style:normal;width:18px;color:var(--mut);font-weight:700;font-size:16px}.f2c .cb{flex:1;min-width:0}
-.f2c .ct{display:flex;align-items:baseline;gap:8px}.f2c .ct b{flex:1;min-width:0;font-size:17px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.3}.f2c .ct span{font-size:17px;font-weight:700}
+.f2c .ct{display:flex;align-items:baseline;gap:8px}.f2c .ct b{flex:1;min-width:0;font-size:18px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.3}.f2c .ct span{font-size:17px;font-weight:700}
 .f2c .bar{height:6px;background:rgba(255,255,255,.07);border-radius:3px;margin-top:4px}.f2c .bar i{display:block;height:100%;border-radius:3px}
-.f2hm{background:var(--card);border-radius:20px;padding:12px 10px;font-family:var(--num)}.f2hm .hm{display:flex;align-items:center;gap:2px;height:22px}.f2hm .hm > span{width:42px;flex:none;font-size:13px;font-weight:700;color:#c7c7cc;display:flex;align-items:center;gap:4px}.f2hm .hm > span i{width:3px;height:13px;border-radius:2px}
-.f2hm .hm .c{flex:1;min-width:0;height:18px;border-radius:4px;font-size:10px}.f2hm .hr i{flex:1;min-width:0;font-style:normal;font-size:10px;color:var(--mut);text-align:center}
+.f2hm{background:var(--card);border-radius:20px;padding:12px 10px;font-family:var(--num)}.f2hm .hmx{overflow-x:auto;margin:0 -10px;padding:0 10px;scrollbar-width:none;overscroll-behavior-x:contain}.f2hm .hmx::-webkit-scrollbar{display:none}.f2hm .hmi{width:max-content}.f2hm .hm{display:flex;align-items:center;gap:3px;height:26px}.f2hm .hm > span{position:sticky;left:-10px;z-index:1;width:48px;flex:none;align-self:stretch;margin-left:-10px;padding-left:10px;background:var(--card);font-size:13px;font-weight:700;color:#c7c7cc;display:flex;align-items:center;gap:4px}.f2hm .hm > span i{width:3px;height:13px;border-radius:2px}
+.f2hm .hm .c{flex:none;width:24px;height:22px;border-radius:5px;font-size:11.5px}.f2hm .hr i{flex:none;width:24px;font-style:normal;font-size:11px;font-weight:700;color:var(--mut);text-align:center}
 .f2hm .lg{display:flex;align-items:center;gap:5px;margin-top:12px;font-size:12px;color:var(--mut);font-weight:600;flex-wrap:wrap}.f2hm .lg .c{width:16px;height:16px;flex:none;border-radius:4px;font-size:10px}.f2hm .lg span{margin-right:6px}
 .f2r .f.z1,.f2hm .c.z1{background:#d4af37}.f2r .f.z2,.f2hm .c.z2{background:#c0c0c0}.f2r .f.z3,.f2hm .c.z3{background:#cd7f32}.f2r .f.zp4,.f2hm .c.zp4{background:#2e7d5b;color:#fff}.f2r .f.zp5,.f2hm .c.zp5{background:#2a6e52;color:#fff}.f2r .f.zp6,.f2hm .c.zp6{background:#255f48;color:#fff}.f2r .f.zp7,.f2hm .c.zp7{background:#20523e;color:#fff}.f2r .f.zp8,.f2hm .c.zp8{background:#1c4535;color:#fff}.f2r .f.zp9,.f2hm .c.zp9{background:#18392c;color:#fff}.f2r .f.zp10,.f2hm .c.zp10{background:#142e24;color:#fff}.f2r .f.zn,.f2hm .c.zn{background:#2c2c2e;color:#fff}.f2r .f.ze,.f2hm .c.ze{background:#1a1a1c;color:#fff}.f2hm .c.zf{background:transparent;box-shadow:inset 0 0 0 1px rgba(255,255,255,.06)}
+
+/* weekend timeline: only the live session's ball is red (pulsing); texts stay white / grey; the line runs between the balls, not behind them */
+.f1big .nd,.f1big.fbD .nd{border-left:0 !important;margin-left:7px}.f1big .nd::before{content:'';position:absolute;left:-1px;top:19px;bottom:1px;width:2px;border-radius:1px;background:rgba(255,255,255,.14)}.f1big .nd:last-child::before{display:none}
+.f1big .nd.next b,.f1big .nd.live b,.f1big .nd.live.yl b{color:#fff !important}.f1big .nd.next span,.f1big .nd.live span,.f1big .nd.live.yl span{color:rgba(255,255,255,.6) !important}
+.f1big .nd.next i{background:#48484a !important;box-shadow:0 0 0 3px #1a1416 !important}.f1big .nd.live i,.f1big .nd.live.yl i{background:var(--brand) !important;box-shadow:0 0 0 3px #1a1416,0 0 10px var(--brand) !important;left:-7px}
+.f1big .bxh u{display:flex;align-items:center;gap:6px}.f1big .bxh u .fd{width:9px;height:9px;border-radius:50%;background:var(--brand)}
+.f1big .bx.gr{box-shadow:inset 0 0 0 1px rgba(48,209,88,.45)}.f1big .bx.gr .bxh u{color:#30d158}.f1big .bx.gr .bxh u .fd{background:#30d158}.f1big .bx.yl .bxh u .fd{background:#ffd60a}
 </style>
 </head>
 <body>
@@ -1492,7 +1499,7 @@ function tabHTML(k) {
     if (v === 'list') { if (state.league === 'fav' || (state.league === 'f1' && !f1Big()) || t.closest('header, #fhome, #ptr')) return; const items = [...$app.querySelectorAll('.dy')], cur = items.findIndex(b => b.classList.contains('on')); if (cur < 0) return;
       S = Object.assign(base, { mode: 'day', el: $app.querySelector('main'), cls: ($app.querySelector('main') || {}).className || '', items, cur }); return; }
     const pe = t.closest('.pane') || (!t.closest('.stkw, header, .hpill, input') ? $app.querySelector(':scope > main > .pane') : null);
-    if (!pe || t.closest('.brsw, .mstrip, .wpw, .rkw, .ysel, .ylist, .scf, .cmpr, input, .ghost')) return;
+    if (!pe || t.closest('.brsw, .mstrip, .wpw, .rkw, .ysel, .ylist, .scf, .cmpr, input, .ghost, .hmx')) return;
     const bs = [...$app.querySelectorAll('.dtabs button')]; if (bs.length < 2) return; const cur = bs.findIndex(b => b.classList.contains('on')); if (cur < 0) return;
     const tw = t.closest('.tw'); S = Object.assign(base, { mode: 'tab', el: pe, cls: 'pane t', items: bs, cur, tw, st0: tw ? tw.scrollLeft : 0 }); }, { passive: true });
   document.addEventListener('touchmove', e => { if (!S) return; const t = e.touches[0], dx = t.clientX - S.x0, dy = t.clientY - S.y0;
@@ -1622,7 +1629,7 @@ function normTeam(c) {
   if (score && typeof score === 'object') score = score.displayValue;
   const rec = (c.records && c.records[0] && c.records[0].summary) ||
               (Array.isArray(c.record) && c.record[0] && c.record[0].displayValue) || '';
-  return { id: t.id, abbr: t.abbreviation || '', name: t.shortDisplayName || t.displayName || t.name || '',
+  return { id: t.id, abbr: t.abbreviation || '', name: t.shortDisplayName || t.displayName || t.name || '', loc: t.location || '',
     logo: dk(t.logo || (t.logos && t.logos[0] && t.logos[0].href) || ''),
     score: score != null ? String(score) : '', winner: !!c.winner, record: rec, color: t.color || '', alt: t.alternateColor || '' };
 }
@@ -2041,7 +2048,7 @@ function listBody(evs, lg) {
   lg = String(lg).replace(/_$/, '');
   const ord = lg === 'nfl' ? nflOrder(evs) : evs;
   /* games of your favourite teams always on top (whatever the time), under a grey "Favorites" line */
-  if (lg !== 'fav' && favs.length && favs.length < ord.length) { const F = ord.filter(fv); return `<div class="hsec fvh">Favorites</div>` + F.map(cardHTML).join('') + '<div class="fvsp"></div>' + ord.filter(e => !fv(e)).map(cardHTML).join(''); }
+  if (lg !== 'fav' && favs.length && favs.length < ord.length) { const F = ord.filter(fv); return F.map(cardHTML).join('') + `<div class="hsec fvh">Favorites</div>` + ord.filter(e => !fv(e)).map(cardHTML).join(''); }
   return ord.map(cardHTML).join('');
 }
 /* ===== alternative home layout (hidden menu) C2: title + icons (Table / Stats / Search) + day strip, leagues + Favorites in a floating bottom bar ===== */
@@ -2132,7 +2139,7 @@ const HCARD = {
 function hGroups(evs, lg) {
   const byDay = lg === 'fav';
   if (!byDay) { const ord = String(lg).replace(/_$/, '') === 'nfl' ? nflOrder(evs) : evs, L = String(lg).replace(/_$/, ''), fv = e => isFav(e.league || L, e.home.id) || isFav(e.league || L, e.away.id), F = ord.filter(fv);
-    return F.length && F.length < ord.length ? [{ t: 'Favorites', evs: F, c: 'fvh' }, { t: '', sp: 1, evs: ord.filter(e => !fv(e)) }] : [{ t: '', evs: ord }]; }
+    return F.length && F.length < ord.length ? [{ t: '', evs: F }, { t: 'Favorites', c: 'fvh', evs: ord.filter(e => !fv(e)), under: 1 }] : [{ t: '', evs: ord }]; }
   const G = [], lv = lg === 'fav' ? [] : evs.filter(e => e.state === 'in');
   if (lv.length) G.push({ t: 'Live', evs: lv });
   let cur = null;
@@ -3002,7 +3009,7 @@ function pvInjuries(g) {
   if (!inj.length) return '';
   const teams = [e.away, e.home], idx = Math.min(g.pvTeam || 0, 1), t = teams[idx];
   const mine = (inj.find(x => String(x.team && x.team.id) === String(t.id)) || {}).injuries || [];
-  const seg = `<div class="seg">${teams.map((x, i) => `<button data-pvt="${i}" class="${i === idx ? 'on' : ''}">${esc(x.abbr || x.name)}</button>`).join('')}</div>`;
+  const city = teams[0].loc && teams[1].loc && teams[0].loc !== teams[1].loc, seg = `<div class="seg">${teams.map((x, i) => `<button data-pvt="${i}" class="${i === idx ? 'on' : ''}">${esc(city ? x.loc : x.name || x.abbr)}</button>`).join('')}</div>`;
   const rows = mine.length ? mine.slice(0, 12).map(i => {
     const a = i.athlete || {}, st = String(i.status || (i.type && i.type.description) || ''), det = (i.details && (i.details.type || i.details.detail)) || i.shortComment || '';
     const red = /out|^ir|injured reserve|suspen/i.test(st), pos = (a.position && a.position.abbreviation) || '';
@@ -5012,7 +5019,7 @@ function f1BigHTML(e, k) { const y = e._y || F1.listY || f1ShowY(), TM = f1TM(y)
   const hm = t => String(t.getHours()).padStart(2, '0') + ':' + String(t.getMinutes()).padStart(2, '0'), day = c => DAYS[new Date(c.date).getDay()];
   const cd = t => { const m = Math.max(1, Math.round((t - now) / 6e4)); return m < 60 ? m + 'm' : m < 1440 ? Math.floor(m / 60) + 'h ' + String(m % 60).padStart(2, '0') + 'm' : Math.floor(m / 1440) + 'd ' + Math.floor((m % 1440) / 60) + 'h'; };
   const wk = !done && f1WkOn(e), lc = !done && f1LiveComp(e), nxi = C.findIndex(c => !fin(c) && !f1CompLive(c) && new Date(c.date).getTime() > now - 6e4);
-  const fl = String((lc && lc._flag) || '').toLowerCase(), fy = /yellow|safety|vsc|\bsc\b/.test(fl), fr = /red/.test(fl), lap = lc ? f1Lap(lc) : 0, laps = lc && lc.status && lc.status.type && 0;
+  const fl = String((lc && lc._flag) || '').toLowerCase(), fy = /yellow|safety|vsc|\bsc\b/.test(fl), fr = /red/.test(fl), fg = /green/.test(fl), lap = lc ? f1Lap(lc) : 0, laps = lc && lc.status && lc.status.type && 0;
   const S = C.map((c, i) => ({ c, n: nm(c), d: day(c), h: hm(new Date(c.date)), st: f1CompLive(c) ? 'live' : fin(c) || (wk && i < nxi) ? 'done' : i === nxi && wk ? 'next' : '' }));
   const MED = ['', '#d4af37', '#c0c0c0', '#cd7f32'], tc = c => TM[String(c.id)] ? f1TCol(TM[String(c.id)]) : MED[c.order] || '#3a3a3c';
   const full = c => { const a = c.athlete || {}; return a.displayName || a.fullName || [a.firstName, a.lastName].filter(Boolean).join(' ') || f1Ab(c); };
@@ -5021,7 +5028,7 @@ function f1BigHTML(e, k) { const y = e._y || F1.listY || f1ShowY(), TM = f1TM(y)
   const nmS = esc(f1Short(e).replace(/\s*Grand Prix\s*/i, ' ').replace(/\bGP\b/, '').replace(/\s+/g, ' ').trim()), dt = esc(f1DatesY(e)), rd = 'R' + (k + 1);
   let tag = '', tcl = '', bx = '';
   if (done) { tag = 'FINISHED'; bx = box('', 'Results', '', rc, false); }
-  else if (lc) { tag = '● ' + (F1NX[ab(lc)] || 'Session') + ' live'; tcl = fy ? 'lv yl' : 'lv'; bx = box(fy ? 'yl' : fr ? 'rd' : '', 'Current standings', (lap ? 'Lap ' + lap + ' · ' : '') + (fl ? '● ' + esc(f1FlagT(lc._flag)) : '● Live'), lc, true); }
+  else if (lc) { tag = '● ' + (F1NX[ab(lc)] || 'Session') + ' live'; tcl = fy ? 'lv yl' : 'lv'; bx = box(fy ? 'yl' : fr ? 'rd' : fg ? 'gr' : '', 'Current standings', fl ? '<i class="fd"></i>' + esc(f1FlagT(lc._flag)) : '<i class="fd"></i>Live', lc, true); }
   else if (wk) { const N = S.find(x => x.st === 'next'), last = nxi > 0 ? C[nxi - 1] : [...C].reverse().find(fin); tag = N ? '● ' + N.n + ' in ' + cd(new Date(N.c.date)) : '● Race weekend'; tcl = 'lv';
     if (last) bx = box('', /^Qual$/.test(ab(last)) ? 'Starting grid' : /^(SS|SQ)$/.test(ab(last)) ? 'Sprint grid' : nm(last) + ' results', '', last, false); }
   else tag = C[0] ? 'Starts in ' + cd(new Date(C[0].date)) : esc(dt);
@@ -5113,10 +5120,10 @@ async function loadF1List() {
 function renderF1() {
   const v = state.lv; let top = '', body = '', ysel = '';
   if (v.kind === 'f1stats' || v.kind === 'f1std') {
-    const y = v.y || F1.listY || f1CurY(); ysel = f1YSel(v, y, f1YearsFor(v, y));
+    const y = v.y || F1.listY || f1CurY();
     top = `<div class="seg pseg lvseg"><button data-f1m="drv" class="${v.m !== 'con' ? 'on' : ''}">Drivers</button><button data-f1m="con" class="${v.m === 'con' ? 'on' : ''}">Constructors</button></div>`;
     if (f12() && v.kind === 'f1stats') top = ''; body = v.kind === 'f1std' ? f1StdHTML(v, y) : f12() ? f12HeatHTML(v, y) : f1StatsHTML(v, y);
-  } else if (v.kind === 'f1drv' || v.kind === 'f1con') { const y = v.y || F1.listY || f1CurY(); ysel = f1YSel(v, y, f1YearsFor(v, y)); body = f1PartHTML(v, y); }
+  } else if (v.kind === 'f1drv' || v.kind === 'f1con') { const y = v.y || F1.listY || f1CurY(); body = f1PartHTML(v, y); }
   else if (v.kind === 'f1race') { const r = f1RaceHTML(v); ysel = r.ysel; top = r.top; body = r.body; }
   $app.innerHTML = `${f1Hdr(ysel)}<main class="f1v ${v.kind === 'f1stats' ? 'f1st' : v.kind === 'f1std' ? 'f1std' : ''}">${top}<div class="pane t">${body}</div></main>`;
   f1Fit();
@@ -5155,9 +5162,9 @@ function f12ConHTML(v, y, ents) { const pts = en => { const p = f1SV(en, 'champi
 function f12HeatHTML(v, y) { const S = F1.st[y], evs = F1.sb[y]; if (!S || !evs) return msg(v.err || 'Loading…'); const w = f1TeamsWait(v, y); if (w) return w;
   const ents = [...((S.drv && S.drv.entries) || [])].sort((a, b) => (f1SV(a, 'rank') || 99) - (f1SV(b, 'rank') || 99)); if (!ents.length) return msg('Not available.');
   const ab = a => (a.abbreviation || String(a.lastName || (a.displayName || '').split(' ').slice(-1)[0] || '').slice(0, 3)).toUpperCase();
-  const head = `<div class="hm hr"><span></span>${evs.map((e, k) => `<i>${k % 2 ? '' : k + 1}</i>`).join('')}</div>`;
-  const rows = ents.map(en => { const a = en.athlete || {}, id = String(a.id); return `<div class="hm" data-f1drv="${esc(id)}"><span><i style="background:${f1TCol(f1DrvTeam(y, id))}"></i>${esc(ab(a))}</span>${evs.map(e => { const rc = f1Comp(e, 'Race'); if (!f1Done(rc)) return '<i class="c zf"></i>'; const p = f1Pos(rc, id); return `<i class="c ${F2PC(p)}">${p && p <= 3 ? p : ''}</i>`; }).join('')}</div>`; }).join('');
-  return `<section class="f2hm">${head}${rows}<div class="lg"><i class="c z1">1</i><i class="c z2">2</i><i class="c z3">3</i><i class="c zp6"></i><span>points</span><i class="c zn"></i><span>no points</span><i class="c ze"></i><span>no result</span></div></section>`; }
+  const head = `<div class="hm hr"><span></span>${evs.map((e, k) => `<i>${k + 1}</i>`).join('')}</div>`;
+  const rows = ents.map(en => { const a = en.athlete || {}, id = String(a.id); return `<div class="hm" data-f1drv="${esc(id)}"><span><i style="background:${f1TCol(f1DrvTeam(y, id))}"></i>${esc(ab(a))}</span>${evs.map(e => { const rc = f1Comp(e, 'Race'); if (!f1Done(rc)) return '<i class="c zf"></i>'; const p = f1Pos(rc, id); return `<i class="c ${F2PC(p)}">${p || ''}</i>`; }).join('')}</div>`; }).join('');
+  return `<section class="f2hm"><div class="hmx"><div class="hmi">${head}${rows}</div></div><div class="lg"><i class="c z1">1</i><i class="c z2">2</i><i class="c z3">3</i><i class="c zp6"></i><span>points</span><i class="c zn"></i><span>no points</span><i class="c ze"></i><span>no result</span></div></section>`; }
 function f12ResHTML(R, timeOf, fl, dm, y) { return `<section class="f2l">${R.sort((a, b) => (a.order || 99) - (b.order || 99)).map(r => { const d = dm[r.id] || {}, st = +d.start || 0, mv = st && r.order ? st - r.order : 0, t = timeOf(r), out = /DNF|DSQ|DNS/.test(t);
     const ar = out || !st ? '<u class="eq"></u>' : mv > 0 ? `<u class="up">▲${mv}</u>` : mv < 0 ? `<u class="dn">▼${-mv}</u>` : '<u class="eq">–</u>', col = d.color ? '#' + String(d.color).replace('#', '') : f1TCol(r.team);
     return `<div class="f2r rr" data-f1drv="${esc(r.id)}"><em class="${r.order <= 3 ? 'w' + r.order : ''}">${esc(String(r.order || ''))}</em><i class="tb" style="background:${col}"></i><div class="n"><b>${esc(r.name || '')}${fl && fl.id === r.id ? '<em class="fl">FL</em>' : ''}</b><small>${esc(r.team || '')}</small></div>${ar}<span>${esc(t)}</span></div>`; }).join('')}</section>${fl ? '<div class="f2note">▲▼ places gained / lost from the grid · <em class="fl">FL</em> fastest lap</div>' : '<div class="f2note">▲▼ places gained / lost from the grid</div>'}`; }
@@ -5240,7 +5247,7 @@ function f1RaceHTML(v) {
   const G = f1Groups(ev); if (!v.g || !G.find(g => g[0] === v.g)) { const d = f1DefGroup(ev, G, v); v.g = d ? d[0] : 'r'; v.gAuto = true; }
   const grp = G.find(g => g[0] === v.g) || G[0], ey = ev._y || f1Year();
   const I = f1Idx(), code = I && I.evc[String(ev.id)], gpl = code && I.gp[code]; let ylist = []; if (gpl) ylist = [...new Set(gpl.map(x => x.y))]; else for (let y = Math.max(f1CurY(), ey); y >= 2002; y--) ylist.push(y); if (!ylist.includes(ey)) ylist.unshift(ey); ylist.sort((a, b) => b - a);
-  const ysel = `<div class="ysel tys"><button class="ybtn" data-f1so="1">${esc(grp ? grp[1] : 'Session')}<i class="chev ${v.sOpen ? 'up' : ''}"></i></button>${v.sOpen ? `<div class="ylist">${G.map(g => `<button data-f1s="${g[0]}" class="${g[0] === v.g ? 'on' : ''}">${esc(g[1])}</button>`).join('')}</div>` : ''}</div>` + `<div class="ysel tys f1ys"><button class="ybtn" data-f1yo="1">${esc(String(ey))}<i class="chev ${v.yOpen ? 'up' : ''}"></i></button>${v.yOpen ? `<div class="ylist">${ylist.map(x => `<button data-f1ry2="${x}" class="${x === ey ? 'on' : ''}">${x}</button>`).join('')}</div>` : ''}</div>`;
+  const ysel = `<div class="ysel tys"><button class="ybtn" data-f1so="1">${esc(grp ? grp[1] : 'Session')}<i class="chev ${v.sOpen ? 'up' : ''}"></i></button>${v.sOpen ? `<div class="ylist">${G.map(g => `<button data-f1s="${g[0]}" class="${g[0] === v.g ? 'on' : ''}">${esc(g[1])}</button>`).join('')}</div>` : ''}</div>`;
   const top = `<div class="f1rh">${f1Flag(ev)}<div><div class="lvt">${esc(f1Short(ev))}</div><div class="f1rsub">${esc(f1DatesY(ev) + (ev.circuit && ev.circuit.fullName ? ' · ' + ev.circuit.fullName : ''))}</div></div></div>`;
   if (!grp) return { ysel, top, body: msg('No results availible') };
   let sub = '', ab = grp[2][0];
@@ -5305,7 +5312,7 @@ function f1Table(rows, det, mode, y) {
       R = has.concat(no); R.forEach((r, i) => { r.order = i + 1; }); const P0 = qt(has[0], k); timeOf = r => { const t = qt(r, k); return !t ? 'DNF' : r.order === 1 ? f1Ms(t) : '+' + ((t - P0) / 1000).toFixed(3); }; } }
   /* no times from ESPN (yet / at all) but laps are known → show laps instead of an empty column */
   if (det && mode !== 'grid' && !/^live/.test(mode) && R.length && !R.some(r => timeOf(r)) && R.some(r => V(r, 'lapsCompleted') > 0)) { timeOf = r => { const l = V(r, 'lapsCompleted'); return l ? String(l) : ''; }; mode = 'liveL'; }
-  if (f12() && pc && det) return f12ResHTML(R, timeOf, fl, dm, y);
+  if (f12() && pc) return f12ResHTML(R, timeOf, fl, dm, y);
   return `<section class="blk"><table class="nfx sep f1t f1res ${pc ? 'f1pc' : ''}"><colgroup><col style="width:34px"><col><col style="width:${pc ? 104 : 88}px">${pc ? '<col style="width:30px">' : ''}</colgroup><thead><tr><th class="n">#</th><th class="l ph">Driver</th><th class="tl">${mode === 'grid' ? '' : mode === 'liveL' ? 'Laps' : mode === 'liveG' ? 'Gap' : mode === 'liveN' ? '' : 'Time'}</th>${pc ? '<th>Pts</th>' : ''}</tr></thead><tbody>${R.sort((a, b) => (a.order || 99) - (b.order || 99)).map(r => `<tr data-f1drv="${esc(r.id)}"${r.order >= outFrom ? ' class="f1out"' : ''}><td class="n f1rk ${pc && r.order <= 3 ? 'p' + r.order : ''}">${esc(String(r.order || ''))}</td><td class="l">${f1Drv(r.id, r.name || '', r.team).replace(/<\/div><\/div>$/, fl && fl.id === r.id ? '</div><i class="f1fast" title="Fastest lap">⚡</i></div>' : '</div></div>')}</td><td class="f1tm">${mode === 'grid' && r.q && r.order > r.q ? `<small class="f1pen">Grid penalty<br><span style="white-space:nowrap">Qualified P${r.q}</span></small>` : esc(det ? timeOf(r) : '')}</td>${pc ? `<td>${esc(det ? ptsOf(r) : '')}</td>` : ''}</tr>`).join('')}</tbody></table></section>`;
 }
 
