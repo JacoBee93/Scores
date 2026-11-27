@@ -1407,8 +1407,11 @@ html.fbar .f2po .pht b{top:-3.5px}html.fsg .f2po .pht b{top:4px}.f2po small{marg
 .f2r .f2pen{text-align:right;margin-left:auto;white-space:nowrap}.f2r .f2pen em{font-style:normal;color:#ffb340}.f1big .g span.qp{font-size:13px;color:#ffb340}
 .f2sy{display:flex;align-items:center;gap:10px;margin:18px 0 0;font-family:var(--num)}.f2sy i{flex:1;height:1px;background:rgba(255,255,255,.1)}.f2sy b{font-size:15px;font-weight:700;letter-spacing:2px;color:#fff}.f2sy + .f2ch{margin-top:10px !important}
 .pane .f2l{padding-left:0;padding-right:0}.pane .f2hm{padding-left:0;padding-right:0}
-.f2r .fm{gap:3px}.f2r .f{width:24px;height:22px;border-radius:5px;font-size:11.5px}
+.f2r .fm{gap:3px}.f2r .f{width:20px;height:19px;border-radius:5px;font-size:11px}.f2hm .hm .c{width:22px;height:20px;font-size:11px}.f2hm .hr i{width:22px}
 .f2r .f.zd,.f2hm .c.zd{background:#4a1416;color:#ff8a8e;font-family:-apple-system,system-ui,sans-serif !important;font-size:12px;line-height:1;padding:0}
+/* optical centring of the row parts against the two-line name (measured per font) */
+.f2r .fm,.f2r > em,.f2r > span,.f2r > u{position:relative}html.fbar .f2r .fm{top:1px}html.fsg .f2r > em,html.fsg .f2r > span,html.fsg .f2r > u{top:1.75px}
+html.fsg .f2r .f:not(.zd),html.fsg .f2hm .c:not(.zd){box-sizing:border-box;padding-top:2px}
 </style>
 </head>
 <body>
