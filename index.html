@@ -1255,7 +1255,8 @@ main.hsA .f1n,.hsA .f1n{background:linear-gradient(100deg,color-mix(in srgb,var(
 .hsB .f1n{padding-left:21px !important;overflow:hidden}.hsB .f1n::before{content:'';position:absolute;left:0;top:0;bottom:0;width:5px;background:linear-gradient(var(--c1),var(--c2))}
 
 /* scrollable top strip (all leagues): 7 per screen, snaps to an item */
-header .hwk.hsc{display:flex;gap:0;overflow-x:auto;overflow-y:hidden;margin:14px -16px 2px;padding:0 16px;scroll-snap-type:x mandatory;scrollbar-width:none;-webkit-overflow-scrolling:touch;justify-content:flex-start}
+html.fbar header .hwk.hsc.stA{margin-top:-4px}html.fsg header .hwk.hsc.stA{margin-top:-8px}
+header .hwk.hsc{display:flex;gap:0;overflow-x:auto;overflow-y:hidden;margin:14px -16px 2px;padding:0 calc(50vw - (100vw - 32px) / 14);scroll-snap-type:x mandatory;scrollbar-width:none;-webkit-overflow-scrolling:touch;justify-content:flex-start}
 header .hwk.hsc::-webkit-scrollbar{display:none}
 .hsc .dy{flex:none !important;width:calc((100vw - 32px) / 7) !important;min-width:0 !important;scroll-snap-align:center;background:none !important;border-radius:0;padding:0 !important;box-shadow:none !important;height:auto;display:flex;flex-direction:column;align-items:center;gap:3px;color:#fff;overflow:visible}
 .hsc .dy small{font-family:var(--num);font-size:13px;font-weight:700;color:var(--mut)}
@@ -1269,14 +1270,13 @@ html.fbar .hsc .dy b{line-height:37px !important;padding-bottom:1px;box-sizing:b
 .stA .dy::after{width:8px !important;height:8px !important;margin:3px 0 1px !important;background:#3a3a3c !important}.stA .dy.hg::after{background:#8e8e93 !important}.stA .dy.hw::after{background:var(--live) !important}
 .stA .dy.on::after{width:14px !important;height:14px !important;margin:0 !important;background:var(--brand) !important}
 /* B · wheel */
-header .hwk.hsc.stB{padding:0 calc(50vw - (100vw - 32px) / 14)}
 .stB .dy{transform:scale(calc(1 - var(--d, 0) * .1));opacity:calc(1 - var(--d, 0) * .26);transition:transform .08s linear,opacity .08s linear}
-.stB .dy b{background:none !important;border-radius:12px}.stB .dy.on b{background:none !important;box-shadow:inset 0 0 0 2px var(--brand);width:46px}
+.stB .dy b{background:none !important}.stB .dy.on b{background:none !important;color:var(--brand)}
 /* C · bars */
 .stC .dy.on b{background:none !important;color:var(--brand)}
-.stC .dy::after{width:24px !important;border-radius:4px !important;height:calc(3px + var(--h, 0) * 15px) !important;background:#2c2c2e !important;margin-top:3px !important;align-self:center}
+.stC .dy::after{width:24px !important;border-radius:4px !important;height:calc(3px + var(--h, 0) * 15px) !important;background:#2c2c2e !important;margin-top:-3px !important;align-self:center}
 .stC .dy.hw::after{background:var(--live) !important}.stC .dy.on::after{background:var(--brand) !important}
-.stC .dy{justify-content:flex-start;height:78px !important}
+.stC .dy{justify-content:flex-start;height:74px !important;gap:1px !important}
 </style>
 </head>
 <body>
@@ -1357,7 +1357,7 @@ function dashAlign(root) {
 }
 function stickTop(v) {
   if (v === 'cmp') return; const hd = $app.querySelector(':scope > header'); if (!hd) return;
-  const keep = [...$app.querySelectorAll('.strip, .mstrip, .tgs, .dtabs')].map(x => [x, x.scrollLeft]);
+  const keep = [...$app.querySelectorAll('.strip, .hsc, .mstrip, .tgs, .dtabs')].map(x => [x, x.scrollLeft]);
   const w = document.createElement('div'); w.className = 'stkw v-' + v; $app.insertBefore(w, hd); w.appendChild(hd);
   const main = $app.querySelector(':scope > main'); if (main && v !== 'list' && v !== 'search') { const pane = main.querySelector(':scope > .pane'); if (pane) while (main.firstChild && main.firstChild !== pane) w.appendChild(main.firstChild); w.classList.add('det'); }
   keep.forEach(([x, l]) => { if (l) x.scrollLeft = l; });
@@ -2020,6 +2020,10 @@ const hStrip = () => { try { const v = localStorage.getItem('hstrip') || ''; ret
 /* scrollable strip: snaps to an item; the wheel style scales items by distance from the centre; dots for days that scroll into view */
 function stripWire() { const s = document.getElementById('strip'); if (!s || !s.classList.contains('hsc') || s.dataset.w) return; s.dataset.w = 1;
   const wheel = () => { if (!s.classList.contains('stB')) return; const c = s.scrollLeft + s.clientWidth / 2; s.querySelectorAll('button').forEach(b => { const d = Math.abs(b.offsetLeft + b.offsetWidth / 2 - c) / b.offsetWidth; b.style.setProperty('--d', Math.min(3, d).toFixed(2)); }); };
+  /* dragging the strip picks the item that ends up in the middle (as if tapped) */
+  s.addEventListener('touchstart', () => { s._u = 1; s._sc = 0; }, { passive: true });
+  s.addEventListener('touchend', () => { if (!s._sc) s._u = 0; }, { passive: true });
+  let pk = 0; s.addEventListener('scroll', () => { if (s._u) { s._sc = 1; clearTimeout(pk); pk = setTimeout(() => { if (!s._u) return; s._u = 0; const c = s.scrollLeft + s.clientWidth / 2; let best = null, bd = 1e9; s.querySelectorAll('button').forEach(b => { const d = Math.abs(b.offsetLeft + b.offsetWidth / 2 - c); if (d < bd) { bd = d; best = b; } }); if (best && !best.classList.contains('on')) { s.querySelectorAll('button.on').forEach(b => b.classList.remove('on')); best.classList.add('on'); best.click(); } }, 140); } }, { passive: true });
   let t = 0; s.addEventListener('scroll', () => { requestAnimationFrame(wheel); clearTimeout(t); t = setTimeout(() => { const lg = state.league; if (!LEAGUES[lg] || lg === 'nfl') return; const L = s.scrollLeft, R2 = L + s.clientWidth, ds = [...s.querySelectorAll('button[data-date]')].filter(b => b.offsetLeft + b.offsetWidth > L && b.offsetLeft < R2).map(b => { const m = /(\d{4})-?(\d{2})-?(\d{2})/.exec(b.dataset.date); return m ? new Date(+m[1], +m[2] - 1, +m[3]) : null; }).filter(Boolean); if (ds.length) hDots(lg, ds); }, 160); }, { passive: true });
   wheel(); }
 const hStyle = () => { try { const v = localStorage.getItem('hstyle') || ''; return HSTY.some(x => x[0] === v) ? v : ''; } catch (e) { return ''; } };
@@ -2086,7 +2090,7 @@ function hHead(HS, items, onIdx, fav) {
   const dOf = x => { const m = /data-date="(\d{4})(\d{2})(\d{2})"/.exec(x[1]) || /data-date="(\d{4})-(\d{2})-(\d{2})"/.exec(x[1]); return m ? new Date(+m[1], +m[2] - 1, +m[3]) : null; };
   /* one header for every style: small line = full date for Yesterday / Today / Tomorrow, otherwise just the date; big line = Today… or the full weekday */
   const rel = hDayLab(d), isRel = rel !== DAYS[d.getDay()], dt = H_MO[d.getMonth()] + ' ' + d.getDate();
-  const wk = cur ? cur[2].replace(/<small>(.*?)<\/small>/, '$1 ') : '', curWk = items.findIndex(x => x[3]);
+  const wk = cur ? cur[2].replace(/<small>(.*?)<\/small>/, (m0, a) => /W$/.test(a) ? a : a + ' ') : '', curWk = items.findIndex(x => x[3]);
   /* NFL: the week's date range from ESPN's calendar (US days: start/end shifted by 12 h so the UTC date is the US one) */
   const wr = nfl && cur && /data-wr="([^|"]+)\|([^"]+)"/.exec(cur[1]), usd = (x, h) => { const t = new Date(new Date(x).getTime() + h * 36e5); return H_MO[t.getUTCMonth()] + ' ' + t.getUTCDate(); };
   const small = fav ? 'FAVORITES' : nfl ? (wr ? (usd(wr[1], 12) + ' – ' + usd(wr[2], -12)).toUpperCase() : esc(LEAGUES.nfl.name)) : (isRel ? H_WD[d.getDay()] + ', ' + dt : dt).toUpperCase();
@@ -2128,7 +2132,7 @@ function renderList() {
     W.cal.forEach((c, i) => {
       const on = c.t === W.sel.t && c.w === W.sel.w; if (on) onIdx = i;
       const m = /^week\s*(\d+)/i.exec(c.label);
-      items.push([on, `data-wk="${c.t}-${c.w}" data-wr="${esc(c.s && c.e ? c.s + '|' + c.e : '')}"`, m ? `<small>Week</small>${m[1]}` : `<small>Playoff Week</small>${W.cal.filter(x => x.t === 3).indexOf(c) + 1}`, W.cur && c.t === W.cur.t && c.w === W.cur.w]);
+      items.push([on, `data-wk="${c.t}-${c.w}" data-wr="${esc(c.s && c.e ? c.s + '|' + c.e : '')}"`, m ? `<small>Week</small>${m[1]}` : `<small>Playoff W</small>${W.cal.filter(x => x.t === 3).indexOf(c) + 1}`, W.cur && c.t === W.cur.t && c.w === W.cur.w]);
     });
   } else if (!fav && state.league !== 'nfl') {
     if (!state.stripBase || Math.abs((state.date - state.stripBase) / 864e5) > 50) state.stripBase = state.date;
@@ -2147,8 +2151,7 @@ function renderList() {
   const s = document.getElementById('strip'), on = s && s.querySelector('.on'); stripWire();
   if (on) {
     const tgt = Math.max(0, on.offsetLeft - (s.clientWidth - on.offsetWidth) / 2);
-    if (prev != null && Math.abs(prev - tgt) > 1) { s.scrollLeft = prev; requestAnimationFrame(() => s.scrollTo({ left: tgt, behavior: 'smooth' })); }
-    else s.scrollLeft = tgt;
+    s.scrollLeft = tgt; /* no rolling animation – the strip simply shows the chosen day in the middle */
   }
   if (fav && !state.favScrolled && state.events.length) { const f = document.querySelector('[data-first]'); if (f) { state.favScrolled = true; window.scrollTo(0, Math.max(0, f.getBoundingClientRect().top + window.scrollY - 190)); } }
 }
