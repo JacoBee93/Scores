@@ -1365,9 +1365,22 @@ html.fsg .f1big .nd i{top:3px !important}html.fsg .f1big .nd::before{top:18px !i
 /* chart bubble: result chip always visible, both lines start at the same edge */
 .f2ch .tip{padding:6px 10px}.f2ch .tip b{margin-top:2px}.f2ch .tip .bb{margin-left:0}.f2ch .tip .bb.zn,.f2ch .tip .bb.ze{background:#48484a}
 
-.f2ch .dx{fill:#ff5a5f;font-size:11px;font-weight:700}.f2ch .tip b span{margin-left:2px}
+.f2ch .dx{fill:#ff5a5f;font-size:11px;font-weight:700;font-family:-apple-system,system-ui,sans-serif}.f2ch .dx.ns{fill:#8e8e93}.f2ch .tip b span{margin-left:2px}
 .bb.zd{font-family:-apple-system,system-ui,sans-serif !important;font-size:13px;line-height:1;padding-top:1px}
 .f2ch{margin-top:30px}.f2ch .tip{top:-26px !important;bottom:auto}.f2ch:first-of-type{margin-top:34px}
+.f2ch svg{height:92px !important}.f2ch{margin-top:26px !important;padding:8px 12px 6px !important;margin-bottom:0 !important}.f2ch .lb{margin-bottom:2px !important}.f2ch .tip{top:-24px !important}.f2dh{margin:0 2px 4px !important}.f2dh .ph{width:48px !important;height:48px !important}.f2dh b{font-size:24px !important}.f2dh .p b{font-size:28px !important}
+
+/* big card, compact: flag beside the name, tighter rows – same design, ~60 px shorter */
+.f1big .pht{display:flex;align-items:center;gap:12px}.f1big .pht .f1fl{width:36px !important;height:36px !important;flex:none}.f1big .pht b{margin-top:0 !important;min-width:0;overflow:hidden}
+.f1big .ph small{margin-top:8px !important}.f1big > .tag{margin:10px 0 10px !important}
+.f1big .wm{font-size:96px !important;top:-14px !important}
+.f1big .nd{padding-bottom:10px !important}.f1big .dc h4{margin-bottom:6px !important}
+.f1big .bx{padding:8px 12px !important}.f1big .g{height:31px !important}.f1card.f1big{min-height:337px !important;padding-bottom:14px !important}
+/* live ball: the aura is its own ring, so nothing can freeze the pulse */
+.f1big .nd.live i{animation:none !important;box-shadow:0 0 0 3px #1a1416,0 0 10px var(--brand) !important}
+.f1big .nd.live i::after{content:'';position:absolute;inset:-2px;border-radius:50%;background:var(--brand);opacity:.55;animation:f1ring 1.4s ease-out infinite;z-index:-1}
+@keyframes f1ring{0%{transform:scale(1);opacity:.55}100%{transform:scale(2.3);opacity:0}}
+.f1big .nd.live i{z-index:1}
 </style>
 </head>
 <body>
@@ -5081,7 +5094,7 @@ function f1BigHTML(e, k) { const y = e._y || F1.listY || f1ShowY(), TM = f1TM(y)
   const tl = done ? '' : `<div class="btl">${D.map(g => `<div class="dc"><h4>${esc(g.d)}</h4>${g.L.map(x => `<div class="nd ${x.st}${x.st === 'live' && fy ? ' yl' : ''}"><i></i><b>${esc(x.n)}</b><span>${x.st === 'next' ? 'in ' + cd(new Date(x.c.date)) : x.st === 'live' ? (lap ? 'Lap ' + lap : 'Live') : esc(x.h)}</span></div>`).join('')}</div>`).join('')}</div>`;
   if (!done && !wk) { const W = f1LastWin(e), cn = (e.circuit && e.circuit.fullName) || ''; bx = W ? `<div class="kv"><div><small>LAST WINNER</small><i style="background:${W.c}"></i><b>${esc(W.n)}</b></div></div>` : ''; }
   return `<div class="card f1card f1big fbD" data-f1race="${esc(e.id)}" data-f1ry="${esc(e._y || '')}" id="f1c${esc(e.id)}" style="--cc:${f1CCol(e)}"><div class="wm">${rd}</div>
-    <div class="ph">${f1Flag(e)}<b>${nmS}</b><small>GRAND PRIX · ${dt}</small></div><div class="tag ${tcl}">${esc(tag.toUpperCase())}</div>${tl}${bx}</div>`; }
+    <div class="ph"><div class="pht">${f1Flag(e)}<b>${nmS}</b></div><small>GRAND PRIX · ${dt}</small></div><div class="tag ${tcl}">${esc(tag.toUpperCase())}</div>${tl}${bx}</div>`; }
 F1.bt = F1.bt || {}; F1.lw = F1.lw || {};
 /* last winner of the same Grand Prix: from the season before (same GP name, else same circuit); null while loading / none */
 function f1LastWin(e) { const y = +(e._y || F1.listY || f1ShowY() || f1Year()) - 1, k = e.id; if (k in F1.lw) return F1.lw[k];
@@ -5222,26 +5235,27 @@ function f12Rows(R, timeOf, outFrom) { return `<section class="f2l">${R.map(r =>
 function f12Podium(P, timeOf) { const col = r => f1TCol(r.team), cell = (r, k) => r ? `<div class="pd p${k}" data-f1drv="${esc(r.id)}"><span class="ph" style="box-shadow:0 0 0 3px ${col(r)}"><img src="${esc(f1Hs(r.id))}" alt="" onerror="this.onerror=null;this.src=SIL"></span><b>${esc(String(r.name || '').split(' ').slice(-1)[0])}</b><small>${esc(timeOf(r) || '')}</small><div class="st">${k}</div></div>` : '<div class="pd"></div>';
   return `<div class="f2pod">${cell(P[1], 2)}${cell(P[0], 1)}${cell(P[2], 3)}</div>`; }
 /* F1 2.0 driver page: compact header, race-position chart, qualifying-position chart, championship position by season, results list */
-function f12PosChart(title, P, n, labels, tc, maxP) { const W = 340, H = 132, L = 30, B = 18, N = Math.max(2, n), X = i => L + 6 + i * (W - L - 14) / (N - 1), Y = p => 10 + (H - B - 16) * (Math.min(p, maxP) - 1) / (maxP - 1);
-  const tk = [1, 5, 10, 15, 20].filter(t => t <= maxP); const grid = tk.map(t => `<line x1="${L}" x2="${W}" y1="${Y(t).toFixed(1)}" y2="${Y(t).toFixed(1)}"/><text x="${L - 6}" y="${(Y(t) + 4).toFixed(1)}" text-anchor="end">P${t}</text>`).join('') + labels.map((l, i) => l ? `<text x="${X(i).toFixed(1)}" y="${H - 2}" text-anchor="middle">${esc(l)}</text>` : '').join('');
-  const ok = P.filter(q => q.p), line = ok.map(q => `${X(q.i).toFixed(1)},${Y(q.p).toFixed(1)}`).join(' '), MC = ['', '#d4af37', '#c0c0c0', '#cd7f32'];
-  const mk = P.map(q => q.p ? `<circle cx="${X(q.i).toFixed(1)}" cy="${Y(q.p).toFixed(1)}" r="${q.p <= 3 ? 4 : 2.6}" fill="${MC[q.p] || tc}" stroke="#111113" stroke-width="1.5"/>` : q.x ? `<text class="dx" x="${X(q.i).toFixed(1)}" y="${(Y(maxP) + 4).toFixed(1)}" text-anchor="middle">✕</text>` : '').join('');
+function f12PosChart(title, P, n, labels, tc, maxP) { const W = 340, H = 92, L = 30, B = 16, N = Math.max(2, n), X = i => L + 6 + i * (W - L - 14) / (N - 1), Y = p => 7 + (H - B - 17) * (Math.min(p, maxP) - 1) / (maxP - 1);
+  const tk = [1, 10, 20].filter(t => t <= maxP); const grid = tk.map(t => `<line x1="${L}" x2="${W}" y1="${Y(t).toFixed(1)}" y2="${Y(t).toFixed(1)}"/><text x="${L - 6}" y="${(Y(t) + 4).toFixed(1)}" text-anchor="end">P${t}</text>`).join('') + labels.map((l, i) => l ? `<text x="${X(i).toFixed(1)}" y="${H - 2}" text-anchor="middle">${esc(l)}</text>` : '').join('');
+  const yb = Y(maxP) + 8, py = q => q.p ? Y(q.p) : yb, line = P.map(q => `${X(q.i).toFixed(1)},${py(q).toFixed(1)}`).join(' '), MC = ['', '#d4af37', '#c0c0c0', '#cd7f32'];
+  const mk = P.map(q => q.p ? `<circle cx="${X(q.i).toFixed(1)}" cy="${Y(q.p).toFixed(1)}" r="${q.p <= 3 ? 4 : 2.6}" fill="${MC[q.p] || tc}" stroke="#111113" stroke-width="1.5"/>` : `<circle cx="${X(q.i).toFixed(1)}" cy="${yb.toFixed(1)}" r="5.5" fill="#111113"/><text class="dx${q.ns ? ' ns' : ''}" x="${X(q.i).toFixed(1)}" y="${(yb + 4).toFixed(1)}" text-anchor="middle">✕</text>`).join('');
   const last = P.length ? P[P.length - 1].i : -1, fut = last < N - 1 && last >= 0 ? `<rect class="fz" x="${X(last + .5).toFixed(1)}" y="6" width="${(W - X(last + .5)).toFixed(1)}" height="${H - B - 6}"/>` : '';
-  const data = P.map(q => ({ x: +X(q.i).toFixed(1), y: +Y(q.p || maxP).toFixed(1), t: q.t, c: q.p ? F2PC(q.p) : 'zd', v: q.p ? 'P' + q.p : q.xl || 'DNF', s: q.s || '' }));
+  const data = P.map(q => ({ x: +X(q.i).toFixed(1), y: +py(q).toFixed(1), t: q.t, c: q.p ? F2PC(q.p) : q.ns ? 'zn' : 'zd', v: q.p ? 'P' + q.p : q.xl || 'DNF', s: q.s || '' }));
   return `<div class="f2ch" data-pts='${esc(JSON.stringify(data))}' style="--tc:${tc}"><div class="lb">${esc(title)}</div><div class="tip"></div><svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none"><g class="gr">${grid}</g>${fut}<polyline points="${line}" fill="none" stroke="${tc}" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round" opacity=".9"/>${mk}<g class="sc"><line y1="6" y2="${H - B}"/><circle r="7"/></g></svg></div>`; }
 function f12DrvPage(v, y, en, evs) { const a = en.athlete || {}, id = String(a.id), tn = f1DrvTeam(y, id), tc = f1TCol(tn);
   const pts = f1SV(en, 'championshipPts') ?? f1SV(en, 'points') ?? 0, rk = f1SV(en, 'rank') || '-';
   /* every season the driver raced: championship position (the whole page waits until all of them are known) */
   const I = f1Idx(); if (!I) return msg('Loading…'); const ys = [...(I.drv[id] || [])].sort((p, q) => p - q); if (!ys.includes(+y)) { ys.push(+y); ys.sort((p, q) => p - q); }
   const miss = ys.filter(yy => !F1.st[yy]); if (miss.length) { F1.cwait = F1.cwait || {}; miss.forEach(yy => { if (!F1.cwait[yy]) { F1.cwait[yy] = 1; f1Stand(yy).catch(() => {}).then(() => { F1.cwait[yy] = 0; if (state.lv === v) render(); }); } }); return msg('Loading…'); }
+  const AG = f1Agg(y); if (!AG || !AG.fin) return msg('Loading…'); const isDnf = e => !!(AG.dnfR && AG.dnfR[e.id] && AG.dnfR[e.id][id]);
   const gpn = e => f1Short(e).replace(/\s*Grand Prix\s*/i, ' GP ').replace(/\s+/g, ' ').trim();
   const R = evs.map((e, k) => { const rc = f1Comp(e, 'Race'), q = f1Comp(e, 'Qual'), sr = f1Comp(e, 'SR'), dn = f1Done(rc), on = dn && (rc.competitors || []).some(c => String(c.id) === id), p = dn ? f1Pos(rc, id) : null;
-    return { k, e, dn, on, p, q: q && f1Done(q) ? f1Pos(q, id) : null, sp: sr && f1Done(sr) ? f1Pos(sr, id) : null }; });
-  const maxP = Math.max(20, ...R.map(r => r.p || 0), ...R.map(r => r.q || 0));
+    const qon = q && f1Done(q) && (q.competitors || []).some(c => String(c.id) === id); return { k, e, dn, on, out: on && isDnf(e), p, q: qon ? f1Pos(q, id) : null, qd: q && f1Done(q), sp: sr && f1Done(sr) ? f1Pos(sr, id) : null }; });
+  const maxP = Math.max(20, ...R.map(r => r.out ? 0 : r.p || 0), ...R.map(r => r.q || 0));
   const lab = evs.map((e, i) => i % 4 === 0 ? String(i + 1) : '');
-  const race = R.filter(r => r.dn).map(r => ({ i: r.k, p: r.on && r.p && r.p <= maxP ? r.p : 0, x: !(r.on && r.p), t: 'R' + (r.k + 1) + ' · ' + gpn(r.e).toUpperCase(), s: r.sp ? 'Sprint P' + r.sp : '' }));
-  const qual = R.filter(r => r.q || r.dn).map(r => ({ i: r.k, p: r.q || 0, x: !r.q, xl: '–', t: 'R' + (r.k + 1) + ' · ' + gpn(r.e).toUpperCase(), s: r.p ? 'Race P' + r.p : '' }));
-  const car = ys.map((yy, i) => { const E = ((F1.st[yy].drv || {}).entries || []).find(x => String((x.athlete || {}).id) === id), r = E && +f1SV(E, 'rank'), pp = E && (f1SV(E, 'championshipPts') ?? f1SV(E, 'points')); return { i, p: r || 0, x: !r, xl: '–', t: String(yy), s: pp != null ? pp + ' pts' : '' }; });
+  const race = R.filter(r => r.dn).map(r => ({ i: r.k, p: r.on && !r.out && r.p ? r.p : 0, ns: !r.on, xl: r.on ? 'DNF' : 'Did not start', t: 'R' + (r.k + 1) + ' · ' + gpn(r.e).toUpperCase(), s: r.sp ? 'Sprint P' + r.sp : '' }));
+  const qual = R.filter(r => r.qd || r.dn).map(r => ({ i: r.k, p: r.q || 0, ns: !r.q, xl: 'No time', t: 'R' + (r.k + 1) + ' · ' + gpn(r.e).toUpperCase(), s: r.out ? 'Race DNF' : r.on && r.p ? 'Race P' + r.p : '' }));
+  const car = ys.map((yy, i) => { const E = ((F1.st[yy].drv || {}).entries || []).find(x => String((x.athlete || {}).id) === id), r = E && +f1SV(E, 'rank'), pp = E && (f1SV(E, 'championshipPts') ?? f1SV(E, 'points')); return { i, p: r || 0, ns: !r, xl: '–', t: String(yy), s: pp != null ? pp + ' pts' : '' }; });
   const cMax = Math.max(20, ...car.map(c => c.p || 0)), cLab = ys.map((yy, i) => ys.length <= 8 || i % Math.ceil(ys.length / 7) === 0 || i === ys.length - 1 ? "'" + String(yy).slice(2) : '');
   const head = `<div class="f2dh"><span class="ph" style="box-shadow:0 0 0 2px ${tc}"><img src="${esc(f1Hs(id))}" alt="" onerror="this.onerror=null;this.src=SIL"></span><div class="n"><b>${esc(a.displayName || a.name || '')}</b><small><i style="background:${tc}"></i>${esc(tn)}</small></div><div class="p"><b>${esc(String(pts))}</b><small>PTS · P${esc(String(rk))}</small></div></div>`;
   const charts = f12PosChart('RACE POSITION · ' + y, race, evs.length, lab, tc, maxP) + f12PosChart('QUALIFYING POSITION · ' + y, qual, evs.length, lab, tc, maxP) + (ys.length > 1 ? f12PosChart('CHAMPIONSHIP · BY SEASON', car, ys.length, cLab, tc, cMax) : '');
