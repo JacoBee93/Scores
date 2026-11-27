@@ -1330,7 +1330,7 @@ main .hsec.fvh{margin:8px 6px 14px !important;text-align:left}
 .f1big .nd:not(.done):not(.live) i{background:transparent !important;box-shadow:inset 0 0 0 2px rgba(255,255,255,.4),0 0 0 3px #1a1416 !important}
 .f1big .nd.live i{animation:f1aura 1.4s ease-in-out infinite !important;opacity:1}
 @keyframes f1aura{0%,100%{box-shadow:0 0 0 3px #1a1416,0 0 0 4px rgba(229,72,77,.15),0 0 6px var(--brand)}50%{box-shadow:0 0 0 3px #1a1416,0 0 0 8px rgba(229,72,77,.4),0 0 16px var(--brand)}}
-.f1big .nd.live span{color:#ff9a9e !important;font-weight:700}.f1big .nd.next span{color:#fff !important;font-weight:700}
+.f1big .nd.live span,.f1big .nd.live.yl span{color:#ff9a9e !important;font-weight:700}.f1big .nd.next span{color:#fff !important;font-weight:700}
 
 /* balls centred on the session name; the line runs exactly through the balls' centres, from one ball to the next */
 .f1big .nd b{line-height:20px !important;height:20px;padding-bottom:0 !important}.f1big .nd i{top:5px !important;left:-7px !important;width:12px;height:12px}
@@ -1398,6 +1398,9 @@ html .seg:has(> button:nth-child(4)) > button{font-size:17px !important}
 html.fbar .f2po .pht b{top:-3.5px}html.fsg .f2po .pht b{top:4px}.f2po small{margin-top:8px !important;text-overflow:clip !important}
 .f2ch .tip.ctr{text-align:center}.f2ch .tip.ctr b{justify-content:center}
 .f2dh{margin-bottom:0 !important}.f2dh + .f2ch{margin-top:22px !important}
+.f1big .cn{margin:10px 0 2px;font-family:var(--num);font-size:13px;font-weight:700;letter-spacing:1px;color:rgba(255,255,255,.5);white-space:nowrap;overflow:hidden;position:relative;z-index:1}.f1big .cn + .btl{margin-top:12px}
+.f1big .bx.cq .bxh u{color:#fff}.f1big .bx.cq .bxh u .fd{background:#fff}
+.f1big .bxh u s{text-decoration:none;color:rgba(255,255,255,.4);margin:0 -1px}.f1big .bxh u em{font-style:normal;color:#fff}
 </style>
 </head>
 <body>
@@ -5055,6 +5058,13 @@ const f1CompLive = c => { if (!c || f1Chq(c)) return false; const st = c.status 
   const t = new Date(c.date).getTime(), ab = String((c.type && c.type.abbreviation) || ''), dur = /race/i.test(ab) ? 135 : /^(SS|SQ)/i.test(ab) ? 50 : 65, now = Date.now(); return t > 0 && now >= t && now < t + dur * 6e4; };
 const f1LiveComp = e => (e.competitions || []).find(f1CompLive) || null;
 const F1AB = { FP1: 'Practice 1', FP2: 'Practice 2', FP3: 'Practice 3', SS: 'Sprint Q', SQ: 'Sprint Q', SR: 'Sprint', Sprint: 'Sprint', Qual: 'Qualifying', Race: 'Race' };
+/* planned race distance: ESPN doesn't send it, so take the lap count of the same circuit's race (or sprint) from the previous season(s) */
+F1.lapsT = F1.lapsT || {};
+const f1LapsTot = (e, c) => { const a = String((c && c.type && c.type.abbreviation) || ''); if (!e || (a !== 'Race' && a !== 'SR')) return 0; const k = e.id + a; if (k in F1.lapsT) return F1.lapsT[k] || 0;
+  F1.lapsT[k] = 0; const y = +(e._y || F1.listY || f1ShowY() || f1Year()), key = x => f1Short(x).toLowerCase().replace(/[^a-z]/g, '');
+  const look = yy => f1Season(yy).then(evs => { const p = (evs || []).find(x => x.circuit && e.circuit && x.circuit.id === e.circuit.id) || (evs || []).find(x => key(x) === key(e)), pc = p && f1Comp(p, a), n = pc && f1Done(pc) && pc.status && +pc.status.period; return n > 0 ? n : 0; });
+  look(y - 1).then(n => n || look(y - 2)).then(n => { if (!n) return; F1.lapsT[k] = n; if (topView() === 'list' && state.league === 'f1' && F1.selId === e.id) f1ShowBig(e.id); }).catch(() => {}); return 0; };
+const f1LapT = (e, c) => { const n = f1Lap(c), t = f1LapsTot(e, c); return n ? 'Lap ' + n + (t && n <= t ? '/' + t : '') : ''; };
 const f1Lap = c => { if (/^(Qual|SS|SQ)/.test(String((c.type && c.type.abbreviation) || ''))) return 0; /* a lap count means nothing in qualifying */ const n = c._lap != null ? c._lap : c.status && c.status.period; return n > 0 ? n : 0; };
 const f1FlagC = f => { f = String(f || '').toLowerCase(); return !f ? '' : /green/.test(f) ? '#30d158' : /red/.test(f) ? 'var(--live)' : /yellow|safety|vsc|sc\b/.test(f) ? '#ffd60a' : /cheq|check|finish/.test(f) ? '#fff' : '#8e8e93'; };
 const f1FlagT = f => { f = String(f || '').trim(); if (!f) return ''; const t = f.toLowerCase().replace(/_/g, ' ').replace(/\b\w/g, x => x.toUpperCase()); return /flag|safety|car/i.test(t) ? t : t + ' flag'; };
@@ -5100,18 +5110,18 @@ function f1BigHTML(e, k) { const y = e._y || F1.listY || f1ShowY(), TM = f1TM(y)
   const full = c => { const a = c.athlete || {}; return a.displayName || a.fullName || [a.firstName, a.lastName].filter(Boolean).join(' ') || f1Ab(c); };
   const top5 = comp => [1, 2, 3, 4, 5].map(o => ((comp && comp.competitors) || []).find(c => c.order === o)).filter(Boolean);
   const box = (cls, title, right, comp, gaps) => { const L = top5(comp), T = !gaps && comp && L.length ? f1BigTimes(e, comp) : null, G = gaps && comp && L.length ? f1BigLive(e, comp) : null; if (gaps && L.length && !G) return `<div class="bx ${cls}"><div class="bxh"><b>${esc(title)}</b>${right ? `<u>${right}</u>` : ''}</div><div class="bxn bxl">Loading…</div></div>`; if (!gaps && L.length && !T) return `<div class="bx ${cls}"><div class="bxh"><b>${esc(title)}</b></div><div class="bxn bxl">Loading…</div></div>`; return `<div class="bx ${cls}"><div class="bxh"><b>${esc(title)}</b>${right ? `<u>${right}</u>` : ''}</div>${L.length ? L.map(c => `<div class="g"><em>${c.order}</em><i style="background:${tc(c)}"></i><b>${esc(full(c))}</b>${gaps ? (c.order === 1 ? `<span>${esc(c.time || c.displayValue || 'Leader')}</span>` : (G && G[String(c.id)]) || c.gap ? `<span>${esc((G && G[String(c.id)]) || c.gap)}</span>` : '') : T && T[String(c.id)] ? `<span>${esc(T[String(c.id)])}</span>` : ''}</div>`).join('') : '<div class="bxn">Results not available yet</div>'}</div>`; };
-  const nmS = esc(f1Short(e).replace(/\s*Grand Prix\s*/i, ' ').replace(/\bGP\b/, '').replace(/\s+/g, ' ').trim()), dt = esc(f1DatesY(e)), rd = 'R' + (k + 1);
+  const cnm = (e.circuit && e.circuit.fullName) || '', nmS = esc(f1Short(e).replace(/\s*Grand Prix\s*/i, ' ').replace(/\bGP\b/, '').replace(/\s+/g, ' ').trim()), dt = esc(f1DatesY(e)), rd = 'R' + (k + 1);
   let tag = '', tcl = '', bx = '';
   if (done) { tag = 'FINISHED'; bx = box('', 'Results', '', rc, false); }
-  else if (lc) { tag = '● ' + (F1NX[ab(lc)] || 'Session') + ' live'; tcl = fy ? 'lv yl' : 'lv'; bx = box(fy ? 'yl' : fr ? 'rd' : fg ? 'gr' : '', 'Current standings', fl ? '<i class="fd"></i>' + esc(f1FlagT(lc._flag)) : '<i class="fd"></i>Live', lc, true); }
+  else if (lc) { tag = '● ' + (F1NX[ab(lc)] || 'Session') + ' live'; tcl = fy ? 'lv yl' : 'lv'; bx = box(fy ? 'yl' : fr ? 'rd' : fg ? 'gr' : /cheq|check|finish/.test(fl) ? 'cq' : '', 'Current standings', '<i class="fd"></i>' + (fl ? esc(f1FlagT(lc._flag)) : 'Live') + (f1LapT(e, lc) ? '<s>·</s><em>' + f1LapT(e, lc) + '</em>' : ''), lc, true); }
   else if (wk) { const N = S.find(x => x.st === 'next'), last = nxi > 0 ? C[nxi - 1] : [...C].reverse().find(fin); tag = N ? '● ' + N.n + ' in ' + cd(new Date(N.c.date)) : '● Race weekend'; tcl = 'lv';
     if (last) bx = box('', /^Qual$/.test(ab(last)) ? 'Starting grid' : /^(SS|SQ)$/.test(ab(last)) ? 'Sprint grid' : nm(last) + ' results', '', last, false); }
   else tag = C[0] ? 'Starts in ' + cd(new Date(C[0].date)) : esc(dt);
   const D = []; S.forEach(x => { let g = D.find(z => z.d === x.d); if (!g) D.push(g = { d: x.d, L: [] }); g.L.push(x); });
-  const tl = done ? '' : `<div class="btl">${D.map(g => `<div class="dc"><h4>${esc(g.d)}</h4>${g.L.map(x => `<div class="nd ${x.st}${x.st === 'live' && fy ? ' yl' : ''}"><i></i><b>${esc(x.n)}</b><span>${x.st === 'next' ? 'in ' + cd(new Date(x.c.date)) : x.st === 'live' ? (lap ? 'Lap ' + lap : 'Live') : esc(x.h)}</span></div>`).join('')}</div>`).join('')}</div>`;
+  const tl = done ? '' : `<div class="btl">${D.map(g => `<div class="dc"><h4>${esc(g.d)}</h4>${g.L.map(x => `<div class="nd ${x.st}${x.st === 'live' && fy ? ' yl' : ''}"><i></i><b>${esc(x.n)}</b><span>${x.st === 'next' ? 'in ' + cd(new Date(x.c.date)) : x.st === 'live' ? 'Live' : esc(x.h)}</span></div>`).join('')}</div>`).join('')}</div>`;
   if (!done && !wk) { const W = f1LastWin(e), cn = (e.circuit && e.circuit.fullName) || ''; bx = W ? `<div class="kv"><div><small>LAST WINNER</small><i style="background:${W.c}"></i><b>${esc(W.n)}</b></div></div>` : ''; }
   return `<div class="card f1card f1big fbD" data-f1race="${esc(e.id)}" data-f1ry="${esc(e._y || '')}" id="f1c${esc(e.id)}" style="--cc:${f1CCol(e)}"><div class="wm">${rd}</div>
-    <div class="ph"><div class="pht">${f1Flag(e)}<b>${nmS}</b></div><small>GRAND PRIX · ${dt}</small></div><div class="tag ${tcl}">${esc(tag.toUpperCase())}</div>${tl}${bx}</div>`; }
+    <div class="ph"><div class="pht">${f1Flag(e)}<b>${nmS}</b></div><small>GRAND PRIX · ${dt}</small></div>${done ? `<div class="tag">FINISHED</div>` : cnm ? `<div class="cn">${esc(cnm.toUpperCase())}</div>` : `<div class="tag ${tcl}">${esc(tag.toUpperCase())}</div>`}${tl}${bx}</div>`; }
 F1.bt = F1.bt || {}; F1.lw = F1.lw || {};
 /* last winner of the same Grand Prix: from the season before (same GP name, else same circuit); null while loading / none */
 function f1LastWin(e) { const y = +(e._y || F1.listY || f1ShowY() || f1Year()) - 1, k = e.id; if (k in F1.lw) return F1.lw[k];
@@ -5130,7 +5140,7 @@ function f1BigTimes(e, c) { const k = c.id, h = F1.bt[k]; if (h && h !== 1 && Ob
     if (!Object.values(out).some(Boolean)) R.forEach(r => { out[r.id] = 'TBD'; }); /* finished, final times not published yet */
     Object.defineProperty(out, '_t', { value: Date.now(), enumerable: false }); F1.bt[k] = out; if (topView() === 'list' && state.league === 'f1' && F1.selId === e.id) f1ShowBig(e.id); })().catch(() => { F1.bt[k] = {}; }); return null; }
 /* the GP name stays on one line (it may run over the round number); only if it is wider than the card does it get smaller */
-function f1BigFit() { requestAnimationFrame(() => $app.querySelectorAll('.f2po small').forEach(b => { b.style.fontSize = ''; b.style.letterSpacing = ''; let f = 14, l = 1; while (b.scrollWidth > b.clientWidth + 1 && f > 10.5) { if (l > .2) l -= .2; else f -= .5; b.style.letterSpacing = l.toFixed(1) + 'px'; b.style.fontSize = f + 'px'; } }));
+function f1BigFit() { requestAnimationFrame(() => $app.querySelectorAll('.f2po small,.f1big .cn').forEach(b => { b.style.fontSize = ''; b.style.letterSpacing = ''; let f = parseFloat(getComputedStyle(b).fontSize) || 14, l = 1; while (b.scrollWidth > b.clientWidth + 1 && f > 10.5) { if (l > .2) l -= .2; else f -= .5; b.style.letterSpacing = l.toFixed(1) + 'px'; b.style.fontSize = f + 'px'; } }));
   requestAnimationFrame(() => $app.querySelectorAll('.f1big .ph b, .f1big .kv b').forEach(b => { b.style.fontSize = ''; let f = parseFloat(getComputedStyle(b).fontSize); while (b.scrollWidth > b.clientWidth + 1 && f > (b.closest('.kv') ? 13 : 24)) { f -= 1; b.style.fontSize = f + 'px'; } })); }
 /* live gaps for the big card: same source as the race page (driver details, re-read at most every 55 s) */
 function f1BigLive(e, c) { F1.lvd = F1.lvd || {}; const L = F1.lvd[c.id] || (F1.lvd[c.id] = { rows: null, t: 0, p: 0 });
@@ -5381,7 +5391,7 @@ function f1RaceHTML(v) {
   const isQ = grp[0] === 'q' || grp[0] === 'ss'; if (isQ) { v.q = v.q || 'T'; const p = grp[0] === 'ss' ? 'SQ' : 'Q'; sub = `<div class="seg pseg">${[['T', 'Total'], ['1', p + '1'], ['2', p + '2'], ['3', p + '3']].map(([k, l]) => `<button data-f1q="${k}" class="${v.q === k ? 'on' : ''}">${l}</button>`).join('')}</div>`; }
   const c = f1Comp(ev, ab), race = ab === 'Race' || ab === 'SR' || grp[3] === 'sprint', mode = grp[3] || (race ? (ab === 'SR' ? 'sprint' : 'race') : isQ ? 'q' + v.q : 'fp');
   const cd = c && c.date ? new Date(c.date) : null, when = cd && !isNaN(cd) ? `${DAYS[cd.getDay()]} ${cd.getDate()}.${cd.getMonth() + 1}. - ${String(cd.getHours()).padStart(2, '0')}:${String(cd.getMinutes()).padStart(2, '0')}` : '';
-  const lvh = f1CompLive(c) ? (f1Chq(c) ? `<span class="f1when f1lvh"><i class="f1ld chq"></i>${f1Lap(c) ? 'Lap ' + f1Lap(c) + ' · ' : ''}Chequered flag</span>` : `<span class="f1when f1lvh"><i class="f1ld"></i>${f1Lap(c) ? 'Lap ' + f1Lap(c) : 'Live'}${f1FlagT(c._flag) ? ` · <span class="flg" style="color:${f1FlagC(c._flag)}">${esc(f1FlagT(c._flag))}</span>` : ''}</span>`) : '';
+  const lvh = f1CompLive(c) ? (f1Chq(c) ? `<span class="f1when f1lvh"><i class="f1ld chq"></i>${f1Lap(c) ? f1LapT(ev, c) + ' · ' : ''}Chequered flag</span>` : `<span class="f1when f1lvh"><i class="f1ld"></i>${f1FlagT(c._flag) ? `<span class="flg" style="color:${f1FlagC(c._flag)}">${esc(f1FlagT(c._flag))}</span>${f1Lap(c) ? ' · ' + f1LapT(ev, c) : ''}` : f1Lap(c) ? f1LapT(ev, c) : 'Live'}</span>`) : '';
   const whenT = grp[0] === 'g' ? '' : c && f1Done(c) ? 'Finished' : when;
   let body = `<div class="sec f1sh">${esc(grp[0] === 'fp' ? (F1SES[ab] || ab) : grp[1])}${lvh || (whenT ? `<span class="f1when">${esc(whenT)}</span>` : '')}</div>` + sub;
   if (!c) return { ysel, top, body: body + msg('No results availible') };
