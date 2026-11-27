@@ -1530,7 +1530,15 @@ const IDB = (() => { let pr = null; const open = () => pr || (pr = new Promise(r
     prune: () => tx('readwrite', st => { const all = []; const c = st.openCursor(); c.onsuccess = () => { const cu = c.result; if (cu) { const v = cu.value || {}; if (!v.t || Date.now() - v.t > Math.max(v.ttl * 4, 2 * 864e5)) cu.delete(); else if (!(v.ttl >= 1e12)) all.push([cu.key, v.t, v.sz || 0]); cu.continue(); } else { all.sort((a, b) => b[1] - a[1]); let sum = 0; all.forEach((x, i) => { sum += x[2] || 60e3; if (i >= 800 || sum > 50e6) st.delete(x[0]); }); } }; return null; }) };
 })();
 /* F1 list: the strip follows the race cards as the page scrolls */
-(() => { let q = 0; window.addEventListener('scroll', () => { if (q) return; q = requestAnimationFrame(() => { q = 0; if (state.league !== 'f1' || topView() !== 'list' || window._stAnim) return;
+(() => { let q = 0, down = 0, te = 0;
+  /* …and like the strip, the cards settle on the nearest race once the finger is up and the scroll has stopped */
+  const settle = () => { if (down || window._stAnim || state.league !== 'f1' || topView() !== 'list') return; const s = document.getElementById('strip'); if (s && s._u) return;
+    const cs = [...$app.querySelectorAll('.f1list > .f1card[id^="f1c"]')]; if (cs.length < 2) return; const f = cs[0].offsetTop, y = window.scrollY; let best = null, bd = 1e9;
+    cs.forEach(c => { const d = Math.abs(c.offsetTop - f - y); if (d < bd) { bd = d; best = c; } }); if (best && bd > 1.5 && window.f1ScrollTo) f1ScrollTo(best.id.slice(3), true); };
+  document.addEventListener('touchstart', () => { down = 1; clearTimeout(te); }, { passive: true, capture: true });
+  const up = () => { down = 0; clearTimeout(te); te = setTimeout(settle, 160); }; document.addEventListener('touchend', up, { passive: true, capture: true }); document.addEventListener('touchcancel', up, { passive: true, capture: true });
+  window.addEventListener('scroll', () => { clearTimeout(te); te = setTimeout(settle, 160); }, { passive: true });
+  window.addEventListener('scroll', () => { if (q) return; q = requestAnimationFrame(() => { q = 0; if (state.league !== 'f1' || topView() !== 'list') return;
   const s = document.getElementById('strip'); if (!s || !s._spyTo || s._u) return; const cs = [...$app.querySelectorAll('.f1list > .f1card[id^="f1c"]')]; if (cs.length < 2) return;
   const f = cs[0].offsetTop, y = window.scrollY; let i = 0; while (i < cs.length - 2 && cs[i + 1].offsetTop - f <= y) i++;
   const ya = cs[i].offsetTop - f, yb = cs[i + 1].offsetTop - f, k = yb > ya ? Math.min(1, Math.max(0, (y - ya) / (yb - ya))) : 0;
