@@ -1256,6 +1256,11 @@ main.hsA .f1n,.hsA .f1n{background:linear-gradient(100deg,color-mix(in srgb,var(
 
 /* scrollable top strip (all leagues): 7 per screen, snaps to an item */
 html.fbar header .hwk.hsc.stA{margin-top:-4px}html.fsg header .hwk.hsc.stA{margin-top:-8px}
+/* strip marker glides between items */
+.hsc .dy b{transition:background-color .22s ease,color .22s ease,transform .22s ease}
+.hsc .dy::after{transition:width .22s ease,height .22s ease,background-color .22s ease,transform .22s ease,margin .22s ease}
+.hsc .dy small{transition:color .22s ease}
+.stB .dy{transition:color .22s ease}
 header .hwk.hsc{display:flex;gap:0;overflow-x:auto;overflow-y:hidden;margin:14px -16px 2px;padding:0 calc(50vw - (100vw - 32px) / 14);scroll-snap-type:x mandatory;scrollbar-width:none;-webkit-overflow-scrolling:touch;justify-content:flex-start}
 header .hwk.hsc::-webkit-scrollbar{display:none}
 .hsc .dy{flex:none !important;width:calc((100vw - 32px) / 7) !important;min-width:0 !important;scroll-snap-align:center;background:none !important;border-radius:0;padding:0 !important;box-shadow:none !important;height:auto;display:flex;flex-direction:column;align-items:center;gap:3px;color:#fff;overflow:visible}
@@ -2020,10 +2025,15 @@ const hStrip = () => { try { const v = localStorage.getItem('hstrip') || ''; ret
 /* scrollable strip: snaps to an item; the wheel style scales items by distance from the centre; dots for days that scroll into view */
 function stripWire() { const s = document.getElementById('strip'); if (!s || !s.classList.contains('hsc') || s.dataset.w) return; s.dataset.w = 1;
   const wheel = () => { if (!s.classList.contains('stB')) return; const c = s.scrollLeft + s.clientWidth / 2; s.querySelectorAll('button').forEach(b => { const d = Math.abs(b.offsetLeft + b.offsetWidth / 2 - c) / b.offsetWidth; b.style.setProperty('--d', Math.min(3, d).toFixed(2)); }); };
-  /* dragging the strip picks the item that ends up in the middle (as if tapped) */
+  /* the strip rolls like a picker: while it moves, the marker (circle / bead / bar) glides to whatever sits in the middle;
+     when it stops, that item is picked (as if tapped). Tapping an item rolls it to the middle first. */
+  const mid = () => { const c = s.scrollLeft + s.clientWidth / 2; let best = null, bd = 1e9; s.querySelectorAll('button').forEach(b => { const d = Math.abs(b.offsetLeft + b.offsetWidth / 2 - c); if (d < bd) { bd = d; best = b; } }); return best; };
+  const mark = b => { if (!b || b.classList.contains('on')) return; s.querySelectorAll('button.on').forEach(x => x.classList.remove('on')); b.classList.add('on'); };
   s.addEventListener('touchstart', () => { s._u = 1; s._sc = 0; }, { passive: true });
   s.addEventListener('touchend', () => { if (!s._sc) s._u = 0; }, { passive: true });
-  let pk = 0; s.addEventListener('scroll', () => { if (s._u) { s._sc = 1; clearTimeout(pk); pk = setTimeout(() => { if (!s._u) return; s._u = 0; const c = s.scrollLeft + s.clientWidth / 2; let best = null, bd = 1e9; s.querySelectorAll('button').forEach(b => { const d = Math.abs(b.offsetLeft + b.offsetWidth / 2 - c); if (d < bd) { bd = d; best = b; } }); if (best && !best.classList.contains('on')) { s.querySelectorAll('button.on').forEach(b => b.classList.remove('on')); best.classList.add('on'); best.click(); } }, 140); } }, { passive: true });
+  s.addEventListener('click', ev => { const b = ev.target.closest('button'); if (!ev.isTrusted || !b || !s.contains(b)) return; const tgt = Math.max(0, b.offsetLeft - (s.clientWidth - b.offsetWidth) / 2); if (Math.abs(s.scrollLeft - tgt) < 3) { s._u = 0; return; } ev.preventDefault(); ev.stopPropagation(); s._u = 1; s.scrollTo({ left: tgt, behavior: 'smooth' }); }, true);
+  let pk = 0; s.addEventListener('scroll', () => { if (!s._u) return; s._sc = 1; requestAnimationFrame(() => s._u && mark(mid())); clearTimeout(pk); pk = setTimeout(() => { if (!s._u) return; s._u = 0; const best = mid(); if (!best) return; if (best.dataset.cur !== '1') { mark(best); best.click(); } }, 140); }, { passive: true });
+  { const o = s.querySelector('.on'); if (o) o.dataset.cur = '1'; }
   let t = 0; s.addEventListener('scroll', () => { requestAnimationFrame(wheel); clearTimeout(t); t = setTimeout(() => { const lg = state.league; if (!LEAGUES[lg] || lg === 'nfl') return; const L = s.scrollLeft, R2 = L + s.clientWidth, ds = [...s.querySelectorAll('button[data-date]')].filter(b => b.offsetLeft + b.offsetWidth > L && b.offsetLeft < R2).map(b => { const m = /(\d{4})-?(\d{2})-?(\d{2})/.exec(b.dataset.date); return m ? new Date(+m[1], +m[2] - 1, +m[3]) : null; }).filter(Boolean); if (ds.length) hDots(lg, ds); }, 160); }, { passive: true });
   wheel(); }
 const hStyle = () => { try { const v = localStorage.getItem('hstyle') || ''; return HSTY.some(x => x[0] === v) ? v : ''; } catch (e) { return ''; } };
