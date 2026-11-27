@@ -1430,7 +1430,7 @@ const THC = (() => { try { return JSON.parse(localStorage.getItem('thc') || '{}'
 const thcPut = (k, o) => { const c = THC[k] || {}; if (Object.keys(o).every(x => !o[x] || c[x] === o[x])) return; THC[k] = Object.assign(c, Object.fromEntries(Object.entries(o).filter(([, v]) => v))); try { localStorage.setItem('thc', JSON.stringify(THC)); } catch (e) {} };
 const HDR_BH = '<button class="back" data-back aria-label="Back"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></button><button class="home" data-home aria-label="Home"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"><path d="M3 10.5 12 3l9 7.5"/><path d="M5.5 9v11h13V9"/><path d="M10 20v-6h4v6"/></svg></button>', HDR_BHR = HDR_BH + '<button class="home" data-refresh aria-label="Refresh"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12a8 8 0 1 1-2.34-5.66"/><path d="M20 4v5h-5"/></svg></button>';
 try { localStorage.removeItem('pstyle'); } catch (e) {}
-try { localStorage.removeItem('design'); const f = localStorage.getItem('font'); document.documentElement.classList.add(f === 'sg' ? 'fsg' : 'fbar'); localStorage.removeItem('d2'); localStorage.removeItem('f12'); localStorage.removeItem('design2'); localStorage.removeItem('design3'); { const hs = localStorage.getItem('hstyle'); if (/^[MDJCIK]$/.test(hs || '')) localStorage.removeItem('hstyle'); } Object.keys(localStorage).filter(k => /^tps[234]?_/.test(k)).forEach(k => localStorage.removeItem(k)); } catch (e) { document.documentElement.classList.add('fbar'); }
+try { localStorage.removeItem('design'); const f = localStorage.getItem('font'); document.documentElement.classList.add(f === 'sg' ? 'fsg' : 'fbar'); localStorage.removeItem('d2'); localStorage.removeItem('f12'); localStorage.removeItem('design2'); localStorage.removeItem('design3'); { const hs = localStorage.getItem('hstyle'); if (/^[MDJCIKB]$/.test(hs || '')) localStorage.removeItem('hstyle'); } Object.keys(localStorage).filter(k => /^tps[234]?_/.test(k)).forEach(k => localStorage.removeItem(k)); } catch (e) { document.documentElement.classList.add('fbar'); }
 const API = 'https://site.api.espn.com/apis/site/v2/sports/';
 const WEB = 'https://site.web.api.espn.com/apis/common/v3/sports/';
 const LEAGUES = {
@@ -2148,7 +2148,7 @@ const LY_BB = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke
 const LY_PK = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><ellipse cx="12" cy="9.5" rx="8" ry="3.5"/><path d="M4 9.5v4c0 2 3.6 3.5 8 3.5s8-1.5 8-3.5v-4"/></svg>';
 const LY_FLG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M5 21V4M5 4h13l-2.5 4.5L18 13H5"/></svg>';
 /* ===== home styles (hidden menu): Classic & Classic Alt (B header + classic cards), A colour cards · B big day ===== */
-const HSTY = [['', 'Classic 2.0'], ['A', 'Home A · Colour cards']];
+const HSTY = [['', 'Classic'], ['C2', 'Classic 2.0'], ['A', 'Home A · Colour cards']];
 const HSTRIP = [['', 'Strip · Circles'], ['A', 'Strip A · Timeline'], ['B', 'Strip B · Wheel']];
 const hStrip = () => { try { let v = localStorage.getItem('hstrip') || ''; if (v === 'D') { v = 'A'; localStorage.setItem('hstrip', v); } else if (v === 'C') { v = ''; localStorage.setItem('hstrip', v); } return HSTRIP.some(x => x[0] === v) ? v : ''; } catch (e) { return ''; } };
 /* scrollable strip: snaps to an item; the wheel style scales items by distance from the centre; dots for days that scroll into view */
@@ -2323,7 +2323,7 @@ function renderList() {
   state.stripKey = skey;
   $app.innerHTML = `
     ${lyHead({ strip, fav, hs: HS, items, onIdx, quick: !fav && LEAGUES[state.league] ? [['data-go2="standings"', 'Table', LY_TROPHY], ['data-go2="lstats"', 'Stats', LY_CHART]] : [] })}
-    <main class="${HS ? 'hs' + HS : ''}">${body}</main>`;
+    <main class="${HS && HCARD[HS] ? 'hs' + HS : ''}">${body}</main>`;
   const s = document.getElementById('strip'), on = s && s.querySelector('.on'); stripWire();
   if (on) {
     s.scrollLeft = s._tgt ? s._tgt(on) : stripTgt(s, on); /* no rolling animation – the strip simply shows the chosen day in the middle */
@@ -2336,8 +2336,8 @@ function cardHTML(e) {
     return `<div class="row ${lose ? 'lose' : ''}">${logoImg(t.logo)}<span class="nm ${state.league !== 'fav' && isFav(e.league || state.league, t.id) ? 'fv' : ''}">${esc(t.name)}${t.record ? `<span class="rec">(${esc(String(t.record).replace(/,\s*\d+\s*pts?\b/i, ''))})</span>` : ''}</span>
       <span class="sc">${e.state === 'pre' ? '' : esc(t.score)}</span><span class="arr">${e.state === 'post' && t.winner ? '◀' : ''}</span></div>`;
   };
-  const lgc = e.league || state.league;
-  return `<div class="card cl2" data-game="${e.id}" data-gl="${lgc}"${e.state === 'pre' ? ' data-pre' : ''} style="--ca:${hCol(lgc, e.away)};--ch:${hCol(lgc, e.home)}"><i class="hbar"></i><div class="top"><span class="${e.state === 'in' ? 'live' : ''}">${(m => e.state === 'in' && m ? `${esc(m[2])}<em>${esc(m[1])}</em>` : esc(statusText(e)))(/^\s*(\d{1,2}:\d{2}(?:\.\d)?)\s*-\s*(.+?)\s*$/.exec(statusText(e)))}</span>${(e.league || state.league) === 'nfl' && e.state !== 'in' && state.league !== 'fav' ? `<small class="ndt">${nflDay(e)}</small>` : ''}${e.league && state.league === 'fav' ? `<span class="lgt">${e.league.toUpperCase()}</span>` : ''}</div>${row(e.away)}${row(e.home)}</div>`;
+  const lgc = e.league || state.league, k2 = hStyle() === 'C2';
+  return `<div class="card${k2 ? ' cl2' : ''}" data-game="${e.id}" data-gl="${lgc}"${e.state === 'pre' ? ' data-pre' : ''}${k2 ? ` style="--ca:${hCol(lgc, e.away)};--ch:${hCol(lgc, e.home)}"><i class="hbar"></i>` : '>'}<div class="top"><span class="${e.state === 'in' ? 'live' : ''}">${(m => e.state === 'in' && m ? `${esc(m[2])}<em>${esc(m[1])}</em>` : esc(statusText(e)))(/^\s*(\d{1,2}:\d{2}(?:\.\d)?)\s*-\s*(.+?)\s*$/.exec(statusText(e)))}</span>${(e.league || state.league) === 'nfl' && e.state !== 'in' && state.league !== 'fav' ? `<small class="ndt">${nflDay(e)}</small>` : ''}${e.league && state.league === 'fav' ? `<span class="lgt">${e.league.toUpperCase()}</span>` : ''}</div>${row(e.away)}${row(e.home)}</div>`;
 }
 
 function renderGame() {
@@ -5171,7 +5171,7 @@ function renderF1List() {
   const os = document.getElementById('strip'), prev = os && state.stripKey === 'f1' ? os.scrollLeft : null; state.stripKey = 'f1';
   $app.innerHTML = `
     ${lyHead({ strip, f1: 1, f1h: 1, quick: [['data-f1v="std"', 'Table', LY_TROPHY], ['data-f1v="stats"', 'Stats', LY_CHART]] })}
-    <main class="f1list${hStyle() ? ' hs' + hStyle() : ''}" data-sig="${esc(f1LSig())}">${body}</main>`;
+    <main class="f1list${HCARD[hStyle()] ? ' hs' + hStyle() : ''}" data-sig="${esc(f1LSig())}">${body}</main>`;
   const s = document.getElementById('strip'); if (s) { stripWire(); f1CenterStrip(false); } f1BigFit(); /* always centred on the chosen GP (a kept scroll position could point elsewhere after the list changed) */
   f1Fit();
   if (evs && evs.length && !F1.scrolled) { F1.scrolled = 1; requestAnimationFrame(() => f1ScrollTo(F1.curId, false)); }
@@ -5266,7 +5266,7 @@ function f12HeatHTML(v, y) { const S = F1.st[y], evs = F1.sb[y]; if (!S || !evs)
   return `<section class="f2hm"><div class="hmx"><div class="hmi">${head}${rows}</div></div><div class="lg"><i class="c z1">1</i><i class="c z2">2</i><i class="c z3">3</i><i class="c zp6"></i><span>points</span><i class="c zn"></i><span>no points</span><i class="c zd">✕</i><span>DNF</span><i class="c ze"></i><span>no result</span></div></section>`; }
 function f12ResHTML(R, timeOf, fl, dm, y) { return `<section class="f2l">${R.sort((a, b) => (a.order || 99) - (b.order || 99)).map(r => { const d = dm[r.id] || {}, st = +d.start || 0, mv = st && r.order ? st - r.order : 0, t = timeOf(r), out = /DNF|DSQ|DNS/.test(t);
     const ar = out || !st ? '<u class="eq"></u>' : mv > 0 ? `<u class="up">▲${mv}</u>` : mv < 0 ? `<u class="dn">▼${-mv}</u>` : '<u class="eq">–</u>', col = d.color ? '#' + String(d.color).replace('#', '') : f1TCol(r.team);
-    return `<div class="f2r rr" data-f1drv="${esc(r.id)}"><em class="${r.order <= 3 ? 'w' + r.order : ''}">${esc(String(r.order || ''))}</em><i class="tb" style="background:${col}"></i><div class="n"><b>${esc(r.name || '')}${fl && fl.id === r.id ? '<em class="fl">FL</em>' : ''}</b><small>${esc(r.team || '')}</small></div>${ar}<span>${esc(t)}</span></div>`; }).join('')}</section>${fl ? '<div class="f2note">▲▼ places gained / lost from the grid · <em class="fl">FL</em> fastest lap</div>' : '<div class="f2note">▲▼ places gained / lost from the grid</div>'}`; }
+    return `<div class="f2r rr" data-f1drv="${esc(r.id)}"><em class="${r.order <= 3 ? 'w' + r.order : ''}">${esc(String(r.order || ''))}</em><i class="tb" style="background:${col}"></i><div class="n"><b>${esc(r.name || '')}${fl && fl.id === r.id ? '<em class="fl">FL</em>' : ''}</b><small>${esc(r.team || '')}</small></div>${ar}<span>${esc(t)}</span></div>`; }).join('')}</section>`; }
 /* F1 2.0 race page: tinted GP card on top */
 function f12RaceTop(ev) { const nm = esc(f1Short(ev).replace(/\s*Grand Prix\s*/i, ' ').replace(/\s+/g, ' ').trim()), circ = esc((ev.circuit && ev.circuit.fullName) || ''), k = Math.max(0, (F1.sb[ev._y] || []).findIndex(e => e.id === ev.id));
   return `<div class="f2po" style="--cc:${f1CCol(ev)}"><div class="wm">R${k + 1}</div><div class="pht">${f1Flag(ev)}<b>${nm}</b></div><small>GRAND PRIX · ${esc(f1DatesY(ev))}${circ ? ' · ' + circ.toUpperCase() : ''}</small></div>`; }
