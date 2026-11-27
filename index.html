@@ -1371,7 +1371,7 @@ html.fsg .f1big .nd i{top:3px !important}html.fsg .f1big .nd::before{top:18px !i
 .f2ch svg{height:128px !important}.f2ch{margin-top:26px !important;padding:8px 12px 6px !important;margin-bottom:0 !important}.f2ch .lb{margin-bottom:2px !important}.f2ch .tip{top:-24px !important}.f2dh{margin:0 2px 4px !important}.f2dh .ph{width:48px !important;height:48px !important}.f2dh b{font-size:24px !important}.f2dh .p b{font-size:28px !important}
 
 /* big card, compact: flag beside the name, tighter rows – same design, ~60 px shorter */
-.f1big .pht{display:flex;align-items:center;gap:12px}.f1big .pht .f1fl{width:36px !important;height:36px !important;flex:none}.f1big .pht b{margin-top:0 !important;min-width:0;overflow:hidden}
+.f1big .pht{display:flex;align-items:center;gap:12px}.f1big .pht .f1fl{width:36px !important;height:36px !important;flex:none}.f1big .pht b{margin-top:0 !important;min-width:0;overflow:hidden;overflow-x:clip;overflow-y:visible}
 .f1big .ph small{margin-top:8px !important}.f1big > .tag{margin:10px 0 10px !important}
 .f1big .wm{font-size:96px !important;top:-14px !important}
 .f1big .nd{padding-bottom:10px !important}.f1big .dc h4{margin-bottom:6px !important}
@@ -1394,13 +1394,15 @@ html .seg:has(> button:nth-child(4)) > button{font-size:17px !important}
 .f2c .ct b,.f2c .ct span{color:#fff}
 .f2hm .hm > em{flex:none;width:40px;text-align:right;font-style:normal;font-size:14px;font-weight:700;color:#fff;padding-right:2px}.f2hm .hr > em{font-size:11px;color:var(--mut)}
 
-.f2po .pht{display:flex;align-items:center;gap:12px;position:relative}.f2po .pht .f1fl{width:36px !important;height:36px !important;flex:none}.f2po .pht b{margin-top:0 !important;min-width:0;overflow:hidden}
+.f2po .pht{display:flex;align-items:center;gap:12px;position:relative}.f2po .pht .f1fl{width:36px !important;height:36px !important;flex:none}.f2po .pht b{margin-top:0 !important;min-width:0;overflow:hidden;overflow-x:clip;overflow-y:visible}
 html.fbar .f2po .pht b{top:-3.5px}html.fsg .f2po .pht b{top:4px}.f2po small{margin-top:8px !important;text-overflow:clip !important}
 .f2ch .tip.ctr{text-align:center}.f2ch .tip.ctr b{justify-content:center}
 .f2dh{margin-bottom:0 !important}.f2dh + .f2ch{margin-top:22px !important}
 .f1big .cn{margin:10px 0 2px;font-family:var(--num);font-size:13px;font-weight:700;letter-spacing:1px;color:rgba(255,255,255,.5);white-space:nowrap;overflow:hidden;position:relative;z-index:1}.f1big .cn + .btl{margin-top:12px}
 .f1big .bx.cq .bxh u{color:#fff}.f1big .bx.cq .bxh u .fd{background:#fff}
 .f1big .bxh u s{text-decoration:none;color:rgba(255,255,255,.4);margin:0 -1px}.f1big .bxh u em{font-style:normal;color:#fff}
+.f2pod .ph{position:relative;overflow:visible !important}.f2pod .ph img{border-radius:50%}
+.f2pod .mvb{position:absolute;right:-6px;bottom:-4px;min-width:30px;height:22px;padding:0 6px;box-sizing:border-box;border-radius:11px;font-size:13px;font-weight:700;line-height:22px;text-align:center;text-decoration:none;color:#fff;box-shadow:0 0 0 3px var(--card)}.f2pod .mvb.up{background:#248a3d}.f2pod .mvb.dn{background:#c9342f}.f2pod .mvb.eq{background:#48484a}
 </style>
 </head>
 <body>
@@ -5141,7 +5143,7 @@ function f1BigTimes(e, c) { const k = c.id, h = F1.bt[k]; if (h && h !== 1 && Ob
     Object.defineProperty(out, '_t', { value: Date.now(), enumerable: false }); F1.bt[k] = out; if (topView() === 'list' && state.league === 'f1' && F1.selId === e.id) f1ShowBig(e.id); })().catch(() => { F1.bt[k] = {}; }); return null; }
 /* the GP name stays on one line (it may run over the round number); only if it is wider than the card does it get smaller */
 function f1BigFit() { requestAnimationFrame(() => $app.querySelectorAll('.f2po small,.f1big .cn').forEach(b => { b.style.fontSize = ''; b.style.letterSpacing = ''; let f = parseFloat(getComputedStyle(b).fontSize) || 14, l = 1; while (b.scrollWidth > b.clientWidth + 1 && f > 10.5) { if (l > .2) l -= .2; else f -= .5; b.style.letterSpacing = l.toFixed(1) + 'px'; b.style.fontSize = f + 'px'; } }));
-  requestAnimationFrame(() => $app.querySelectorAll('.f1big .ph b, .f1big .kv b').forEach(b => { b.style.fontSize = ''; let f = parseFloat(getComputedStyle(b).fontSize); while (b.scrollWidth > b.clientWidth + 1 && f > (b.closest('.kv') ? 13 : 24)) { f -= 1; b.style.fontSize = f + 'px'; } })); }
+  requestAnimationFrame(() => $app.querySelectorAll('.f1big .ph b, .f1big .kv b, .f2po .pht b').forEach(b => { b.style.fontSize = ''; let f = parseFloat(getComputedStyle(b).fontSize); while (b.scrollWidth > b.clientWidth + 1 && f > (b.closest('.kv') ? 13 : 24)) { f -= 1; b.style.fontSize = f + 'px'; } })); }
 /* live gaps for the big card: same source as the race page (driver details, re-read at most every 55 s) */
 function f1BigLive(e, c) { F1.lvd = F1.lvd || {}; const L = F1.lvd[c.id] || (F1.lvd[c.id] = { rows: null, t: 0, p: 0 });
   if (!L.p && Date.now() - L.t > 55e3) { L.p = 1; f1Detail(e.id, c, false, true).then(r => { L.rows = r; L.t = Date.now(); L.p = 0; if (topView() === 'list' && state.league === 'f1' && F1.selId === e.id) f1ShowBig(e.id); }).catch(() => { L.p = 0; L.t = Date.now(); L.rows = L.rows || []; }); }
@@ -5265,7 +5267,7 @@ function f12RaceTop(ev) { const nm = esc(f1Short(ev).replace(/\s*Grand Prix\s*/i
   return `<div class="f2po" style="--cc:${f1CCol(ev)}"><div class="wm">R${k + 1}</div><div class="pht">${f1Flag(ev)}<b>${nm}</b></div><small>GRAND PRIX · ${esc(f1DatesY(ev))}${circ ? ' · ' + circ.toUpperCase() : ''}</small></div>`; }
 /* any session as team-bar rows (no photos) */
 function f12Rows(R, timeOf, outFrom) { return `<section class="f2l">${R.map(r => `<div class="f2r rr${r.order >= outFrom ? ' out' : ''}" data-f1drv="${esc(r.id)}"><em>${esc(String(r.order || ''))}</em><i class="tb" style="background:${f1TCol(r.team)}"></i><div class="n"><b>${esc(r.name || '')}</b><small>${esc(r.team || '')}</small></div><span>${esc(timeOf(r) || '')}</span></div>`).join('')}</section>`; }
-function f12Podium(P, timeOf) { const col = r => f1TCol(r.team), cell = (r, k) => r ? `<div class="pd p${k}" data-f1drv="${esc(r.id)}"><span class="ph" style="box-shadow:0 0 0 3px ${col(r)}"><img src="${esc(f1Hs(r.id))}" alt="" onerror="this.onerror=null;this.src=SIL"></span><b>${esc(String(r.name || '').split(' ').slice(-1)[0])}</b><small>${esc(timeOf(r) || '')}</small><div class="st">${k}</div></div>` : '<div class="pd"></div>';
+function f12Podium(P, timeOf, dm) { const col = r => f1TCol(r.team), mvb = r => { const st = +((dm || {})[r.id] || {}).start || 0, m = st && r.order ? st - r.order : null; return m == null ? '' : `<u class="mvb ${m > 0 ? 'up' : m < 0 ? 'dn' : 'eq'}">${m > 0 ? '▲' + m : m < 0 ? '▼' + -m : '–'}</u>`; }, cell = (r, k) => r ? `<div class="pd p${k}" data-f1drv="${esc(r.id)}"><span class="ph" style="box-shadow:0 0 0 3px ${col(r)}"><img src="${esc(f1Hs(r.id))}" alt="" onerror="this.onerror=null;this.src=SIL">${mvb(r)}</span><b>${esc(String(r.name || '').split(' ').slice(-1)[0])}</b><small>${esc(timeOf(r) || '')}</small><div class="st">${k}</div></div>` : '<div class="pd"></div>';
   return `<div class="f2pod">${cell(P[1], 2)}${cell(P[0], 1)}${cell(P[2], 3)}</div>`; }
 /* F1 2.0 driver page: compact header, race-position chart, qualifying-position chart, championship position by season, results list */
 function f12PosChart(title, P, n, labels, tc, maxP) { const W = 340, H = 128, L = 30, B = 16, N = Math.max(2, n), X = i => L + 6 + i * (W - L - 14) / (N - 1), hh = (H - B - 17) / 2, Y = p => { p = Math.min(p, maxP); return 7 + (p <= 10 ? (p - 1) / 9 * hh : hh + (p - 10) / Math.max(1, maxP - 10) * hh); }; /* P1–P10 takes the same height as P10–last */
@@ -5448,7 +5450,7 @@ function f1Table(rows, det, mode, y) {
       R = has.concat(no); R.forEach((r, i) => { r.order = i + 1; }); const P0 = qt(has[0], k); timeOf = r => { const t = qt(r, k); return !t ? 'DNF' : r.order === 1 ? f1Ms(t) : '+' + ((t - P0) / 1000).toFixed(3); }; } }
   /* no times from ESPN (yet / at all) but laps are known → show laps instead of an empty column */
   if (det && mode !== 'grid' && !/^live/.test(mode) && R.length && !R.some(r => timeOf(r)) && R.some(r => V(r, 'lapsCompleted') > 0)) { timeOf = () => 'TBD'; } /* finished, ESPN has only laps so far: final times follow */
-  if (f12() && pc) { R.sort((a, b) => (a.order || 99) - (b.order || 99)); const fin = det && R.length >= 3 && !/^live/.test(mode); return (fin ? f12Podium(R.slice(0, 3), timeOf) : '') + f12ResHTML(fin ? R.slice(3) : R, timeOf, fl, dm, y); }
+  if (f12() && pc) { R.sort((a, b) => (a.order || 99) - (b.order || 99)); const fin = det && R.length >= 3 && !/^live/.test(mode); return (fin ? f12Podium(R.slice(0, 3), timeOf, dm) : '') + f12ResHTML(fin ? R.slice(3) : R, timeOf, fl, dm, y); }
   if (f12()) return f12Rows(R.sort((a, b) => (a.order || 99) - (b.order || 99)), det ? timeOf : () => '', outFrom);
   return `<section class="blk"><table class="nfx sep f1t f1res ${pc ? 'f1pc' : ''}"><colgroup><col style="width:34px"><col><col style="width:${pc ? 104 : 88}px">${pc ? '<col style="width:30px">' : ''}</colgroup><thead><tr><th class="n">#</th><th class="l ph">Driver</th><th class="tl">${mode === 'grid' ? '' : mode === 'liveL' ? 'Laps' : mode === 'liveG' ? 'Gap' : mode === 'liveN' ? '' : 'Time'}</th>${pc ? '<th>Pts</th>' : ''}</tr></thead><tbody>${R.sort((a, b) => (a.order || 99) - (b.order || 99)).map(r => `<tr data-f1drv="${esc(r.id)}"${r.order >= outFrom ? ' class="f1out"' : ''}><td class="n f1rk ${pc && r.order <= 3 ? 'p' + r.order : ''}">${esc(String(r.order || ''))}</td><td class="l">${f1Drv(r.id, r.name || '', r.team).replace(/<\/div><\/div>$/, fl && fl.id === r.id ? '</div><i class="f1fast" title="Fastest lap">⚡</i></div>' : '</div></div>')}</td><td class="f1tm">${mode === 'grid' && r.q && r.order > r.q ? `<small class="f1pen">Grid penalty<br><span style="white-space:nowrap">Qualified P${r.q}</span></small>` : esc(det ? timeOf(r) : '')}</td>${pc ? `<td>${esc(det ? ptsOf(r) : '')}</td>` : ''}</tr>`).join('')}</tbody></table></section>`;
 }
