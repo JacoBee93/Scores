@@ -1328,12 +1328,14 @@ main .hsec.fvh{margin:8px 6px 14px !important;text-align:left}
    sit on a soft block (red / grey) behind the whole entry – the ball stays in its column */
 .f1big .nd.done i{background:#fff !important;box-shadow:0 0 0 3px #1a1416 !important}.f1big .nd.done b,.f1big .nd.done span{opacity:.55}.f1big .nd.done::before{background:#8e8e93}
 .f1big .nd:not(.done):not(.live) i{background:transparent !important;box-shadow:inset 0 0 0 2px rgba(255,255,255,.4),0 0 0 3px #1a1416 !important}
-.f1big .nd.live,.f1big .nd.next{isolation:isolate}
-.f1big .nd.live::after,.f1big .nd.next::after{content:'';position:absolute;z-index:-1;left:-15px;right:-4px;top:-5px;bottom:7px;border-radius:10px}
-.f1big .nd.live::after{background:linear-gradient(90deg,rgba(229,72,77,.3),rgba(229,72,77,.05))}.f1big .nd.next::after{background:linear-gradient(90deg,rgba(255,255,255,.14),rgba(255,255,255,.03))}
 .f1big .nd.live i{animation:f1aura 1.4s ease-in-out infinite !important;opacity:1}
 @keyframes f1aura{0%,100%{box-shadow:0 0 0 3px #1a1416,0 0 0 4px rgba(229,72,77,.15),0 0 6px var(--brand)}50%{box-shadow:0 0 0 3px #1a1416,0 0 0 8px rgba(229,72,77,.4),0 0 16px var(--brand)}}
 .f1big .nd.live span{color:#ff9a9e !important;font-weight:700}.f1big .nd.next span{color:#fff !important;font-weight:700}
+
+/* balls centred on the session name; the line runs exactly through the balls' centres, from one ball to the next */
+.f1big .nd b{line-height:20px !important;height:20px;padding-bottom:0 !important}.f1big .nd i{top:5px !important;left:-7px !important;width:12px;height:12px}
+.f1big .nd::before{left:-2px !important;width:2px;top:20px !important;bottom:0 !important}
+html.fsg .f1big .nd i{top:3px !important}html.fsg .f1big .nd::before{top:18px !important;bottom:2px !important}
 </style>
 </head>
 <body>
