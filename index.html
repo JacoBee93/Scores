@@ -711,8 +711,8 @@ td.n .slg{width:20px;height:20px;object-fit:contain;vertical-align:-6px;margin-l
 .lpm{position:fixed;z-index:61;background:#1c1c1d;border-radius:12px;min-width:200px;overflow:hidden;box-shadow:0 10px 30px rgba(0,0,0,.5)}
 .lpm button{display:block;width:100%;text-align:left;padding:14px 16px;font-size:16px;font-weight:600;color:#fff;background:none;border:0;border-bottom:1px solid #282829;font-family:inherit}
 .lpm button:last-child{border-bottom:0}
-.lpm button[data-psw],.lpm button[data-fsw],.lpm button[data-bmsw],.lpm button[data-hsw],.lpm button[data-ssw]{display:flex;justify-content:space-between;align-items:center}
-.lpm button[data-psw]:not(.on),.lpm button[data-fsw]:not(.on),.lpm button[data-bmsw]:not(.on),.lpm button[data-hsw]:not(.on),.lpm button[data-ssw]:not(.on){color:var(--mut)}
+.lpm button[data-f1csw],.lpm button[data-psw],.lpm button[data-fsw],.lpm button[data-bmsw],.lpm button[data-hsw],.lpm button[data-ssw]{display:flex;justify-content:space-between;align-items:center}
+.lpm button[data-f1csw]:not(.on),.lpm button[data-psw]:not(.on),.lpm button[data-fsw]:not(.on),.lpm button[data-bmsw]:not(.on),.lpm button[data-hsw]:not(.on),.lpm button[data-ssw]:not(.on){color:var(--mut)}
 .lpck{color:#fff;font-size:15px}
 .lpm button[data-cc]{border-bottom:6px solid #0e0e10}
 .lvt{font-family:var(--num);font-weight:700;font-size:26px;margin:4px 4px 12px}
@@ -1293,6 +1293,30 @@ html.pgA .seg:has(> button:nth-child(4)){gap:18px}
 html.fsg.pgA .seg > button{font-size:16px !important}html.fsg.pgA .seg:has(> button:nth-child(4)){gap:14px}html.pgA .seg:has(> button:nth-child(5)){gap:12px}
 html.pgA .seg > button.on{color:#fff !important;background:none !important}
 html.pgA .seg > button.on::after{content:'';position:absolute;left:0;right:0;bottom:0;height:3px;border-radius:3px;background:var(--brand)}
+
+/* F1 big card (hidden menu) */
+.f1card.f1big{height:auto !important;display:block !important;padding:16px !important;border-radius:22px;position:relative;overflow:hidden}
+.f1big .bt{display:flex;align-items:center;gap:11px}.f1big .bt .f1fl{width:30px;height:30px}.f1big .bn{flex:1;min-width:0}.f1big .bn b{display:block;font-family:var(--num);font-size:22px;font-weight:700;line-height:1.05;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.f1big .bn small{display:block;color:var(--mut);font-size:13.5px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.f1big .br{text-align:right;font-family:var(--num)}.f1big .br b{display:block;font-size:14px;color:var(--mut)}.f1big .br small{font-size:13.5px;font-weight:700}
+.f1big .bl{margin:16px 0 8px;font-size:13px;font-weight:700;color:var(--mut);letter-spacing:.8px;text-transform:uppercase}.f1big .lvd{color:var(--live)}
+.f1big .bls{display:flex;flex-direction:column;gap:6px}
+.f1big .sr,.f1big .pr{display:flex;align-items:center;gap:10px;height:44px;background:rgba(255,255,255,.05);border-radius:12px;padding:0 13px;font-family:var(--num);font-size:17px}
+.f1big .sr b{flex:1;font-weight:700}.f1big .sr span{color:#c7c7cc;font-weight:600}.f1big .sr u{text-decoration:none;font-size:14px;font-weight:700;color:var(--mut)}
+.f1big .sr.done{opacity:.45}.f1big .sr.next,.f1big .sr.live{background:color-mix(in srgb,var(--brand) 16%,transparent)}.f1big .sr.next b,.f1big .sr.next u,.f1big .sr.live b,.f1big .sr.live u{color:#ff6b70}
+.f1big .pr em{font-style:normal;color:var(--mut);width:14px;font-weight:700}.f1big .pr i{width:4px;height:20px;border-radius:2px;flex:none}.f1big .pr b{font-weight:700}.f1big .pr span{flex:1;color:var(--mut);font-size:14px;text-align:right;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.f1big .btl{display:flex;gap:8px;margin-top:4px}.f1big .dc{flex:1;min-width:0}.f1big .dc h4{font-family:var(--num);font-size:14px;color:var(--mut);letter-spacing:1px;text-transform:uppercase;margin:0 0 8px}
+.f1big .nd{position:relative;padding:0 0 14px 16px;border-left:2px solid #2c2c2e;margin-left:5px;font-family:var(--num)}.f1big .nd:last-child{border-left-color:transparent}.f1big .nd i{position:absolute;left:-7px;top:2px;width:12px;height:12px;border-radius:50%;background:#3a3a3c;box-shadow:0 0 0 3px var(--card)}
+.f1big .nd b{display:block;font-size:15px;font-weight:700;line-height:1.1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.f1big .nd span{font-size:14px;color:var(--mut);font-weight:600}.f1big .nd.done{opacity:.45}.f1big .nd.done i{background:var(--mut)}
+.f1big .nd.next i,.f1big .nd.live i{background:var(--brand);box-shadow:0 0 0 3px var(--card),0 0 10px var(--brand)}.f1big .nd.next b,.f1big .nd.next span,.f1big .nd.live b,.f1big .nd.live span{color:#ff6b70}
+.f1big .win{position:relative;margin:14px 0 8px;border-radius:16px;padding:14px 16px;overflow:hidden;background:linear-gradient(120deg,color-mix(in srgb,var(--w) 70%,#000),rgba(255,255,255,.04) 75%);font-family:var(--num)}
+.f1big .win small{font-size:12px;font-weight:700;letter-spacing:1.5px;color:rgba(255,255,255,.7)}.f1big .win b{display:block;font-size:34px;font-weight:700;line-height:1}.f1big .win span{font-size:15px;color:rgba(255,255,255,.8);font-weight:600}.f1big .win em{position:absolute;right:14px;top:-6px;font-style:normal;font-size:96px;font-weight:700;color:rgba(255,255,255,.14)}
+.f1card.f1big.fbD{background:linear-gradient(160deg,color-mix(in srgb,var(--cc) 80%,#000) 0%,var(--card) 62%) !important;padding:18px 16px !important}
+.f1big .wm{position:absolute;right:-6px;top:-18px;font-family:var(--num);font-size:120px;font-weight:700;color:rgba(255,255,255,.08);line-height:1;pointer-events:none}
+.f1big .ph{position:relative}.f1big .ph .f1fl{width:34px;height:34px}.f1big .ph b{display:block;font-family:var(--num);font-size:40px;font-weight:700;line-height:1;margin-top:10px}.f1big .ph small{font-family:var(--num);font-size:14px;font-weight:700;color:rgba(255,255,255,.7);letter-spacing:1px}
+.f1big .tag{display:inline-block;margin:14px 0 10px;font-family:var(--num);font-size:13px;font-weight:700;letter-spacing:1px;background:rgba(255,255,255,.12);border-radius:8px;padding:3px 9px}.f1big .tag.lv{background:color-mix(in srgb,var(--brand) 25%,transparent);color:#ff8a8e}
+.f1big .tiles{display:grid;grid-template-columns:1fr 1fr;gap:7px;font-family:var(--num)}.f1big .tile{background:rgba(0,0,0,.35);border-radius:12px;padding:8px 11px}.f1big .tile:last-child:nth-child(odd){grid-column:1/-1;background:rgba(255,255,255,.1)}
+.f1big .tile small{display:block;font-size:13px;color:var(--mut);font-weight:700}.f1big .tile b{font-size:18px;font-weight:700}.f1big .tile.done{opacity:.45}.f1big .tile.next,.f1big .tile.live{background:color-mix(in srgb,var(--brand) 22%,transparent)}.f1big .tile.next b,.f1big .tile.next small,.f1big .tile.live b,.f1big .tile.live small{color:#ff8a8e}
+.f1big .tbl{display:flex;flex-direction:column;font-family:var(--num)}.f1big .tr{display:flex;align-items:center;gap:10px;height:38px;border-bottom:1px solid rgba(255,255,255,.08);font-size:17px}.f1big .tr:last-child{border:0}.f1big .tr em{font-style:normal;width:14px;color:var(--mut);font-weight:700}.f1big .tr i{width:4px;height:18px;border-radius:2px}.f1big .tr b{width:40px;font-weight:700}.f1big .tr span{flex:1;color:#c7c7cc}
 </style>
 </head>
 <body>
@@ -1466,7 +1490,7 @@ function tabHTML(k) {
   document.addEventListener('touchstart', e => { if (S && S.hz) { try { cleanup(S); } catch (er) {} } S = null; $app.querySelectorAll('.ghost').forEach(g => g.remove()); if (e.touches.length !== 1 || pop()) return; const t = e.target; if (!t.closest) return;
     if (window.isSAm && isSAm() && e.touches[0].clientX <= 24 && topView() !== 'list') return;
     const v = topView(), x = e.touches[0].clientX, y = e.touches[0].clientY, base = { x0: x, y0: y, t0: Date.now(), x: 0, hz: false, gh: [], sy0: window.scrollY };
-    if (v === 'list') { if (state.league === 'fav' || state.league === 'f1' || t.closest('header, #fhome, #ptr')) return; const items = [...$app.querySelectorAll('.dy')], cur = items.findIndex(b => b.classList.contains('on')); if (cur < 0) return;
+    if (v === 'list') { if (state.league === 'fav' || (state.league === 'f1' && !f1Big()) || t.closest('header, #fhome, #ptr')) return; const items = [...$app.querySelectorAll('.dy')], cur = items.findIndex(b => b.classList.contains('on')); if (cur < 0) return;
       S = Object.assign(base, { mode: 'day', el: $app.querySelector('main'), cls: ($app.querySelector('main') || {}).className || '', items, cur }); return; }
     const pe = t.closest('.pane') || (!t.closest('.stkw, header, .hpill, input') ? $app.querySelector(':scope > main > .pane') : null);
     if (!pe || t.closest('.brsw, .mstrip, .wpw, .rkw, .ysel, .ylist, .scf, .cmpr, input, .ghost')) return;
@@ -1485,6 +1509,7 @@ function tabHTML(k) {
       [[S.cur - 1, -1], [S.cur + 1, 1]].forEach(([k, off]) => { if (k < 0 || k >= S.items.length) return;
         let html = '';
         if (S.mode === 'tab') { window._ghk = keyOf(S.items[k]); html = tabHTML(window._ghk); }
+        else if (state.league === 'f1') { const evs = f1ListEvs() || [], e = evs[k]; html = e ? f1BigHTML(e, k) : ''; } /* F1 big card: swipe to the next / previous GP */
         else { const n = neighborKeys()[off < 0 ? 0 : 1], ev = n && state.dayC[n.key]; html = Array.isArray(ev) ? (ev.length ? (hStyle() && HCARD[hStyle()] ? hBody(hStyle(), ev, state.league) : listBody(ev, state.league)) : msg('No games on this day.')) : msg('Loading…'); }
         ghost(S, html, off); });
       if (S.mode === 'day') { S.strip = document.getElementById('strip'); if (S.strip) { S.iw = (S.items[1] ? S.items[1].offsetLeft - S.items[0].offsetLeft : 70); S.sl0 = S.strip.scrollLeft; S.onk = S.cur; S.strip.style.scrollSnapType = 'none'; } }
@@ -4743,12 +4768,13 @@ function renderLeaders() {
     const o = document.createElement('div'); o.className = 'lpo';
     const m = document.createElement('div'); m.className = 'lpm';
     m.style.top = (r.bottom + 8) + 'px'; m.style.left = Math.min(r.left, window.innerWidth - 216) + 'px';
-    m.innerHTML = `<button data-cc>Clear cache</button>${(() => { const de = document.documentElement, cur = de.classList.contains('fsg') ? 'sg' : 'bar'; return [['bar', 'Bleacher font'], ['sg', 'Mercedes font']].map(([k, t]) => `<button data-fsw="${k}" class="${k === cur ? 'on' : ''}">${t}${k === cur ? '<span class="lpck">✓</span>' : ''}</button>`).join(''); })()}${[['2', 'Pill menu'], ['3', 'Bar menu']].map(([k, t], i) => `<button data-bmsw="${k}" class="${i ? '' : 'lyf '}${lyMenu() === k ? 'on' : ''}">${t}${lyMenu() === k ? '<span class="lpck">✓</span>' : ''}</button>`).join('')}${[['', 'Pills · Outline'], ['A', 'Pills A · Underline']].map(([k, t], i) => { const cur = document.documentElement.classList.contains('pgA') ? 'A' : ''; return `<button data-psw="${k}" class="${i ? '' : 'lyf '}${cur === k ? 'on' : ''}">${t}${cur === k ? '<span class="lpck">✓</span>' : ''}</button>`; }).join('')}${HSTRIP.map(([k, t], i) => `<button data-ssw="${k}" class="${i ? '' : 'lyf '}${hStrip() === k ? 'on' : ''}">${t}${hStrip() === k ? '<span class="lpck">✓</span>' : ''}</button>`).join('')}${HSTY.map(([k, t], i) => `<button data-hsw="${k}" class="${i ? '' : 'lyf '}${hStyle() === k ? 'on' : ''}">${t}${hStyle() === k ? '<span class="lpck">✓</span>' : ''}</button>`).join('')}`;
+    m.innerHTML = `<button data-cc>Clear cache</button>${(() => { const de = document.documentElement, cur = de.classList.contains('fsg') ? 'sg' : 'bar'; return [['bar', 'Bleacher font'], ['sg', 'Mercedes font']].map(([k, t]) => `<button data-fsw="${k}" class="${k === cur ? 'on' : ''}">${t}${k === cur ? '<span class="lpck">✓</span>' : ''}</button>`).join(''); })()}${[['2', 'Pill menu'], ['3', 'Bar menu']].map(([k, t], i) => `<button data-bmsw="${k}" class="${i ? '' : 'lyf '}${lyMenu() === k ? 'on' : ''}">${t}${lyMenu() === k ? '<span class="lpck">✓</span>' : ''}</button>`).join('')}${[['', 'Pills · Outline'], ['A', 'Pills A · Underline']].map(([k, t], i) => { const cur = document.documentElement.classList.contains('pgA') ? 'A' : ''; return `<button data-psw="${k}" class="${i ? '' : 'lyf '}${cur === k ? 'on' : ''}">${t}${cur === k ? '<span class="lpck">✓</span>' : ''}</button>`; }).join('')}${F1BIG.map(([k, t], i) => `<button data-f1csw="${k}" class="${i ? '' : 'lyf '}${f1Big() === k ? 'on' : ''}">${t}${f1Big() === k ? '<span class="lpck">✓</span>' : ''}</button>`).join('')}${HSTRIP.map(([k, t], i) => `<button data-ssw="${k}" class="${i ? '' : 'lyf '}${hStrip() === k ? 'on' : ''}">${t}${hStrip() === k ? '<span class="lpck">✓</span>' : ''}</button>`).join('')}${HSTY.map(([k, t], i) => `<button data-hsw="${k}" class="${i ? '' : 'lyf '}${hStyle() === k ? 'on' : ''}">${t}${hStyle() === k ? '<span class="lpck">✓</span>' : ''}</button>`).join('')}`;
     /* show how much the cache takes (IndexedDB + localStorage) */
     (async () => { let b = 0; try { const e = navigator.storage && navigator.storage.estimate && await navigator.storage.estimate(); b = (e && e.usage) || 0; } catch (er) {} try { Object.keys(localStorage).forEach(k => { b += (k.length + String(localStorage.getItem(k) || '').length) * 2; }); } catch (er) {} const cb = m.querySelector('[data-cc]'); if (cb && b) cb.textContent = 'Clear cache · ' + (b > 1e6 ? (b / 1048576).toFixed(1) + ' MB' : Math.round(b / 1024) + ' KB'); })();
     o.addEventListener('click', close);
     m.addEventListener('click', ev => {
       { const pb = ev.target.closest('[data-psw]'); if (pb) { try { localStorage.setItem('pstyle', pb.dataset.psw); } catch (er) {} document.documentElement.classList.toggle('pgA', pb.dataset.psw === 'A'); close(); return; } }
+      { const fb = ev.target.closest('[data-f1csw]'); if (fb) { try { localStorage.setItem('f1card', fb.dataset.f1csw); } catch (er) {} close(); state.stripKey = null; render(); return; } }
       { const sb = ev.target.closest('[data-ssw]'); if (sb) { try { localStorage.setItem('hstrip', sb.dataset.ssw); } catch (er) {} close(); state.stripKey = null; render(); return; } }
       { const hb = ev.target.closest('[data-hsw]'); if (hb) { try { localStorage.setItem('hstyle', hb.dataset.hsw); } catch (er) {} close(); render(); return; } }
       { const bmb = ev.target.closest('[data-bmsw]'); if (bmb) { const k = bmb.dataset.bmsw; try { localStorage.setItem('bmenu', k); } catch (er) {} close(); render(); return; } }
@@ -4971,7 +4997,7 @@ const f1CCol = e => F1CCOL[String(f1Iso(e) || '').toLowerCase()] || '#3a3a3c';
 /* keep the label / dot current while the list is open (no re-render) */
 setInterval(() => { if (document.hidden || typeof topView !== 'function' || topView() !== 'list' || state.league !== 'f1') return; const evs = f1ListEvs(); if (!evs) return;
   f1LivePatch(); }, 20000);
-function f1LivePatch() { if (topView() !== 'list' || state.league !== 'f1') return; const evs = f1ListEvs(); if (!evs) return; let ch = 0;
+function f1LivePatch() { if (topView() !== 'list' || state.league !== 'f1') return; const evs = f1ListEvs(); if (!evs) return; let ch = 0; if (f1Big()) { if (F1.selId) f1ShowBig(F1.selId); return; }
   evs.forEach((e, k) => { const c = document.getElementById('f1c' + e.id), rd = c && c.querySelector('.f1rd'); if (!rd || !c.classList.contains('f1up')) return; const h = f1RdHTML(e, k, false); if (rd.innerHTML !== h) { rd.innerHTML = h; ch = 1; }
     const tl = c.querySelector('.f1tl'), h2 = f1Tiles(e, false); if (tl ? tl.outerHTML !== h2 : h2) { if (tl) tl.outerHTML = h2 || ''; else c.insertAdjacentHTML('beforeend', h2); ch = 1; } });
 }
@@ -4989,6 +5015,35 @@ async function f1LiveTick() { if (document.hidden || !Object.keys(F1.sb).length)
 setInterval(() => { f1LiveTick().catch(() => {}); }, 5000);
 document.addEventListener('visibilitychange', () => { if (!document.hidden) { F1.lv.t = 0; f1LiveTick().catch(() => {}); } });
 const f1LSig = () => { const evs = f1ListEvs(); return (evs ? f1Sig(evs) + evs.filter(f1WkOn).map(e => e.id).join() : 'x') + '|' + (F1.listY || '') + '|' + (F1.listY || f1ShowY() || '') + '|' + (F1.err || '') + '|' + (F1.hOpen ? 1 : 0); };
+/* F1 big card (hidden menu): under the strip only the chosen GP, as one large card – A session list · C weekend timeline · D tinted poster */
+const F1BIG = [['', 'F1 · Cards'], ['A', 'F1 A · Session list'], ['C', 'F1 C · Weekend timeline'], ['D', 'F1 D · Tinted poster']];
+const f1Big = () => { try { const v = localStorage.getItem('f1card') || ''; return F1BIG.some(x => x[0] === v) ? v : ''; } catch (e) { return ''; } };
+function f1BigHTML(e, k) { const V = f1Big(), y = e._y || F1.listY || f1ShowY(), TM = f1TM(y), now = Date.now();
+  const rc = f1Comp(e, 'Race'), done = f1Done(rc) || !!(rc && rc.date && new Date(rc.date) < now - 3 * 36e5);
+  const C = [...(e.competitions || [])].sort((a, b) => new Date(a.date) - new Date(b.date)), ab = c => c.type && c.type.abbreviation, nm = c => F1NX[ab(c)] || (c.type && c.type.text) || ab(c) || '';
+  const fin = c => { const st = (c.status && c.status.type) || {}; return st.completed || st.state === 'post' || f1Chq(c); };
+  const hm = t => String(t.getHours()).padStart(2, '0') + ':' + String(t.getMinutes()).padStart(2, '0'), day = c => DAYS[new Date(c.date).getDay()], tm = c => day(c) + ' ' + hm(new Date(c.date));
+  const cd = t => { const m = Math.max(1, Math.round((t - now) / 6e4)); return m < 60 ? m + 'm' : m < 1440 ? Math.floor(m / 60) + 'h ' + String(m % 60).padStart(2, '0') + 'm' : Math.floor(m / 1440) + 'd ' + Math.floor((m % 1440) / 60) + 'h'; };
+  const wk = !done && f1WkOn(e), nxi = C.findIndex(c => !fin(c) && !f1CompLive(c) && new Date(c.date).getTime() > now - 6e4);
+  const S = C.map((c, i) => ({ c, n: nm(c), t: tm(c), d: day(c), h: hm(new Date(c.date)), st: f1CompLive(c) ? 'live' : fin(c) || (wk && i < nxi) ? 'done' : i === nxi && wk ? 'next' : '' }));
+  const lab = x => x.st === 'live' ? '● Live' : x.st === 'done' ? 'Done' : x.st === 'next' ? 'in ' + cd(new Date(x.c.date)) : x.t;
+  const top = !wk && C[0] ? 'Starts in ' + cd(new Date(C[0].date)) : (() => { const L = S.find(x => x.st === 'live'), N = S.find(x => x.st === 'next'); return L ? '<span class="lvd">●</span> ' + esc(L.n) + ' live' : N ? '<span class="lvd">●</span> ' + esc(N.n) + ' in ' + cd(new Date(N.c.date)) : '<span class="lv">●</span> Race weekend'; })();
+  const MED = ['', '#d4af37', '#c0c0c0', '#cd7f32'], tc = c => TM[String(c.id)] ? f1TCol(TM[String(c.id)]) : MED[c.order] || '#3a3a3c';
+  const R = [1, 2, 3, 4, 5].map(o => ((rc && rc.competitors) || []).find(c => c.order === o)).filter(Boolean), an = c => { const a = c.athlete || {}; return a.lastName || String(a.displayName || '').split(' ').slice(-1)[0] || f1Ab(c); };
+  const noR = '<div class="bl">Results not available yet</div>', res = L => !L.length ? noR : L.map(c => `<div class="pr"><em>${c.order}</em><i style="background:${tc(c)}"></i><b>${esc(an(c))}</b><span>${esc(TM[String(c.id)] || '')}</span></div>`).join('');
+  const nmS = esc(f1Short(e).replace(/-Catalunya/i, '')), circ = esc((e.circuit && e.circuit.fullName) || ''), dt = esc(f1DatesY(e)), rd = 'R' + (k + 1);
+  const ttl = `<div class="bt">${f1Flag(e)}<div class="bn"><b>${nmS}</b><small>${circ}</small></div><div class="br"><b>${rd}</b><small>${done ? 'Finished' : dt}</small></div></div>`;
+  let in_ = '';
+  if (V === 'A') in_ = ttl + (done ? `<div class="bl">Race · Finished</div><div class="bls">${res(R)}</div>` : `<div class="bl">${top}</div><div class="bls">${S.map(x => `<div class="sr ${x.st}"><b>${esc(x.n)}</b><span>${esc(x.t)}</span>${x.st ? `<u>${lab(x)}</u>` : ''}</div>`).join('')}</div>`);
+  else if (V === 'C') { if (done) { const w = R[0]; in_ = ttl + (w ? `<div class="win" style="--w:${tc(w)}"><small>WINNER</small><b>${esc(an(w))}</b><span>${esc(TM[String(w.id)] || '')}</span><em>1</em></div>` : '') + `<div class="bls">${res(R.slice(1, 4))}</div>`; }
+    else { const D = []; S.forEach(x => { let g = D.find(z => z.d === x.d); if (!g) D.push(g = { d: x.d, L: [] }); g.L.push(x); });
+      in_ = ttl + `<div class="bl">${top}</div><div class="btl">${D.map(g => `<div class="dc"><h4>${esc(g.d)}</h4>${g.L.map(x => `<div class="nd ${x.st}"><i></i><b>${esc(x.n)}</b><span>${x.st === 'next' || x.st === 'live' ? lab(x) : esc(x.h)}</span></div>`).join('')}</div>`).join('')}</div>`; } }
+  else { in_ = `<div class="wm">${rd}</div><div class="ph">${f1Flag(e)}<b>${esc(f1Short(e).replace(/ Grand Prix.*$/i, '').replace(/-Catalunya/i, ''))}</b><small>GRAND PRIX · ${dt}</small></div>` +
+      (done ? `<div class="tag">FINISHED</div><div class="tbl">${!R.length ? noR : R.map(c => `<div class="tr"><em>${c.order}</em><i style="background:${tc(c)}"></i><b>${esc(f1Ab(c))}</b><span>${esc(an(c))}</span></div>`).join('')}</div>`
+        : `<div class="tag ${wk ? 'lv' : ''}">${wk ? '● RACE WEEKEND' : esc(top.toUpperCase())}</div><div class="tiles">${S.map(x => `<div class="tile ${x.st}"><small>${esc(x.n)}</small><b>${lab(x)}</b></div>`).join('')}</div>`); }
+  return `<div class="card f1card f1big fb${V}" data-f1race="${esc(e.id)}" data-f1ry="${esc(e._y || '')}" id="f1c${esc(e.id)}" style="--cc:${f1CCol(e)}">${in_}</div>`; }
+function f1ShowBig(id) { const evs = f1ListEvs(), m = $app.querySelector('main.f1list'); if (!evs || !m) return; const k = evs.findIndex(e => e.id === id); if (k < 0) return; F1.selId = id;
+  const h = f1BigHTML(evs[k], k); if (m.innerHTML !== h) m.innerHTML = h; }
 function renderF1List() {
   F1._y0 = F1.scrolled ? window.scrollY : null; F1._anc = null; const noAnc = F1.noAnc; F1.noAnc = 0;
   /* keep the card that is at the top where it is, even if cards above it change */
@@ -5001,6 +5056,7 @@ function renderF1List() {
     const cur = f1CurEv(evs); F1.curId = cur.id; if (!F1.selId || !evs.some(e => e.id === F1.selId)) F1.selId = cur.id;
     strip = evs.map((e, k) => { const rc = f1Comp(e, 'Race'), dn = f1Done(rc); return `<button class="dy ${e.id === F1.selId ? 'on' : ''}${e.id === F1.curId ? ' tdy' : ''}${dn ? ' hg' : !F1.listY && f1WkOn(e) ? ' hg hw' : ''}" style="--h:${dn ? .5 : 0}" data-f1go="${esc(e.id)}"><small>${esc(f1Iso(e) || 'GP')}</small><b>${k + 1}</b></button>`; }).join('');
     F1._rnd = [evs.findIndex(e => e.id === cur.id) + 1, evs.length];
+    if (f1Big()) { const k = Math.max(0, evs.findIndex(e => e.id === F1.selId)); body = f1BigHTML(evs[k], k); } else
     body = evs.map((e, k) => {
       try { f1FixCid(e); } catch (er) {} const rc = f1Comp(e, 'Race'), done = f1Done(rc) || !!(rc && rc.date && new Date(rc.date) < Date.now() - 3 * 36e5 && (rc.competitors || []).some(c => c.order === 1)), w = done && rc && (rc.competitors || []).find(c => c.order === 1), cid = e.circuit && e.circuit.id, cu = F1.circ[cid];
       const lc = !done && f1LiveComp(e), y = e._y || F1.listY || f1ShowY();
@@ -5051,6 +5107,7 @@ function f1Pin(id) { const t0 = Date.now(), tok = F1.tok; cancelAnimationFrame(F
     F1._pin = requestAnimationFrame(step); };
   F1._pin = requestAnimationFrame(step); }
 function f1ScrollTo(id, smooth) {
+  if (f1Big()) { f1ShowBig(id); window.scrollTo(0, 0); return; }
   try { f1Spacer(); } catch (e) {}
   const c = document.getElementById('f1c' + id), f = $app.querySelector('.f1list > .f1card'); if (!c || !f) return;
   const target = Math.max(0, Math.round(c.offsetTop - f.offsetTop));
