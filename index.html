@@ -1255,7 +1255,9 @@ main.hsA .f1n,.hsA .f1n{background:linear-gradient(100deg,color-mix(in srgb,var(
 .hsB .f1n{padding-left:21px !important;overflow:hidden}.hsB .f1n::before{content:'';position:absolute;left:0;top:0;bottom:0;width:5px;background:linear-gradient(var(--c1),var(--c2))}
 
 /* scrollable top strip (all leagues): 7 per screen, snaps to an item */
-html.fbar header .hwk.hsc.stA{margin-top:-4px}html.fsg header .hwk.hsc.stA{margin-top:-8px}
+html.fbar header .hwk.hsc.stA,html.fbar header .hwk.hsc.stD{margin-top:-4px}html.fsg header .hwk.hsc.stA,html.fsg header .hwk.hsc.stD{margin-top:-8px}
+/* circles: every day with games gets a red dot (NFL weeks and F1 rounds always have one) */
+.hsc.st .dy.hg::after,.hsc.st .dy[data-wk]::after,.hsc.st .dy[data-f1go]::after{background:var(--brand) !important}.hsc.st .dy.hw::after{background:var(--live) !important}
 /* strip marker glides between items */
 .hsc .dy b{transition:background-color .22s ease,color .22s ease,transform .22s ease}
 .hsc .dy::after{transition:width .22s ease,height .22s ease,background-color .22s ease,transform .22s ease,margin .22s ease}
@@ -1277,6 +1279,14 @@ html.fbar .hsc .dy b{line-height:37px !important;padding-bottom:1px;box-sizing:b
 /* B · wheel */
 .stB .dy{transform:scale(calc(1 - var(--d, 0) * .1));opacity:calc(1 - var(--d, 0) * .26);transition:transform .08s linear,opacity .08s linear}
 .stB .dy b{background:none !important}.stB .dy.on b{background:none !important;color:var(--brand)}
+/* D · timeline 2.0 */
+.stD .dy{height:54px !important;justify-content:flex-start;padding-top:6px !important;gap:0 !important;position:relative;z-index:1}
+.stD .dy small{display:none}.stD .dy::after{display:none}
+.stD .dy b{width:auto;height:auto;line-height:1.1 !important;padding:0 !important;font-size:15px;color:var(--mut);background:none !important;overflow:visible;transform:translateY(calc(var(--l, 0) * -3px)) scale(calc(1 + var(--l, 0) * .3));transition:color .2s ease !important;transform-origin:50% 100%}
+.stD .dy.on b{color:#fff;background:none !important}.stD .dy.tdy:not(.on) b{color:var(--brand)}
+.stD .tl2{position:absolute;left:0;bottom:0;height:30px;pointer-events:none}
+.stD .tl2 svg{display:block;overflow:visible}.stD .tl2 .l{fill:none;stroke:#5a5a5e;stroke-width:2;stroke-linecap:round}.stD .tl2 .a{display:none}
+.stD .tl2 i{position:absolute;left:0;top:0;width:16px;height:16px;border-radius:50%;background:var(--brand);box-shadow:0 0 0 3px #000,0 0 12px rgba(229,72,77,.55);will-change:transform}
 /* C · bars */
 .stC .dy.on b{background:none !important;color:var(--brand)}
 .stC .dy::after{width:24px !important;border-radius:4px !important;height:calc(3px + var(--h, 0) * 15px) !important;background:#2c2c2e !important;margin-top:-3px !important;align-self:center}
@@ -2029,19 +2039,30 @@ const LY_PK = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke
 const LY_FLG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M5 21V4M5 4h13l-2.5 4.5L18 13H5"/></svg>';
 /* ===== home styles (hidden menu): Classic & Classic Alt (B header + classic cards), A colour cards · B big day ===== */
 const HSTY = [['', 'Classic'], ['A', 'Home A · Colour cards'], ['B', 'Home B · Big day']];
-const HSTRIP = [['', 'Strip · Circles'], ['A', 'Strip A · Timeline'], ['B', 'Strip B · Wheel'], ['C', 'Strip C · Bars']];
+const HSTRIP = [['', 'Strip · Circles'], ['A', 'Strip A · Timeline'], ['B', 'Strip B · Wheel'], ['C', 'Strip C · Bars'], ['D', 'Strip D · Timeline 2.0']];
 const hStrip = () => { try { const v = localStorage.getItem('hstrip') || ''; return HSTRIP.some(x => x[0] === v) ? v : ''; } catch (e) { return ''; } };
 /* scrollable strip: snaps to an item; the wheel style scales items by distance from the centre; dots for days that scroll into view */
 function stripWire() { const s = document.getElementById('strip'); if (!s || !s.classList.contains('hsc') || s._wired) return; s._wired = 1; s.dataset.w = 1;
   /* the strip fills edge to edge (no empty space after the last GP / before the first day). Near the ends, where the
      middle can't reach the first / last items, a virtual pointer slides on to them, so they can still be picked by dragging. */
   const bs = () => [...s.querySelectorAll('button')], pos = b => b.getBoundingClientRect().left - s.getBoundingClientRect().left + s.scrollLeft + b.offsetWidth / 2;
-  const vc = () => { const W = s.clientWidth, sl = s.scrollLeft, maxS = Math.max(0, s.scrollWidth - W), f = s.firstElementChild, l = s.lastElementChild; let c = sl + W / 2; if (!f) return c;
+  const vc = () => { const W = s.clientWidth, sl = s.scrollLeft, maxS = Math.max(0, s.scrollWidth - W), L0 = bs(), f = L0[0], l = L0[L0.length - 1]; let c = sl + W / 2; if (!f) return c;
     const H1 = W / 2 - pos(f), H2 = pos(l) - (s.scrollWidth - W / 2), r = maxS - sl; if (H1 > 0 && sl < H1) c -= H1 - sl; if (H2 > 0 && r < H2) c += H2 - r; return c; };
   const near = () => { const c = vc(); let best = null, bd = 1e9; bs().forEach(b => { const d = Math.abs(pos(b) - c); if (d < bd) { bd = d; best = b; } }); return best; };
   const tgtOf = b => Math.min(Math.max(0, s.scrollWidth - s.clientWidth), Math.max(0, pos(b) - s.clientWidth / 2));
   const atEdgeKeep = () => { const cur = s._cur; if (!cur) return null; return Math.abs(tgtOf(cur) - s.scrollLeft) < 3 ? cur : null; };
-  const wheel = () => { if (!s.classList.contains('stB')) return; const c = vc(); bs().forEach(b => { const d = Math.abs(pos(b) - c) / b.offsetWidth; b.style.setProperty('--d', Math.min(3, d).toFixed(2)); }); };
+  /* D · timeline 2.0: a plain line; a ball rides it under the pointer and the dates next to the ball rise, like the wheel */
+  let tl = null; const tlDraw = () => { if (!s.classList.contains('stD')) return; const L = bs(); if (!L.length) return;
+    if (!tl) { tl = document.createElement('div'); tl.className = 'tl2'; tl.innerHTML = '<svg><defs><linearGradient id="tl2g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".13"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient></defs><path class="a"/><path class="l"/></svg><i></i>'; s.appendChild(tl); }
+    const sig = s.scrollWidth + '|' + L.map(b => b.style.getPropertyValue('--h')).join(','); if (tl && tl._sig === sig) return; tl._sig = sig;
+    const hv = b => parseFloat(b.style.getPropertyValue('--h')) || 0, mx = Math.max(.25, ...L.map(hv)), W = s.scrollWidth, H = 30, y = () => H - 8, P = L.map(b => [pos(b), y(b)]);
+    P.unshift([0, P[0][1]]); P.push([W, P[P.length - 1][1]]);
+    let d = `M${P[0][0]},${P[0][1]}`; for (let i = 0; i < P.length - 1; i++) { const p0 = P[i - 1] || P[i], p1 = P[i], p2 = P[i + 1], p3 = P[i + 2] || p2; d += ` C${p1[0] + (p2[0] - p0[0]) / 6},${p1[1] + (p2[1] - p0[1]) / 6} ${p2[0] - (p3[0] - p1[0]) / 6},${p2[1] - (p3[1] - p1[1]) / 6} ${p2[0]},${p2[1]}`; }
+    const sv = tl.firstChild; sv.setAttribute('width', W); sv.setAttribute('height', H); sv.setAttribute('viewBox', `0 0 ${W} ${H}`); tl.style.width = W + 'px';
+    sv.querySelector('.l').setAttribute('d', d); sv.querySelector('.a').setAttribute('d', d + ` L${W},${H} L0,${H} Z`); tl._len = 0; tlBall(); };
+  const tlBall = () => { if (!tl) return; const pth = tl.querySelector('.l'), x = vc(); let len = tl._len || (tl._len = pth.getTotalLength()), lo = 0, hi = len, pt = null; for (let k = 0; k < 18; k++) { const m = (lo + hi) / 2; pt = pth.getPointAtLength(m); if (pt.x < x) lo = m; else hi = m; } if (pt) tl.lastChild.style.transform = `translate3d(${x - 8}px,${pt.y - 8}px,0)`; };
+  const wheel = () => { const B = s.classList.contains('stB'), D = s.classList.contains('stD'); if (!B && !D) return; const c = vc(); bs().forEach(b => { const d = Math.abs(pos(b) - c) / b.offsetWidth; if (B) b.style.setProperty('--d', Math.min(3, d).toFixed(2)); else b.style.setProperty('--l', Math.max(0, 1 - d / 1.4).toFixed(3)); }); if (D) tlBall(); };
+  if (s.classList.contains('stD')) { s.style.position = 'relative'; tlDraw(); let q = 0; new MutationObserver(() => { cancelAnimationFrame(q); q = requestAnimationFrame(tlDraw); }).observe(s, { subtree: true, attributes: true, attributeFilter: ['style'] }); }
   /* the strip rolls like a picker: while it moves, the marker glides to the item under the pointer; when it stops, that item
      is picked (as if tapped). Tapping an item rolls the strip to it first. */
   const mark = b => { if (!b || b.classList.contains('on')) return; s.querySelectorAll('button.on').forEach(x => x.classList.remove('on')); b.classList.add('on'); };
