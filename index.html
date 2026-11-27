@@ -162,9 +162,8 @@ header.d + main{padding-top:0}
 .dtabs.five button{font-size:11.5px;letter-spacing:0;font-stretch:100%}
 .pane{background:var(--card);margin:0 -16px 24px;padding:30px 16px 32px}
 .pane.t{padding-top:10px}
-.seg{display:flex;background:transparent;border-radius:999px;padding:3px;margin:0 auto;max-width:252px;border:1.5px solid #282829}
+.seg{display:flex;margin:0 auto}
 .seg button{flex:1;padding:3px 4px;border-radius:999px;font-weight:600;font-size:14px;color:#fff}
-.seg button.on{background:#fff;color:#000}
 .blk{margin-top:24px}
 .seg + .blk{margin-top:8px}
 .pv{margin-bottom:6px}
@@ -711,8 +710,8 @@ td.n .slg{width:20px;height:20px;object-fit:contain;vertical-align:-6px;margin-l
 .lpm{position:fixed;z-index:61;background:#1c1c1d;border-radius:12px;min-width:200px;overflow:hidden;box-shadow:0 10px 30px rgba(0,0,0,.5)}
 .lpm button{display:block;width:100%;text-align:left;padding:14px 16px;font-size:16px;font-weight:600;color:#fff;background:none;border:0;border-bottom:1px solid #282829;font-family:inherit}
 .lpm button:last-child{border-bottom:0}
-.lpm button[data-f1csw],.lpm button[data-psw],.lpm button[data-fsw],.lpm button[data-bmsw],.lpm button[data-hsw],.lpm button[data-ssw]{display:flex;justify-content:space-between;align-items:center}
-.lpm button[data-f1csw]:not(.on),.lpm button[data-psw]:not(.on),.lpm button[data-fsw]:not(.on),.lpm button[data-bmsw]:not(.on),.lpm button[data-hsw]:not(.on),.lpm button[data-ssw]:not(.on){color:var(--mut)}
+.lpm button[data-f12sw],.lpm button[data-fsw],.lpm button[data-bmsw],.lpm button[data-hsw],.lpm button[data-ssw]{display:flex;justify-content:space-between;align-items:center}
+.lpm button[data-f12sw]:not(.on),.lpm button[data-fsw]:not(.on),.lpm button[data-bmsw]:not(.on),.lpm button[data-hsw]:not(.on),.lpm button[data-ssw]:not(.on){color:var(--mut)}
 .lpck{color:#fff;font-size:15px}
 .lpm button[data-cc]{border-bottom:6px solid #0e0e10}
 .lvt{font-family:var(--num);font-weight:700;font-size:26px;margin:4px 4px 12px}
@@ -995,7 +994,6 @@ html,body{overflow-anchor:none}
 html.fbar .f1d .f1dn{position:relative;top:-2px}
 html.fbar .f1gp > span:not(.f1fl){position:relative;top:-2px}
 html.fsg .f1gp > span:not(.f1fl){position:relative;top:.75px}
-.f1nm{font-family:var(--num);font-weight:700;font-size:18px;line-height:1.1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .f1pen{display:block;color:var(--mut);font-family:-apple-system,sans-serif;font-size:11.5px;font-weight:600;line-height:1.25}
 .f1d{display:flex;align-items:center;gap:10px;min-width:0}
 .f1d .hs{width:36px;height:36px;border-radius:50%;object-fit:cover;background:#1c1c1d;flex:none}
@@ -1073,20 +1071,17 @@ html.fsg td.n .slg{top:.75px}
 /* scores (inline grids) sat ~1.5px below the names in the same row */
 .gl2 .glr,.sch .rs .rg{position:relative;top:-1.5px}
 /* descenders (g, p, y) in clipped one-line texts */
-.f1nm,.f1dn b{padding-bottom:6px;margin-bottom:-6px}
+.f1dn b{padding-bottom:6px;margin-bottom:-6px}
 
 /* F1 list cards (Kuba's layout): ROUND label, small flag next to the GP name, cut-out driver photo */
 
-.f1rd .rdl{color:var(--live)}
 .f1fl.chq,.f1lvh .f1ld.chq{background:repeating-conic-gradient(#fff 0 25%, #0e0e10 0 50%) 0 0/3px 3px !important;animation:none !important;box-shadow:0 0 0 .5px rgba(255,255,255,.6)}
 tr.f1out td.f1rk,tr.f1out .f1dn b{color:var(--live)}
 .f1lvh{color:#fff !important;font-weight:600;position:relative;white-space:nowrap}
 .f1lvh .f1ld{position:relative;display:inline-block;border-radius:50%;background:var(--live);animation:blink 1.4s infinite;margin:0 7px 0 0 !important;width:7px !important;height:7px !important;vertical-align:calc(var(--capc, .405em) - 3.5px) !important}
 .f1lvh .flg{margin-left:2px}
-.f1rd .f1ld{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--live);margin-left:6px;vertical-align:calc(var(--capc, .405em) - 3px);animation:blink 1.4s infinite}
-.f1rd{font-family:var(--num);font-weight:700;font-size:12px;letter-spacing:.6px;text-transform:uppercase;color:#fff;line-height:1.2;white-space:nowrap}
 
-@supports (overflow:clip){.f1nm,.f1rh .lvt,.f1dn b,.stn td.n .pn,.brt b{overflow-x:clip;overflow-y:visible}}
+@supports (overflow:clip){.f1rh .lvt,.f1dn b,.stn td.n .pn,.brt b{overflow-x:clip;overflow-y:visible}}
 
 /* finished GP: podium balls with gold / silver / bronze rings (same colours as positions 1–3) */
 
@@ -1236,23 +1231,6 @@ header .f1wk.strip{display:flex;gap:0;overflow-x:auto;margin:14px -16px 2px;padd
 .f1wk .dy.on{background:none;color:#fff}.f1wk .dy.on b{background:var(--brand);color:#fff}.f1wk .dy.tdy:not(.on) b{color:var(--brand)}
 .hwk button::after{content:'';width:5px;height:5px;border-radius:50%;margin-top:1px;background:transparent}.hwk button.hg::after{background:var(--mut)}.hwk button.hg.on::after{background:var(--brand)}.hwk button.hw::after{background:var(--live) !important}
 
-/* F1 list cards (new) – same height as the game cards */
-.f1card.f1n{display:flex;flex-direction:column;justify-content:space-between;height:95px !important;box-sizing:border-box;padding:10px 14px 10px !important;position:relative}
-.f1n .f1nt{display:flex;align-items:center;gap:10px;min-height:0}
-.f1n .f1nt > .f1fl{width:26px;height:26px;display:block}
-.f1n .f1nh{flex:1;min-width:0}
-.f1n .f1nm{font-family:var(--num);font-weight:700;font-size:21px;line-height:1.05;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:none !important;padding:0;margin:0}
-.f1n .f1rd{flex:none;text-align:right;text-transform:none;letter-spacing:0;font-family:var(--num);font-weight:700;font-size:13.5px;color:var(--mut);display:flex;flex-direction:column;align-items:flex-end;gap:0;line-height:1.12;margin:0;padding:0}
-.f1n .f1rd b{font-size:13.5px}.f1n .f1rd .f1dt{color:#fff}.f1n .f1rd .rdl{color:var(--live);display:flex;align-items:center;gap:5px}
-.f1n .f1rd .f1ld{position:static !important;margin:0 !important}
-.f1n .f1tl{display:flex;gap:7px;margin:0}
-.f1n .f1tl > div{flex:1;min-width:0;height:40px;box-sizing:border-box;background:rgba(255,255,255,.06);border-radius:11px;padding:0 9px;display:flex;align-items:center;gap:7px;font-family:var(--num)}
-.f1n .f1tl em{font-style:normal;font-weight:800;font-size:15px;color:var(--mut)}.f1n .f1tl i{display:block;width:4px;height:20px;border-radius:2px;flex:none}.f1n .f1tl b{font-size:17px;font-weight:700;white-space:nowrap}
-.f1n .f1tl .f1gp{margin-left:auto;font-size:13.5px;font-weight:600;color:var(--mut)}
-.f1n .f1tl .s{flex-direction:column;align-items:flex-start;justify-content:center;gap:0;padding:0 10px}.f1n .f1tl .s small{font-size:12px;font-weight:700;color:var(--mut);line-height:1.1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}.f1n .f1tl .s b{font-size:15.5px;line-height:1.12}
-.f1n .f1tl .s.nx{background:color-mix(in srgb,var(--live) 16%,transparent)}.f1n .f1tl .s.nx small,.f1n .f1tl .s.nx b{color:#ff6b6b}.f1n .f1tl .s.dn{opacity:.45}
-main.hsA .f1n,.hsA .f1n{background:linear-gradient(100deg,color-mix(in srgb,var(--c1) 75%,transparent) 0%,var(--card) 58%)}
-.hsB .f1n{padding-left:21px !important;overflow:hidden}.hsB .f1n::before{content:'';position:absolute;left:0;top:0;bottom:0;width:5px;background:linear-gradient(var(--c1),var(--c2))}
 
 /* scrollable top strip (all leagues): 7 per screen, snaps to an item */
 html.fbar header .hwk.hsc.stA{margin-top:2px}html.fsg header .hwk.hsc.stA{margin-top:-2px}
@@ -1287,37 +1265,24 @@ header .hwk.hsc.stA{background:linear-gradient(#3a3a3c,#3a3a3c) no-repeat 0 calc
 .stA .tlb::after{content:'';position:absolute;left:-8px;top:-8px;width:16px;height:16px;border-radius:50%;background:var(--brand);box-shadow:0 0 0 3px #000,0 0 12px rgba(229,72,77,.55)}
 .stA .tlb.idle{transition:transform .25s cubic-bezier(.2,.8,.2,1)}
 
-/* Pills A · Underline (hidden menu): text tabs, centred, the chosen one white with a red bar under it */
-html.pgA .seg{border:0 !important;background:none !important;border-radius:0 !important;padding:0 !important;max-width:100% !important;justify-content:center;gap:24px;box-shadow:inset 0 -1px 0 #2c2c2e}
-html.pgA .seg > button{flex:0 0 auto !important;padding:5px 0 10px !important;border-radius:0 !important;background:none !important;color:#8e8e93 !important;position:relative;font-size:18px !important;box-shadow:none !important}
-html.pgA .seg:has(> button:nth-child(4)){gap:18px}
-html.fsg.pgA .seg > button{font-size:16px !important}html.fsg.pgA .seg:has(> button:nth-child(4)){gap:14px}html.pgA .seg:has(> button:nth-child(5)){gap:12px}
-html.pgA .seg > button.on{color:#fff !important;background:none !important}
-html.pgA .seg > button.on::after{content:'';position:absolute;left:0;right:0;bottom:0;height:3px;border-radius:3px;background:var(--brand)}
+/* pills: text tabs, centred, the chosen one white with a red bar under it */
+html .seg{border:0 !important;background:none !important;border-radius:0 !important;padding:0 !important;max-width:100% !important;justify-content:center;gap:24px;box-shadow:inset 0 -1px 0 #2c2c2e}
+html .seg > button{flex:0 0 auto !important;padding:5px 0 10px !important;border-radius:0 !important;background:none !important;color:#8e8e93 !important;position:relative;font-size:18px !important;box-shadow:none !important}
+html .seg:has(> button:nth-child(4)){gap:18px}
+html.fsg .seg > button{font-size:16px !important}html.fsg .seg:has(> button:nth-child(4)){gap:14px}html .seg:has(> button:nth-child(5)){gap:12px}
+html .seg > button.on{color:#fff !important;background:none !important}
+html .seg > button.on::after{content:'';position:absolute;left:0;right:0;bottom:0;height:3px;border-radius:3px;background:var(--brand)}
 
 /* F1 big card (hidden menu) */
 .f1card.f1big{height:auto !important;min-height:408px;display:block !important;padding:16px !important;border-radius:22px;position:relative;overflow:hidden}
-.f1big .bt{display:flex;align-items:center;gap:11px}.f1big .bt .f1fl{width:30px;height:30px}.f1big .bn{flex:1;min-width:0}.f1big .bn b{display:block;font-family:var(--num);font-size:22px;font-weight:700;line-height:1.05;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.f1big .bn small{display:block;color:var(--mut);font-size:13.5px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.f1big .br{text-align:right;font-family:var(--num)}.f1big .br b{display:block;font-size:14px;color:var(--mut)}.f1big .br small{font-size:13.5px;font-weight:700}
-.f1big .bl{margin:16px 0 8px;font-size:13px;font-weight:700;color:var(--mut);letter-spacing:.8px;text-transform:uppercase}.f1big .lvd{color:var(--live)}
-.f1big .bls{display:flex;flex-direction:column;gap:6px}
-.f1big .sr,.f1big .pr{display:flex;align-items:center;gap:10px;height:44px;background:rgba(255,255,255,.05);border-radius:12px;padding:0 13px;font-family:var(--num);font-size:17px}
-.f1big .sr b{flex:1;font-weight:700}.f1big .sr span{color:#c7c7cc;font-weight:600}.f1big .sr u{text-decoration:none;font-size:14px;font-weight:700;color:var(--mut)}
-.f1big .sr.done{opacity:.45}.f1big .sr.next,.f1big .sr.live{background:color-mix(in srgb,var(--brand) 16%,transparent)}.f1big .sr.next b,.f1big .sr.next u,.f1big .sr.live b,.f1big .sr.live u{color:#ff6b70}
-.f1big .pr em{font-style:normal;color:var(--mut);width:14px;font-weight:700}.f1big .pr i{width:4px;height:20px;border-radius:2px;flex:none}.f1big .pr b{font-weight:700}.f1big .pr span{flex:1;color:var(--mut);font-size:14px;text-align:right;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .f1big .btl{display:flex;gap:8px;margin-top:4px}.f1big .dc{flex:1;min-width:0}.f1big .dc h4{font-family:var(--num);font-size:14px;color:var(--mut);letter-spacing:1px;text-transform:uppercase;margin:0 0 8px}
 .f1big .nd{position:relative;padding:0 0 14px 16px;border-left:2px solid #2c2c2e;margin-left:5px;font-family:var(--num)}.f1big .nd:last-child{border-left-color:transparent}.f1big .nd i{position:absolute;left:-7px;top:2px;width:12px;height:12px;border-radius:50%;background:#3a3a3c;box-shadow:0 0 0 3px var(--card)}
 .f1big .nd b{display:block;font-size:15px;font-weight:700;line-height:1.25;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding-bottom:1px}.f1big .nd span{font-size:14px;color:var(--mut);font-weight:600}.f1big .nd.done{opacity:.45}.f1big .nd.done i{background:var(--mut)}
 .f1big .nd.next i,.f1big .nd.live i{background:var(--brand);box-shadow:0 0 0 3px var(--card),0 0 10px var(--brand)}.f1big .nd.next b,.f1big .nd.next span,.f1big .nd.live b,.f1big .nd.live span{color:#ff6b70}
-.f1big .win{position:relative;margin:14px 0 8px;border-radius:16px;padding:14px 16px;overflow:hidden;background:linear-gradient(120deg,color-mix(in srgb,var(--w) 70%,#000),rgba(255,255,255,.04) 75%);font-family:var(--num)}
-.f1big .win small{font-size:12px;font-weight:700;letter-spacing:1.5px;color:rgba(255,255,255,.7)}.f1big .win b{display:block;font-size:34px;font-weight:700;line-height:1}.f1big .win span{font-size:15px;color:rgba(255,255,255,.8);font-weight:600}.f1big .win em{position:absolute;right:14px;top:-6px;font-style:normal;font-size:96px;font-weight:700;color:rgba(255,255,255,.14)}
 .f1card.f1big.fbD{background:linear-gradient(160deg,color-mix(in srgb,var(--cc) 80%,#000) 0%,var(--card) 62%) !important;padding:18px 16px !important}
 .f1big .wm{position:absolute;right:-6px;top:-18px;font-family:var(--num);font-size:120px;font-weight:700;color:rgba(255,255,255,.08);line-height:1;pointer-events:none}
 .f1big .ph{position:relative}.f1big .ph .f1fl{width:34px;height:34px}.f1big .ph b{display:block;font-family:var(--num);font-size:40px;font-weight:700;line-height:44px;height:44px;margin-top:10px;white-space:nowrap}.f1big .ph small{display:block;margin-top:12px;font-family:var(--num);font-size:14px;line-height:1;font-weight:700;color:rgba(255,255,255,.7);letter-spacing:1px}
 .f1big .tag{display:inline-block;margin:12px 0 12px;line-height:1.25;font-family:var(--num);font-size:13px;font-weight:700;letter-spacing:1px;background:rgba(255,255,255,.12);border-radius:8px;padding:3px 9px}.f1big .tag.lv{background:color-mix(in srgb,var(--brand) 25%,transparent);color:#ff8a8e}
-.f1big .tiles{display:grid;grid-template-columns:1fr 1fr;gap:7px;font-family:var(--num)}.f1big .tile{background:rgba(0,0,0,.35);border-radius:12px;padding:8px 11px}.f1big .tile:last-child:nth-child(odd){grid-column:1/-1;background:rgba(255,255,255,.1)}
-.f1big .tile small{display:block;font-size:13px;color:var(--mut);font-weight:700}.f1big .tile b{font-size:18px;font-weight:700}.f1big .tile.done{opacity:.45}.f1big .tile.next,.f1big .tile.live{background:color-mix(in srgb,var(--brand) 22%,transparent)}.f1big .tile.next b,.f1big .tile.next small,.f1big .tile.live b,.f1big .tile.live small{color:#ff8a8e}
-.f1big .tbl{display:flex;flex-direction:column;font-family:var(--num)}.f1big .tr{display:flex;align-items:center;gap:10px;height:38px;border-bottom:1px solid rgba(255,255,255,.08);font-size:17px}.f1big .tr:last-child{border:0}.f1big .tr em{font-style:normal;width:14px;color:var(--mut);font-weight:700}.f1big .tr i{width:4px;height:18px;border-radius:2px}.f1big .tr b{width:40px;font-weight:700}.f1big .tr span{flex:1;color:#c7c7cc}
 
 .f1big .bx{margin-top:4px;background:rgba(0,0,0,.35);border-radius:14px;padding:10px 12px;font-family:var(--num)}.f1big .bx.yl{box-shadow:inset 0 0 0 1px rgba(255,214,10,.4)}.f1big .bx.rd{box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--live) 55%,transparent)}
 .f1big .bxh{display:flex;align-items:center;gap:10px;margin-bottom:2px}.f1big .bxh b{font-size:13px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:rgba(255,255,255,.65)}.f1big .bxh u{text-decoration:none;margin-left:auto;font-size:14px;font-weight:700;color:#ff8a8e}.f1big .bx.yl .bxh u{color:#ffd60a}
@@ -1332,8 +1297,25 @@ main .hsec.fvh{margin-top:4px !important}main .fvsp{height:10px}
 
 .f1big .kv{position:absolute;left:16px;right:16px;bottom:12px;background:none;border-radius:0;padding:0;font-family:var(--num)}.f1big .kv:empty{display:none}.f1big .kv > div{display:flex;align-items:center;gap:10px;height:36px}.f1big .kv > div + div{border-top:1px solid rgba(255,255,255,.07)}
 .f1big .kv small{flex:none;width:86px;font-size:12px;font-weight:700;letter-spacing:1px;color:rgba(255,255,255,.6);white-space:nowrap}.f1big .kv i{width:4px;height:18px;border-radius:2px;flex:none;margin-right:-2px}.f1big .kv b{flex:1;min-width:0;font-size:17px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.3}
-.f1big > .tag{align-self:flex-start}
 .f1big.fbD .nd:last-child{border-left-color:transparent}
+
+/* F1 2.0 */
+.f2l{background:var(--card);border-radius:20px;padding:4px 12px;font-family:var(--num)}
+.f2r{display:flex;align-items:center;gap:8px;height:52px;border-bottom:1px solid rgba(255,255,255,.06)}.f2r:last-child{border:0}.f2r > em{font-style:normal;width:18px;color:var(--mut);font-weight:700;font-size:16px;flex:none}
+.f2r > em.w1{color:#d4af37}.f2r > em.w2{color:#c0c0c0}.f2r > em.w3{color:#cd7f32}
+.f2r .tb{width:4px;height:26px;border-radius:2px;flex:none}.f2r .n{flex:1;min-width:0}.f2r .n b{display:block;font-size:17px;font-weight:700;line-height:1.25;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.f2r .n small{display:block;font-size:13px;color:var(--mut);font-weight:600;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.f2r > span{flex:none;min-width:34px;text-align:right;font-size:16px;font-weight:700}.f2r.rr > span{min-width:78px;font-weight:600;color:#c7c7cc;font-size:15px}
+.f2r u{text-decoration:none;font-size:14px;font-weight:700;width:28px;flex:none;text-align:center}.f2r u.up{color:#30d158}.f2r u.dn{color:#ff5a5f}.f2r u.eq{color:#5c5c60}
+.f2r .n b .fl,.f2note .fl{display:inline-block;font-style:normal;margin-left:6px;font-size:11px;line-height:15px;font-weight:700;background:#a855f7;color:#fff;border-radius:5px;padding:0 5px;vertical-align:.18em}
+.f2r .fm{display:flex;gap:3px;flex:none}.f2r .f,.f2hm .c{font-style:normal;font-weight:700;display:flex;align-items:center;justify-content:center;color:#000}.f2r .f{width:17px;height:17px;border-radius:5px;font-size:11px}
+.f2note{margin:10px 4px 0;font-family:var(--num);font-size:13px;color:var(--mut);font-weight:600}.f2note .fl{margin:0 2px 0 4px}
+.f2c{display:flex;align-items:center;gap:10px;height:54px;border-bottom:1px solid rgba(255,255,255,.06)}.f2c:last-child{border:0}.f2c > em{font-style:normal;width:18px;color:var(--mut);font-weight:700;font-size:16px}.f2c .cb{flex:1;min-width:0}
+.f2c .ct{display:flex;align-items:baseline;gap:8px}.f2c .ct b{flex:1;min-width:0;font-size:17px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.3}.f2c .ct span{font-size:17px;font-weight:700}
+.f2c .bar{height:6px;background:rgba(255,255,255,.07);border-radius:3px;margin-top:4px}.f2c .bar i{display:block;height:100%;border-radius:3px}
+.f2hm{background:var(--card);border-radius:20px;padding:12px 10px;font-family:var(--num)}.f2hm .hm{display:flex;align-items:center;gap:2px;height:22px}.f2hm .hm > span{width:42px;flex:none;font-size:13px;font-weight:700;color:#c7c7cc;display:flex;align-items:center;gap:4px}.f2hm .hm > span i{width:3px;height:13px;border-radius:2px}
+.f2hm .hm .c{flex:1;min-width:0;height:18px;border-radius:4px;font-size:10px}.f2hm .hr i{flex:1;min-width:0;font-style:normal;font-size:10px;color:var(--mut);text-align:center}
+.f2hm .lg{display:flex;align-items:center;gap:5px;margin-top:12px;font-size:12px;color:var(--mut);font-weight:600;flex-wrap:wrap}.f2hm .lg .c{width:16px;height:16px;flex:none;border-radius:4px;font-size:10px}.f2hm .lg span{margin-right:6px}
+.f2r .f.z1,.f2hm .c.z1{background:#d4af37}.f2r .f.z2,.f2hm .c.z2{background:#c0c0c0}.f2r .f.z3,.f2hm .c.z3{background:#cd7f32}.f2r .f.zp4,.f2hm .c.zp4{background:#2e7d5b;color:#fff}.f2r .f.zp5,.f2hm .c.zp5{background:#2a6e52;color:#fff}.f2r .f.zp6,.f2hm .c.zp6{background:#255f48;color:#fff}.f2r .f.zp7,.f2hm .c.zp7{background:#20523e;color:#fff}.f2r .f.zp8,.f2hm .c.zp8{background:#1c4535;color:#fff}.f2r .f.zp9,.f2hm .c.zp9{background:#18392c;color:#fff}.f2r .f.zp10,.f2hm .c.zp10{background:#142e24;color:#fff}.f2r .f.zn,.f2hm .c.zn{background:#2c2c2e;color:#fff}.f2r .f.ze,.f2hm .c.ze{background:#1a1a1c;color:#fff}.f2hm .c.zf{background:transparent;box-shadow:inset 0 0 0 1px rgba(255,255,255,.06)}
 </style>
 </head>
 <body>
@@ -1356,7 +1338,7 @@ function d2Trim(img) { const w = img.parentNode, u = w && w.dataset.u; if (!u ||
 const THC = (() => { try { return JSON.parse(localStorage.getItem('thc') || '{}'); } catch (e) { return {}; } })();
 const thcPut = (k, o) => { const c = THC[k] || {}; if (Object.keys(o).every(x => !o[x] || c[x] === o[x])) return; THC[k] = Object.assign(c, Object.fromEntries(Object.entries(o).filter(([, v]) => v))); try { localStorage.setItem('thc', JSON.stringify(THC)); } catch (e) {} };
 const HDR_BH = '<button class="back" data-back aria-label="Back"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></button><button class="home" data-home aria-label="Home"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"><path d="M3 10.5 12 3l9 7.5"/><path d="M5.5 9v11h13V9"/><path d="M10 20v-6h4v6"/></svg></button>', HDR_BHR = HDR_BH + '<button class="home" data-refresh aria-label="Refresh"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12a8 8 0 1 1-2.34-5.66"/><path d="M20 4v5h-5"/></svg></button>';
-try { if (localStorage.getItem('pstyle') === 'A') document.documentElement.classList.add('pgA'); } catch (e) {}
+try { localStorage.removeItem('pstyle'); } catch (e) {}
 try { localStorage.removeItem('design'); const f = localStorage.getItem('font'); document.documentElement.classList.add(f === 'sg' ? 'fsg' : 'fbar'); localStorage.removeItem('d2'); localStorage.removeItem('f12'); localStorage.removeItem('design2'); localStorage.removeItem('design3'); { const hs = localStorage.getItem('hstyle'); if (/^[MDJCIK]$/.test(hs || '')) localStorage.removeItem('hstyle'); } Object.keys(localStorage).filter(k => /^tps[234]?_/.test(k)).forEach(k => localStorage.removeItem(k)); } catch (e) { document.documentElement.classList.add('fbar'); }
 const API = 'https://site.api.espn.com/apis/site/v2/sports/';
 const WEB = 'https://site.web.api.espn.com/apis/common/v3/sports/';
@@ -2038,7 +2020,7 @@ function render() {
   if (window._slide) { const p = window._slideSel ? $app.querySelector('main') : $app.querySelector('.pane'), d = window._slide; window._slide = 0; window._slideSel = null; if (p && p.animate) p.animate([{ transform: `translateX(${d * 70}px)`, opacity: .3 }, { transform: 'none', opacity: 1 }], { duration: 230, easing: 'cubic-bezier(.2,.7,.3,1)' }); }
   const fh = document.getElementById('fhome'); if (fh) fh.hidden = true;
   $app.querySelectorAll(':scope > .hpw').forEach(x => x.remove()); if (v !== 'search') $app.insertAdjacentHTML('beforeend', '<div class="hpw"><button class="hpill" data-home><svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linejoin="round" stroke-linecap="round" style="vertical-align:-3px;margin-right:7px"><path d="M3 10.5 12 3l9 7.5"/><path d="M5.5 9v11h13V9"/><path d="M10 20v-6h4v6"/></svg>Home</button></div>');
-  if (v === 'list' && state.league === 'f1' && typeof F1 !== 'undefined' && F1._y0 != null) { const y0 = F1._y0; F1._y0 = null; try { f1Spacer(); } catch (e) {} if (!window._stAnim && Math.abs(window.scrollY - y0) > 1) window.scrollTo(0, y0); const A = F1._anc; F1._anc = null; const ac = A && document.getElementById(A[0]); if (ac && !window._stAnim) { const d = ac.getBoundingClientRect().top - A[1]; if (Math.abs(d) > 1) window.scrollBy(0, d); } window._yOv = window.scrollY; }
+  if (v === 'list' && state.league === 'f1' && typeof F1 !== 'undefined' && F1._y0 != null) { const y0 = F1._y0; F1._y0 = null; if (!window._stAnim && Math.abs(window.scrollY - y0) > 1) window.scrollTo(0, y0); const A = F1._anc; F1._anc = null; const ac = A && document.getElementById(A[0]); if (ac && !window._stAnim) { const d = ac.getBoundingClientRect().top - A[1]; if (Math.abs(d) > 1) window.scrollBy(0, d); } window._yOv = window.scrollY; }
   const bsw = document.getElementById('brsw');
   if (bsw && state.lv) { const lv = state.lv; bsw.scrollLeft = (lv.brPg || 0) * bsw.clientWidth;
     bsw.addEventListener('scroll', () => { const i = Math.round(bsw.scrollLeft / Math.max(1, bsw.clientWidth)); if (i !== lv.brPg) { lv.brPg = i; document.querySelectorAll('[data-brpg]').forEach((b, k) => b.classList.toggle('on', k === i)); } }, { passive: true }); }
@@ -4796,13 +4778,12 @@ function renderLeaders() {
     const o = document.createElement('div'); o.className = 'lpo';
     const m = document.createElement('div'); m.className = 'lpm';
     m.style.top = (r.bottom + 8) + 'px'; m.style.left = Math.min(r.left, window.innerWidth - 216) + 'px';
-    m.innerHTML = `<button data-cc>Clear cache</button>${(() => { const de = document.documentElement, cur = de.classList.contains('fsg') ? 'sg' : 'bar'; return [['bar', 'Bleacher font'], ['sg', 'Mercedes font']].map(([k, t]) => `<button data-fsw="${k}" class="${k === cur ? 'on' : ''}">${t}${k === cur ? '<span class="lpck">✓</span>' : ''}</button>`).join(''); })()}${[['2', 'Pill menu'], ['3', 'Bar menu']].map(([k, t], i) => `<button data-bmsw="${k}" class="${i ? '' : 'lyf '}${lyMenu() === k ? 'on' : ''}">${t}${lyMenu() === k ? '<span class="lpck">✓</span>' : ''}</button>`).join('')}${[['', 'Pills · Outline'], ['A', 'Pills A · Underline']].map(([k, t], i) => { const cur = document.documentElement.classList.contains('pgA') ? 'A' : ''; return `<button data-psw="${k}" class="${i ? '' : 'lyf '}${cur === k ? 'on' : ''}">${t}${cur === k ? '<span class="lpck">✓</span>' : ''}</button>`; }).join('')}${F1BIG.map(([k, t], i) => `<button data-f1csw="${k}" class="${i ? '' : 'lyf '}${f1Big() === k ? 'on' : ''}">${t}${f1Big() === k ? '<span class="lpck">✓</span>' : ''}</button>`).join('')}${HSTRIP.map(([k, t], i) => `<button data-ssw="${k}" class="${i ? '' : 'lyf '}${hStrip() === k ? 'on' : ''}">${t}${hStrip() === k ? '<span class="lpck">✓</span>' : ''}</button>`).join('')}${HSTY.map(([k, t], i) => `<button data-hsw="${k}" class="${i ? '' : 'lyf '}${hStyle() === k ? 'on' : ''}">${t}${hStyle() === k ? '<span class="lpck">✓</span>' : ''}</button>`).join('')}`;
+    m.innerHTML = `<button data-cc>Clear cache</button>${(() => { const de = document.documentElement, cur = de.classList.contains('fsg') ? 'sg' : 'bar'; return [['bar', 'Bleacher font'], ['sg', 'Mercedes font']].map(([k, t]) => `<button data-fsw="${k}" class="${k === cur ? 'on' : ''}">${t}${k === cur ? '<span class="lpck">✓</span>' : ''}</button>`).join(''); })()}${[['2', 'Pill menu'], ['3', 'Bar menu']].map(([k, t], i) => `<button data-bmsw="${k}" class="${i ? '' : 'lyf '}${lyMenu() === k ? 'on' : ''}">${t}${lyMenu() === k ? '<span class="lpck">✓</span>' : ''}</button>`).join('')}<button data-f12sw class="lyf ${f12() ? 'on' : ''}">F1 2.0${f12() ? '<span class="lpck">✓</span>' : ''}</button>${HSTRIP.map(([k, t], i) => `<button data-ssw="${k}" class="${i ? '' : 'lyf '}${hStrip() === k ? 'on' : ''}">${t}${hStrip() === k ? '<span class="lpck">✓</span>' : ''}</button>`).join('')}${HSTY.map(([k, t], i) => `<button data-hsw="${k}" class="${i ? '' : 'lyf '}${hStyle() === k ? 'on' : ''}">${t}${hStyle() === k ? '<span class="lpck">✓</span>' : ''}</button>`).join('')}`;
     /* show how much the cache takes (IndexedDB + localStorage) */
     (async () => { let b = 0; try { const e = navigator.storage && navigator.storage.estimate && await navigator.storage.estimate(); b = (e && e.usage) || 0; } catch (er) {} try { Object.keys(localStorage).forEach(k => { b += (k.length + String(localStorage.getItem(k) || '').length) * 2; }); } catch (er) {} const cb = m.querySelector('[data-cc]'); if (cb && b) cb.textContent = 'Clear cache · ' + (b > 1e6 ? (b / 1048576).toFixed(1) + ' MB' : Math.round(b / 1024) + ' KB'); })();
     o.addEventListener('click', close);
     m.addEventListener('click', ev => {
-      { const pb = ev.target.closest('[data-psw]'); if (pb) { try { localStorage.setItem('pstyle', pb.dataset.psw); } catch (er) {} document.documentElement.classList.toggle('pgA', pb.dataset.psw === 'A'); close(); return; } }
-      { const fb = ev.target.closest('[data-f1csw]'); if (fb) { try { localStorage.setItem('f1card', fb.dataset.f1csw); } catch (er) {} close(); state.stripKey = null; render(); return; } }
+      if (ev.target.closest('[data-f12sw]')) { try { localStorage.setItem('f1v2', f12() ? '' : '1'); } catch (er) {} close(); render(); return; }
       { const sb = ev.target.closest('[data-ssw]'); if (sb) { try { localStorage.setItem('hstrip', sb.dataset.ssw); } catch (er) {} close(); state.stripKey = null; render(); return; } }
       { const hb = ev.target.closest('[data-hsw]'); if (hb) { try { localStorage.setItem('hstyle', hb.dataset.hsw); } catch (er) {} close(); render(); return; } }
       { const bmb = ev.target.closest('[data-bmsw]'); if (bmb) { const k = bmb.dataset.bmsw; try { localStorage.setItem('bmenu', k); } catch (er) {} close(); render(); return; } }
@@ -4995,28 +4976,8 @@ const F1AB = { FP1: 'Practice 1', FP2: 'Practice 2', FP3: 'Practice 3', SS: 'Spr
 const f1Lap = c => { if (/^(Qual|SS|SQ)/.test(String((c.type && c.type.abbreviation) || ''))) return 0; /* a lap count means nothing in qualifying */ const n = c._lap != null ? c._lap : c.status && c.status.period; return n > 0 ? n : 0; };
 const f1FlagC = f => { f = String(f || '').toLowerCase(); return !f ? '' : /green/.test(f) ? '#30d158' : /red/.test(f) ? 'var(--live)' : /yellow|safety|vsc|sc\b/.test(f) ? '#ffd60a' : /cheq|check|finish/.test(f) ? '#fff' : '#8e8e93'; };
 const f1FlagT = f => { f = String(f || '').trim(); if (!f) return ''; const t = f.toLowerCase().replace(/_/g, ' ').replace(/\b\w/g, x => x.toUpperCase()); return /flag|safety|car/i.test(t) ? t : t + ' flag'; };
-/* card lines while a session is running: "FP3 · Lap 10 ●(flag)" and the current top 3 */
-/* between sessions of a race weekend: the next session with a countdown (last hour in red) and its day/time */
 const F1NX = { FP1: 'Practice 1', FP2: 'Practice 2', FP3: 'Practice 3', SS: 'Sprint Q', SQ: 'Sprint Q', SR: 'Sprint', Sprint: 'Sprint', Qual: 'Qualifying', Race: 'Race' };
-const f1RdHTML = (e, k, done) => { const lc = !done && f1LiveComp(e); return '<b>R' + (k + 1) + '</b>' + (lc ? '<span class="rdl"><i class="f1ld"></i>' + esc(F1AB[lc.type && lc.type.abbreviation] || 'Live') + (f1Lap(lc) ? ' · Lap ' + f1Lap(lc) : '') + '</span>' : !done && f1WkOn(e) ? '<span class="rdl">Race weekend</span>' : done ? '<span>Finished</span>' : '<span class="f1dt">' + esc(f1DatesY(e)) + '</span>'); };
-/* bottom row of every F1 card: three equal tiles – session times / live order / podium */
 const f1Ab = c => { const a = (c && c.athlete) || {}; return a.abbreviation || String(a.lastName || (a.displayName || '').split(' ').slice(-1)[0] || '').slice(0, 3).toUpperCase(); };
-function f1Tiles(e, done) { const y = e._y || F1.listY || f1ShowY(), rc = f1Comp(e, 'Race'), lc = !done && f1LiveComp(e), TM = f1TM(y);
-  const MED = ['', '#d4af37', '#c0c0c0', '#cd7f32'], pc = c => TM[String(c.id)] ? f1TCol(TM[String(c.id)]) : MED[c.order] || '#3a3a3c';
-  const pos = (c, gap) => `<div><em>${c.order}</em><i style="background:${pc(c)}"></i><b>${esc(f1Ab(c))}</b>${gap ? `<span class="f1gp">${esc(gap)}</span>` : ''}</div>`;
-  const top3 = comp => [1, 2, 3].map(o => ((comp && comp.competitors) || []).find(c => c.order === o)).filter(Boolean);
-  if (done) { const P = top3(rc); return P.length ? `<div class="f1tl">${P.map(c => pos(c)).join('')}</div>` : ''; }
-  if (lc) { const P = top3(lc); if (P.length) return `<div class="f1tl">${P.map(c => pos(c, c.order > 1 && c.gap ? c.gap : '')).join('')}</div>`; }
-  const C = [...(e.competitions || [])].sort((a, b) => new Date(a.date) - new Date(b.date)); if (!C.length) return '';
-  const ab = c => c.type && c.type.abbreviation, nm = c => esc(F1NX[ab(c)] || (c.type && c.type.text) || ab(c) || ''), now = Date.now();
-  const tm = c => { const t = new Date(c.date); return DAYS[t.getDay()] + ' ' + String(t.getHours()).padStart(2, '0') + ':' + String(t.getMinutes()).padStart(2, '0'); };
-  const fin = c => { const st = (c.status && c.status.type) || {}; return st.completed || st.state === 'post' || f1Chq(c); };
-  let pick;
-  if (f1WkOn(e)) { let i = C.findIndex(c => !fin(c) && new Date(c.date).getTime() > now - 3 * 36e5); if (i < 0) i = C.length - 1; const st = Math.max(0, Math.min(i - 1, C.length - 3)); pick = C.slice(st, st + 3).map(c => [c, C.indexOf(c) < i ? 'dn' : C.indexOf(c) === i ? 'nx' : '']); }
-  else pick = [C[0]].concat(C.filter(c => /^(Qual|Race)$/.test(ab(c)))).filter((c, i, A) => A.indexOf(c) === i).slice(-3).map(c => [c, '']);
-  const cd = c => { const m = Math.max(1, Math.round((new Date(c.date) - now) / 6e4)); return 'in ' + (m < 60 ? m + 'm' : m < 1440 ? Math.floor(m / 60) + 'h ' + String(m % 60).padStart(2, '0') + 'm' : Math.floor(m / 1440) + 'd ' + Math.floor((m % 1440) / 60) + 'h'); };
-  const lv = c => f1CompLive(c);
-  return `<div class="f1tl">${pick.map(([c, k]) => lv(c) ? `<div class="s nx"><small>${nm(c)}</small><b>● Live</b></div>` : `<div class="s ${k}"><small>${nm(c)}</small><b>${k === 'dn' ? 'Done' : k === 'nx' ? cd(c) : tm(c)}</b></div>`).join('')}</div>`; }
 /* team colours (driver bars) and host-country colours (A / B card tint) */
 const F1TCOL = [[/mclaren/i, '#ff8000'], [/red ?bull(?! ?racing bulls)/i, '#3671c6'], [/ferrari/i, '#e80020'], [/mercedes/i, '#27f4d2'], [/aston/i, '#229971'], [/alpine/i, '#0093cc'], [/williams/i, '#64c4ff'], [/racing bulls|\brb\b|alphatauri|toro rosso|visa/i, '#6692ff'], [/haas/i, '#b6babd'], [/audi/i, '#f50537'], [/sauber|kick|alfa/i, '#52e252'], [/cadillac/i, '#c8a64b'], [/renault/i, '#fff500'], [/racing point|force india/i, '#f596c8']];
 const f1TCol = n => { for (const [re, c] of F1TCOL) if (re.test(String(n || ''))) return c; return '#3a3a3c'; };
@@ -5025,10 +4986,7 @@ const f1CCol = e => F1CCOL[String(f1Iso(e) || '').toLowerCase()] || '#3a3a3c';
 /* keep the label / dot current while the list is open (no re-render) */
 setInterval(() => { if (document.hidden || typeof topView !== 'function' || topView() !== 'list' || state.league !== 'f1') return; const evs = f1ListEvs(); if (!evs) return;
   f1LivePatch(); }, 20000);
-function f1LivePatch() { if (topView() !== 'list' || state.league !== 'f1') return; const evs = f1ListEvs(); if (!evs) return; let ch = 0; if (f1Big()) { if (F1.selId) f1ShowBig(F1.selId); return; }
-  evs.forEach((e, k) => { const c = document.getElementById('f1c' + e.id), rd = c && c.querySelector('.f1rd'); if (!rd || !c.classList.contains('f1up')) return; const h = f1RdHTML(e, k, false); if (rd.innerHTML !== h) { rd.innerHTML = h; ch = 1; }
-    const tl = c.querySelector('.f1tl'), h2 = f1Tiles(e, false); if (tl ? tl.outerHTML !== h2 : h2) { if (tl) tl.outerHTML = h2 || ''; else c.insertAdjacentHTML('beforeend', h2); ch = 1; } });
-}
+function f1LivePatch() { if (topView() !== 'list' || state.league !== 'f1' || !f1ListEvs()) return; if (F1.selId) f1ShowBig(F1.selId); }
 /* live: while a session runs, the current GP (small scoreboard) every 25 s + the session flag; the open session's driver table every 60 s */
 F1.lv = { t: 0, d: 0 };
 async function f1LiveTick() { if (document.hidden || !Object.keys(F1.sb).length) return; const all = [].concat(...Object.values(F1.sb).map(x => x || [])), lev = all.filter(e => f1LiveComp(e)); if (!lev.length) return;
@@ -5044,8 +5002,7 @@ setInterval(() => { f1LiveTick().catch(() => {}); }, 5000);
 document.addEventListener('visibilitychange', () => { if (!document.hidden) { F1.lv.t = 0; f1LiveTick().catch(() => {}); } });
 const f1LSig = () => { const evs = f1ListEvs(); return (evs ? f1Sig(evs) + evs.filter(f1WkOn).map(e => e.id).join() : 'x') + '|' + (F1.listY || '') + '|' + (F1.listY || f1ShowY() || '') + '|' + (F1.err || '') + '|' + (F1.hOpen ? 1 : 0); };
 /* F1 big card (hidden menu): under the strip only the chosen GP, as one large card – A session list · C weekend timeline · D tinted poster */
-const F1BIG = [['', 'F1 · Cards'], ['D', 'F1 · Big card']];
-const f1Big = () => { try { let v = localStorage.getItem('f1card') || ''; if (v === 'A' || v === 'C') { v = 'D'; localStorage.setItem('f1card', v); } return F1BIG.some(x => x[0] === v) ? v : ''; } catch (e) { return ''; } };
+const f1Big = () => 'D'; try { localStorage.removeItem('f1card'); } catch (e) {}
 /* the chosen GP as one tinted card: weekend timeline (Fri / Sat / Sun) + a box with the live order, the last session's results,
    the starting grid after qualifying, or the race result */
 function f1BigHTML(e, k) { const y = e._y || F1.listY || f1ShowY(), TM = f1TM(y), now = Date.now();
@@ -5095,8 +5052,7 @@ function f1ShowBig(id) { const evs = f1ListEvs(), m = $app.querySelector('main.f
   const h = f1BigHTML(evs[k], k); if (m.innerHTML !== h) { m.innerHTML = h; f1BigFit(); } }
 function renderF1List() {
   F1._y0 = F1.scrolled ? window.scrollY : null; F1._anc = null; const noAnc = F1.noAnc; F1.noAnc = 0;
-  /* keep the card that is at the top where it is, even if cards above it change */
-  if (F1._y0 != null && !noAnc) { const he = $app.querySelector(':scope > .stkw, :scope > header'), hb = he ? he.getBoundingClientRect().bottom : 0, c0 = [...$app.querySelectorAll('.f1list > .f1card[data-f1race]')].find(c => c.getBoundingClientRect().bottom > hb + 4); if (c0) F1._anc = [c0.id, c0.getBoundingClientRect().top]; }
+  if (false && !noAnc) { const he = $app.querySelector(':scope > .stkw, :scope > header'), hb = he ? he.getBoundingClientRect().bottom : 0, c0 = [...$app.querySelectorAll('.f1list > .f1card[data-f1race]')].find(c => c.getBoundingClientRect().bottom > hb + 4); if (c0) F1._anc = [c0.id, c0.getBoundingClientRect().top]; }
   const evs = f1ListEvs();
   let body = '', strip = '';
   if (!evs) body = msg(F1.listY ? 'Loading…' : F1.err || 'Loading…');
@@ -5105,21 +5061,13 @@ function renderF1List() {
     const cur = f1CurEv(evs); F1.curId = cur.id; if (!F1.selId || !evs.some(e => e.id === F1.selId)) F1.selId = cur.id;
     strip = evs.map((e, k) => { const rc = f1Comp(e, 'Race'), dn = f1Done(rc); return `<button class="dy ${e.id === F1.selId ? 'on' : ''}${e.id === F1.curId ? ' tdy' : ''}${dn ? ' hg' : !F1.listY && f1WkOn(e) ? ' hg hw' : ''}" style="--h:${dn ? .5 : 0}" data-f1go="${esc(e.id)}"><small>${esc(f1Iso(e) || 'GP')}</small><b>${k + 1}</b></button>`; }).join('');
     F1._rnd = [evs.findIndex(e => e.id === cur.id) + 1, evs.length];
-    if (f1Big()) { const k = Math.max(0, evs.findIndex(e => e.id === F1.selId)); body = f1BigHTML(evs[k], k); } else
-    body = evs.map((e, k) => {
-      try { f1FixCid(e); } catch (er) {} const rc = f1Comp(e, 'Race'), done = f1Done(rc) || !!(rc && rc.date && new Date(rc.date) < Date.now() - 3 * 36e5 && (rc.competitors || []).some(c => c.order === 1)), w = done && rc && (rc.competitors || []).find(c => c.order === 1), cid = e.circuit && e.circuit.id, cu = F1.circ[cid];
-      const lc = !done && f1LiveComp(e), y = e._y || F1.listY || f1ShowY();
-      const c1 = done && w ? (f1TM(y)[String(w.id)] ? f1TCol(f1TM(y)[String(w.id)]) : '#d4af37') : f1CCol(e), c2 = c1;
-      const tr = esc((e.circuit && e.circuit.fullName) || '');
-      const body = f1Tiles(e, done);
-      return `<div class="card f1card f1n${done ? '' : ' f1up'}" data-f1race="${esc(e.id)}" data-f1ry="${esc(e._y || '')}" id="f1c${esc(e.id)}" style="--c1:${c1};--c2:${c2}">
-        <div class="f1nt">${f1Flag(e)}<div class="f1nh"><div class="f1nm">${esc(f1Short(e).replace(/-Catalunya/i, ''))}</div></div><div class="f1rd">${f1RdHTML(e, k, done)}</div></div>${body}</div>`; }).join('');
+    { const k = Math.max(0, evs.findIndex(e => e.id === F1.selId)); body = f1BigHTML(evs[k], k); }
   }
   const os = document.getElementById('strip'), prev = os && state.stripKey === 'f1' ? os.scrollLeft : null; state.stripKey = 'f1';
   $app.innerHTML = `
     ${lyHead({ strip, f1: 1, f1h: 1, quick: [['data-f1v="std"', 'Table', LY_TROPHY], ['data-f1v="stats"', 'Stats', LY_CHART]] })}
     <main class="f1list${hStyle() ? ' hs' + hStyle() : ''}" data-sig="${esc(f1LSig())}">${body}</main>`;
-  const s = document.getElementById('strip'); if (s) { stripWire(); f1CenterStrip(false); } if (f1Big()) f1BigFit(); /* always centred on the chosen GP (a kept scroll position could point elsewhere after the list changed) */
+  const s = document.getElementById('strip'); if (s) { stripWire(); f1CenterStrip(false); } f1BigFit(); /* always centred on the chosen GP (a kept scroll position could point elsewhere after the list changed) */
   f1Fit();
   if (evs && evs.length && !F1.scrolled) { F1.scrolled = 1; requestAnimationFrame(() => f1ScrollTo(F1.curId, false)); }
 }
@@ -5130,9 +5078,9 @@ function f1LvAlign() { const cv = (f1LvAlign.c = f1LvAlign.c || document.createE
     const tC = base(sh) - asc(sh) / 2, sC = base(sp) - asc(sp) / 2, dy = Math.round((tC - sC) * 2) / 2; sp.style.top = dy + 'px';
     if (d) { const r = d.getBoundingClientRect(), dc = (r.top + r.bottom) / 2; d.style.top = Math.round((tC - dc) * 2) / 2 + 'px'; } });
 }
-function f1Fit() { requestAnimationFrame(() => { try { f1LvAlign(); } catch (e) {} $app.querySelectorAll('.f1nm,.f1gp span,.f1rh .lvt').forEach(el => { if (el.scrollWidth > el.clientWidth + 1 && /Grand Prix/.test(el.textContent)) el.textContent = el.textContent.replace(/Grand Prix/, 'GP'); });
+function f1Fit() { requestAnimationFrame(() => { try { f1LvAlign(); } catch (e) {} $app.querySelectorAll('.f1gp span,.f1rh .lvt').forEach(el => { if (el.scrollWidth > el.clientWidth + 1 && /Grand Prix/.test(el.textContent)) el.textContent = el.textContent.replace(/Grand Prix/, 'GP'); });
   $app.querySelectorAll('.f1dn b').forEach(el => { if (el.scrollWidth > el.clientWidth + 1) { const w = el.textContent.trim().split(/\s+/); if (w.length > 1 && !/\.$/.test(w[0])) el.textContent = w[0][0] + '. ' + w.slice(1).join(' '); } });
-  try { f1Spacer(); } catch (e) {} }); }
+  }); }
 function heroSrs() { const E = 11; const capc = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--capc')) || .405;
   const base = el => { const z = document.createElement('i'); z.style.cssText = 'display:inline-block;width:0;height:0;vertical-align:baseline'; el.appendChild(z); const y = z.getBoundingClientRect().bottom; z.remove(); return y; };
   /* playoff card = same size and layout as any card; round label (top) and series state (bottom) sit E px from the card edges */
@@ -5145,26 +5093,8 @@ const stripTgt = (s, b) => Math.max(0, Math.min(s.scrollWidth - s.clientWidth, b
 function f1CenterStrip(smooth) { const s = document.getElementById('strip'), on = s && s.querySelector('.on'); if (!on) return; const tgt = s._tgt ? s._tgt(on) : stripTgt(s, on); if (smooth) s.scrollTo({ left: tgt, behavior: 'smooth' }); else s.scrollLeft = tgt; }
 F1.tok = 0;
 function f1CancelAnim() { F1.tok++; if (window._stAnim) { window._stAnim = false; window._scrollMem[location.hash] = window.scrollY; } }
-/* the empty space under the F1 list is only as tall as needed for the last race to reach the top */
-function f1Spacer() { const hp = $app.querySelector(':scope > .hpw'), cs = $app.querySelectorAll('.f1list > .f1card'), f = cs[0], c = cs[cs.length - 1]; if (!hp || !c || !f) return;
-  const ex = parseFloat(hp.dataset.ex || 0), base = (parseFloat(getComputedStyle(hp).paddingBottom) || 0) - ex, need = Math.max(0, Math.round(c.offsetTop - f.offsetTop) + window.innerHeight - (document.documentElement.scrollHeight - ex));
-  if (Math.abs(need - ex) > 1) { hp.dataset.ex = need; hp.style.paddingBottom = (base + need) + 'px'; } }
-/* after the list is put on the current GP, hold it there for a moment: whatever settles late (maps, fonts, Safari's own scroll fixes) cannot move it; the first touch releases it */
-function f1Pin(id) { const t0 = Date.now(), tok = F1.tok; cancelAnimationFrame(F1._pin);
-  const step = () => { if (tok !== F1.tok || window._touchT > t0 || Date.now() - t0 > 2500 || topView() !== 'list' || state.league !== 'f1') return;
-    const c = document.getElementById('f1c' + id), f = $app.querySelector('.f1list > .f1card'); if (c && f) { try { f1Spacer(); } catch (e) {} const y = Math.max(0, Math.round(c.offsetTop - f.offsetTop)); if (Math.abs(window.scrollY - y) > 250) return; /* a big move is the user's (e.g. tapping the status bar to go to the top) – let go */ if (Math.abs(window.scrollY - y) > 1) { window.scrollTo(0, y); window._scrollMem[location.hash] = y; } }
-    F1._pin = requestAnimationFrame(step); };
-  F1._pin = requestAnimationFrame(step); }
-function f1ScrollTo(id, smooth) {
-  if (f1Big()) { f1ShowBig(id); window.scrollTo(0, 0); return; }
-  try { f1Spacer(); } catch (e) {}
-  const c = document.getElementById('f1c' + id), f = $app.querySelector('.f1list > .f1card'); if (!c || !f) return;
-  const target = Math.max(0, Math.round(c.offsetTop - f.offsetTop));
-  if (!smooth) { window.scrollTo(0, target); window._scrollMem[location.hash] = window.scrollY; f1Pin(id); return; }
-  const tok = ++F1.tok, y0 = window.scrollY, dy = target - y0, T = Math.min(650, 260 + Math.abs(dy) / 6), t0 = performance.now(); window._stAnim = true;
-  const step = now => { if (tok !== F1.tok || topView() !== 'list' || state.league !== 'f1') { if (tok === F1.tok) window._stAnim = false; return; } const k = Math.min(1, (now - t0) / T), e = 1 - Math.pow(1 - k, 3); window.scrollTo(0, Math.round(y0 + dy * e)); if (k < 1) requestAnimationFrame(step); else { window._stAnim = false; window._scrollMem[location.hash] = window.scrollY; f1Pin(id); } };
-  requestAnimationFrame(step);
-}
+/* choosing a GP (strip, swipe, header) shows its card */
+function f1ScrollTo(id) { f1ShowBig(id); window.scrollTo(0, 0); }
 async function loadF1List() {
   if (forceNow() && Object.keys(F1.sb).length) { if (topView() === 'list' && state.league === 'f1' && !$app.querySelector('main.f1list')) render(); return f1Refresh(true, true); } /* switched to F1 right after a pull-to-refresh: show it at once, refresh behind */
   const Y = f1Year();
@@ -5185,7 +5115,7 @@ function renderF1() {
   if (v.kind === 'f1stats' || v.kind === 'f1std') {
     const y = v.y || F1.listY || f1CurY(); ysel = f1YSel(v, y, f1YearsFor(v, y));
     top = `<div class="seg pseg lvseg"><button data-f1m="drv" class="${v.m !== 'con' ? 'on' : ''}">Drivers</button><button data-f1m="con" class="${v.m === 'con' ? 'on' : ''}">Constructors</button></div>`;
-    body = v.kind === 'f1std' ? f1StdHTML(v, y) : f1StatsHTML(v, y);
+    if (f12() && v.kind === 'f1stats') top = ''; body = v.kind === 'f1std' ? f1StdHTML(v, y) : f12() ? f12HeatHTML(v, y) : f1StatsHTML(v, y);
   } else if (v.kind === 'f1drv' || v.kind === 'f1con') { const y = v.y || F1.listY || f1CurY(); ysel = f1YSel(v, y, f1YearsFor(v, y)); body = f1PartHTML(v, y); }
   else if (v.kind === 'f1race') { const r = f1RaceHTML(v); ysel = r.ysel; top = r.top; body = r.body; }
   $app.innerHTML = `${f1Hdr(ysel)}<main class="f1v ${v.kind === 'f1stats' ? 'f1st' : v.kind === 'f1std' ? 'f1std' : ''}">${top}<div class="pane t">${body}</div></main>`;
@@ -5206,12 +5136,38 @@ function f1TeamsWait(v, y) { F1.tmY = F1.tmY || {}; F1.tmW = F1.tmW || {}; if (F
   if (!F1.tmW[y]) { F1.tmW[y] = 1; const go = () => f1Teams(F1.sb[y]).then(m => { F1.tmY[y] = m; }, () => { F1.tmY[y] = {}; });
     (F1.sb[y] ? go() : f1Season(y).then(go, () => { F1.tmY[y] = {}; })).then(() => { F1.tmW[y] = 0; if (state.lv === v) render(); }); }
   return msg('Loading…'); }
+/* ===== F1 2.0 (hidden menu): standings with movement + form, constructors as bars, season heatmap, race result with places gained ===== */
+const f12 = () => { try { return localStorage.getItem('f1v2') === '1'; } catch (e) { return false; } };
+const F2PC = p => !p ? 'ze' : p <= 3 ? 'z' + p : p <= 10 ? 'zp' + p : 'zn';
+function f1DrvTeam(y, id) { const tm = F1.tmY && F1.tmY[y] && F1.tmY[y][String(id)]; return (tm && tm.team) || f1TM(y)[String(id)] || ''; }
+function f12DrvHTML(v, y, ents) { const races = (F1.sb[y] || []).filter(f1RaceDone), last = races[races.length - 1], T = f1PtsTable(y, false), TS = f1PtsTable(y, true);
+  const pts = en => { const p = f1SV(en, 'championshipPts'); return +(p != null ? p : f1SV(en, 'points')) || 0; };
+  const lastPts = id => { if (!last) return 0; const p = f1Pos(f1Comp(last, 'Race'), id), sr = f1Comp(last, 'SR'), sp = sr && f1Done(sr) ? f1Pos(sr, id) : null; return (p ? T[p - 1] || 0 : 0) + (sp ? TS[sp - 1] || 0 : 0); };
+  const prev = ents.map(en => { const id = String((en.athlete || {}).id); return { id, p: pts(en) - lastPts(id) }; }).sort((a, b) => b.p - a.p), pr = {}; prev.forEach((x, i) => { pr[x.id] = i + 1; });
+  const L5 = races.slice(-5);
+  return `<section class="f2l">${ents.map(en => { const a = en.athlete || {}, id = String(a.id), rk = +f1SV(en, 'rank') || 0, mv = races.length > 1 && pr[id] ? pr[id] - rk : 0, tn = f1DrvTeam(y, id);
+    const ar = mv > 0 ? `<u class="up">▲${mv}</u>` : mv < 0 ? `<u class="dn">▼${-mv}</u>` : '<u class="eq">•</u>';
+    const form = L5.map(e => { const p = f1Pos(f1Comp(e, 'Race'), id); return `<i class="f ${F2PC(p)}">${p && p <= 10 ? p : ''}</i>`; }).join('');
+    return `<div class="f2r" data-f1drv="${esc(id)}"><em>${rk || ''}</em>${ar}<i class="tb" style="background:${f1TCol(tn)}"></i><div class="n"><b>${esc(a.displayName || a.name || '')}</b><small>${esc(tn)}</small></div><div class="fm">${form}</div><span>${pts(en)}</span></div>`; }).join('')}</section><div class="f2note">▲▼ places vs. the previous round · last 5 races</div>`; }
+function f12ConHTML(v, y, ents) { const pts = en => { const p = f1SV(en, 'championshipPts'); return +(p != null ? p : f1SV(en, 'points')) || 0; }, top = Math.max(1, ...ents.map(pts));
+  return `<section class="f2l">${ents.map(en => { const t = en.team || {}, n = t.displayName || t.name || '', p = pts(en);
+    return `<div class="f2c" data-f1con="${esc(t.id)}"><em>${esc(String(f1SV(en, 'rank') || ''))}</em><div class="cb"><div class="ct"><b>${esc(n)}</b><span>${p}</span></div><div class="bar"><i style="width:${(p / top * 100).toFixed(1)}%;background:${f1TCol(n)}"></i></div></div></div>`; }).join('')}</section>`; }
+function f12HeatHTML(v, y) { const S = F1.st[y], evs = F1.sb[y]; if (!S || !evs) return msg(v.err || 'Loading…'); const w = f1TeamsWait(v, y); if (w) return w;
+  const ents = [...((S.drv && S.drv.entries) || [])].sort((a, b) => (f1SV(a, 'rank') || 99) - (f1SV(b, 'rank') || 99)); if (!ents.length) return msg('Not available.');
+  const ab = a => (a.abbreviation || String(a.lastName || (a.displayName || '').split(' ').slice(-1)[0] || '').slice(0, 3)).toUpperCase();
+  const head = `<div class="hm hr"><span></span>${evs.map((e, k) => `<i>${k % 2 ? '' : k + 1}</i>`).join('')}</div>`;
+  const rows = ents.map(en => { const a = en.athlete || {}, id = String(a.id); return `<div class="hm" data-f1drv="${esc(id)}"><span><i style="background:${f1TCol(f1DrvTeam(y, id))}"></i>${esc(ab(a))}</span>${evs.map(e => { const rc = f1Comp(e, 'Race'); if (!f1Done(rc)) return '<i class="c zf"></i>'; const p = f1Pos(rc, id); return `<i class="c ${F2PC(p)}">${p && p <= 3 ? p : ''}</i>`; }).join('')}</div>`; }).join('');
+  return `<section class="f2hm">${head}${rows}<div class="lg"><i class="c z1">1</i><i class="c z2">2</i><i class="c z3">3</i><i class="c zp6"></i><span>points</span><i class="c zn"></i><span>no points</span><i class="c ze"></i><span>no result</span></div></section>`; }
+function f12ResHTML(R, timeOf, fl, dm, y) { return `<section class="f2l">${R.sort((a, b) => (a.order || 99) - (b.order || 99)).map(r => { const d = dm[r.id] || {}, st = +d.start || 0, mv = st && r.order ? st - r.order : 0, t = timeOf(r), out = /DNF|DSQ|DNS/.test(t);
+    const ar = out || !st ? '<u class="eq"></u>' : mv > 0 ? `<u class="up">▲${mv}</u>` : mv < 0 ? `<u class="dn">▼${-mv}</u>` : '<u class="eq">–</u>', col = d.color ? '#' + String(d.color).replace('#', '') : f1TCol(r.team);
+    return `<div class="f2r rr" data-f1drv="${esc(r.id)}"><em class="${r.order <= 3 ? 'w' + r.order : ''}">${esc(String(r.order || ''))}</em><i class="tb" style="background:${col}"></i><div class="n"><b>${esc(r.name || '')}${fl && fl.id === r.id ? '<em class="fl">FL</em>' : ''}</b><small>${esc(r.team || '')}</small></div>${ar}<span>${esc(t)}</span></div>`; }).join('')}</section>${fl ? '<div class="f2note">▲▼ places gained / lost from the grid · <em class="fl">FL</em> fastest lap</div>' : '<div class="f2note">▲▼ places gained / lost from the grid</div>'}`; }
 function f1StdHTML(v, y) {
   const S = F1.st[y]; if (!S) return msg(v.err || 'Loading…');
   const con = v.m === 'con', st = con ? S.con : S.drv; if (!st || !(st.entries || []).length) return msg('Standings not available.');
   if (!con) { const w = f1TeamsWait(v, y); if (w) return w; } const tm = F1.tmY && F1.tmY[y];
   const ents = [...st.entries].sort((a, b) => (f1SV(a, 'rank') || 99) - (f1SV(b, 'rank') || 99));
   const pts = en => { const p = f1SV(en, 'championshipPts'); return p != null ? p : f1SV(en, 'points'); };
+  if (f12()) return con ? f12ConHTML(v, y, ents) : f12DrvHTML(v, y, ents);
   return `<section class="blk"><table class="nfx sep f1t"><colgroup><col style="width:40px"><col><col style="width:62px"></colgroup><thead><tr><th class="n">#</th><th class="l ${con ? '' : 'ph'}">${con ? 'Constructor' : 'Driver'}</th><th>PTS</th></tr></thead><tbody>${ents.map(en => { const a = en.athlete || {}, t = en.team || {}, tt = !con && tm && tm[String(a.id)];
     return `<tr ${con ? `data-f1con="${esc(t.id)}"` : `data-f1drv="${esc(a.id)}"`}><td class="n f1rk">${esc(String(f1SV(en, 'rank') || ''))}</td><td class="l">${con ? f1Con(t.displayName || t.name) : f1Drv(a.id, a.displayName || a.name, tt && tt.team)}</td><td><b>${esc(String(pts(en) ?? '-'))}</b></td></tr>`; }).join('')}</tbody></table></section>`;
 }
@@ -5349,6 +5305,7 @@ function f1Table(rows, det, mode, y) {
       R = has.concat(no); R.forEach((r, i) => { r.order = i + 1; }); const P0 = qt(has[0], k); timeOf = r => { const t = qt(r, k); return !t ? 'DNF' : r.order === 1 ? f1Ms(t) : '+' + ((t - P0) / 1000).toFixed(3); }; } }
   /* no times from ESPN (yet / at all) but laps are known → show laps instead of an empty column */
   if (det && mode !== 'grid' && !/^live/.test(mode) && R.length && !R.some(r => timeOf(r)) && R.some(r => V(r, 'lapsCompleted') > 0)) { timeOf = r => { const l = V(r, 'lapsCompleted'); return l ? String(l) : ''; }; mode = 'liveL'; }
+  if (f12() && pc && det) return f12ResHTML(R, timeOf, fl, dm, y);
   return `<section class="blk"><table class="nfx sep f1t f1res ${pc ? 'f1pc' : ''}"><colgroup><col style="width:34px"><col><col style="width:${pc ? 104 : 88}px">${pc ? '<col style="width:30px">' : ''}</colgroup><thead><tr><th class="n">#</th><th class="l ph">Driver</th><th class="tl">${mode === 'grid' ? '' : mode === 'liveL' ? 'Laps' : mode === 'liveG' ? 'Gap' : mode === 'liveN' ? '' : 'Time'}</th>${pc ? '<th>Pts</th>' : ''}</tr></thead><tbody>${R.sort((a, b) => (a.order || 99) - (b.order || 99)).map(r => `<tr data-f1drv="${esc(r.id)}"${r.order >= outFrom ? ' class="f1out"' : ''}><td class="n f1rk ${pc && r.order <= 3 ? 'p' + r.order : ''}">${esc(String(r.order || ''))}</td><td class="l">${f1Drv(r.id, r.name || '', r.team).replace(/<\/div><\/div>$/, fl && fl.id === r.id ? '</div><i class="f1fast" title="Fastest lap">⚡</i></div>' : '</div></div>')}</td><td class="f1tm">${mode === 'grid' && r.q && r.order > r.q ? `<small class="f1pen">Grid penalty<br><span style="white-space:nowrap">Qualified P${r.q}</span></small>` : esc(det ? timeOf(r) : '')}</td>${pc ? `<td>${esc(det ? ptsOf(r) : '')}</td>` : ''}</tr>`).join('')}</tbody></table></section>`;
 }
 
@@ -5415,7 +5372,7 @@ window.addEventListener('hashchange', () => { const h = location.hash, st = wind
   if (bi >= 0) { st.splice(bi + 1).forEach(x => { if (x !== h) delete window._snap[x]; }); delete window._snap[prev]; window._backY = window._scrollMem[h] || 0; window._backT = Date.now(); window._backH = h;
     const sn = noR ? null : window._snap[h]; delete window._snap[h]; if (noR) window._backY = 0;
     { const u = document.getElementById('under'); if (u) { if (sn && sn.f) [...u.childNodes].forEach(n => { if (!(n.classList && n.classList.contains('undim'))) sn.f.appendChild(n); }); u.remove(); } }
-    if (sn && Date.now() - sn.t < 30 * 60e3) { $app.style.transition = ''; $app.style.transform = ''; $app.innerHTML = ''; $app.appendChild(sn.f); (sn.sl || []).forEach(([x, l, tp]) => { x.scrollLeft = l; x.scrollTop = tp; }); $app.className = sn.cls; if (window._f1Home) { window._f1Home = 0; try { if (state.league === 'f1' && F1.curId) { F1.selId = F1.curId; $app.querySelectorAll('.strip .dy').forEach(x => x.classList.toggle('on', x.dataset.f1go === F1.curId)); f1CenterStrip(false); const c = document.getElementById('f1c' + F1.curId), f = $app.querySelector('.f1list > .f1card'); if (c && f) { f1Spacer(); sn.y = Math.max(0, Math.round(c.offsetTop - f.offsetTop)); window._scrollMem[h] = sn.y; setTimeout(() => f1Pin(F1.curId), 0); } } } catch (e) {} } const bg = sn.bg; document.documentElement.style.background = bg.h; document.body.style.background = bg.b; document.documentElement.style.setProperty('--pbg', bg.p); const tm = document.querySelector('meta[name="theme-color"]'); if (tm && bg.t) tm.setAttribute('content', bg.t); document.documentElement.classList.remove('lock1'); window.scrollTo(0, sn.y); window._restoreKey = h; window._restoreY = sn.y; window._restoreVK = sn.vk;
+    if (sn && Date.now() - sn.t < 30 * 60e3) { $app.style.transition = ''; $app.style.transform = ''; $app.innerHTML = ''; $app.appendChild(sn.f); (sn.sl || []).forEach(([x, l, tp]) => { x.scrollLeft = l; x.scrollTop = tp; }); $app.className = sn.cls; if (window._f1Home) { window._f1Home = 0; try { if (state.league === 'f1' && F1.curId) { F1.selId = F1.curId; $app.querySelectorAll('.strip .dy').forEach(x => x.classList.toggle('on', x.dataset.f1go === F1.curId)); f1CenterStrip(false); const c = document.getElementById('f1c' + F1.curId), f = $app.querySelector('.f1list > .f1card'); if (c && f) { sn.y = 0; window._scrollMem[h] = 0; } } } catch (e) {} } const bg = sn.bg; document.documentElement.style.background = bg.h; document.body.style.background = bg.b; document.documentElement.style.setProperty('--pbg', bg.p); const tm = document.querySelector('meta[name="theme-color"]'); if (tm && bg.t) tm.setAttribute('content', bg.t); document.documentElement.classList.remove('lock1'); window.scrollTo(0, sn.y); window._restoreKey = h; window._restoreY = sn.y; window._restoreVK = sn.vk;
       const chk = () => { if (location.hash !== h) return; const mx = document.documentElement.scrollHeight - window.innerHeight; if (!$app.firstElementChild || !$app.querySelector('main')) { window._restoreKey = null; state.lastView = null; render(); return; } if (window.scrollY > mx + 1) window.scrollTo(0, Math.max(0, mx)); else if (Math.abs(window.scrollY - sn.y) > 2 && window._touchT < sn.t0) window.scrollTo(0, Math.min(sn.y, Math.max(0, mx))); }; sn.t0 = Date.now(); requestAnimationFrame(chk); setTimeout(chk, 80); setTimeout(chk, 250); setTimeout(chk, 500); }
   } else { st.push(h); window._backY = 0; window._backH = null;
     if (window._noSnap) window._noSnap = 0; else if (prev != null && $app.firstChild) { const sl = [...$app.querySelectorAll('.strip, .mstrip, .tw, .dtabs, .brsw, .tgs, .ysel .ylist')].filter(x => x.scrollLeft > 0 || x.scrollTop > 0).map(x => [x, x.scrollLeft, x.scrollTop]); const f = document.createDocumentFragment(); while ($app.firstChild) f.appendChild($app.firstChild); window._snap[prev] = { sl, vk: snapVK(), f, y: window._scrollMem[prev] || 0, cls: $app.className, bg: snapBg(), t: Date.now() };
