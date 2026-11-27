@@ -1255,7 +1255,7 @@ main.hsA .f1n,.hsA .f1n{background:linear-gradient(100deg,color-mix(in srgb,var(
 .hsB .f1n{padding-left:21px !important;overflow:hidden}.hsB .f1n::before{content:'';position:absolute;left:0;top:0;bottom:0;width:5px;background:linear-gradient(var(--c1),var(--c2))}
 
 /* scrollable top strip (all leagues): 7 per screen, snaps to an item */
-html.fbar header .hwk.hsc.stA{margin-top:-4px}html.fsg header .hwk.hsc.stA{margin-top:-8px}html.fbar header .hwk.hsc.stD{margin-top:6px}html.fsg header .hwk.hsc.stD{margin-top:2px}
+html.fbar header .hwk.hsc.stA{margin-top:-4px}html.fsg header .hwk.hsc.stA{margin-top:-8px}html.fbar header .hwk.hsc.stD{margin-top:2px}html.fsg header .hwk.hsc.stD{margin-top:-2px}
 /* circles: every day with games gets a red dot (NFL weeks and F1 rounds always have one) */
 .hsc.st .dy.hg::after,.hsc.st .dy[data-wk]::after,.hsc.st .dy[data-f1go]::after{background:var(--brand) !important}.hsc.st .dy.hw::after{background:var(--live) !important}
 /* strip marker glides between items */
@@ -1282,7 +1282,7 @@ html.fbar .hsc .dy b{line-height:37px !important;padding-bottom:1px;box-sizing:b
 /* D · timeline 2.0 */
 .stD .dy{height:54px !important;justify-content:flex-start;padding-top:6px !important;gap:0 !important;position:relative;z-index:1}
 .stD .dy small{display:none}.stD .dy::after{display:none}
-.stD .dy b{width:auto;height:auto;line-height:1.1 !important;padding:0 !important;font-size:15px;color:var(--mut);background:none !important;overflow:visible;transform:translateY(calc(var(--l, 0) * -3px)) scale(calc(1 + var(--l, 0) * .3));transition:color .2s ease !important;transform-origin:50% 100%}
+.stD .dy b{width:auto;height:auto;line-height:1.1 !important;padding:0 !important;font-size:15px;color:var(--mut);background:none !important;overflow:visible;transform:translateY(calc((1 - var(--l, 0)) * 13px)) scale(calc(1 + var(--l, 0) * .3));transition:color .2s ease !important;transform-origin:50% 100%}
 .stD .dy.on b{color:#fff;background:none !important}.stD .dy.tdy:not(.on) b{color:var(--brand)}
 .hsc.stD .dy,.hsc.stD .dy.on{background:linear-gradient(#3a3a3c,#3a3a3c) no-repeat 0 calc(100% - 7px)/100% 2px !important}
 .stD .tlb{position:sticky;left:calc(50vw - 16px);flex:none;width:0;height:0;align-self:flex-end;order:-1;z-index:2;pointer-events:none;margin-bottom:8px;will-change:transform}
@@ -2046,7 +2046,9 @@ const hStrip = () => { try { const v = localStorage.getItem('hstrip') || ''; ret
 function stripWire() { const s = document.getElementById('strip'); if (!s || !s.classList.contains('hsc') || s._wired) return; s._wired = 1; s.dataset.w = 1;
   /* the strip fills edge to edge (no empty space after the last GP / before the first day). Near the ends, where the
      middle can't reach the first / last items, a virtual pointer slides on to them, so they can still be picked by dragging. */
-  const bs = () => [...s.querySelectorAll('button')], pos = b => b.getBoundingClientRect().left - s.getBoundingClientRect().left + s.scrollLeft + b.offsetWidth / 2;
+  let BS = null, PG = 0, PW = ''; const bs = () => BS || (BS = [...s.querySelectorAll('button')]);
+  /* item centres in strip coordinates, measured once (reading layout for every item on every frame made the strip stutter) */
+  const pos = b => { const w = s.scrollWidth + ':' + s.clientWidth; if (w !== PW) { PW = w; PG++; BS = null; } if (b._pg !== PG) { b._pg = PG; b._p = b.getBoundingClientRect().left - s.getBoundingClientRect().left + s.scrollLeft + b.offsetWidth / 2; } return b._p; };
   const vc = () => { const W = s.clientWidth, sl = s.scrollLeft, maxS = Math.max(0, s.scrollWidth - W), L0 = bs(), f = L0[0], l = L0[L0.length - 1]; let c = sl + W / 2; if (!f) return c;
     const H1 = W / 2 - pos(f), H2 = pos(l) - (s.scrollWidth - W / 2), r = maxS - sl; if (H1 > 0 && sl < H1) c -= H1 - sl; if (H2 > 0 && r < H2) c += H2 - r; return c; };
   const near = () => { const c = vc(); let best = null, bd = 1e9; bs().forEach(b => { const d = Math.abs(pos(b) - c); if (d < bd) { bd = d; best = b; } }); return best; };
@@ -2059,22 +2061,26 @@ function stripWire() { const s = document.getElementById('strip'); if (!s || !s.
     if (s._u) { const k = Math.max(0, 1 - Math.abs(s.scrollLeft - (s._bs || 0)) / 60); x = vc() + (s._bo || 0) * k; } else x = on ? pos(on) : vc();
     const dx = x - (s.scrollLeft + W / 2); ball.style.transform = `translate3d(${dx.toFixed(1)}px,0,0)`; ball.classList.toggle('idle', !s._u); };
   s._ballGrab = () => { if (!ball) return; const on = s.querySelector('button.on'); s._bo = on ? pos(on) - vc() : 0; s._bs = s.scrollLeft; };
-  const wheel = () => { const B = s.classList.contains('stB'), D = s.classList.contains('stD'); if (!B && !D) return; const c = vc(); bs().forEach(b => { const d = Math.abs(pos(b) - c) / b.offsetWidth; if (B) b.style.setProperty('--d', Math.min(3, d).toFixed(2)); else b.style.setProperty('--l', Math.max(0, 1 - d / 1.4).toFixed(3)); }); if (D) tlBall(); };
+  const wheel = () => { const B = s.classList.contains('stB'), D = s.classList.contains('stD'); if (!B && !D) return; const c = vc(); bs().forEach(b => { const d = Math.abs(pos(b) - c) / b.offsetWidth; const v = B ? Math.min(3, d).toFixed(2) : Math.max(0, 1 - d / 1.4).toFixed(3); if (b._v !== v) { b._v = v; b.style.setProperty(B ? '--d' : '--l', v); } }); if (D) tlBall(); };
   /* the strip rolls like a picker: while it moves, the marker glides to the item under the pointer; when it stops, that item
      is picked (as if tapped). Tapping an item rolls the strip to it first. */
   const mark = b => { if (!b || b.classList.contains('on')) return; s.querySelectorAll('button.on').forEach(x => x.classList.remove('on')); b.classList.add('on'); };
-  /* F1: while the strip moves, the race cards below follow it smoothly (each GP's card meets the top as its round passes the middle) */
-  const f1Sync = () => { const L = bs(); if (!L.length || !L[0].dataset.f1go || state.league !== 'f1' || topView() !== 'list') return; const f = $app.querySelector('.f1list > .f1card'); if (!f) return;
-    const c = vc(); let i = 0; while (i < L.length - 2 && pos(L[i + 1]) <= c) i++; const a = L[i], b = L[i + 1] || a, pa = pos(a), pb = pos(b), k = pb > pa ? Math.min(1, Math.max(0, (c - pa) / (pb - pa))) : 0;
-    const ca = document.getElementById('f1c' + a.dataset.f1go), cb = document.getElementById('f1c' + b.dataset.f1go); if (!ca || !cb) return;
-    const ya = ca.offsetTop - f.offsetTop, yb = cb.offsetTop - f.offsetTop; if (window.F1) F1.tok++; window._stAnim = false; window.scrollTo(0, Math.round(ya + (yb - ya) * k)); };
-  s._f1Prep = () => { try { if (bs()[0] && bs()[0].dataset.f1go) f1Spacer(); } catch (e) {} };
-  const live = () => { if (!s._u) return; f1Sync(); let b = atEdgeKeep() || near(); if (s._tap) { const L = bs(), i = L.indexOf(b), j = L.indexOf(s._tap), k = L.indexOf(s._cur); if (k >= 0 && i >= 0 && ((j > k && (i > j || i < k)) || (j < k && (i < j || i > k)))) b = s._tap; } mark(b); };
-  s.addEventListener('touchstart', () => { s._ballGrab && s._ballGrab(); s._f1Prep(); s._u = 1; s._sc = 0; s._tap = null; s._cur = s.querySelector('.on'); }, { passive: true });
-  s.addEventListener('touchend', () => { if (!s._sc) s._u = 0; }, { passive: true });
+  /* F1: while the strip moves, the race cards below follow it (each GP's card meets the top as its round passes the middle) */
+  let CY = null; const f1Prep = () => { CY = null; const L = bs(); if (!L[0] || !L[0].dataset.f1go || state.league !== 'f1' || topView() !== 'list') return; try { f1Spacer(); } catch (e) {} const f = $app.querySelector('.f1list > .f1card'); if (!f) return;
+    CY = L.map(b => { const c = document.getElementById('f1c' + b.dataset.f1go); return c ? c.offsetTop - f.offsetTop : null; }); if (CY.some(y => y == null)) CY = null; };
+  let lastY = -1; const f1Sync = () => { if (!CY) return; const L = bs(), c = vc(); let i = 0; while (i < L.length - 2 && pos(L[i + 1]) <= c) i++; const pa = pos(L[i]), pb = pos(L[i + 1] || L[i]), k = pb > pa ? Math.min(1, Math.max(0, (c - pa) / (pb - pa))) : 0;
+    const y = CY[i] + ((CY[i + 1] != null ? CY[i + 1] : CY[i]) - CY[i]) * k; if (Math.abs(y - lastY) < .5) return; lastY = y; if (window.F1) F1.tok++; window._stAnim = false; window.scrollTo(0, y); };
+  const live = () => { let b = atEdgeKeep() || near(); if (s._tap) { const L = bs(), i = L.indexOf(b), j = L.indexOf(s._tap), k = L.indexOf(s._cur); if (k >= 0 && i >= 0 && ((j > k && (i > j || i < k)) || (j < k && (i < j || i > k)))) b = s._tap; } mark(b); };
+  /* one loop per gesture: follows the strip every frame, and picks only once the finger is up AND the strip has come to rest
+     (picking while the finger was still down, or mid-snap, made it jump to another day) */
+  const pick = () => { s._u = 0; const best = s._tap || atEdgeKeep() || near(); s._tap = null; if (!best) return; const was = s._cur; s._cur = null; mark(best); if (best !== was) best.click(); else if (best.dataset.f1go && window.f1ScrollTo) f1ScrollTo(best.dataset.f1go, true); requestAnimationFrame(wheel); };
+  let lp = 0, rest = 0, lastS = -1; const loop = () => { if (!s._u || !s.isConnected) { lp = 0; return; } const sl = s.scrollLeft; if (sl !== lastS) { rest = 0; lastS = sl; f1Sync(); live(); } else if (!s._t && s._sc && ++rest >= 7) { lp = 0; pick(); return; } lp = requestAnimationFrame(loop); };
+  const go = () => { lastS = s.scrollLeft; rest = 0; lastY = -1; if (!lp) lp = requestAnimationFrame(loop); };
+  s.addEventListener('touchstart', () => { BS = null; s._ballGrab && s._ballGrab(); f1Prep(); s._u = 1; s._t = 1; s._sc = 0; s._tap = null; s._cur = s.querySelector('.on'); go(); }, { passive: true });
+  const up = () => { s._t = 0; if (!s._sc) s._u = 0; }; s.addEventListener('touchend', up, { passive: true }); s.addEventListener('touchcancel', up, { passive: true });
   s._roll = b => Math.abs(s.scrollLeft - tgtOf(b)) >= 3;
-  s.addEventListener('click', ev => { const b = ev.target.closest('button'); if (!ev.isTrusted || !b || !s.contains(b)) return; const tgt = tgtOf(b); if (Math.abs(s.scrollLeft - tgt) < 3) { s._u = 0; s._tap = null; return; } ev.preventDefault(); ev.stopPropagation(); s._ballGrab && s._ballGrab(); s._f1Prep(); s._u = 1; s._tap = b; s._cur = s._cur || s.querySelector('.on'); s.scrollTo({ left: tgt, behavior: 'smooth' }); }, true);
-  let pk = 0; s.addEventListener('scroll', () => { if (!s._u) return; s._sc = 1; requestAnimationFrame(live); clearTimeout(pk); pk = setTimeout(() => { if (!s._u) return; s._u = 0; const best = s._tap || atEdgeKeep() || near(); s._tap = null; if (!best) return; const was = s._cur; s._cur = null; mark(best); if (best !== was) best.click(); else if (best.dataset.f1go && window.f1ScrollTo) f1ScrollTo(best.dataset.f1go, true); requestAnimationFrame(wheel); }, 140); }, { passive: true });
+  s.addEventListener('click', ev => { const b = ev.target.closest('button'); if (!ev.isTrusted || !b || !s.contains(b)) return; const tgt = tgtOf(b); if (Math.abs(s.scrollLeft - tgt) < 3) { s._u = 0; s._tap = null; return; } ev.preventDefault(); ev.stopPropagation(); s._ballGrab && s._ballGrab(); f1Prep(); s._u = 1; s._t = 0; s._sc = 1; s._tap = b; s._cur = s._cur || s.querySelector('.on'); s.scrollTo({ left: tgt, behavior: 'smooth' }); go(); rest = -12; }, true);
+  s.addEventListener('scroll', () => { if (s._u) s._sc = 1; }, { passive: true });
   let t = 0; s.addEventListener('scroll', () => { requestAnimationFrame(wheel); clearTimeout(t); t = setTimeout(() => { const lg = state.league; if (!LEAGUES[lg] || lg === 'nfl') return; const L = s.scrollLeft, R2 = L + s.clientWidth, ds = [...s.querySelectorAll('button[data-date]')].filter(b => b.offsetLeft + b.offsetWidth > L && b.offsetLeft < R2).map(b => { const m = /(\d{4})-?(\d{2})-?(\d{2})/.exec(b.dataset.date); return m ? new Date(+m[1], +m[2] - 1, +m[3]) : null; }).filter(Boolean); if (ds.length) hDots(lg, ds); }, 160); }, { passive: true });
   wheel(); }
 const hStyle = () => { try { const v = localStorage.getItem('hstyle') || ''; return HSTY.some(x => x[0] === v) ? v : ''; } catch (e) { return ''; } };
