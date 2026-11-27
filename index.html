@@ -1407,6 +1407,9 @@ html.fbar .f2po .pht b{top:-3.5px}html.fsg .f2po .pht b{top:4px}.f2po small{marg
 .f2r .fm,.f2r > em,.f2r > span,.f2r > u{position:relative}html.fbar .f2r .fm{top:1px}html.fsg .f2r > em,html.fsg .f2r > span,html.fsg .f2r > u{top:1.75px}
 html.fsg .f2r .f:not(.zd),html.fsg .f2hm .c:not(.zd){box-sizing:border-box;padding-top:2px}
 .card.cl2{position:relative;overflow:hidden}.card.cl2 > .hbar{position:absolute;left:0;top:0;bottom:0;width:5px;border-radius:0 4px 4px 0;background:linear-gradient(var(--ca),var(--ch))}
+.f2hm .hm .c{position:relative}.f2hm .c b{position:absolute;top:-3px;width:10px;height:10px;border-radius:50%;background:#fff;color:#000;font:800 7px/10px -apple-system,system-ui,sans-serif;text-align:center;box-shadow:0 0 0 1.5px var(--card)}.f2hm .c b.mp{left:-3px}.f2hm .c b.mf{right:-3px}
+.f2hm .hmi{padding-top:3px}.f2hm .hr i b{display:block;font-size:9px;color:#c7c7cc;line-height:1.1}.f2hm .hr{align-items:flex-end}
+.f2hm .lg .c.lgm{background:none;position:relative;width:12px}.f2hm .lg .lgp{display:inline-flex;align-items:center;gap:5px;white-space:nowrap}.f2hm .lg .c.lgm b{top:50%;left:50%;margin:-5px 0 0 -5px;right:auto}
 </style>
 </head>
 <body>
@@ -4874,7 +4877,7 @@ function renderLeaders() {
     (async () => { let b = 0; try { const e = navigator.storage && navigator.storage.estimate && await navigator.storage.estimate(); b = (e && e.usage) || 0; } catch (er) {} try { Object.keys(localStorage).forEach(k => { b += (k.length + String(localStorage.getItem(k) || '').length) * 2; }); } catch (er) {} const cb = m.querySelector('[data-cc]'); if (cb && b) cb.textContent = 'Clear cache · ' + (b > 1e6 ? (b / 1048576).toFixed(1) + ' MB' : Math.round(b / 1024) + ' KB'); })();
     o.addEventListener('click', close);
     m.addEventListener('click', ev => {
-      if (ev.target.closest('[data-f12sw]')) { try { localStorage.setItem('f1v2', f12() ? '' : '1'); } catch (er) {} close(); render(); return; }
+      if (ev.target.closest('[data-f12sw]')) { try { localStorage.setItem('f1v2', f12() ? '0' : '1'); } catch (er) {} close(); render(); return; }
       { const sb = ev.target.closest('[data-ssw]'); if (sb) { try { localStorage.setItem('hstrip', sb.dataset.ssw); } catch (er) {} close(); state.stripKey = null; render(); return; } }
       { const hb = ev.target.closest('[data-hsw]'); if (hb) { try { localStorage.setItem('hstyle', hb.dataset.hsw); } catch (er) {} close(); render(); return; } }
       { const bmb = ev.target.closest('[data-bmsw]'); if (bmb) { const k = bmb.dataset.bmsw; try { localStorage.setItem('bmenu', k); } catch (er) {} close(); render(); return; } }
@@ -5242,7 +5245,7 @@ function f1TeamsWait(v, y) { F1.tmY = F1.tmY || {}; F1.tmW = F1.tmW || {}; if (F
     (F1.sb[y] ? go() : f1Season(y).then(go, () => { F1.tmY[y] = {}; })).then(() => { F1.tmW[y] = 0; if (state.lv === v) render(); }); }
   return msg('Loading…'); }
 /* ===== F1 2.0 (hidden menu): standings with movement + form, constructors as bars, season heatmap, race result with places gained ===== */
-const f12 = () => { try { return localStorage.getItem('f1v2') === '1'; } catch (e) { return false; } };
+const f12 = () => { try { return localStorage.getItem('f1v2') !== '0'; } catch (e) { return true; } }; /* F1 2.0 is the default; the hidden menu can switch back to the old pages */
 const F2PC = p => !p ? 'ze' : p <= 3 ? 'z' + p : p <= 10 ? 'zp' + p : 'zn';
 function f1DrvTeam(y, id) { const tm = F1.tmY && F1.tmY[y] && F1.tmY[y][String(id)]; return (tm && tm.team) || f1TM(y)[String(id)] || ''; }
 function f12DrvHTML(v, y, ents) { const races = (F1.sb[y] || []).filter(f1RaceDone), last = races[races.length - 1], T = f1PtsTable(y, false), TS = f1PtsTable(y, true);
@@ -5261,9 +5264,9 @@ function f12HeatHTML(v, y) { const S = F1.st[y], evs = F1.sb[y]; if (!S || !evs)
   const ents = [...((S.drv && S.drv.entries) || [])].sort((a, b) => (f1SV(a, 'rank') || 99) - (f1SV(b, 'rank') || 99)); if (!ents.length) return msg('Not available.');
   const AG = f1Agg(y); if (!AG || !AG.fin) return msg('Loading…'); const dnf = (e, id) => AG && AG.dnfR && AG.dnfR[e.id] && AG.dnfR[e.id][id];
   const ab = a => (a.abbreviation || String(a.lastName || (a.displayName || '').split(' ').slice(-1)[0] || '').slice(0, 3)).toUpperCase();
-  const head = `<div class="hm hr"><span></span>${evs.map((e, k) => `<i>${k + 1}</i>`).join('')}<em>PTS</em></div>`, ptsOf = en => { const p = f1SV(en, 'championshipPts'); return p != null ? p : f1SV(en, 'points') ?? ''; };
-  const rows = ents.map(en => { const a = en.athlete || {}, id = String(a.id); return `<div class="hm" data-f1drv="${esc(id)}"><span><i style="background:${f1TCol(f1DrvTeam(y, id))}"></i>${esc(ab(a))}</span>${evs.map(e => { const rc = f1Comp(e, 'Race'); if (!f1Done(rc)) return '<i class="c zf"></i>'; if (dnf(e, id)) return '<i class="c zd">✕</i>'; const p = f1Pos(rc, id); return `<i class="c ${F2PC(p)}">${p || ''}</i>`; }).join('')}<em>${esc(String(ptsOf(en)))}</em></div>`; }).join('');
-  return `<section class="f2hm"><div class="hmx"><div class="hmi">${head}${rows}</div></div><div class="lg"><i class="c z1">1</i><i class="c z2">2</i><i class="c z3">3</i><i class="c zp6"></i><span>points</span><i class="c zn"></i><span>no points</span><i class="c zd">✕</i><span>DNF</span><i class="c ze"></i><span>no result</span></div></section>`; }
+  const head = `<div class="hm hr"><span></span>${evs.map((e, k) => `<i>${k + 1}<b>${esc(String(f1Iso(e) || '').toUpperCase())}</b></i>`).join('')}<em>PTS</em></div>`, pole = e => { const q = f1Comp(e, 'Qual'), c = q && f1Done(q) && (q.competitors || []).find(x => x.order === 1); return c ? String(c.id) : ''; }, mk = (e, id) => `${pole(e) === id ? '<b class="mp">P</b>' : ''}${AG.flR && String(AG.flR[e.id] || '') === id ? '<b class="mf">F</b>' : ''}`, ptsOf = en => { const p = f1SV(en, 'championshipPts'); return p != null ? p : f1SV(en, 'points') ?? ''; };
+  const rows = ents.map(en => { const a = en.athlete || {}, id = String(a.id); return `<div class="hm" data-f1drv="${esc(id)}"><span><i style="background:${f1TCol(f1DrvTeam(y, id))}"></i>${esc(ab(a))}</span>${evs.map(e => { const rc = f1Comp(e, 'Race'); if (!f1Done(rc)) return '<i class="c zf"></i>'; if (dnf(e, id)) return '<i class="c zd">✕</i>'; const p = f1Pos(rc, id); return `<i class="c ${F2PC(p)}">${p || ''}${p ? mk(e, id) : ''}</i>`; }).join('')}<em>${esc(String(ptsOf(en)))}</em></div>`; }).join('');
+  return `<section class="f2hm"><div class="hmx"><div class="hmi">${head}${rows}</div></div><div class="lg"><i class="c z1">1</i><i class="c z2">2</i><i class="c z3">3</i><i class="c zp6"></i><span>points</span><i class="c zn"></i><span>no points</span><i class="c zd">✕</i><span>DNF</span><span class="lgp"><i class="c lgm"><b class="mp">P</b></i>pole</span><span class="lgp"><i class="c lgm"><b class="mf">F</b></i>fastest lap</span><i class="c ze"></i><span>no result</span></div></section>`; }
 function f12ResHTML(R, timeOf, fl, dm, y) { return `<section class="f2l">${R.sort((a, b) => (a.order || 99) - (b.order || 99)).map(r => { const d = dm[r.id] || {}, st = +d.start || 0, mv = st && r.order ? st - r.order : 0, t = timeOf(r), out = /DNF|DSQ|DNS/.test(t);
     const ar = out || !st ? '<u class="eq"></u>' : mv > 0 ? `<u class="up">▲${mv}</u>` : mv < 0 ? `<u class="dn">▼${-mv}</u>` : '<u class="eq">–</u>', col = d.color ? '#' + String(d.color).replace('#', '') : f1TCol(r.team);
     return `<div class="f2r rr" data-f1drv="${esc(r.id)}"><em class="${r.order <= 3 ? 'w' + r.order : ''}">${esc(String(r.order || ''))}</em><i class="tb" style="background:${col}"></i><div class="n"><b>${esc(r.name || '')}${fl && fl.id === r.id ? '<em class="fl">FL</em>' : ''}</b><small>${esc(r.team || '')}</small></div>${ar}<span>${esc(t)}</span></div>`; }).join('')}</section>`; }
