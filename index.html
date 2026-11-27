@@ -1255,7 +1255,7 @@ main.hsA .f1n,.hsA .f1n{background:linear-gradient(100deg,color-mix(in srgb,var(
 .hsB .f1n{padding-left:21px !important;overflow:hidden}.hsB .f1n::before{content:'';position:absolute;left:0;top:0;bottom:0;width:5px;background:linear-gradient(var(--c1),var(--c2))}
 
 /* scrollable top strip (all leagues): 7 per screen, snaps to an item */
-html.fbar header .hwk.hsc.stA,html.fbar header .hwk.hsc.stD{margin-top:-4px}html.fsg header .hwk.hsc.stA,html.fsg header .hwk.hsc.stD{margin-top:-8px}
+html.fbar header .hwk.hsc.stA{margin-top:-4px}html.fsg header .hwk.hsc.stA{margin-top:-8px}html.fbar header .hwk.hsc.stD{margin-top:6px}html.fsg header .hwk.hsc.stD{margin-top:2px}
 /* circles: every day with games gets a red dot (NFL weeks and F1 rounds always have one) */
 .hsc.st .dy.hg::after,.hsc.st .dy[data-wk]::after,.hsc.st .dy[data-f1go]::after{background:var(--brand) !important}.hsc.st .dy.hw::after{background:var(--live) !important}
 /* strip marker glides between items */
@@ -1274,8 +1274,8 @@ html.fbar .hsc .dy b{line-height:37px !important;padding-bottom:1px;box-sizing:b
 .stA .dy{gap:5px;padding-top:4px !important;background:linear-gradient(#222,#222) no-repeat 0 calc(100% - 4px)/100% 2px !important}
 .stA .dy small{display:none}.stA .dy b{width:auto;height:auto;line-height:1.1 !important;padding:0 !important;font-size:15px;color:var(--mut);background:none !important;overflow:visible}
 .stA .dy.on b{color:#fff;background:none !important}.stA .dy.tdy:not(.on) b{color:var(--brand)}
-.stA .dy::after{width:8px !important;height:8px !important;margin:3px 0 1px !important;background:#3a3a3c !important}.stA .dy.hg::after{background:#8e8e93 !important}.stA .dy.hw::after{background:var(--live) !important}
-.stA .dy.on::after{width:14px !important;height:14px !important;margin:0 !important;background:var(--brand) !important}
+.stA .dy::after{width:14px !important;height:14px !important;margin:0 !important;transform:scale(.5715);background:#3a3a3c !important}.stA .dy.hg::after{background:#8e8e93 !important}.stA .dy.hw::after{background:var(--live) !important}
+.stA .dy.on::after{transform:none;background:var(--brand) !important}
 /* B · wheel */
 .stB .dy{transform:scale(calc(1 - var(--d, 0) * .1));opacity:calc(1 - var(--d, 0) * .26);transition:transform .08s linear,opacity .08s linear}
 .stB .dy b{background:none !important}.stB .dy.on b{background:none !important;color:var(--brand)}
@@ -1284,9 +1284,10 @@ html.fbar .hsc .dy b{line-height:37px !important;padding-bottom:1px;box-sizing:b
 .stD .dy small{display:none}.stD .dy::after{display:none}
 .stD .dy b{width:auto;height:auto;line-height:1.1 !important;padding:0 !important;font-size:15px;color:var(--mut);background:none !important;overflow:visible;transform:translateY(calc(var(--l, 0) * -3px)) scale(calc(1 + var(--l, 0) * .3));transition:color .2s ease !important;transform-origin:50% 100%}
 .stD .dy.on b{color:#fff;background:none !important}.stD .dy.tdy:not(.on) b{color:var(--brand)}
-.stD .tl2{position:absolute;left:0;bottom:0;height:30px;pointer-events:none}
-.stD .tl2 svg{display:block;overflow:visible}.stD .tl2 .l{fill:none;stroke:#5a5a5e;stroke-width:2;stroke-linecap:round}.stD .tl2 .a{display:none}
-.stD .tl2 i{position:absolute;left:0;top:0;width:16px;height:16px;border-radius:50%;background:var(--brand);box-shadow:0 0 0 3px #000,0 0 12px rgba(229,72,77,.55);will-change:transform}
+.hsc.stD .dy,.hsc.stD .dy.on{background:linear-gradient(#3a3a3c,#3a3a3c) no-repeat 0 calc(100% - 7px)/100% 2px !important}
+.stD .tlb{position:sticky;left:calc(50vw - 16px);flex:none;width:0;height:0;align-self:flex-end;order:-1;z-index:2;pointer-events:none;margin-bottom:8px;will-change:transform}
+.stD .tlb::after{content:'';position:absolute;left:-8px;top:-8px;width:16px;height:16px;border-radius:50%;background:var(--brand);box-shadow:0 0 0 3px #000,0 0 12px rgba(229,72,77,.55)}
+.stD .tlb.idle{transition:transform .25s cubic-bezier(.2,.8,.2,1)}
 /* C · bars */
 .stC .dy.on b{background:none !important;color:var(--brand)}
 .stC .dy::after{width:24px !important;border-radius:4px !important;height:calc(3px + var(--h, 0) * 15px) !important;background:#2c2c2e !important;margin-top:-3px !important;align-self:center}
@@ -2051,27 +2052,29 @@ function stripWire() { const s = document.getElementById('strip'); if (!s || !s.
   const near = () => { const c = vc(); let best = null, bd = 1e9; bs().forEach(b => { const d = Math.abs(pos(b) - c); if (d < bd) { bd = d; best = b; } }); return best; };
   const tgtOf = b => Math.min(Math.max(0, s.scrollWidth - s.clientWidth), Math.max(0, pos(b) - s.clientWidth / 2));
   const atEdgeKeep = () => { const cur = s._cur; if (!cur) return null; return Math.abs(tgtOf(cur) - s.scrollLeft) < 3 ? cur : null; };
-  /* D · timeline 2.0: a plain line; a ball rides it under the pointer and the dates next to the ball rise, like the wheel */
-  let tl = null; const tlDraw = () => { if (!s.classList.contains('stD')) return; const L = bs(); if (!L.length) return;
-    if (!tl) { tl = document.createElement('div'); tl.className = 'tl2'; tl.innerHTML = '<svg><defs><linearGradient id="tl2g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".13"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient></defs><path class="a"/><path class="l"/></svg><i></i>'; s.appendChild(tl); }
-    const sig = s.scrollWidth + '|' + L.map(b => b.style.getPropertyValue('--h')).join(','); if (tl && tl._sig === sig) return; tl._sig = sig;
-    const hv = b => parseFloat(b.style.getPropertyValue('--h')) || 0, mx = Math.max(.25, ...L.map(hv)), W = s.scrollWidth, H = 30, y = () => H - 8, P = L.map(b => [pos(b), y(b)]);
-    P.unshift([0, P[0][1]]); P.push([W, P[P.length - 1][1]]);
-    let d = `M${P[0][0]},${P[0][1]}`; for (let i = 0; i < P.length - 1; i++) { const p0 = P[i - 1] || P[i], p1 = P[i], p2 = P[i + 1], p3 = P[i + 2] || p2; d += ` C${p1[0] + (p2[0] - p0[0]) / 6},${p1[1] + (p2[1] - p0[1]) / 6} ${p2[0] - (p3[0] - p1[0]) / 6},${p2[1] - (p3[1] - p1[1]) / 6} ${p2[0]},${p2[1]}`; }
-    const sv = tl.firstChild; sv.setAttribute('width', W); sv.setAttribute('height', H); sv.setAttribute('viewBox', `0 0 ${W} ${H}`); tl.style.width = W + 'px';
-    sv.querySelector('.l').setAttribute('d', d); sv.querySelector('.a').setAttribute('d', d + ` L${W},${H} L0,${H} Z`); tl._len = 0; tlBall(); };
-  const tlBall = () => { if (!tl) return; const pth = tl.querySelector('.l'), x = vc(); let len = tl._len || (tl._len = pth.getTotalLength()), lo = 0, hi = len, pt = null; for (let k = 0; k < 18; k++) { const m = (lo + hi) / 2; pt = pth.getPointAtLength(m); if (pt.x < x) lo = m; else hi = m; } if (pt) tl.lastChild.style.transform = `translate3d(${x - 8}px,${pt.y - 8}px,0)`; };
+  /* D · timeline 2.0: a plain line and a ball on it. The ball is sticky in the middle of the strip (moved by the browser
+     together with the scroll, so it never shakes); only near the ends, and to sit on the chosen item, is it shifted. */
+  let ball = null; if (s.classList.contains('stD')) { ball = document.createElement('i'); ball.className = 'tlb idle'; s.prepend(ball); }
+  const tlBall = () => { if (!ball) return; const on = s.querySelector('button.on'), W = s.clientWidth; let x;
+    if (s._u) { const k = Math.max(0, 1 - Math.abs(s.scrollLeft - (s._bs || 0)) / 60); x = vc() + (s._bo || 0) * k; } else x = on ? pos(on) : vc();
+    const dx = x - (s.scrollLeft + W / 2); ball.style.transform = `translate3d(${dx.toFixed(1)}px,0,0)`; ball.classList.toggle('idle', !s._u); };
+  s._ballGrab = () => { if (!ball) return; const on = s.querySelector('button.on'); s._bo = on ? pos(on) - vc() : 0; s._bs = s.scrollLeft; };
   const wheel = () => { const B = s.classList.contains('stB'), D = s.classList.contains('stD'); if (!B && !D) return; const c = vc(); bs().forEach(b => { const d = Math.abs(pos(b) - c) / b.offsetWidth; if (B) b.style.setProperty('--d', Math.min(3, d).toFixed(2)); else b.style.setProperty('--l', Math.max(0, 1 - d / 1.4).toFixed(3)); }); if (D) tlBall(); };
-  if (s.classList.contains('stD')) { s.style.position = 'relative'; tlDraw(); let q = 0; new MutationObserver(() => { cancelAnimationFrame(q); q = requestAnimationFrame(tlDraw); }).observe(s, { subtree: true, attributes: true, attributeFilter: ['style'] }); }
   /* the strip rolls like a picker: while it moves, the marker glides to the item under the pointer; when it stops, that item
      is picked (as if tapped). Tapping an item rolls the strip to it first. */
   const mark = b => { if (!b || b.classList.contains('on')) return; s.querySelectorAll('button.on').forEach(x => x.classList.remove('on')); b.classList.add('on'); };
-  const live = () => { if (!s._u) return; let b = atEdgeKeep() || near(); if (s._tap) { const L = bs(), i = L.indexOf(b), j = L.indexOf(s._tap), k = L.indexOf(s._cur); if (k >= 0 && i >= 0 && ((j > k && (i > j || i < k)) || (j < k && (i < j || i > k)))) b = s._tap; } mark(b); };
-  s.addEventListener('touchstart', () => { s._u = 1; s._sc = 0; s._tap = null; s._cur = s.querySelector('.on'); }, { passive: true });
+  /* F1: while the strip moves, the race cards below follow it smoothly (each GP's card meets the top as its round passes the middle) */
+  const f1Sync = () => { const L = bs(); if (!L.length || !L[0].dataset.f1go || state.league !== 'f1' || topView() !== 'list') return; const f = $app.querySelector('.f1list > .f1card'); if (!f) return;
+    const c = vc(); let i = 0; while (i < L.length - 2 && pos(L[i + 1]) <= c) i++; const a = L[i], b = L[i + 1] || a, pa = pos(a), pb = pos(b), k = pb > pa ? Math.min(1, Math.max(0, (c - pa) / (pb - pa))) : 0;
+    const ca = document.getElementById('f1c' + a.dataset.f1go), cb = document.getElementById('f1c' + b.dataset.f1go); if (!ca || !cb) return;
+    const ya = ca.offsetTop - f.offsetTop, yb = cb.offsetTop - f.offsetTop; if (window.F1) F1.tok++; window._stAnim = false; window.scrollTo(0, Math.round(ya + (yb - ya) * k)); };
+  s._f1Prep = () => { try { if (bs()[0] && bs()[0].dataset.f1go) f1Spacer(); } catch (e) {} };
+  const live = () => { if (!s._u) return; f1Sync(); let b = atEdgeKeep() || near(); if (s._tap) { const L = bs(), i = L.indexOf(b), j = L.indexOf(s._tap), k = L.indexOf(s._cur); if (k >= 0 && i >= 0 && ((j > k && (i > j || i < k)) || (j < k && (i < j || i > k)))) b = s._tap; } mark(b); };
+  s.addEventListener('touchstart', () => { s._ballGrab && s._ballGrab(); s._f1Prep(); s._u = 1; s._sc = 0; s._tap = null; s._cur = s.querySelector('.on'); }, { passive: true });
   s.addEventListener('touchend', () => { if (!s._sc) s._u = 0; }, { passive: true });
   s._roll = b => Math.abs(s.scrollLeft - tgtOf(b)) >= 3;
-  s.addEventListener('click', ev => { const b = ev.target.closest('button'); if (!ev.isTrusted || !b || !s.contains(b)) return; const tgt = tgtOf(b); if (Math.abs(s.scrollLeft - tgt) < 3) { s._u = 0; s._tap = null; return; } ev.preventDefault(); ev.stopPropagation(); s._u = 1; s._tap = b; s._cur = s._cur || s.querySelector('.on'); s.scrollTo({ left: tgt, behavior: 'smooth' }); }, true);
-  let pk = 0; s.addEventListener('scroll', () => { if (!s._u) return; s._sc = 1; requestAnimationFrame(live); clearTimeout(pk); pk = setTimeout(() => { if (!s._u) return; s._u = 0; const best = s._tap || atEdgeKeep() || near(); s._tap = null; if (!best) return; const was = s._cur; s._cur = null; mark(best); if (best !== was) best.click(); }, 140); }, { passive: true });
+  s.addEventListener('click', ev => { const b = ev.target.closest('button'); if (!ev.isTrusted || !b || !s.contains(b)) return; const tgt = tgtOf(b); if (Math.abs(s.scrollLeft - tgt) < 3) { s._u = 0; s._tap = null; return; } ev.preventDefault(); ev.stopPropagation(); s._ballGrab && s._ballGrab(); s._f1Prep(); s._u = 1; s._tap = b; s._cur = s._cur || s.querySelector('.on'); s.scrollTo({ left: tgt, behavior: 'smooth' }); }, true);
+  let pk = 0; s.addEventListener('scroll', () => { if (!s._u) return; s._sc = 1; requestAnimationFrame(live); clearTimeout(pk); pk = setTimeout(() => { if (!s._u) return; s._u = 0; const best = s._tap || atEdgeKeep() || near(); s._tap = null; if (!best) return; const was = s._cur; s._cur = null; mark(best); if (best !== was) best.click(); else if (best.dataset.f1go && window.f1ScrollTo) f1ScrollTo(best.dataset.f1go, true); requestAnimationFrame(wheel); }, 140); }, { passive: true });
   let t = 0; s.addEventListener('scroll', () => { requestAnimationFrame(wheel); clearTimeout(t); t = setTimeout(() => { const lg = state.league; if (!LEAGUES[lg] || lg === 'nfl') return; const L = s.scrollLeft, R2 = L + s.clientWidth, ds = [...s.querySelectorAll('button[data-date]')].filter(b => b.offsetLeft + b.offsetWidth > L && b.offsetLeft < R2).map(b => { const m = /(\d{4})-?(\d{2})-?(\d{2})/.exec(b.dataset.date); return m ? new Date(+m[1], +m[2] - 1, +m[3]) : null; }).filter(Boolean); if (ds.length) hDots(lg, ds); }, 160); }, { passive: true });
   wheel(); }
 const hStyle = () => { try { const v = localStorage.getItem('hstyle') || ''; return HSTY.some(x => x[0] === v) ? v : ''; } catch (e) { return ''; } };
