@@ -1205,12 +1205,6 @@ main[class^="hs"] .lose{color:var(--mut)}
 .hA1 > div,.hA3 > div{min-width:0}
 .hA2{text-align:center;min-width:80px;white-space:nowrap}.hA2 b{display:block;font-family:var(--num);font-weight:700;font-size:29px;line-height:1;font-variant-numeric:tabular-nums}.hA2 b i{font-style:normal;color:var(--mut);margin:0 5px}
 .hA2 small{display:block;font-size:12.5px;color:rgba(255,255,255,.75);margin-top:3px;font-family:var(--num);font-weight:600}
-/* B / J */
-.hcB{display:flex;align-items:stretch;background:var(--card);border-radius:18px;margin-bottom:8px;padding:8px 0;overflow:hidden;cursor:pointer}
-.hcB .hbar{width:5px;border-radius:0 4px 4px 0;background:linear-gradient(var(--ca),var(--ch));margin:-8px 13px -8px 0;flex:none}
-.hcB .hst{width:76px;flex:none;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;border-left:1px solid var(--line);margin-left:10px;font-family:var(--num);font-weight:600;font-size:14px;color:var(--mut);text-align:center}
-.hcB[data-pre] .hst{color:#fff;font-size:16px;font-weight:700}
-.hcB .hrs{flex:1;min-width:0}
 .hB{padding-bottom:4px}.hBt{display:flex;justify-content:space-between;align-items:flex-start}
 .hBt small{display:block;font-family:var(--num);font-weight:700;font-size:14px;letter-spacing:1.4px;color:var(--mut)}
 .hBt b{display:block;font-family:var(--num);font-weight:800;font-size:44px;line-height:1}
@@ -1407,11 +1401,12 @@ html.fbar .f2po .pht b{top:-3.5px}html.fsg .f2po .pht b{top:4px}.f2po small{marg
 .f2r .f2pen{text-align:right;margin-left:auto;white-space:nowrap}.f2r .f2pen em{font-style:normal;color:#ffb340}.f1big .g span.qp{font-size:13px;color:#ffb340}
 .f2sy{display:flex;align-items:center;gap:10px;margin:18px 0 0;font-family:var(--num)}.f2sy i{flex:1;height:1px;background:rgba(255,255,255,.1)}.f2sy b{font-size:15px;font-weight:700;letter-spacing:2px;color:#fff}.f2sy + .f2ch{margin-top:10px !important}
 .pane .f2l{padding-left:0;padding-right:0}.pane .f2hm{padding-left:0;padding-right:0}
-.f2r .fm{gap:3px}.f2r .f{width:20px;height:19px;border-radius:5px;font-size:11px}.f2hm .hm .c{width:22px;height:20px;font-size:11px}.f2hm .hr i{width:22px}
+.f2r .fm{gap:3px}.f2r .f{width:20px;height:19px;border-radius:5px;font-size:11px}
 .f2r .f.zd,.f2hm .c.zd{background:#4a1416;color:#ff8a8e;font-family:-apple-system,system-ui,sans-serif !important;font-size:12px;line-height:1;padding:0}
 /* optical centring of the row parts against the two-line name (measured per font) */
 .f2r .fm,.f2r > em,.f2r > span,.f2r > u{position:relative}html.fbar .f2r .fm{top:1px}html.fsg .f2r > em,html.fsg .f2r > span,html.fsg .f2r > u{top:1.75px}
 html.fsg .f2r .f:not(.zd),html.fsg .f2hm .c:not(.zd){box-sizing:border-box;padding-top:2px}
+.card.cl2{position:relative;overflow:hidden}.card.cl2 > .hbar{position:absolute;left:0;top:0;bottom:0;width:5px;border-radius:0 4px 4px 0;background:linear-gradient(var(--ca),var(--ch))}
 </style>
 </head>
 <body>
@@ -2153,7 +2148,7 @@ const LY_BB = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke
 const LY_PK = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><ellipse cx="12" cy="9.5" rx="8" ry="3.5"/><path d="M4 9.5v4c0 2 3.6 3.5 8 3.5s8-1.5 8-3.5v-4"/></svg>';
 const LY_FLG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M5 21V4M5 4h13l-2.5 4.5L18 13H5"/></svg>';
 /* ===== home styles (hidden menu): Classic & Classic Alt (B header + classic cards), A colour cards · B big day ===== */
-const HSTY = [['', 'Classic'], ['A', 'Home A · Colour cards'], ['B', 'Home B · Big day']];
+const HSTY = [['', 'Classic 2.0'], ['A', 'Home A · Colour cards']];
 const HSTRIP = [['', 'Strip · Circles'], ['A', 'Strip A · Timeline'], ['B', 'Strip B · Wheel']];
 const hStrip = () => { try { let v = localStorage.getItem('hstrip') || ''; if (v === 'D') { v = 'A'; localStorage.setItem('hstrip', v); } else if (v === 'C') { v = ''; localStorage.setItem('hstrip', v); } return HSTRIP.some(x => x[0] === v) ? v : ''; } catch (e) { return ''; } };
 /* scrollable strip: snaps to an item; the wheel style scales items by distance from the centre; dots for days that scroll into view */
@@ -2223,7 +2218,6 @@ const HCARD = {
     <div class="hA1">${logoImg(a.logo)}<div><b class="${hLose(e, a) ? 'lose' : ''}">${esc(a.abbr || a.name)}</b><small>${hRec(a)}</small></div></div>
     <div class="hA2">${e.state === 'pre' ? '' : `<b><span class="${hLose(e, a) ? 'lose' : ''}">${esc(a.score)}</span><i>-</i><span class="${hLose(e, h) ? 'lose' : ''}">${esc(h.score)}</span></b>`}<small>${hSt(e)}</small>${hLg(e)}</div>
     <div class="hA3"><div><b class="${hLose(e, h) ? 'lose' : ''}">${esc(h.abbr || h.name)}</b><small>${hRec(h)}</small></div>${logoImg(h.logo)}</div></div>`; },
-  B: e => { const lg = e.league || state.league; return `<div class="hcB" ${hAttr(e)} style="--ca:${hCol(lg, e.away)};--ch:${hCol(lg, e.home)}"><i class="hbar"></i><div class="hrs">${hRow(e, e.away)}${hRow(e, e.home)}</div><div class="hst">${hSt(e)}${hLg(e)}</div></div>`; },
 };
 function hGroups(evs, lg) {
   const byDay = lg === 'fav';
@@ -2342,7 +2336,8 @@ function cardHTML(e) {
     return `<div class="row ${lose ? 'lose' : ''}">${logoImg(t.logo)}<span class="nm ${state.league !== 'fav' && isFav(e.league || state.league, t.id) ? 'fv' : ''}">${esc(t.name)}${t.record ? `<span class="rec">(${esc(String(t.record).replace(/,\s*\d+\s*pts?\b/i, ''))})</span>` : ''}</span>
       <span class="sc">${e.state === 'pre' ? '' : esc(t.score)}</span><span class="arr">${e.state === 'post' && t.winner ? '◀' : ''}</span></div>`;
   };
-  return `<div class="card" data-game="${e.id}" data-gl="${e.league || state.league}"${e.state === 'pre' ? ' data-pre' : ''}><div class="top"><span class="${e.state === 'in' ? 'live' : ''}">${(m => e.state === 'in' && m ? `${esc(m[2])}<em>${esc(m[1])}</em>` : esc(statusText(e)))(/^\s*(\d{1,2}:\d{2}(?:\.\d)?)\s*-\s*(.+?)\s*$/.exec(statusText(e)))}</span>${(e.league || state.league) === 'nfl' && e.state !== 'in' && state.league !== 'fav' ? `<small class="ndt">${nflDay(e)}</small>` : ''}${e.league && state.league === 'fav' ? `<span class="lgt">${e.league.toUpperCase()}</span>` : ''}</div>${row(e.away)}${row(e.home)}</div>`;
+  const lgc = e.league || state.league;
+  return `<div class="card cl2" data-game="${e.id}" data-gl="${lgc}"${e.state === 'pre' ? ' data-pre' : ''} style="--ca:${hCol(lgc, e.away)};--ch:${hCol(lgc, e.home)}"><i class="hbar"></i><div class="top"><span class="${e.state === 'in' ? 'live' : ''}">${(m => e.state === 'in' && m ? `${esc(m[2])}<em>${esc(m[1])}</em>` : esc(statusText(e)))(/^\s*(\d{1,2}:\d{2}(?:\.\d)?)\s*-\s*(.+?)\s*$/.exec(statusText(e)))}</span>${(e.league || state.league) === 'nfl' && e.state !== 'in' && state.league !== 'fav' ? `<small class="ndt">${nflDay(e)}</small>` : ''}${e.league && state.league === 'fav' ? `<span class="lgt">${e.league.toUpperCase()}</span>` : ''}</div>${row(e.away)}${row(e.home)}</div>`;
 }
 
 function renderGame() {
@@ -5258,7 +5253,7 @@ function f12DrvHTML(v, y, ents) { const races = (F1.sb[y] || []).filter(f1RaceDo
   return `<section class="f2l">${ents.map(en => { const a = en.athlete || {}, id = String(a.id), rk = +f1SV(en, 'rank') || 0, mv = races.length > 1 && pr[id] ? pr[id] - rk : 0, tn = f1DrvTeam(y, id);
     const ar = mv > 0 ? `<u class="up">▲${mv}</u>` : mv < 0 ? `<u class="dn">▼${-mv}</u>` : '<u class="eq">•</u>';
     const form = L5.map(e => { if (AGf && AGf.dnfR && AGf.dnfR[e.id] && AGf.dnfR[e.id][id]) return '<i class="f zd">✕</i>'; const p = f1Pos(f1Comp(e, 'Race'), id); return `<i class="f ${F2PC(p)}">${p || ''}</i>`; }).join('');
-    return `<div class="f2r" data-f1drv="${esc(id)}"><em>${rk || ''}</em>${ar}<i class="tb" style="background:${f1TCol(tn)}"></i><div class="n"><b>${esc(a.displayName || a.name || '')}</b><small>${esc(tn)}</small></div><div class="fm">${form}</div><span>${pts(en)}</span></div>`; }).join('')}</section><div class="f2note">▲▼ places vs. the previous round · last 5 races</div>`; }
+    return `<div class="f2r" data-f1drv="${esc(id)}"><em>${rk || ''}</em>${ar}<i class="tb" style="background:${f1TCol(tn)}"></i><div class="n"><b>${esc(a.displayName || a.name || '')}</b><small>${esc(tn)}</small></div><div class="fm">${form}</div><span>${pts(en)}</span></div>`; }).join('')}</section>`; }
 function f12ConHTML(v, y, ents) { const pts = en => { const p = f1SV(en, 'championshipPts'); return +(p != null ? p : f1SV(en, 'points')) || 0; }, top = Math.max(1, ...ents.map(pts));
   return `<section class="f2l">${ents.map(en => { const t = en.team || {}, n = t.displayName || t.name || '', p = pts(en);
     return `<div class="f2c"><em>${esc(String(f1SV(en, 'rank') || ''))}</em><div class="cb"><div class="ct"><b>${esc(n)}</b><span>${p}</span></div><div class="bar"><i style="width:${(p / top * 100).toFixed(1)}%;background:${f1TCol(n)}"></i></div></div></div>`; }).join('')}</section>`; }
