@@ -1296,7 +1296,7 @@ html.pgA .seg > button.on{color:#fff !important;background:none !important}
 html.pgA .seg > button.on::after{content:'';position:absolute;left:0;right:0;bottom:0;height:3px;border-radius:3px;background:var(--brand)}
 
 /* F1 big card (hidden menu) */
-.f1card.f1big{height:auto !important;min-height:428px;flex-direction:column;display:flex !important;padding:16px !important;border-radius:22px;position:relative;overflow:hidden}
+.f1card.f1big{height:auto !important;min-height:408px;display:block !important;padding:16px !important;border-radius:22px;position:relative;overflow:hidden}
 .f1big .bt{display:flex;align-items:center;gap:11px}.f1big .bt .f1fl{width:30px;height:30px}.f1big .bn{flex:1;min-width:0}.f1big .bn b{display:block;font-family:var(--num);font-size:22px;font-weight:700;line-height:1.05;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.f1big .bn small{display:block;color:var(--mut);font-size:13.5px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .f1big .br{text-align:right;font-family:var(--num)}.f1big .br b{display:block;font-size:14px;color:var(--mut)}.f1big .br small{font-size:13.5px;font-weight:700}
 .f1big .bl{margin:16px 0 8px;font-size:13px;font-weight:700;color:var(--mut);letter-spacing:.8px;text-transform:uppercase}.f1big .lvd{color:var(--live)}
@@ -1330,7 +1330,7 @@ html.pgA .seg > button.on::after{content:'';position:absolute;left:0;right:0;bot
 
 main .hsec.fvh{margin-top:4px !important}main .fvsp{height:10px}
 
-.f1big .kv{margin-top:auto;background:rgba(0,0,0,.35);border-radius:14px;padding:0 12px;font-family:var(--num)}.f1big .kv:empty{display:none}.f1big .kv > div{display:flex;align-items:center;gap:10px;height:30px}.f1big .kv > div + div{border-top:1px solid rgba(255,255,255,.07)}
+.f1big .kv{position:absolute;left:16px;right:16px;bottom:12px;background:none;border-radius:0;padding:0;font-family:var(--num)}.f1big .kv:empty{display:none}.f1big .kv > div{display:flex;align-items:center;gap:10px;height:36px}.f1big .kv > div + div{border-top:1px solid rgba(255,255,255,.07)}
 .f1big .kv small{flex:none;width:86px;font-size:12px;font-weight:700;letter-spacing:1px;color:rgba(255,255,255,.6);white-space:nowrap}.f1big .kv i{width:4px;height:18px;border-radius:2px;flex:none;margin-right:-2px}.f1big .kv b{flex:1;min-width:0;font-size:17px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.3}
 .f1big > .tag{align-self:flex-start}
 .f1big.fbD .nd:last-child{border-left-color:transparent}
@@ -5070,7 +5070,7 @@ function f1BigHTML(e, k) { const y = e._y || F1.listY || f1ShowY(), TM = f1TM(y)
   else tag = C[0] ? 'Starts in ' + cd(new Date(C[0].date)) : esc(dt);
   const D = []; S.forEach(x => { let g = D.find(z => z.d === x.d); if (!g) D.push(g = { d: x.d, L: [] }); g.L.push(x); });
   const tl = done ? '' : `<div class="btl">${D.map(g => `<div class="dc"><h4>${esc(g.d)}</h4>${g.L.map(x => `<div class="nd ${x.st}${x.st === 'live' && fy ? ' yl' : ''}"><i></i><b>${esc(x.n)}</b><span>${x.st === 'next' ? 'in ' + cd(new Date(x.c.date)) : x.st === 'live' ? (lap ? 'Lap ' + lap : 'Live') : esc(x.h)}</span></div>`).join('')}</div>`).join('')}</div>`;
-  if (!done && !wk) { const W = f1LastWin(e), cn = (e.circuit && e.circuit.fullName) || ''; bx = `<div class="kv">${W ? `<div><small>LAST WINNER</small><i style="background:${W.c}"></i><b>${esc(W.n)}</b></div>` : ''}${cn ? `<div><small>CIRCUIT</small><b>${esc(cn)}</b></div>` : ''}</div>`; }
+  if (!done && !wk) { const W = f1LastWin(e), cn = (e.circuit && e.circuit.fullName) || ''; bx = W ? `<div class="kv"><div><small>LAST WINNER</small><i style="background:${W.c}"></i><b>${esc(W.n)}</b></div></div>` : ''; }
   return `<div class="card f1card f1big fbD" data-f1race="${esc(e.id)}" data-f1ry="${esc(e._y || '')}" id="f1c${esc(e.id)}" style="--cc:${f1CCol(e)}"><div class="wm">${rd}</div>
     <div class="ph">${f1Flag(e)}<b>${nmS}</b><small>GRAND PRIX · ${dt}</small></div><div class="tag ${tcl}">${esc(tag.toUpperCase())}</div>${tl}${bx}</div>`; }
 F1.bt = F1.bt || {}; F1.lw = F1.lw || {};
