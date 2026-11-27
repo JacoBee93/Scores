@@ -1255,9 +1255,10 @@ main.hsA .f1n,.hsA .f1n{background:linear-gradient(100deg,color-mix(in srgb,var(
 .hsB .f1n{padding-left:21px !important;overflow:hidden}.hsB .f1n::before{content:'';position:absolute;left:0;top:0;bottom:0;width:5px;background:linear-gradient(var(--c1),var(--c2))}
 
 /* scrollable top strip (all leagues): 7 per screen, snaps to an item */
-html.fbar header .hwk.hsc.stA{margin-top:-4px}html.fsg header .hwk.hsc.stA{margin-top:-8px}html.fbar header .hwk.hsc.stD{margin-top:2px}html.fsg header .hwk.hsc.stD{margin-top:-2px}
+html.fbar header .hwk.hsc.stA{margin-top:2px}html.fsg header .hwk.hsc.stA{margin-top:-2px}
 /* circles: every day with games gets a red dot (NFL weeks and F1 rounds always have one) */
-.hsc.st .dy.hg::after,.hsc.st .dy[data-wk]::after,.hsc.st .dy[data-f1go]::after{background:var(--brand) !important}.hsc.st .dy.hw::after{background:var(--live) !important}
+.hsc.st .dy.hg::after,.hsc.st .dy[data-wk]::after,.hsc.st .dy[data-f1go]::after,.hsc.stB .dy.hg::after,.hsc.stB .dy[data-wk]::after,.hsc.stB .dy[data-f1go]::after{background:var(--mut) !important}
+.hsc.st .dy.tdy.hg::after,.hsc.st .dy.tdy[data-wk]::after,.hsc.st .dy.tdy[data-f1go]::after,.hsc.stB .dy.tdy.hg::after,.hsc.stB .dy.tdy[data-wk]::after,.hsc.stB .dy.tdy[data-f1go]::after{background:var(--brand) !important}
 /* strip marker glides between items */
 .hsc .dy b{transition:background-color .22s ease,color .22s ease,transform .22s ease}
 .hsc .dy::after{transition:width .22s ease,height .22s ease,background-color .22s ease,transform .22s ease,margin .22s ease}
@@ -1270,29 +1271,18 @@ header .hwk.hsc::-webkit-scrollbar{display:none}
 .hsc .dy b{font-family:var(--num);font-size:19px;font-weight:700;width:38px;height:38px;line-height:38px;border-radius:50%;text-align:center}
 .hsc .dy.on{background:none !important;color:#fff}.hsc .dy.on b{background:var(--brand);color:#fff}.hsc .dy.tdy:not(.on) b{color:var(--brand)}
 html.fbar .hsc .dy b{line-height:37px !important;padding-bottom:1px;box-sizing:border-box}html.fsg .hsc .dy b{line-height:40px !important;box-sizing:border-box;overflow:hidden}
-/* A · timeline */
-.stA .dy{gap:5px;padding-top:4px !important;background:linear-gradient(#222,#222) no-repeat 0 calc(100% - 4px)/100% 2px !important}
-.stA .dy small{display:none}.stA .dy b{width:auto;height:auto;line-height:1.1 !important;padding:0 !important;font-size:15px;color:var(--mut);background:none !important;overflow:visible}
-.stA .dy.on b{color:#fff;background:none !important}.stA .dy.tdy:not(.on) b{color:var(--brand)}
-.stA .dy::after{width:14px !important;height:14px !important;margin:0 !important;transform:scale(.5715);background:#3a3a3c !important}.stA .dy.hg::after{background:#8e8e93 !important}.stA .dy.hw::after{background:var(--live) !important}
-.stA .dy.on::after{transform:none;background:var(--brand) !important}
 /* B · wheel */
 .stB .dy{transform:scale(calc(1 - var(--d, 0) * .1));opacity:calc(1 - var(--d, 0) * .26);transition:transform .08s linear,opacity .08s linear}
 .stB .dy b{background:none !important}.stB .dy.on b{background:none !important;color:var(--brand)}
 /* D · timeline 2.0 */
-.stD .dy{height:54px !important;justify-content:flex-start;padding-top:6px !important;gap:0 !important;position:relative;z-index:1}
-.stD .dy small{display:none}.stD .dy::after{display:none}
-.stD .dy b{width:auto;height:auto;line-height:1.1 !important;padding:0 !important;font-size:15px;color:var(--mut);background:none !important;overflow:visible;transform:translateY(calc((1 - var(--l, 0)) * 13px)) scale(calc(1 + var(--l, 0) * .3));transition:color .2s ease !important;transform-origin:50% 100%}
-.stD .dy.on b{color:#fff;background:none !important}.stD .dy.tdy:not(.on) b{color:var(--brand)}
-.hsc.stD .dy,.hsc.stD .dy.on{background:linear-gradient(#3a3a3c,#3a3a3c) no-repeat 0 calc(100% - 7px)/100% 2px !important}
-.stD .tlb{position:sticky;left:calc(50vw - 16px);flex:none;width:0;height:0;align-self:flex-end;order:-1;z-index:2;pointer-events:none;margin-bottom:8px;will-change:transform}
-.stD .tlb::after{content:'';position:absolute;left:-8px;top:-8px;width:16px;height:16px;border-radius:50%;background:var(--brand);box-shadow:0 0 0 3px #000,0 0 12px rgba(229,72,77,.55)}
-.stD .tlb.idle{transition:transform .25s cubic-bezier(.2,.8,.2,1)}
-/* C · bars */
-.stC .dy.on b{background:none !important;color:var(--brand)}
-.stC .dy::after{width:24px !important;border-radius:4px !important;height:calc(3px + var(--h, 0) * 15px) !important;background:#2c2c2e !important;margin-top:-3px !important;align-self:center}
-.stC .dy.hw::after{background:var(--live) !important}.stC .dy.on::after{background:var(--brand) !important}
-.stC .dy{justify-content:flex-start;height:74px !important;gap:1px !important}
+.stA .dy{height:54px !important;justify-content:flex-start;padding-top:6px !important;gap:0 !important;position:relative;z-index:1}
+.stA .dy small{display:none}.stA .dy::after{display:none}
+.stA .dy b{width:auto;height:auto;line-height:1.1 !important;padding:0 !important;font-size:15px;color:var(--mut);background:none !important;overflow:visible;transform:translateY(calc((1 - var(--l, 0)) * 11px)) scale(calc(1 + var(--l, 0) * .3));opacity:calc(1 - var(--d, 0) * .26);transition:color .2s ease !important;transform-origin:50% 100%}
+.stA .dy.on b{color:#fff;background:none !important}.stA .dy.tdy:not(.on) b{color:var(--brand)}
+.hsc.stA .dy,.hsc.stA .dy.on{background:linear-gradient(#3a3a3c,#3a3a3c) no-repeat 0 calc(100% - 7px)/100% 2px !important}
+.stA .tlb{position:sticky;left:calc(50vw - 16px);flex:none;width:0;height:0;align-self:flex-end;order:-1;z-index:2;pointer-events:none;margin-bottom:8px;will-change:transform}
+.stA .tlb::after{content:'';position:absolute;left:-8px;top:-8px;width:16px;height:16px;border-radius:50%;background:var(--brand);box-shadow:0 0 0 3px #000,0 0 12px rgba(229,72,77,.55)}
+.stA .tlb.idle{transition:transform .25s cubic-bezier(.2,.8,.2,1)}
 
 /* Pills A · Underline (hidden menu): text tabs, centred, the chosen one white with a red bar under it */
 html.pgA .seg{border:0 !important;background:none !important;border-radius:0 !important;padding:0 !important;max-width:100% !important;justify-content:center;gap:24px;box-shadow:inset 0 -1px 0 #2c2c2e}
@@ -2040,8 +2030,8 @@ const LY_PK = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke
 const LY_FLG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M5 21V4M5 4h13l-2.5 4.5L18 13H5"/></svg>';
 /* ===== home styles (hidden menu): Classic & Classic Alt (B header + classic cards), A colour cards · B big day ===== */
 const HSTY = [['', 'Classic'], ['A', 'Home A · Colour cards'], ['B', 'Home B · Big day']];
-const HSTRIP = [['', 'Strip · Circles'], ['A', 'Strip A · Timeline'], ['B', 'Strip B · Wheel'], ['C', 'Strip C · Bars'], ['D', 'Strip D · Timeline 2.0']];
-const hStrip = () => { try { const v = localStorage.getItem('hstrip') || ''; return HSTRIP.some(x => x[0] === v) ? v : ''; } catch (e) { return ''; } };
+const HSTRIP = [['', 'Strip · Circles'], ['A', 'Strip A · Timeline'], ['B', 'Strip B · Wheel']];
+const hStrip = () => { try { let v = localStorage.getItem('hstrip') || ''; if (v === 'D') { v = 'A'; localStorage.setItem('hstrip', v); } else if (v === 'C') { v = ''; localStorage.setItem('hstrip', v); } return HSTRIP.some(x => x[0] === v) ? v : ''; } catch (e) { return ''; } };
 /* scrollable strip: snaps to an item; the wheel style scales items by distance from the centre; dots for days that scroll into view */
 function stripWire() { const s = document.getElementById('strip'); if (!s || !s.classList.contains('hsc') || s._wired) return; s._wired = 1; s.dataset.w = 1;
   /* the strip fills edge to edge (no empty space after the last GP / before the first day). Near the ends, where the
@@ -2056,12 +2046,12 @@ function stripWire() { const s = document.getElementById('strip'); if (!s || !s.
   const atEdgeKeep = () => { const cur = s._cur; if (!cur) return null; return Math.abs(tgtOf(cur) - s.scrollLeft) < 3 ? cur : null; };
   /* D · timeline 2.0: a plain line and a ball on it. The ball is sticky in the middle of the strip (moved by the browser
      together with the scroll, so it never shakes); only near the ends, and to sit on the chosen item, is it shifted. */
-  let ball = null; if (s.classList.contains('stD')) { ball = document.createElement('i'); ball.className = 'tlb idle'; s.prepend(ball); }
+  let ball = null; if (s.classList.contains('stA')) { ball = document.createElement('i'); ball.className = 'tlb idle'; s.prepend(ball); }
   const tlBall = () => { if (!ball) return; const on = s.querySelector('button.on'), W = s.clientWidth; let x;
     if (s._u) { const k = Math.max(0, 1 - Math.abs(s.scrollLeft - (s._bs || 0)) / 60); x = vc() + (s._bo || 0) * k; } else x = on ? pos(on) : vc();
     const dx = x - (s.scrollLeft + W / 2); ball.style.transform = `translate3d(${dx.toFixed(1)}px,0,0)`; ball.classList.toggle('idle', !s._u); };
   s._ballGrab = () => { if (!ball) return; const on = s.querySelector('button.on'); s._bo = on ? pos(on) - vc() : 0; s._bs = s.scrollLeft; };
-  const wheel = () => { const B = s.classList.contains('stB'), D = s.classList.contains('stD'); if (!B && !D) return; const c = vc(); bs().forEach(b => { const d = Math.abs(pos(b) - c) / b.offsetWidth; const v = B ? Math.min(3, d).toFixed(2) : Math.max(0, 1 - d / 1.4).toFixed(3); if (b._v !== v) { b._v = v; b.style.setProperty(B ? '--d' : '--l', v); } }); if (D) tlBall(); };
+  const wheel = () => { const B = s.classList.contains('stB'), D = s.classList.contains('stA'); if (!B && !D) return; const c = vc(); bs().forEach(b => { const d = Math.abs(pos(b) - c) / b.offsetWidth; const v = Math.min(3, d).toFixed(2); if (b._v !== v) { b._v = v; b.style.setProperty('--d', v); if (D) b.style.setProperty('--l', Math.max(0, 1 - d / 1.4).toFixed(3)); } }); if (D) tlBall(); };
   /* the strip rolls like a picker: while it moves, the marker glides to the item under the pointer; when it stops, that item
      is picked (as if tapped). Tapping an item rolls the strip to it first. */
   const mark = b => { if (!b || b.classList.contains('on')) return; s.querySelectorAll('button.on').forEach(x => x.classList.remove('on')); b.classList.add('on'); };
@@ -2069,14 +2059,19 @@ function stripWire() { const s = document.getElementById('strip'); if (!s || !s.
   let CY = null; const f1Prep = () => { CY = null; const L = bs(); if (!L[0] || !L[0].dataset.f1go || state.league !== 'f1' || topView() !== 'list') return; try { f1Spacer(); } catch (e) {} const f = $app.querySelector('.f1list > .f1card'); if (!f) return;
     CY = L.map(b => { const c = document.getElementById('f1c' + b.dataset.f1go); return c ? c.offsetTop - f.offsetTop : null; }); if (CY.some(y => y == null)) CY = null; };
   let lastY = -1; const f1Sync = () => { if (!CY) return; const L = bs(), c = vc(); let i = 0; while (i < L.length - 2 && pos(L[i + 1]) <= c) i++; const pa = pos(L[i]), pb = pos(L[i + 1] || L[i]), k = pb > pa ? Math.min(1, Math.max(0, (c - pa) / (pb - pa))) : 0;
-    const y = CY[i] + ((CY[i + 1] != null ? CY[i + 1] : CY[i]) - CY[i]) * k; if (Math.abs(y - lastY) < .5) return; lastY = y; if (window.F1) F1.tok++; window._stAnim = false; window.scrollTo(0, y); };
+    const y = CY[i] + ((CY[i + 1] != null ? CY[i + 1] : CY[i]) - CY[i]) * k; if (Math.abs(y - lastY) < .1) return; lastY = y; if (window.F1) F1.tok++;
+    /* the list is slid with a GPU transform while the strip moves (scrolling the page every frame shook the sticky header);
+       the real page scroll is set once, when the strip stops */
+    if (!TF) { const el = $app.querySelector('.f1list'); if (!el) return; TF = { el, base: window.scrollY }; el.style.willChange = 'transform'; }
+    TF.el.style.transform = `translate3d(0,${(TF.base - y).toFixed(2)}px,0)`; };
+  let TF = null; const commit = () => { if (!TF) return; const { el } = TF; TF = null; el.style.transform = ''; el.style.willChange = ''; window._stAnim = false; if (lastY >= 0) window.scrollTo(0, lastY); };
   const live = () => { let b = atEdgeKeep() || near(); if (s._tap) { const L = bs(), i = L.indexOf(b), j = L.indexOf(s._tap), k = L.indexOf(s._cur); if (k >= 0 && i >= 0 && ((j > k && (i > j || i < k)) || (j < k && (i < j || i > k)))) b = s._tap; } mark(b); };
   /* one loop per gesture: follows the strip every frame, and picks only once the finger is up AND the strip has come to rest
      (picking while the finger was still down, or mid-snap, made it jump to another day) */
-  const pick = () => { s._u = 0; const best = s._tap || atEdgeKeep() || near(); s._tap = null; if (!best) return; const was = s._cur; s._cur = null; mark(best); if (best !== was) best.click(); else if (best.dataset.f1go && window.f1ScrollTo) f1ScrollTo(best.dataset.f1go, true); requestAnimationFrame(wheel); };
-  let lp = 0, rest = 0, lastS = -1; const loop = () => { if (!s._u || !s.isConnected) { lp = 0; return; } const sl = s.scrollLeft; if (sl !== lastS) { rest = 0; lastS = sl; f1Sync(); live(); } else if (!s._t && s._sc && ++rest >= 7) { lp = 0; pick(); return; } lp = requestAnimationFrame(loop); };
+  const pick = () => { s._u = 0; commit(); const best = s._tap || atEdgeKeep() || near(); s._tap = null; if (!best) return; const was = s._cur; s._cur = null; mark(best); if (best !== was) best.click(); else if (best.dataset.f1go && window.f1ScrollTo) f1ScrollTo(best.dataset.f1go, true); requestAnimationFrame(wheel); };
+  let lp = 0, rest = 0, lastS = -1; const loop = () => { if (!s._u || !s.isConnected) { lp = 0; commit(); return; } const sl = s.scrollLeft; if (sl !== lastS) { rest = 0; lastS = sl; f1Sync(); live(); } else if (!s._t && s._sc && ++rest >= 7) { lp = 0; pick(); return; } lp = requestAnimationFrame(loop); };
   const go = () => { lastS = s.scrollLeft; rest = 0; lastY = -1; if (!lp) lp = requestAnimationFrame(loop); };
-  s.addEventListener('touchstart', () => { BS = null; s._ballGrab && s._ballGrab(); f1Prep(); s._u = 1; s._t = 1; s._sc = 0; s._tap = null; s._cur = s.querySelector('.on'); go(); }, { passive: true });
+  s.addEventListener('touchstart', () => { commit(); BS = null; s._ballGrab && s._ballGrab(); f1Prep(); s._u = 1; s._t = 1; s._sc = 0; s._tap = null; s._cur = s.querySelector('.on'); go(); }, { passive: true });
   const up = () => { s._t = 0; if (!s._sc) s._u = 0; }; s.addEventListener('touchend', up, { passive: true }); s.addEventListener('touchcancel', up, { passive: true });
   s._roll = b => Math.abs(s.scrollLeft - tgtOf(b)) >= 3;
   s.addEventListener('click', ev => { const b = ev.target.closest('button'); if (!ev.isTrusted || !b || !s.contains(b)) return; const tgt = tgtOf(b); if (Math.abs(s.scrollLeft - tgt) < 3) { s._u = 0; s._tap = null; return; } ev.preventDefault(); ev.stopPropagation(); s._ballGrab && s._ballGrab(); f1Prep(); s._u = 1; s._t = 0; s._sc = 1; s._tap = b; s._cur = s._cur || s.querySelector('.on'); s.scrollTo({ left: tgt, behavior: 'smooth' }); go(); rest = -12; }, true);
