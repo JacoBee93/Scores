@@ -1368,7 +1368,7 @@ html.fsg .f1big .nd i{top:3px !important}html.fsg .f1big .nd::before{top:18px !i
 .f2ch .dx{fill:#ff5a5f;font-size:11px;font-weight:700;font-family:-apple-system,system-ui,sans-serif}.f2ch .dx.ns{fill:#8e8e93}.f2ch .tip b span{margin-left:2px}
 .bb.zd{font-family:-apple-system,system-ui,sans-serif !important;font-size:13px;line-height:1;padding-top:1px}
 .f2ch{margin-top:30px}.f2ch .tip{top:-26px !important;bottom:auto}.f2ch:first-of-type{margin-top:34px}
-.f2ch svg{height:92px !important}.f2ch{margin-top:26px !important;padding:8px 12px 6px !important;margin-bottom:0 !important}.f2ch .lb{margin-bottom:2px !important}.f2ch .tip{top:-24px !important}.f2dh{margin:0 2px 4px !important}.f2dh .ph{width:48px !important;height:48px !important}.f2dh b{font-size:24px !important}.f2dh .p b{font-size:28px !important}
+.f2ch svg{height:140px !important}.f2ch{margin-top:26px !important;padding:8px 12px 6px !important;margin-bottom:0 !important}.f2ch .lb{margin-bottom:2px !important}.f2ch .tip{top:-24px !important}.f2dh{margin:0 2px 4px !important}.f2dh .ph{width:48px !important;height:48px !important}.f2dh b{font-size:24px !important}.f2dh .p b{font-size:28px !important}
 
 /* big card, compact: flag beside the name, tighter rows – same design, ~60 px shorter */
 .f1big .pht{display:flex;align-items:center;gap:12px}.f1big .pht .f1fl{width:36px !important;height:36px !important;flex:none}.f1big .pht b{margin-top:0 !important;min-width:0;overflow:hidden}
@@ -1381,6 +1381,11 @@ html.fsg .f1big .nd i{top:3px !important}html.fsg .f1big .nd::before{top:18px !i
 .f1big .nd.live i::after{content:'';position:absolute;inset:-2px;border-radius:50%;background:var(--brand);opacity:.55;animation:f1ring 1.4s ease-out infinite;z-index:-1}
 @keyframes f1ring{0%{transform:scale(1);opacity:.55}100%{transform:scale(2.3);opacity:0}}
 .f1big .nd.live i{z-index:1}
+html.fbar .f1big .pht b{position:relative;top:-3.5px}html.fsg .f1big .pht b{position:relative;top:4px}
+
+/* two-option pills: the gap between them sits exactly on the middle of the screen */
+.seg:not(:has(> button:nth-child(3))){display:grid !important;grid-template-columns:1fr 1fr;max-width:100% !important}
+.seg:not(:has(> button:nth-child(3))) > button:first-child{justify-self:end;margin-right:12px}.seg:not(:has(> button:nth-child(3))) > button:nth-child(2){justify-self:start;margin-left:12px}
 </style>
 </head>
 <body>
@@ -5082,7 +5087,7 @@ function f1BigHTML(e, k) { const y = e._y || F1.listY || f1ShowY(), TM = f1TM(y)
   const MED = ['', '#d4af37', '#c0c0c0', '#cd7f32'], tc = c => TM[String(c.id)] ? f1TCol(TM[String(c.id)]) : MED[c.order] || '#3a3a3c';
   const full = c => { const a = c.athlete || {}; return a.displayName || a.fullName || [a.firstName, a.lastName].filter(Boolean).join(' ') || f1Ab(c); };
   const top5 = comp => [1, 2, 3, 4, 5].map(o => ((comp && comp.competitors) || []).find(c => c.order === o)).filter(Boolean);
-  const box = (cls, title, right, comp, gaps) => { const L = top5(comp), T = !gaps && comp && L.length ? f1BigTimes(e, comp) : null; if (!gaps && L.length && !T) return `<div class="bx ${cls}"><div class="bxh"><b>${esc(title)}</b></div><div class="bxn bxl">Loading…</div></div>`; return `<div class="bx ${cls}"><div class="bxh"><b>${esc(title)}</b>${right ? `<u>${right}</u>` : ''}</div>${L.length ? L.map(c => `<div class="g"><em>${c.order}</em><i style="background:${tc(c)}"></i><b>${esc(full(c))}</b>${gaps ? (c.order === 1 ? `<span>${esc(c.time || c.displayValue || 'Leader')}</span>` : c.gap ? `<span>${esc(c.gap)}</span>` : '') : T && T[String(c.id)] ? `<span>${esc(T[String(c.id)])}</span>` : ''}</div>`).join('') : '<div class="bxn">Results not available yet</div>'}</div>`; };
+  const box = (cls, title, right, comp, gaps) => { const L = top5(comp), T = !gaps && comp && L.length ? f1BigTimes(e, comp) : null, G = gaps && comp && L.length ? f1BigLive(e, comp) : null; if (gaps && L.length && !G) return `<div class="bx ${cls}"><div class="bxh"><b>${esc(title)}</b>${right ? `<u>${right}</u>` : ''}</div><div class="bxn bxl">Loading…</div></div>`; if (!gaps && L.length && !T) return `<div class="bx ${cls}"><div class="bxh"><b>${esc(title)}</b></div><div class="bxn bxl">Loading…</div></div>`; return `<div class="bx ${cls}"><div class="bxh"><b>${esc(title)}</b>${right ? `<u>${right}</u>` : ''}</div>${L.length ? L.map(c => `<div class="g"><em>${c.order}</em><i style="background:${tc(c)}"></i><b>${esc(full(c))}</b>${gaps ? (c.order === 1 ? `<span>${esc(c.time || c.displayValue || 'Leader')}</span>` : (G && G[String(c.id)]) || c.gap ? `<span>${esc((G && G[String(c.id)]) || c.gap)}</span>` : '') : T && T[String(c.id)] ? `<span>${esc(T[String(c.id)])}</span>` : ''}</div>`).join('') : '<div class="bxn">Results not available yet</div>'}</div>`; };
   const nmS = esc(f1Short(e).replace(/\s*Grand Prix\s*/i, ' ').replace(/\bGP\b/, '').replace(/\s+/g, ' ').trim()), dt = esc(f1DatesY(e)), rd = 'R' + (k + 1);
   let tag = '', tcl = '', bx = '';
   if (done) { tag = 'FINISHED'; bx = box('', 'Results', '', rc, false); }
@@ -5113,6 +5118,10 @@ function f1BigTimes(e, c) { const k = c.id, h = F1.bt[k]; if (h && h !== 1) retu
     F1.bt[k] = out; if (topView() === 'list' && state.league === 'f1' && F1.selId === e.id) f1ShowBig(e.id); })().catch(() => { F1.bt[k] = {}; }); return null; }
 /* the GP name stays on one line (it may run over the round number); only if it is wider than the card does it get smaller */
 function f1BigFit() { requestAnimationFrame(() => $app.querySelectorAll('.f1big .ph b, .f1big .kv b').forEach(b => { b.style.fontSize = ''; let f = parseFloat(getComputedStyle(b).fontSize); while (b.scrollWidth > b.clientWidth + 1 && f > (b.closest('.kv') ? 13 : 24)) { f -= 1; b.style.fontSize = f + 'px'; } })); }
+/* live gaps for the big card: same source as the race page (driver details, re-read at most every 55 s) */
+function f1BigLive(e, c) { F1.lvd = F1.lvd || {}; const L = F1.lvd[c.id] || (F1.lvd[c.id] = { rows: null, t: 0, p: 0 });
+  if (!L.p && Date.now() - L.t > 55e3) { L.p = 1; f1Detail(e.id, c, false, true).then(r => { L.rows = r; L.t = Date.now(); L.p = 0; if (topView() === 'list' && state.league === 'f1' && F1.selId === e.id) f1ShowBig(e.id); }).catch(() => { L.p = 0; L.t = Date.now(); L.rows = L.rows || []; }); }
+  if (!L.rows) return null; const m = {}; L.rows.forEach(r => { const g = r.st && ((r.st.gapToLeader && r.st.gapToLeader.v > 0 && r.st.gapToLeader) || (r.st.behindTime && r.st.behindTime.v > 0 && r.st.behindTime)); if (g) m[r.id] = g.d; }); return m; }
 function f1ShowBig(id) { const evs = f1ListEvs(), m = $app.querySelector('main.f1list'); if (!evs || !m) return; const k = evs.findIndex(e => e.id === id); if (k < 0) return; F1.selId = id;
   const h = f1BigHTML(evs[k], k); if (m.innerHTML !== h) { m.innerHTML = h; f1BigFit(); } }
 function renderF1List() {
@@ -5235,8 +5244,8 @@ function f12Rows(R, timeOf, outFrom) { return `<section class="f2l">${R.map(r =>
 function f12Podium(P, timeOf) { const col = r => f1TCol(r.team), cell = (r, k) => r ? `<div class="pd p${k}" data-f1drv="${esc(r.id)}"><span class="ph" style="box-shadow:0 0 0 3px ${col(r)}"><img src="${esc(f1Hs(r.id))}" alt="" onerror="this.onerror=null;this.src=SIL"></span><b>${esc(String(r.name || '').split(' ').slice(-1)[0])}</b><small>${esc(timeOf(r) || '')}</small><div class="st">${k}</div></div>` : '<div class="pd"></div>';
   return `<div class="f2pod">${cell(P[1], 2)}${cell(P[0], 1)}${cell(P[2], 3)}</div>`; }
 /* F1 2.0 driver page: compact header, race-position chart, qualifying-position chart, championship position by season, results list */
-function f12PosChart(title, P, n, labels, tc, maxP) { const W = 340, H = 92, L = 30, B = 16, N = Math.max(2, n), X = i => L + 6 + i * (W - L - 14) / (N - 1), Y = p => 7 + (H - B - 17) * (Math.min(p, maxP) - 1) / (maxP - 1);
-  const tk = [1, 10, 20].filter(t => t <= maxP); const grid = tk.map(t => `<line x1="${L}" x2="${W}" y1="${Y(t).toFixed(1)}" y2="${Y(t).toFixed(1)}"/><text x="${L - 6}" y="${(Y(t) + 4).toFixed(1)}" text-anchor="end">P${t}</text>`).join('') + labels.map((l, i) => l ? `<text x="${X(i).toFixed(1)}" y="${H - 2}" text-anchor="middle">${esc(l)}</text>` : '').join('');
+function f12PosChart(title, P, n, labels, tc, maxP) { const W = 340, H = 140, L = 30, B = 16, N = Math.max(2, n), X = i => L + 6 + i * (W - L - 14) / (N - 1), Y = p => 7 + (H - B - 17) * (Math.min(p, maxP) - 1) / (maxP - 1);
+  const tk = [1, 10, maxP].filter((t, i, A) => t <= maxP && A.indexOf(t) === i); const grid = tk.map(t => `<line x1="${L}" x2="${W}" y1="${Y(t).toFixed(1)}" y2="${Y(t).toFixed(1)}"/><text x="${L - 6}" y="${(Y(t) + 4).toFixed(1)}" text-anchor="end">P${t}</text>`).join('') + labels.map((l, i) => l ? `<text x="${X(i).toFixed(1)}" y="${H - 2}" text-anchor="middle">${esc(l)}</text>` : '').join('');
   const yb = Y(maxP) + 8, py = q => q.p ? Y(q.p) : yb, line = P.map(q => `${X(q.i).toFixed(1)},${py(q).toFixed(1)}`).join(' '), MC = ['', '#d4af37', '#c0c0c0', '#cd7f32'];
   const mk = P.map(q => q.p ? `<circle cx="${X(q.i).toFixed(1)}" cy="${Y(q.p).toFixed(1)}" r="${q.p <= 3 ? 4 : 2.6}" fill="${MC[q.p] || tc}" stroke="#111113" stroke-width="1.5"/>` : `<circle cx="${X(q.i).toFixed(1)}" cy="${yb.toFixed(1)}" r="5.5" fill="#111113"/><text class="dx${q.ns ? ' ns' : ''}" x="${X(q.i).toFixed(1)}" y="${(yb + 4).toFixed(1)}" text-anchor="middle">✕</text>`).join('');
   const last = P.length ? P[P.length - 1].i : -1, fut = last < N - 1 && last >= 0 ? `<rect class="fz" x="${X(last + .5).toFixed(1)}" y="6" width="${(W - X(last + .5)).toFixed(1)}" height="${H - B - 6}"/>` : '';
@@ -5251,12 +5260,12 @@ function f12DrvPage(v, y, en, evs) { const a = en.athlete || {}, id = String(a.i
   const gpn = e => f1Short(e).replace(/\s*Grand Prix\s*/i, ' GP ').replace(/\s+/g, ' ').trim();
   const R = evs.map((e, k) => { const rc = f1Comp(e, 'Race'), q = f1Comp(e, 'Qual'), sr = f1Comp(e, 'SR'), dn = f1Done(rc), on = dn && (rc.competitors || []).some(c => String(c.id) === id), p = dn ? f1Pos(rc, id) : null;
     const qon = q && f1Done(q) && (q.competitors || []).some(c => String(c.id) === id); return { k, e, dn, on, out: on && isDnf(e), p, q: qon ? f1Pos(q, id) : null, qd: q && f1Done(q), sp: sr && f1Done(sr) ? f1Pos(sr, id) : null }; });
-  const maxP = Math.max(20, ...R.map(r => r.out ? 0 : r.p || 0), ...R.map(r => r.q || 0));
+  const field = Math.max(0, ...evs.map(e => { const rc = f1Comp(e, 'Race'); return rc && f1Done(rc) ? (rc.competitors || []).length : 0; })), maxP = Math.max(field || 20, ...R.map(r => r.out ? 0 : r.p || 0), ...R.map(r => r.q || 0));
   const lab = evs.map((e, i) => i % 4 === 0 ? String(i + 1) : '');
   const race = R.filter(r => r.dn).map(r => ({ i: r.k, p: r.on && !r.out && r.p ? r.p : 0, ns: !r.on, xl: r.on ? 'DNF' : 'Did not start', t: 'R' + (r.k + 1) + ' · ' + gpn(r.e).toUpperCase(), s: r.sp ? 'Sprint P' + r.sp : '' }));
   const qual = R.filter(r => r.qd || r.dn).map(r => ({ i: r.k, p: r.q || 0, ns: !r.q, xl: 'No time', t: 'R' + (r.k + 1) + ' · ' + gpn(r.e).toUpperCase(), s: r.out ? 'Race DNF' : r.on && r.p ? 'Race P' + r.p : '' }));
   const car = ys.map((yy, i) => { const E = ((F1.st[yy].drv || {}).entries || []).find(x => String((x.athlete || {}).id) === id), r = E && +f1SV(E, 'rank'), pp = E && (f1SV(E, 'championshipPts') ?? f1SV(E, 'points')); return { i, p: r || 0, ns: !r, xl: '–', t: String(yy), s: pp != null ? pp + ' pts' : '' }; });
-  const cMax = Math.max(20, ...car.map(c => c.p || 0)), cLab = ys.map((yy, i) => ys.length <= 8 || i % Math.ceil(ys.length / 7) === 0 || i === ys.length - 1 ? "'" + String(yy).slice(2) : '');
+  const cMax = Math.max(field || 20, ...car.map(c => c.p || 0)), cLab = ys.map((yy, i) => ys.length <= 8 || i % Math.ceil(ys.length / 7) === 0 || i === ys.length - 1 ? "'" + String(yy).slice(2) : '');
   const head = `<div class="f2dh"><span class="ph" style="box-shadow:0 0 0 2px ${tc}"><img src="${esc(f1Hs(id))}" alt="" onerror="this.onerror=null;this.src=SIL"></span><div class="n"><b>${esc(a.displayName || a.name || '')}</b><small><i style="background:${tc}"></i>${esc(tn)}</small></div><div class="p"><b>${esc(String(pts))}</b><small>PTS · P${esc(String(rk))}</small></div></div>`;
   const charts = f12PosChart('RACE POSITION · ' + y, race, evs.length, lab, tc, maxP) + f12PosChart('QUALIFYING POSITION · ' + y, qual, evs.length, lab, tc, maxP) + (ys.length > 1 ? f12PosChart('CHAMPIONSHIP · BY SEASON', car, ys.length, cLab, tc, cMax) : '');
   const list = `<section class="f2l">${R.filter(r => r.dn).map(r => `<div class="f2r gp" data-f1race="${esc(r.e.id)}" data-f1ry="${y}">${f1Flag(r.e)}<div class="n"><b>${esc(gpn(r.e))}</b>${r.sp ? `<small>Sprint P${r.sp}</small>` : ''}</div><i class="bb ${r.on && r.p ? F2PC(r.p) : 'zd'}">${r.on && r.p ? r.p : '✕'}</i></div>`).join('')}</section>`;
