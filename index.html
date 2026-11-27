@@ -1367,6 +1367,7 @@ html.fsg .f1big .nd i{top:3px !important}html.fsg .f1big .nd::before{top:18px !i
 
 .f2ch .dx{fill:#ff5a5f;font-size:11px;font-weight:700}.f2ch .tip b span{margin-left:2px}
 .bb.zd{font-family:-apple-system,system-ui,sans-serif !important;font-size:13px;line-height:1;padding-top:1px}
+.f2ch{margin-top:30px}.f2ch .tip{top:-26px !important;bottom:auto}.f2ch:first-of-type{margin-top:34px}
 </style>
 </head>
 <body>
@@ -5245,13 +5246,13 @@ function f12DrvPage(v, y, en, evs) { const a = en.athlete || {}, id = String(a.i
   const head = `<div class="f2dh"><span class="ph" style="box-shadow:0 0 0 2px ${tc}"><img src="${esc(f1Hs(id))}" alt="" onerror="this.onerror=null;this.src=SIL"></span><div class="n"><b>${esc(a.displayName || a.name || '')}</b><small><i style="background:${tc}"></i>${esc(tn)}</small></div><div class="p"><b>${esc(String(pts))}</b><small>PTS · P${esc(String(rk))}</small></div></div>`;
   const charts = f12PosChart('RACE POSITION · ' + y, race, evs.length, lab, tc, maxP) + f12PosChart('QUALIFYING POSITION · ' + y, qual, evs.length, lab, tc, maxP) + (ys.length > 1 ? f12PosChart('CHAMPIONSHIP · BY SEASON', car, ys.length, cLab, tc, cMax) : '');
   const list = `<section class="f2l">${R.filter(r => r.dn).map(r => `<div class="f2r gp" data-f1race="${esc(r.e.id)}" data-f1ry="${y}">${f1Flag(r.e)}<div class="n"><b>${esc(gpn(r.e))}</b>${r.sp ? `<small>Sprint P${r.sp}</small>` : ''}</div><i class="bb ${r.on && r.p ? F2PC(r.p) : 'zd'}">${r.on && r.p ? r.p : '✕'}</i></div>`).join('')}</section>`;
-  return head + charts + list; }
+  return head + charts; }
 /* drag over a chart: marker + bubble for the point under the finger */
 (() => { const at = (ch, cx) => { let P; try { P = JSON.parse(ch.dataset.pts || '[]'); } catch (e) { P = []; } if (!P.length) return; const sv = ch.querySelector('svg'), r = sv.getBoundingClientRect(), vb = sv.viewBox.baseVal, x = (cx - r.left) / r.width * vb.width;
     let b = P[0]; P.forEach(q => { if (Math.abs(q.x - x) < Math.abs(b.x - x)) b = q; }); const g = ch.querySelector('.sc'), ln = g.querySelector('line'), ci = g.querySelector('circle');
     ln.setAttribute('x1', b.x); ln.setAttribute('x2', b.x); ci.setAttribute('cx', b.x); ci.setAttribute('cy', b.y); g.style.display = 'block';
     const tp = ch.querySelector('.tip'); tp.innerHTML = `<small>${esc(b.t)}</small><b><i class="bb ${b.c}">${esc(b.v)}</i>${b.s ? `<span>${esc(b.s)}</span>` : ''}</b>`; tp.style.display = 'block';
-    const px = b.x / vb.width * r.width, w = tp.offsetWidth; tp.style.left = Math.max(0, Math.min(ch.clientWidth - w, px + (r.left - ch.getBoundingClientRect().left) - w / 2)) + 'px'; const lowP = b.y < vb.height * .45; const cr = ch.getBoundingClientRect(); tp.style.top = lowP ? (r.top - cr.top + r.height * .48) + 'px' : ''; };
+    const px = b.x / vb.width * r.width, w = tp.offsetWidth; tp.style.left = Math.max(0, Math.min(ch.clientWidth - w, px + (r.left - ch.getBoundingClientRect().left) - w / 2)) + 'px'; };
   const on = e => { const ch = e.target.closest && e.target.closest('.f2ch'); if (!ch) return; const t = e.touches ? e.touches[0] : e; document.querySelectorAll('.f2ch').forEach(o => { if (o !== ch) o.querySelectorAll('.sc, .tip').forEach(x => { x.style.display = ''; }); }); at(ch, t.clientX); if (e.cancelable && e.type === 'touchmove') e.preventDefault(); };
   document.addEventListener('touchstart', on, { passive: true }); document.addEventListener('touchmove', on, { passive: false }); document.addEventListener('mousemove', e => { if (e.buttons) on(e); });
   const off = () => document.querySelectorAll('.f2ch .sc, .f2ch .tip').forEach(x => { x.style.display = ''; }); document.addEventListener('touchend', off, { passive: true }); document.addEventListener('mouseup', off); })();
