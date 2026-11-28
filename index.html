@@ -1455,10 +1455,10 @@ header.lyc.hdA{position:relative;margin:calc(env(safe-area-inset-top) + 22px) 16
 header.lyc.hdA:has(.ylist){overflow:visible}
 header.hdA .hwm{position:absolute;right:-6px;top:-14px;font-family:var(--num);font-style:normal;font-size:112px;font-weight:800;line-height:1;color:rgba(255,255,255,.05);pointer-events:none}
 header.hdA .hBt{position:relative;padding:0 6px}
-header.hdA .hic{background:rgba(0,0,0,.28) !important}
+header.hdA .hic{background:rgba(0,0,0,.28) !important;width:32px !important;height:32px !important}header.hdA .hic svg{width:16px;height:16px}header.hdA .hics{gap:6px !important}
 header.hdA .hwk.hsc{margin:8px 0 0 !important;padding:0 !important;-webkit-mask-image:none !important;mask-image:none !important}
 header.hdA .hsc .dy{width:calc((100vw - 52px) / 7) !important}
-header.hdA .hsc .dy.on b{background:rgba(255,255,255,.2) !important;color:#fff !important}
+header.hdA .hsc .dy.on b{background:rgba(0,0,0,.28) !important;color:#fff !important}
 header.lyc.hdA.hf1{background:repeating-linear-gradient(45deg,rgba(255,255,255,.022) 0 3px,transparent 3px 6px),repeating-linear-gradient(-45deg,rgba(255,255,255,.014) 0 3px,transparent 3px 6px),var(--card)}
 </style>
 </head>
@@ -2228,14 +2228,16 @@ function stripWire() { const s = document.getElementById('strip'); if (!s || !s.
   const vc = () => vcAt(s.scrollLeft);
   const slFor = p => { const maxS = Math.max(0, s.scrollWidth - s.clientWidth); let lo = 0, hi = maxS; if (vcAt(0) >= p) return 0; if (vcAt(maxS) <= p) return maxS; for (let k = 0; k < 30; k++) { const m = (lo + hi) / 2; if (vcAt(m) < p) lo = m; else hi = m; } return (lo + hi) / 2; };
   /* snap points: invisible markers at each item's resting place (the items themselves no longer snap) */
+  /* resting place of an item: near either end the strip sits fully at the end (no half item peeking in); the chosen one stays marked */
+  const restOf = b => { pos(b); const L = bs(), i = L.indexOf(b), n = L.length, maxS = Math.max(0, s.scrollWidth - s.clientWidth), k = Math.floor(Math.round(s.clientWidth / (s._iw || 1)) / 2); if (n > 2 * k + 1 && i >= 0) { if (i <= k) return 0; if (i >= n - 1 - k) return maxS; } return slFor(pos(b)); };
   let SW = ''; const snaps = () => { const w = s.scrollWidth + ':' + s.clientWidth; if (w === SW) return; SW = w; s.querySelectorAll(':scope > .snp').forEach(x => x.remove()); const W = s.clientWidth, fr = document.createDocumentFragment();
-    bs().forEach(b => { const m = document.createElement('i'); m.className = 'snp'; m.style.left = (slFor(pos(b)) + W / 2).toFixed(1) + 'px'; fr.appendChild(m); }); s.appendChild(fr); };
-  s._tgt = b => { snaps(); return slFor(pos(b)); };
+    bs().forEach(b => { const m = document.createElement('i'); m.className = 'snp'; m.style.left = (restOf(b) + W / 2).toFixed(1) + 'px'; fr.appendChild(m); }); s.appendChild(fr); };
+  s._tgt = b => { snaps(); return restOf(b); };
   /* the pointer: the middle of the strip (slid on to the first / last items at the ends). When a drag starts on an item
      that isn't under the middle (near the ends), the pointer starts on that item and slides to the middle as the finger moves. */
   const ptr = () => vc();
   const near = () => { const c = ptr(); let best = null, bd = 1e9; bs().forEach(b => { const d = Math.abs(pos(b) - c); if (d < bd) { bd = d; best = b; } }); return best; };
-  const tgtOf = b => slFor(pos(b));
+  const tgtOf = b => restOf(b);
   /* D · timeline 2.0: a plain line and a ball on it. The ball is sticky in the middle of the strip (moved by the browser
      together with the scroll, so it never shakes); only near the ends, and to sit on the chosen item, is it shifted. */
   let ball = null; if (s.classList.contains('stA')) { ball = document.createElement('i'); ball.className = 'tlb'; s.prepend(ball); }
