@@ -1424,7 +1424,7 @@ header .hwk.hsc:has(.dy[data-date]){-webkit-mask-image:linear-gradient(90deg,tra
 .nA .lose,.nC .lose{color:rgba(255,255,255,.42) !important}
 .nA .bx{position:relative;margin-top:10px;background:rgba(0,0,0,.35);border-radius:14px;padding:6px 12px;display:flex;justify-content:space-between;gap:10px;font-family:var(--num);font-size:14px;font-weight:600;color:#c7c7cc}.nA .bx b{color:#fff}.nA .bx span:last-child{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 /* ===== New C: featured live game + Classic 2.0 cards ===== */
-.nC{position:relative;overflow:hidden;border-radius:22px;padding:14px 16px;margin-bottom:12px;cursor:pointer;background:linear-gradient(160deg,color-mix(in srgb,var(--ch) 78%,#000),var(--card) 72%);box-shadow:inset 0 1px 0 rgba(255,255,255,.07)}
+.nC{position:relative;overflow:hidden;border-radius:22px;padding:14px 16px;margin-bottom:12px;cursor:pointer;background:linear-gradient(115deg,color-mix(in srgb,var(--ca) 72%,#000) 0%,var(--card) 47%,var(--card) 53%,color-mix(in srgb,var(--ch) 72%,#000) 100%);box-shadow:inset 0 1px 0 rgba(255,255,255,.07)}
 .nC .wm{position:absolute;right:-4px;top:-14px;font-family:var(--num);font-size:96px;font-weight:800;color:rgba(255,255,255,.06);line-height:1;pointer-events:none}
 .nC .tm{position:relative;display:flex;align-items:center;gap:10px;margin-top:8px}.nC .tm img,.nC .tm .ph{width:32px;height:32px}.nC .tm b{flex:1;min-width:0;font-family:var(--num);font-size:29px;font-weight:700;line-height:1.1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.nC .tm span{font-family:var(--num);font-size:34px;font-weight:800;font-variant-numeric:tabular-nums}
 .nC .qs{position:relative;display:grid;gap:2px 2px;margin-top:10px;font-family:var(--num);font-size:13.5px;font-weight:700;color:#c7c7cc;text-align:center}.nC .qs i{font-style:normal;color:var(--mut)}.nC .qs .a{text-align:left}.nC .qs b{color:#fff}
@@ -1446,8 +1446,8 @@ header .hwk.hsc:has(.dy[data-date]){-webkit-mask-image:linear-gradient(90deg,tra
 .nch .n{flex:1;min-width:0}.nch .n b{display:block;font-size:21px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.nch .n small{color:var(--mut);font-size:13px;font-weight:600}
 .nch .p{text-align:right}.nch .p b{font-size:30px;font-weight:700;line-height:1}.nch .p small{display:block;font-size:11px;color:var(--mut);font-weight:700}
 .ncs .cl{margin:6px 12px 12px}
-/* Classic 2.0: every card as tall as a finished one (scheduled games hide the score, which made them shorter) */
-.card.cl2[data-game] > .row{min-height:42px}
+/* Classic + Classic 2.0: live, finished and scheduled cards are all the same height (the score no longer makes its row taller) */
+.card[data-game] > .row .sc{line-height:27px}.card[data-game] > .row{height:39px;min-height:0}
 /* New A: the game page header gets the same away → home colouring as the home card */
 .hero.hnA{background:linear-gradient(115deg,color-mix(in srgb,var(--ca) 72%,#000) 0%,var(--card) 47%,var(--card) 53%,color-mix(in srgb,var(--ch) 72%,#000) 100%) !important}
 </style>
@@ -2277,7 +2277,7 @@ const HCARD = {
         <div class="tm">${logoImg(a.logo)}<b class="${hLose(e, a) ? 'lose' : ''}">${esc(a.name)}</b><span>${esc(a.score)}</span></div><div class="tm">${logoImg(h.logo)}<b class="${hLose(e, h) ? 'lose' : ''}">${esc(h.name)}</b><span>${esc(h.score)}</span></div>
         ${a.ls.length ? `<div class="qs" style="grid-template-columns:44px repeat(${n},1fr) 36px"><i></i>${Array.from({ length: n }, (_, k) => `<i>${Q(k)}</i>`).join('')}<i>T</i>${row(a)}${row(h)}</div>` : ''}
         ${P.length ? `<div class="bx"><div class="lb">TOP PERFORMERS</div>${P.map(t => `<div class="p"><i style="background:${hCol(lg, t)}"></i><b>${esc(t.ldr.n)}</b><span>${esc(t.ldr.v)}</span></div>`).join('')}</div>` : ''}</div>`; }
-    return cardHTML(e, true); },
+    return HCARD.NA(e); }, /* the rest: the coloured matchup cards; only the featured game is big */
 };
 function hGroups(evs, lg) {
   const byDay = lg === 'fav';
