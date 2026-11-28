@@ -1450,6 +1450,15 @@ header .hwk.hsc:has(.dy[data-date]){-webkit-mask-image:linear-gradient(90deg,tra
 .card[data-game] > .row .sc{line-height:27px}.card[data-game] > .row{height:39px;min-height:0}
 /* New A: the game page header gets the same away → home colouring as the home card */
 .hero.hnA{background:linear-gradient(115deg,color-mix(in srgb,var(--ca) 72%,#000) 0%,var(--card) 47%,var(--card) 53%,color-mix(in srgb,var(--ch) 72%,#000) 100%) !important}
+/* ===== New A: header as a tinted card (H1) ===== */
+header.lyc.hdA{position:relative;margin:calc(env(safe-area-inset-top) + 22px) 16px 12px !important;width:calc(100% - 32px) !important;max-width:none !important;box-sizing:border-box;padding:14px 10px 8px !important;border-radius:22px;overflow:clip;background:linear-gradient(160deg,color-mix(in srgb,var(--lc) 72%,#000),var(--card) 72%);box-shadow:inset 0 1px 0 rgba(255,255,255,.08)}
+header.lyc.hdA:has(.ylist){overflow:visible}
+header.hdA .hwm{position:absolute;right:-6px;top:-14px;font-family:var(--num);font-style:normal;font-size:112px;font-weight:800;line-height:1;color:rgba(255,255,255,.05);pointer-events:none}
+header.hdA .hBt,header.hdA .hchp{position:relative;padding:0 6px}
+header.hdA .hic{background:rgba(0,0,0,.28) !important}
+header.hdA .hchp{display:flex;gap:6px;margin-top:8px}.hchp span{font-family:var(--num);font-size:13px;font-weight:700;letter-spacing:.8px;padding:4px 10px;border-radius:9px;background:rgba(0,0,0,.32)}.hchp .lv{color:var(--live);display:inline-flex;align-items:center;gap:6px}.hchp .lv::before{content:'';width:7px;height:7px;border-radius:50%;background:var(--live)}
+header.hdA .hwk.hsc{margin:10px -10px 0 !important;padding:0 10px !important}
+header.hdA .hsc .dy{width:calc((100vw - 52px) / 7) !important}
 </style>
 </head>
 <body>
@@ -2198,6 +2207,8 @@ const LY_PK = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke
 const LY_FLG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M5 21V4M5 4h13l-2.5 4.5L18 13H5"/></svg>';
 /* ===== home styles (hidden menu): Classic & Classic Alt (B header + classic cards), A colour cards · B big day ===== */
 const HSTY = [['', 'Classic'], ['C2', 'Classic 2.0'], ['NA', 'New A · Matchup'], ['NC', 'New C · Featured']];
+/* New A: the header is a card tinted in the league's colour */
+const HLC = { nba: '#e8702a', nfl: '#1f4fb5', nhl: '#e0b21b', f1: '#e5484d', fav: '#e5484d' };
 const hNew = () => /^N[AC]$/.test(hStyle());
 const HSTRIP = [['', 'Strip · Circles'], ['A', 'Strip A · Timeline'], ['B', 'Strip B · Wheel']];
 const hStrip = () => { try { let v = localStorage.getItem('hstrip') || ''; if (v === 'D') { v = 'A'; localStorage.setItem('hstrip', v); } else if (v === 'C') { v = ''; localStorage.setItem('hstrip', v); } return HSTRIP.some(x => x[0] === v) ? v : ''; } catch (e) { return ''; } };
@@ -2332,7 +2343,8 @@ function hHead(HS, items, onIdx, fav) {
   const small = fav ? 'FAVORITES' : nfl ? (wr ? (usd(wr[1], 12) + ' – ' + usd(wr[2], -12)).toUpperCase() : esc(LEAGUES.nfl.name)) : (isRel ? H_WD[d.getDay()] + ', ' + dt : dt).toUpperCase();
   const big = fav ? 'Your teams' : nfl ? wk : isRel ? rel : H_WD[d.getDay()];
   if (!nfl && !fav && items.length) { const ds = items.slice(Math.max(0, onIdx - 3), onIdx + 4).map(dOf).filter(Boolean); setTimeout(() => hDots(lg, ds), 0); }
-  return `<header class="lyc hsh hB"><div class="hBt"><div><small>${small}</small><b>${big}</b></div><div class="hics">${icons}</div></div>
+  const hA = hStyle() === 'NA', nLv = hA ? (state.events || []).filter(e => e.state === 'in').length : 0, nAll = hA ? (state.events || []).length : 0;
+  return `<header class="lyc hsh hB${hA ? ' hdA' : ''}"${hA ? ` style="--lc:${HLC[fav ? 'fav' : lg] || 'var(--brand)'}"` : ''}>${hA ? `<i class="hwm">${esc(fav ? 'FAVS' : (LEAGUES[lg] ? LEAGUES[lg].name : ''))}</i>` : ''}<div class="hBt"><div><small>${small}</small><b>${big}</b></div><div class="hics">${icons}</div></div>${hA && nAll ? `<div class="hchp">${nLv ? `<span class="lv">${nLv} LIVE</span>` : ''}<span>${nAll} ${nAll === 1 ? 'GAME' : 'GAMES'}</span></div>` : ''}
     ${items.length ? `<div class="hwk hsc st${hStrip()}" id="strip">${items.map(x => { const dd = dOf(x), m = /<small>(.*?)<\/small>(.*)/.exec(x[2]), ws = /data-wr="([^|"]+)\|/.exec(x[1]), wm = ws ? H_MO[new Date(new Date(ws[1]).getTime() + 12 * 36e5).getUTCMonth()].toUpperCase() : '', past = nfl && curWk >= 0 && items.indexOf(x) < curWk; const hc = dd ? ((HDOT[lg] || {})[ymd(dd)] || [0])[0] : 0; return `<button ${x[1]} class="dy ${x[0] ? 'on' : ''}${x[3] ? ' tdy' : ''}${hc > 0 || past ? ' hg' : ''}" style="--h:${dd ? Math.min(1, hc / 14).toFixed(2) : past ? .5 : 0}">${dd ? `<small>${DAYS[dd.getDay()].slice(0, 1)}</small><b>${dd.getDate()}</b>` : m ? `<small>${wm || m[1]}</small><b>${m[2]}</b>` : x[2]}</button>`; }).join('')}</div>` : ''}</header>`;
 }
 function lyHead(o) { const lg = state.league, fav = lg === 'fav';
@@ -5132,7 +5144,8 @@ function f1CurEv(evs) { if (F1.listY) return evs[0]; const now = Date.now(); ret
 function f1HeadHTML(o) { const sy = f1ShowY(), y = F1.listY || sy || f1Year(), I = F1.idx && F1.idx.ready ? F1.idx : null, ys = (I && I.years.length ? I.years : (F1.seasons && F1.seasons.length ? F1.seasons : f1Years())).filter(x => x !== sy && x <= f1Year()).sort((a, b) => b - a), r = F1._rnd;
   const ic = (a, t, svg) => `<button class="hic" ${a} aria-label="${t}">${svg}</button>`;
   const line = !F1.listY && r && r[0] ? 'ROUND ' + r[0] + ' OF ' + r[1] : r && r[1] ? r[1] + ' ROUNDS' : 'SEASON';
-  return `<header class="lyc hsh hB"><div class="hBt"><div class="f1ys"><div class="f1yb" data-f1hist="1" role="button"><small>${esc(line)}</small><b>F1 ${y}<i class="chev ${F1.hOpen ? 'up' : ''}"></i></b></div>
+  const hA = hStyle() === 'NA';
+  return `<header class="lyc hsh hB${hA ? ' hdA' : ''}"${hA ? ` style="--lc:${HLC.f1}"` : ''}>${hA ? '<i class="hwm">F1</i>' : ''}<div class="hBt"><div class="f1ys"><div class="f1yb" data-f1hist="1" role="button"><small>${esc(line)}</small><b>F1 ${y}<i class="chev ${F1.hOpen ? 'up' : ''}"></i></b></div>
     ${F1.hOpen ? `<div class="ylist">${F1.listY ? `<button data-f1ly="0">Current season (${sy || f1Year()})</button>` : ''}${ys.map(x => `<button data-f1ly="${x}" class="${F1.listY === x ? 'on' : ''}">${x}</button>`).join('')}</div>` : ''}</div>
     <div class="hics">${(o.quick || []).map(q => ic(q[0], q[1], q[2])).join('')}${ic('data-search', 'Search', LY_SRCH)}</div></div>${o.strip ? `<div class="strip hwk hsc f1wk st${hStrip()}" id="strip">${o.strip}</div>` : ''}</header>`; }
 /* race weekend under way: from the start of the first session (FP1) until the race is over */
