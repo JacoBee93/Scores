@@ -1407,7 +1407,20 @@ html.fbar .f2po .pht b{top:-3.5px}html.fsg .f2po .pht b{top:4px}.f2po small{marg
 .f2r .fm,.f2r > em,.f2r > span,.f2r > u{position:relative}html.fbar .f2r .fm{top:1px}html.fsg .f2r > em,html.fsg .f2r > span,html.fsg .f2r > u{top:1.75px}
 html.fsg .f2r .f:not(.zd),html.fsg .f2hm .c:not(.zd){box-sizing:border-box;padding-top:2px}
 .card.cl2{position:relative;overflow:hidden}.card.cl2 > .hbar{position:absolute;left:0;top:0;bottom:0;width:5px;border-radius:0 4px 4px 0;background:linear-gradient(var(--ca),var(--ch))}
-.f2hm .lg .c.lgm b{top:50%;left:50%;margin:-5px 0 0 -5px;right:auto}
+.f2r .f.ze,.f2hm .c.ze{color:#fff !important;font-family:-apple-system,system-ui,sans-serif !important;font-size:11px;line-height:1;padding:0 !important}
+/* driver page: the same gap header → season → chart → chart */
+.f2sy{margin-top:17px !important}.f2ch{padding-top:0 !important;padding-bottom:0 !important;margin-top:18px !important}.f2sy + .f2ch{margin-top:19px !important}
+/* top tab bars: same red rounded underline as the segment pills, the thin line stays */
+.dtabs button{position:relative;border-bottom-color:transparent !important}.dtabs button.on::after{content:'';position:absolute;left:0;right:0;bottom:-3px;height:3px;border-radius:3px;background:var(--brand)}
+/* heatmap: names stay put while the races scroll */
+.pane .f2hm .hmx{margin:0;padding:0}.pane .f2hm .hm > span{left:0;margin-left:0;padding-left:0;z-index:2}
+/* pickers (season, session, year…): liquid glass like the league switcher */
+.ybtn,header .tys .ybtn{background:rgba(36,36,40,.35) !important;-webkit-backdrop-filter:blur(12px) saturate(170%);backdrop-filter:blur(12px) saturate(170%);box-shadow:inset 0 1px 0 rgba(255,255,255,.14),inset 0 0 0 .5px rgba(255,255,255,.08),0 10px 26px rgba(0,0,0,.45) !important;border-radius:999px !important}
+header .tys .ybtn{padding:0 16px !important}
+.ylist{background:rgba(30,30,34,.55) !important;-webkit-backdrop-filter:blur(22px) saturate(170%);backdrop-filter:blur(22px) saturate(170%);box-shadow:inset 0 1px 0 rgba(255,255,255,.14),inset 0 0 0 .5px rgba(255,255,255,.08),0 16px 36px rgba(0,0,0,.55) !important;border-radius:18px !important}
+.ylist button{border-bottom-color:rgba(255,255,255,.08) !important}
+/* day strips: a neighbouring day must not peek in at the screen edge */
+header .hwk.hsc:has(.dy[data-date]){-webkit-mask-image:linear-gradient(90deg,transparent 0,transparent 10px,#000 16px,#000 calc(100% - 16px),transparent calc(100% - 10px));mask-image:linear-gradient(90deg,transparent 0,transparent 10px,#000 16px,#000 calc(100% - 16px),transparent calc(100% - 10px))}
 </style>
 </head>
 <body>
@@ -5129,7 +5142,7 @@ function f1BigHTML(e, k) { const y = e._y || F1.listY || f1ShowY(), TM = f1TM(y)
   const tl = done ? '' : `<div class="btl">${D.map(g => `<div class="dc"><h4>${esc(g.d)}</h4>${g.L.map(x => `<div class="nd ${x.st}${x.st === 'live' && fy ? ' yl' : ''}"><i></i><b>${esc(x.n)}</b><span>${x.st === 'next' ? 'in ' + cd(new Date(x.c.date)) : x.st === 'live' ? 'Live' : esc(x.h)}</span></div>`).join('')}</div>`).join('')}</div>`;
   if (!done && !wk) { const W = f1LastWin(e), cn = (e.circuit && e.circuit.fullName) || ''; bx = W ? `<div class="kv"><div><small>LAST WINNER</small><i style="background:${W.c}"></i><b>${esc(W.n)}</b></div></div>` : ''; }
   return `<div class="card f1card f1big fbD" data-f1race="${esc(e.id)}" data-f1ry="${esc(e._y || '')}" id="f1c${esc(e.id)}" style="--cc:${f1CCol(e)}"><div class="wm">${rd}</div>
-    <div class="ph"><div class="pht">${f1Flag(e)}<b>${nmS}</b></div><small>GRAND PRIX · ${dt}</small></div>${done ? `<div class="tag">FINISHED</div>` : cnm ? `<div class="cn">${esc(cnm.toUpperCase())}</div>` : `<div class="tag ${tcl}">${esc(tag.toUpperCase())}</div>`}${tl}${bx}</div>`; }
+    <div class="ph"><div class="pht">${f1Flag(e)}<b>${nmS}</b></div><small>GRAND PRIX · ${dt}</small></div>${done && !cnm ? `<div class="tag">FINISHED</div>` : cnm ? `<div class="cn">${esc(cnm.toUpperCase())}</div>` : `<div class="tag ${tcl}">${esc(tag.toUpperCase())}</div>`}${tl}${bx}</div>`; }
 F1.bt = F1.bt || {}; F1.lw = F1.lw || {};
 /* last winner of the same Grand Prix: from the season before (same GP name, else same circuit); null while loading / none */
 function f1LastWin(e) { const y = +(e._y || F1.listY || f1ShowY() || f1Year()) - 1, k = e.id; if (k in F1.lw) return F1.lw[k];
@@ -5253,7 +5266,7 @@ function f12DrvHTML(v, y, ents) { const races = (F1.sb[y] || []).filter(f1RaceDo
   const L5 = races.slice(-3), AGf = f1Agg(y);
   return `<section class="f2l">${ents.map(en => { const a = en.athlete || {}, id = String(a.id), rk = +f1SV(en, 'rank') || 0, mv = races.length > 1 && pr[id] ? pr[id] - rk : 0, tn = f1DrvTeam(y, id);
     const ar = mv > 0 ? `<u class="up">▲${mv}</u>` : mv < 0 ? `<u class="dn">▼${-mv}</u>` : '<u class="eq">•</u>';
-    const form = L5.map(e => { if (AGf && AGf.dnfR && AGf.dnfR[e.id] && AGf.dnfR[e.id][id]) return '<i class="f zd">✕</i>'; const p = f1Pos(f1Comp(e, 'Race'), id); return `<i class="f ${F2PC(p)}">${p || ''}</i>`; }).join('');
+    const form = L5.map(e => { if (AGf && AGf.dnfR && AGf.dnfR[e.id] && AGf.dnfR[e.id][id]) return '<i class="f zd">✕</i>'; const p = f1Pos(f1Comp(e, 'Race'), id); return `<i class="f ${F2PC(p)}">${p || '✕'}</i>`; }).join('');
     return `<div class="f2r" data-f1drv="${esc(id)}"><em>${rk || ''}</em>${ar}<i class="tb" style="background:${f1TCol(tn)}"></i><div class="n"><b>${esc(a.displayName || a.name || '')}</b><small>${esc(tn)}</small></div><div class="fm">${form}</div><span>${pts(en)}</span></div>`; }).join('')}</section>`; }
 function f12ConHTML(v, y, ents) { const pts = en => { const p = f1SV(en, 'championshipPts'); return +(p != null ? p : f1SV(en, 'points')) || 0; }, top = Math.max(1, ...ents.map(pts));
   return `<section class="f2l">${ents.map(en => { const t = en.team || {}, n = t.displayName || t.name || '', p = pts(en);
@@ -5263,8 +5276,8 @@ function f12HeatHTML(v, y) { const S = F1.st[y], evs = F1.sb[y]; if (!S || !evs)
   const AG = f1Agg(y); if (!AG || !AG.fin) return msg('Loading…'); const dnf = (e, id) => AG && AG.dnfR && AG.dnfR[e.id] && AG.dnfR[e.id][id];
   const ab = a => (a.abbreviation || String(a.lastName || (a.displayName || '').split(' ').slice(-1)[0] || '').slice(0, 3)).toUpperCase();
   const head = `<div class="hm hr"><span></span>${evs.map((e, k) => `<i>${k + 1}</i>`).join('')}<em>PTS</em></div>`, ptsOf = en => { const p = f1SV(en, 'championshipPts'); return p != null ? p : f1SV(en, 'points') ?? ''; };
-  const rows = ents.map(en => { const a = en.athlete || {}, id = String(a.id); return `<div class="hm" data-f1drv="${esc(id)}"><span><i style="background:${f1TCol(f1DrvTeam(y, id))}"></i>${esc(ab(a))}</span>${evs.map(e => { const rc = f1Comp(e, 'Race'); if (!f1Done(rc)) return '<i class="c zf"></i>'; if (dnf(e, id)) return '<i class="c zd">✕</i>'; const p = f1Pos(rc, id); return `<i class="c ${F2PC(p)}">${p || ''}</i>`; }).join('')}<em>${esc(String(ptsOf(en)))}</em></div>`; }).join('');
-  return `<section class="f2hm"><div class="hmx"><div class="hmi">${head}${rows}</div></div><div class="lg"><i class="c z1">1</i><i class="c z2">2</i><i class="c z3">3</i><i class="c zp6"></i><span>points</span><i class="c zn"></i><span>no points</span><i class="c zd">✕</i><span>DNF</span><i class="c ze"></i><span>no result</span></div></section>`; }
+  const rows = ents.map(en => { const a = en.athlete || {}, id = String(a.id); return `<div class="hm" data-f1drv="${esc(id)}"><span><i style="background:${f1TCol(f1DrvTeam(y, id))}"></i>${esc(ab(a))}</span>${evs.map(e => { const rc = f1Comp(e, 'Race'); if (!f1Done(rc)) return '<i class="c zf"></i>'; if (dnf(e, id)) return '<i class="c zd">✕</i>'; const p = f1Pos(rc, id); return `<i class="c ${F2PC(p)}">${p || '✕'}</i>`; }).join('')}<em>${esc(String(ptsOf(en)))}</em></div>`; }).join('');
+  return `<section class="f2hm"><div class="hmx"><div class="hmi">${head}${rows}</div></div><div class="lg"><i class="c z1">1</i><i class="c z2">2</i><i class="c z3">3</i><i class="c zp6"></i><span>points</span><i class="c zn"></i><span>no points</span><i class="c zd">✕</i><span>DNF</span><i class="c ze">✕</i><span>did not race</span></div></section>`; }
 function f12ResHTML(R, timeOf, fl, dm, y) { return `<section class="f2l">${R.sort((a, b) => (a.order || 99) - (b.order || 99)).map(r => { const d = dm[r.id] || {}, st = +d.start || 0, mv = st && r.order ? st - r.order : 0, t = timeOf(r), out = /DNF|DSQ|DNS/.test(t);
     const ar = out || !st ? '<u class="eq"></u>' : mv > 0 ? `<u class="up">▲${mv}</u>` : mv < 0 ? `<u class="dn">▼${-mv}</u>` : '<u class="eq">–</u>', col = d.color ? '#' + String(d.color).replace('#', '') : f1TCol(r.team);
     return `<div class="f2r rr" data-f1drv="${esc(r.id)}"><em class="${r.order <= 3 ? 'w' + r.order : ''}">${esc(String(r.order || ''))}</em><i class="tb" style="background:${col}"></i><div class="n"><b>${esc(r.name || '')}${fl && fl.id === r.id ? '<em class="fl">FL</em>' : ''}</b><small>${esc(r.team || '')}</small></div>${ar}<span>${esc(t)}</span></div>`; }).join('')}</section>`; }
@@ -5456,7 +5469,7 @@ function f1Table(rows, det, mode, y) {
       R = has.concat(no); R.forEach((r, i) => { r.order = i + 1; }); const P0 = qt(has[0], k); timeOf = r => { const t = qt(r, k); return !t ? 'DNF' : r.order === 1 ? f1Ms(t) : '+' + ((t - P0) / 1000).toFixed(3); }; } }
   /* no times from ESPN (yet / at all) but laps are known → show laps instead of an empty column */
   if (det && mode !== 'grid' && !/^live/.test(mode) && R.length && !R.some(r => timeOf(r)) && R.some(r => V(r, 'lapsCompleted') > 0)) { timeOf = () => 'TBD'; } /* finished, ESPN has only laps so far: final times follow */
-  if (f12() && pc) { R.sort((a, b) => (a.order || 99) - (b.order || 99)); const fin = det && R.length >= 3 && !/^live/.test(mode); return (fin ? f12Podium(R.slice(0, 3), timeOf, dm) : '') + f12ResHTML(fin ? R.slice(3) : R, timeOf, fl, dm, y); }
+  if (f12() && pc) { R.sort((a, b) => (a.order || 99) - (b.order || 99)); return f12ResHTML(R, timeOf, fl, dm, y); }
   if (f12()) return f12Rows(R.sort((a, b) => (a.order || 99) - (b.order || 99)), det ? timeOf : () => '', outFrom);
   return `<section class="blk"><table class="nfx sep f1t f1res ${pc ? 'f1pc' : ''}"><colgroup><col style="width:34px"><col><col style="width:${pc ? 104 : 88}px">${pc ? '<col style="width:30px">' : ''}</colgroup><thead><tr><th class="n">#</th><th class="l ph">Driver</th><th class="tl">${mode === 'grid' ? '' : mode === 'liveL' ? 'Laps' : mode === 'liveG' ? 'Gap' : mode === 'liveN' ? '' : 'Time'}</th>${pc ? '<th>Pts</th>' : ''}</tr></thead><tbody>${R.sort((a, b) => (a.order || 99) - (b.order || 99)).map(r => `<tr data-f1drv="${esc(r.id)}"${r.order >= outFrom ? ' class="f1out"' : ''}><td class="n f1rk ${pc && r.order <= 3 ? 'p' + r.order : ''}">${esc(String(r.order || ''))}</td><td class="l">${f1Drv(r.id, r.name || '', r.team).replace(/<\/div><\/div>$/, fl && fl.id === r.id ? '</div><i class="f1fast" title="Fastest lap">⚡</i></div>' : '</div></div>')}</td><td class="f1tm">${mode === 'grid' && r.q && r.order > r.q ? `<small class="f1pen">Grid penalty<br><span style="white-space:nowrap">Qualified P${r.q}</span></small>` : esc(det ? timeOf(r) : '')}</td>${pc ? `<td>${esc(det ? ptsOf(r) : '')}</td>` : ''}</tr>`).join('')}</tbody></table></section>`;
 }
@@ -5489,7 +5502,7 @@ function route() {
   if (m && LEAGUES[m[1]]) { const sy = window._ldY || null, ll = window._ldL || {}; window._ldY = null; window._ldL = null; if (!state.lv || state.lv.kind !== 'leaders' || state.lv.cat !== m[2] || (sy || null) !== (state.lv.sy || null)) state.lv = { kind: 'leaders', league: m[1], cat: m[2], sk: null, asc: false, sy, lab: ll.lab || '', title: ll.title || '' }; render(); loadLeaders(); return; }
   m = h.match(/^#\/f1\/(stats|std|race|drv|con)(?:\/(\w+))?/);
   if (m) { const k = 'f1' + m[1], y = window._f1y || null, fwd = !!F1.goTop; window._f1y = null; F1.mem = F1.mem || {}; const mem = F1.mem[location.hash];
-    if (!fwd && mem) state.lv = mem; else if (!state.lv || state.lv.kind !== k || (state.lv.cat || null) !== (m[2] || null) || fwd) state.lv = { kind: k, league: 'f1', cat: m[2] || null, y: y ? +y : null, m: window._f1m || 'drv' };
+    if (mem && (k === 'f1std' || k === 'f1stats') && !(state.lv && /^f1(drv|con|race)$/.test(state.lv.kind))) mem.m = 'drv'; /* a fresh visit always opens on Drivers; coming back from a driver / team keeps the tab */ if (!fwd && mem) state.lv = mem; else if (!state.lv || state.lv.kind !== k || (state.lv.cat || null) !== (m[2] || null) || fwd) state.lv = { kind: k, league: 'f1', cat: m[2] || null, y: y ? +y : null, m: 'drv' };
     F1.mem[location.hash] = state.lv; render(); if (F1.goTop) { F1.goTop = 0; window._forceY(0); } f1Load(state.lv); return; }
   m = h.match(/^#\/(standings|lstats)\/(\w+)/);
   if (m && LEAGUES[m[2]]) { if (!state.lv || state.lv.kind !== m[1] || state.lv.league !== m[2]) state.lv = { kind: m[1], league: m[2], mode: m[2] === 'nba' ? 'conf' : 'div', sy: m[1] === 'lstats' ? (state.lsY || {})[m[2]] || null : null, tm: m[1] === 'lstats' ? (state.lsTm || {})[m[2]] || null : null }; render(); loadLV(); return; }
