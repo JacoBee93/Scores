@@ -2396,7 +2396,7 @@ function cardHTML(e, cl2) {
     return `<div class="row ${lose ? 'lose' : ''}">${logoImg(t.logo)}<span class="nm ${state.league !== 'fav' && isFav(e.league || state.league, t.id) ? 'fv' : ''}">${esc(t.name)}${t.record ? `<span class="rec">(${esc(String(t.record).replace(/,\s*\d+\s*pts?\b/i, ''))})</span>` : ''}</span>
       <span class="sc">${e.state === 'pre' ? '' : esc(t.score)}</span><span class="arr">${e.state === 'post' && t.winner ? '◀' : ''}</span></div>`;
   };
-  const lgc = e.league || state.league, k2 = cl2 || hStyle() === 'C2';
+  const lgc = e.league || state.league, k2 = cl2 === true || hStyle() === 'C2'; /* cardHTML is also used as a .map() callback: its index must not switch the edge on */
   return `<div class="card${k2 ? ' cl2' : ''}" data-game="${e.id}" data-gl="${lgc}"${e.state === 'pre' ? ' data-pre' : ''}${k2 ? ` style="--ca:${hCol(lgc, e.away)};--ch:${hCol(lgc, e.home)}"><i class="hbar"></i>` : '>'}<div class="top"><span class="${e.state === 'in' ? 'live' : ''}">${(m => e.state === 'in' && m ? `${esc(m[2])}<em>${esc(m[1])}</em>` : esc(statusText(e)))(/^\s*(\d{1,2}:\d{2}(?:\.\d)?)\s*-\s*(.+?)\s*$/.exec(statusText(e)))}</span>${(e.league || state.league) === 'nfl' && e.state !== 'in' && state.league !== 'fav' ? `<small class="ndt">${nflDay(e)}</small>` : ''}${e.league && state.league === 'fav' ? `<span class="lgt">${e.league.toUpperCase()}</span>` : ''}</div>${row(e.away)}${row(e.home)}</div>`;
 }
 
